@@ -1,0 +1,28 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.modal { background: var(--bg-surface); border: 1px solid var(--border, #333); border-radius: 10px;
+  padding: 20px 22px; width: min(640px, 94vw); max-height: 86vh; overflow: auto; }
+.title { margin: 0 0 2px; font-size: 1.05rem; }
+.lede { margin: 0 0 14px; color: var(--text-secondary); font-size: 13px; }
+.loading, .noRisks { font-size: 13px; color: var(--text-muted); }
+.effects { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.effects li { border-left: 2px solid var(--border, #444); padding-left: 10px; }
+.detail { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.risks { border: 1px solid var(--amber, #d4a017); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+.risksTitle { margin: 0 0 2px; font-size: 0.9rem; color: var(--amber, #d4a017); }
+.risksNote { margin: 0 0 8px; font-size: 12px; color: var(--text-secondary); }
+.table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.table th { text-align: left; font-weight: 500; color: var(--text-muted); padding: 2px 6px 4px 0; }
+.table td { padding: 3px 6px 3px 0; border-top: 1px solid var(--border, #333); }
+.after { color: var(--amber, #d4a017); }
+.field { display: block; margin-bottom: 10px; }
+.label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+.input { width: 100%; background: var(--bg-input, #1b1b1b); color: var(--text-primary); font: inherit;
+  border: 1px solid var(--border, #444); border-radius: 6px; padding: 8px; }
+.note { font-size: 12px; color: var(--text-muted); margin: 0 0 12px; }
+.error { color: var(--red, #e05252); font-size: 12.5px; margin: 6px 0; }
+.actions { display: flex; gap: 10px; justify-content: flex-end; }
+.cancel, .danger { font: inherit; font-size: 13px; border-radius: 6px; padding: 7px 14px; cursor: pointer; }
+.cancel { background: none; border: 1px solid var(--border, #444); color: var(--text-secondary); }
+.danger { background: var(--red, #a12d2d); border: 1px solid var(--red, #c04040); color: #fff; }
+.danger:disabled, .cancel:disabled { opacity: 0.5; cursor: not-allowed; }

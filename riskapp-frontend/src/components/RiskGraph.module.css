@@ -1,0 +1,96 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.wrapper {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border, #1e293b);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 460px;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.errorMsg {
+  color: var(--red, #ef4444);
+}
+
+.emptyMsg {
+  color: var(--text-muted, #64748b);
+}
+
+.fitBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border, #334155);
+  color: var(--text-secondary, #94a3b8);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.fitBtn:hover {
+  background: var(--bg-hover, #334155);
+  color: var(--text-primary, #f1f5f9);
+}
+
+.legend {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  background: rgba(12, 17, 23, 0.85);
+  border: 1px solid var(--border, #1e293b);
+  border-radius: 6px;
+  padding: 8px 10px;
+  max-width: 360px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  color: var(--text-secondary, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+

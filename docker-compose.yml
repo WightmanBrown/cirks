@@ -1,0 +1,105 @@
+# CIRKS — production-style stack: one app container + PostgreSQL 17.
+#
+#   cp .env.docker.example .env      # fill in secrets + DB password
+#   docker compose up -d --build
+#   docker compose logs -f app
+#
+# The app entrypoint waits for the DB, takes a pre-migrate backup when needed,
+# runs migrations, then serves the SPA + API on http://localhost:${APP_PORT}.
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-cirks}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      POSTGRES_DB: ${DB_NAME:-cirks}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-cirks} -d ${DB_NAME:-cirks}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - backend
+    # Not published by default — only the app needs it. Uncomment to inspect.
+    # ports:
+    #   - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cirks:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgresql://${DB_USER:-cirks}:${DB_PASSWORD}@db:5432/${DB_NAME:-cirks}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set JWT_ACCESS_SECRET in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_DAYS: ${JWT_REFRESH_EXPIRES_DAYS:-30}
+      TOTP_ISSUER: ${TOTP_ISSUER:-CIRKS}
+      # Auth brute-force throttle (H-03)
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-20}
+      AUTH_RATE_LIMIT_WINDOW_MIN: ${AUTH_RATE_LIMIT_WINDOW_MIN:-15}
+      # Opt-in least-privilege DB role (H-01): set APP_DB_PASSWORD to enable.
+      # Migrate/seed run as the owner above; the app then connects restricted.
+      APP_DB_USER: ${APP_DB_USER:-cirks_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:-}
+      # The source link on the login screen. Defaults to upstream; set it to
+      # YOUR repository if you run a modified CIRKS.
+      CIRKS_SOURCE_URL: ${CIRKS_SOURCE_URL:-}
+    volumes:
+      - uploads:/app/riskapp/uploads/meetings
+      - backups:/app/backups
+      # Files to load with db/import.js (docs/INSTALL.md). Read-only: the app
+      # reads what you put in ./import on the host and can never write to it.
+      # Copying files INTO the container does not work — its root is read-only.
+      - ./import:/import:ro
+    # ── Container hardening (H-20) ───────────────────────────────────────────
+    # The app writes ONLY to the two volumes above, so a read-only root costs
+    # nothing and removes most of the room to turn a bug into persistence.
+    # /tmp is a tmpfs because node and gzip (the pre-migrate pg_dump) want one.
+    # The image already runs as USER node, so nothing drops privileges at
+    # runtime and dropping every capability is safe.
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # ── Egress (H-19) ────────────────────────────────────────────────────────
+    # The backend makes NO outbound HTTP requests — established by the OWASP
+    # review of 2026-08-17, which is why A10 came back clean. `backend` is an
+    # internal network, so the app can reach the database and nothing else:
+    # no tooling downloads, no command-and-control, no quiet exfiltration.
+    # It does NOT stop an attacker answering their own inbound request with
+    # data; it removes the quiet options and leaves the loud one.
+    networks:
+      - backend
+    ports:
+      - "${APP_PORT:-8080}:3000"
+
+networks:
+  # internal: no gateway to the outside world. NOTE: current Docker (28+) also
+  # does not publish ports for a container that is only on an internal network,
+  # so APP_PORT above is NOT reachable from the host on its own. Reach CIRKS
+  # through the bundled Caddy (deploy/docker-compose.tls.yml), which sits on
+  # both this network and an ordinary one — docs/INSTALL.md does this from the
+  # start. (Found 2026-10-15 on Docker 29; earlier Docker published the port.)
+  backend:
+    internal: true
+
+volumes:
+  pgdata:
+  uploads:
+  backups:

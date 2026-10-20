@@ -1,0 +1,381 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1100px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.pageDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.warning {
+  color: var(--amber);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btnPrimary { composes: btnPrimary from '../components/buttons.module.css'; }
+
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+
+/* ── Filters ─────────────────────────────────────────────────────────────── */
+
+.filters {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.viewModeSlot {
+  margin-left: auto;
+}
+
+.filterBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterBtn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.filterActive {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+  background: var(--amber-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 13px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.row:hover { background: var(--bg-elevated); }
+
+.rowSelected td {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-bottom-color: transparent !important;
+}
+
+.summaryRow td {
+  background: var(--bg-inset);
+  padding: 14px 16px !important;
+  border-top: none !important;
+}
+
+.summaryCell {
+  padding: 14px 16px !important;
+}
+
+.serviceName {
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.chevron {
+  color: var(--text-muted);
+  text-align: right;
+  font-size: 1rem;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+
+.sharedBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.adoptedBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--green-dim);
+  border: 1px solid rgba(76, 175, 125, 0.25);
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.tableSet {
+  color: var(--text-secondary);
+}
+
+.tableUnset {
+  color: var(--text-muted);
+  font-style: italic;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ── BIL pills ───────────────────────────────────────────────────────────── */
+
+.bil {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
+
+.bilUnset { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+.bil1 { background: var(--green-dim);  border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.bil2 { background: var(--amber-faint); border: 1px solid rgba(245,166,35,0.2); color: var(--amber); }
+.bil3 { background: rgba(245,140,35,0.1); border: 1px solid rgba(245,140,35,0.25); color: #f59e0b; }
+.bil4 { background: var(--red-dim); border: 1px solid rgba(232,93,74,0.2); color: var(--red); }
+.bil5 { background: rgba(180,20,20,0.25); border: 1px solid rgba(232,93,74,0.4); color: #fca5a5; }
+
+/* ── Empty / loading / error ─────────────────────────────────────────────── */
+
+.loading {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 2rem 0;
+}
+
+.error {
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--red);
+  font-size: 13px;
+  padding: 12px 16px;
+}
+
+.empty { composes: emptyState from '../components/form.module.css'; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 64px 24px; }
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal { composes: modal from '../components/modal.module.css'; padding: 24px; width: 480px; max-width: 95vw; }
+.modal h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.modal input:not([type="checkbox"]),
+.modal textarea {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 8px 10px;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+.modal input:not([type="checkbox"]):focus,
+.modal textarea:focus {
+  outline: none;
+  border-color: var(--amber-dim);
+}
+
+.modal textarea { resize: vertical; }
+
+.checkboxLabel {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 13px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: var(--text-secondary) !important;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Responsive optional columns (owner dept/manager) */
+.colOptional { font-size: 12px; color: var(--text-secondary); }
+@media (max-width: 900px) { .colOptional { display: none; } }
+
+/* Risk level pill */
+.riskPill     { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: var(--radius-sm); white-space: nowrap; }
+.riskCritical { background: rgba(180,30,30,0.15);  border: 1px solid rgba(180,30,30,0.3);  color: #e05252; }
+.riskHigh     { background: var(--red-dim);         border: 1px solid rgba(232,93,74,0.25); color: var(--red); }
+.riskMedium   { background: var(--amber-faint);     border: 1px solid rgba(245,166,35,0.25); color: var(--amber); }
+.riskLow      { background: var(--green-dim);       border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.riskNone     { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
+
+/* ---- Bulk delete --------------------------------------------------------- */
+/* Pruning a register means deleting many at once, so the selection gets one
+   review point rather than one confirmation per row — nobody reads the fifth. */
+
+.selectCell { width: 2.2rem; text-align: center; }
+.selectNa   { color: var(--text-muted); cursor: help; }
+
+.selectionBar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-elevated, transparent);
+  font-size: 0.9rem;
+}
+
+.btnDangerSm {
+  padding: 0.25rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid var(--danger, #b3261e);
+  background: transparent;
+  color: var(--danger, #b3261e);
+}
+.btnDangerSm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btnPlain {
+  padding: 0.25rem 0.5rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
+.deleteError {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--danger, #b3261e);
+  border-radius: 6px;
+  color: var(--danger, #b3261e);
+  font-size: 0.88rem;
+}

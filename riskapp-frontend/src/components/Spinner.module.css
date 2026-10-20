@@ -1,0 +1,45 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* Two tones preserved from the pre-consolidation per-page spinners. */
+
+.amber {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.amber span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 1.2s infinite;
+}
+.amber span:nth-child(2) { animation-delay: 0.2s; }
+.amber span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40%           { opacity: 1;   transform: scale(1); }
+}
+
+.muted {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.muted span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted, #64748b);
+  animation: bounce 1.2s ease-in-out infinite;
+}
+.muted span:nth-child(2) { animation-delay: 0.2s; }
+.muted span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1);   opacity: 1; }
+}

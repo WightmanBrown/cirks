@@ -1,0 +1,177 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.section {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  background: var(--bg-surface);
+}
+
+.sectionTitle {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.optional {
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.hint {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.hintSmall {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.input { composes: input from '../components/form.module.css'; max-width: 400px; }
+.select { composes: select from '../components/form.module.css'; max-width: 400px; }
+
+/* Attendee list */
+.attendeeList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.attendeeItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.attendeeLabel {
+  flex: 1;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.attendeeEmail {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.attendeeRoleBadge {
+  padding: 1px 7px;
+  background: rgba(100,181,246,0.12);
+  color: var(--accent, #64b5f6);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.btnRemove { composes: btnGhost from '../components/buttons.module.css'; }
+/* Add attendee row */
+.addAttendeeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.addModeToggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.modeBtn,
+.modeActive {
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.modeActive {
+  background: var(--accent, #64b5f6);
+  color: #000;
+  font-weight: 600;
+}
+
+.selectRole {
+  padding: 8px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  width: 130px;
+}
+
+.btnAdd { composes: btnAccent from '../components/buttons.module.css'; }
+/* Form actions */
+.error {
+  color: var(--red);
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btnCancel { composes: btnSecondary from '../components/buttons.module.css'; }
+.btnSave { composes: btnPrimary from '../components/buttons.module.css'; }

@@ -1,0 +1,3 @@
+source_name,source_type,relationship_type,target_name,target_type
+Supply chain management,process,documented_by,Supply Chain Security Policy,information
+Supply chain management,process,operated_by,Procurement Team,people

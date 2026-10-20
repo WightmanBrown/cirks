@@ -1,0 +1,32 @@
+email,full_name,primary_role,department_name,is_active,totp_enabled,last_login_at
+A.Lovelace@mig.local,Ada Lovelace,information_asset_owner,DEFA,true,false,
+A.Kay@mig.local,Alan Kay,information_asset_owner,Misty Isles Cabinet Office,true,false,
+A.Turing@mig.local,Alan Turing,information_asset_owner,Maritime Department,true,false,
+A.James@mig.local,Alfredo James,admin,Department of Communications,true,false,2026-07-24T12:24:09.553Z
+B.Liskov@mig.local,Barbara Liskov,information_asset_manager,MIG Department of Justice,true,false,
+B.Kirk@mig.local,Bob Kirk,information_asset_owner,MIG Department of Justice,true,false,2026-09-16T16:45:24.303Z
+C.Giles@mig.local,Carla Giles,information_asset_owner,Department of Roads and Airports,true,false,
+C.Babbage@mig.local,Charles Babbage,information_asset_manager,MIG Treasury,true,false,
+C.Shannon@mig.local,Claude Shannon,information_asset_owner,Department of Information Security,true,false,
+e.lectric@miu.local,Edwina Lectric,information_asset_owner,Misty Islands Utilities,true,false,2026-09-14T15:32:39.722Z
+F.Nightingale@mig.local,Florence Nightingale,information_asset_manager,Misty Isles Department of Health,true,false,
+G.Welchman@mig.local,Gordon Welchman,information_asset_owner,Department of Communications,true,false,
+g.hopper@mig.local,Grace Hopper,information_asset_owner,Misty Isles Department of Health,true,false,
+H.Lamarr@mig.local,Hedy Lamarr,information_asset_manager,Disaster and Emergency Management,true,false,
+siro@mig.local,Helen Wright,siro,Misty Isles Cabinet Office,true,false,2026-09-28T13:23:08.045Z
+J.Finx@mig.local,Jack Finx,information_asset_owner,Department of Education,true,false,
+J.Bartik@mig.local,Jean Bartik,information_asset_manager,Misty Isles Cabinet Office,true,false,
+K.Johnson@mig.local,Katherine Johnson,information_asset_manager,Department of Roads and Airports,true,false,
+K.Hummer@mig.local,Katie Sommer,security_consultant,Department of Information Security,true,false,
+ciso@mig.local,Lewis Fisher,ciso,Department of Information Security,true,false,2026-09-28T11:07:51.303Z
+M.Hamilton@mig.local,Margret Hamilton,information_asset_owner,Disaster and Emergency Management,true,false,
+M.Karloff@mig.local,Mia Karloff,information_asset_owner,MIG Treasury,true,false,
+M.Faraday@miu.local,Michael Faraday,information_asset_manager,Misty Islands Utilities,true,false,2026-09-14T09:30:44.023Z
+swg.secretary@mig.local,Morag Sinclair,meeting_secretary,Department of Information Security,true,false,2026-09-20T10:29:18.978Z
+n.Dull@mig.local,Nev Dull,soc_analyst,Department of Information Security,true,false,
+R.Perlman@mig.local,Radia Perlman,information_asset_manager,Department of Information Security,true,false,2026-08-11T17:15:09.151Z
+R.Franklin@mig.local,Rosalind Franklin,information_asset_manager,DEFA,true,false,
+S.Papert@mig.local,Seymour Papert,information_asset_manager,Department of Education,true,false,2026-09-15T08:55:42.926Z
+S.Topping@mig.local,Stevie Topping,risk_analyst,Department of Information Security,true,false,2026-09-29T08:10:39.696Z
+V.Cerf@mig.local,Vint Cerf,information_asset_manager,Department of Communications,true,false,2026-09-08T14:12:23.100Z
+W.Thomson@mig.local,William Thomson,information_asset_manager,Maritime Department,true,false,

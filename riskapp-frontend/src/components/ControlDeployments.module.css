@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.panel { margin-top: 10px; }
+.summary { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 8px; }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.row { border-left: 2px solid var(--border, #3a3a3a); padding-left: 10px; }
+.head { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.system { color: var(--text-primary); font-weight: 500; text-decoration: none; font-size: 13.5px; }
+.system:hover { color: var(--accent, #64b5f6); text-decoration: underline; }
+.dept { font-size: 11.5px; color: var(--text-muted); }
+.status { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.operational { color: var(--green, #4caf50); }
+.degraded { color: var(--amber, #d4a017); }
+.missing { color: var(--red, #e05252); }
+.via { font-size: 11px; border: 1px solid var(--accent, #64b5f6); color: var(--accent, #64b5f6);
+  border-radius: 10px; padding: 0 7px; }
+.why, .whyBaseline { font-size: 12.5px; color: var(--text-secondary); margin: 2px 0 0; line-height: 1.45; }
+.whyBaseline { color: var(--text-muted); }
+.detail { color: var(--text-muted); }
+.delivery { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 0; }
+.warn { color: var(--amber); }

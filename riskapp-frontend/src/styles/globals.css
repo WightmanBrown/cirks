@@ -1,0 +1,153 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Design Tokens ──────────────────────────────────────────────────────────── */
+:root {
+  /* Palette — dark slate + amber */
+  --bg-base:        #0d0f13;
+  --bg-surface:     #13161d;
+  --bg-elevated:    #1a1e28;
+  --bg-overlay:     rgba(13, 15, 19, 0.85);
+  --bg-inset:       #0f1218;            /* recessed wells / input backgrounds */
+  --bg-hover:       rgba(255,255,255,0.04); /* subtle row/button hover */
+
+  --border:         #252a38;
+  --border-accent:  #2e3547;
+
+  --amber:          #f5a623;
+  --amber-dim:      #c47e0c;
+  --amber-glow:     rgba(245, 166, 35, 0.12);
+  --amber-faint:    rgba(245, 166, 35, 0.06);
+
+  --red:            #e85d4a;
+  --red-dim:        rgba(232, 93, 74, 0.15);
+  --green:          #4caf7d;
+  --green-dim:      rgba(76, 175, 125, 0.12);
+  --blue:           #5b8dee;
+  --violet:         #a58bf0;             /* system architecture patterns (PatternChip) */
+  /* Secondary accent — blue, distinct from the amber brand accent. Used for
+     focus rings, interactive highlights, selected states. */
+  --accent:         var(--blue);
+  --accent-hover:   #4778d6;             /* darker blue for accent :hover */
+  --accent-faint:   rgba(91, 141, 238, 0.12);
+
+  --text-primary:   #e8ecf4;
+  --text-secondary: #8b93a8;
+  --text-muted:     #4e5668;
+  --text-amber:     #f5a623;
+
+  /* Typography */
+  --font-display:  'Syne', sans-serif;
+  --font-body:     'IBM Plex Sans', sans-serif;
+  --font-mono:     'IBM Plex Mono', monospace;
+
+  /* Type scale — use these instead of raw px in new/edited rules.
+     Existing per-page px values migrate incrementally. */
+  --text-xs:    10px;   /* badges, chips, super-labels */
+  --text-sm:    11px;   /* secondary mono labels, metadata */
+  --text-hint:  12px;   /* hints, helper text, captions */
+  --text-body:  13px;   /* primary body text, inputs, table cells */
+  --text-base:  14px;   /* global body default (matches body font-size) */
+  --text-lg:    16px;   /* card/section headings */
+  --text-xl:    18px;   /* page sub-headings */
+  --text-2xl:   22px;   /* page headings */
+  --text-3xl:   24px;   /* display headings */
+
+  /* Spacing scale — use these instead of raw px in new/edited rules.
+     Existing per-page px values migrate incrementally. */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Border radii */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-modal: 0 8px 48px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Always reserve the scrollbar gutter so a vertical scrollbar appearing or
+   disappearing (e.g. as auto-fit dashboard widgets settle their heights) never
+   changes the content width. Without this, the width change reflows the widgets,
+   which can re-toggle the scrollbar — a measure→layout→measure flicker loop. */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Disabled field style (universal read-only treatment) ───────────────────── */
+input:disabled:not([type="checkbox"]):not([type="radio"]),
+select:disabled,
+textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────────── */
+.mono { font-family: var(--font-mono); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ── Accessibility: motion ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Accessibility: high contrast ───────────────────────────────────────────── */
+@media (prefers-contrast: more) {
+  :root {
+    --border:        #4e5668;
+    --border-accent: #6b7590;
+    --text-muted:    #8b93a8;
+    --text-secondary:#c4cad8;
+  }
+}

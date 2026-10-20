@@ -1,0 +1,2 @@
+# Place your TLS cert.pem + key.pem here for bring-your-own-cert mode.
+# Real certs/keys are git-ignored (see ../../.gitignore).

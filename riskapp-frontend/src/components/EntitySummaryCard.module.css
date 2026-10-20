@@ -1,0 +1,565 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.metaChip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  color: var(--text-secondary);
+}
+
+.metaLine {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--amber);
+}
+
+.gapDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.bodyRow {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.bodyLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 84px;
+}
+
+.bodyValue {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.servicesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.serviceTag {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  padding: 3px 8px;
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.openBtn {
+  background: var(--amber);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 7px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.openBtn:hover { opacity: 0.85; }
+
+.inactiveBadge {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  color: var(--text-muted);
+}
+
+/* Risk-level pill — used on the right (top) of summary cards for entities
+   that carry a risk rating (e.g. systems). Combine with the riskColors
+   palette classes (.critical/.high/.medium/.low) for colour. */
+.riskPill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.riskPillNone {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.warnBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 167, 38, 0.08);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-size: 12px;
+}
+
+/* CIA contribution table — used by SystemSummaryCard to show the system's
+   own CIA values alongside each linked information asset's CIA values, so
+   the user can see at a glance how each asset contributes to system impact.
+   The first row is the system itself; subsequent rows are assets. All rows
+   share the same grid template so the C/I/A columns align vertically. */
+.ciaTable {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.ciaTableHeader,
+.ciaTableRow {
+  display: grid;
+  grid-template-columns: 1fr 48px 48px 48px;
+  column-gap: 14px;
+  align-items: center;
+}
+
+/* Business view collapses C/I/A to a single max-impact word. */
+.ciaMaxLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.ciaMaxLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ciaTableHeader {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ciaColLabel {
+  text-align: center;
+}
+
+.ciaTableRow {
+  padding: 6px 0;
+  border-radius: var(--radius-sm);
+}
+
+.ciaTableRowSystem {
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  padding: 8px 8px;
+  border: 1px solid var(--border);
+  margin: 0 -8px;
+}
+
+.ciaRowName {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ciaRowNameMuted {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.ciaCellChip {
+  display: flex;
+  justify-content: center;
+}
+
+.ciaEmpty {
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 6px 0;
+}
+
+/* Risk path strip — compact chain showing the chain that produced the
+   service/asset's max_risk_level: [Asset] → [System] → [Threat] [pill].
+   Used above the CIA contribution table on entity summary cards. */
+.riskPathSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.riskPathHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.riskPathLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.riskPathMore {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.riskPathStrip {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.riskPathNode {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  max-width: 200px;
+  padding: 6px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.riskPathNodeName {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.riskPathNodeKind {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.riskPathArrow {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  user-select: none;
+}
+
+.riskPathPill {
+  display: inline-flex;
+  align-items: center;
+}
+
+.riskPathEmpty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* Risk path tree — used on entity detail pages. Tabular tree grouped by
+   asset (left) → system (middle) → threat + risk pill (right). Asset cell
+   spans all of its system rows. Compact but shows every contributing path. */
+.riskTree {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) minmax(180px, 1.5fr) auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.riskTreeHeader {
+  display: contents;
+}
+
+.riskTreeHeader > span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.riskTreeAsset,
+.riskTreeSystem,
+.riskTreeThreat,
+.riskTreePill {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.riskTreeAsset {
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.riskTreeSystem {
+  border-right: 1px solid var(--border);
+}
+
+.riskTreeThreat {
+  border-right: 1px solid var(--border);
+}
+
+.riskTreePill {
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.riskTreeName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.riskTreeKind {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.riskTreeSectionTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: var(--text-primary);
+}
+
+.riskTreeCellLink {
+  cursor: pointer;
+}
+.riskTreeCellLink:hover {
+  background: var(--bg-hover, rgba(255,255,255,0.04));
+}
+
+/* Highest-risk line */
+.topRiskRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.topRiskLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.topRiskThreat {
+  font-size: 13px;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Folded risk list (RiskPathTree groupBy="system" collapsed) ---------- */
+
+.riskFoldList { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.riskFoldGroup {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* The whole header is the control, so the hit area matches what it looks like. */
+.riskFoldHeader {
+  width: 100%;
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  background: none; border: 0; cursor: pointer;
+  font: inherit; color: inherit; text-align: left;
+}
+.riskFoldHeader:hover { background: var(--surface-2, rgba(127, 127, 127, 0.08)); }
+.riskFoldHeader:focus-visible { outline: 2px solid var(--accent, #3f7ea6); outline-offset: -2px; }
+
+.riskFoldChevron,
+.riskFoldChevronOpen {
+  flex: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: transform 120ms ease;
+}
+.riskFoldChevronOpen { transform: rotate(90deg); }
+
+.riskFoldName  { flex: 1 1 auto; font-weight: 500; }
+.riskFoldCount { flex: none; font-size: 0.78rem; color: var(--text-muted); }
+
+.riskFoldBody {
+  display: flex; flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.riskFoldRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+  padding: 0.4rem 0.7rem 0.4rem 2rem;
+  font-size: 0.88rem;
+}
+.riskFoldRow + .riskFoldRow { border-top: 1px solid var(--border-subtle, var(--border)); }
+.riskFoldThreat { flex: 1 1 auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .riskFoldChevron, .riskFoldChevronOpen { transition: none; }
+}
+
+/* Links inside a card body read as the text they name, not browser blue. */
+.bodyValue a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dotted var(--border); }
+.bodyValue a:hover { color: var(--accent, #64b5f6); border-bottom-color: currentColor; }

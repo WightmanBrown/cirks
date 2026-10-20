@@ -1,0 +1,24 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.form { display: flex; flex-direction: column; gap: 12px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 14px; }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); }
+.field select, .field input {
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 6px 10px; font-size: 13px;
+}
+.wide { grid-column: 1 / -1; }
+.hint { margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
+.error { background: rgba(229,83,75,0.12); border: 1px solid rgba(229,83,75,0.4); color: var(--red, #e5534b); border-radius: 6px; padding: 8px 12px; font-size: 13px; }
+.buttons { display: flex; gap: 8px; }
+.primary { background: var(--accent, #64b5f6); color: #0b1220; border: none; border-radius: 5px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.secondary { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); border-radius: 5px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+.checks { display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; margin-top: 6px; padding: 8px; border: 1px solid var(--border); border-radius: 5px; }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--text-primary); line-height: 1.4; }
+.check b { font-family: var(--font-mono, monospace); font-weight: 500; color: var(--accent, #64b5f6); font-size: 11.5px; }
+.check em { color: var(--amber, #d29922); font-style: normal; }
+.linkish { background: none; border: none; padding: 0; color: var(--accent, #64b5f6); cursor: pointer; font-size: 12px; }
+.step { margin: 4px 0 0; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.group { display: flex; flex-direction: column; gap: 4px; }
+.groupHead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); }

@@ -1,0 +1,116 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 28px;
+}
+
+.editControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editHint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.editBtn,
+.ghostBtn,
+.primaryBtn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-secondary);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.editBtn:hover,
+.ghostBtn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+}
+
+.primaryBtn {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.primaryBtn:disabled,
+.ghostBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Grid items ──────────────────────────────────────────────────────────── */
+
+.item {
+  box-sizing: border-box;
+}
+
+/* The measuring wrapper must report the widget's natural height, so it must
+   not be height-constrained by the grid cell. The min-height prevents widgets
+   collapsing to near-zero during async data load (2px loading bars, bare
+   "Loading…" text), which would cause a large ResizeObserver delta and a
+   visible jump when content arrives. 120px is the approximate smallest
+   natural height of any populated widget. */
+.measure {
+  height: auto;
+  min-height: 120px;
+}
+
+/* The grid container fades in once the first synchronous height-pass
+   completes, so the initial paint is always at the correct heights. */
+.grid {
+  transition: opacity 120ms ease;
+}
+
+/* Override RGL's default transition to position-only. RGL ships with
+   transition-property: transform, width, height on .cssTransforms items,
+   which means every data-load height change animates — causing all widgets
+   below the resized one to slide up/down visibly. We only need the transform
+   animation (smooth drag repositioning); width/height must change instantly. */
+:global(.react-grid-item.cssTransforms) {
+  transition-property: transform !important;
+}
+
+/* Edit-mode affordances on each item */
+.editing :global(.react-grid-item) {
+  cursor: move;
+  outline: 1px dashed var(--border-accent);
+  outline-offset: -1px;
+  border-radius: var(--radius-md);
+}
+
+.editing :global(.react-grid-item):hover {
+  outline-color: var(--amber);
+}
+
+/* Drop-target placeholder shown while dragging */
+:global(.react-grid-item.react-grid-placeholder) {
+  background: var(--amber);
+  opacity: 0.18;
+  border-radius: var(--radius-md);
+}

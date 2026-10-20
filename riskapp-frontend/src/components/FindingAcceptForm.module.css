@@ -1,0 +1,9 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; max-width: 560px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-secondary); }
+.field textarea, .field input, .field select { font-size: 13px; }
+.buttons { display: flex; gap: 8px; justify-content: flex-end; }
+.btnSave { composes: btnPrimary btnSm from './buttons.module.css'; }
+.btnCancel { composes: btnGhost btnSm from './buttons.module.css'; }
+.err { color: var(--red); font-size: 13px; }

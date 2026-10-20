@@ -1,0 +1,67 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.ciaGroup {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-items: flex-end;
+}
+
+.ciaCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ciaLetter {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.ciaUnrated {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 29px;
+  text-align: center;
+  display: inline-block;
+}
+
+/* Large variant — used on summary cards (list page expanded row, detail page header).
+   Roughly doubles the visual weight of the chip group so CIA acts as a
+   visual anchor for the entity. The colour values still come from
+   riskColors.module.css; only sizing is overridden here via :global. */
+.lg {
+  gap: 14px;
+}
+
+.lg .ciaLetter {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.lg .ciaCell {
+  gap: 6px;
+}
+
+.lg .ciaCell :global(.chip) {
+  font-size: 22px;
+  padding: 6px 14px;
+  min-width: 48px;
+  border-radius: 4px;
+}
+
+.lg .ciaUnrated {
+  font-size: 22px;
+  min-width: 48px;
+  padding: 6px 14px;
+}

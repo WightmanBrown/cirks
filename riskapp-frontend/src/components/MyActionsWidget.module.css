@@ -1,0 +1,311 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.widget {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.15s;
+}
+.widget:hover { border-color: var(--border-accent); }
+.widget.alertRed   { border-color: rgba(229,57,53,0.6); }
+.widget.alertAmber { border-color: rgba(255,167,38,0.5); }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.badgeRed {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ef9a9a;
+  border: 1px solid rgba(229,57,53,0.4);
+  background: rgba(229,57,53,0.1);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.badgeAmber {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffcc80;
+  border: 1px solid rgba(255,167,38,0.4);
+  background: rgba(255,167,38,0.08);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.badgeClear {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--green, #4caf50);
+  border: 1px solid rgba(76,175,80,0.3);
+  background: rgba(76,175,80,0.07);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.loadingBar {
+  height: 2px;
+  background: var(--amber, #ffa726);
+  border-radius: 1px;
+  opacity: 0.5;
+}
+
+.emptyMsg {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.item:hover { background: var(--bg-hover, rgba(255,255,255,0.04)); }
+
+.itemUrgent  { background: rgba(229,57,53,0.07); }
+.itemWarning { background: rgba(255,167,38,0.06); }
+.itemClear   { background: transparent; }
+
+.itemUrgent:hover  { background: rgba(229,57,53,0.13); }
+.itemWarning:hover { background: rgba(255,167,38,0.11); }
+
+.itemIcon {
+  font-size: 12px;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.itemUrgent  .itemIcon { color: #ef9a9a; }
+.itemWarning .itemIcon { color: #ffcc80; }
+.itemClear   .itemIcon { color: var(--green, #4caf50); }
+
+.itemLabel {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.itemUrgent  .itemLabel { color: var(--text-primary); }
+.itemWarning .itemLabel { color: var(--text-primary); }
+
+.itemCount {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.countUrgent  { color: #ef9a9a; }
+.countWarning { color: #ffcc80; }
+.countClear   { color: var(--green, #4caf50); }
+
+/* ── In-flight actions panel ───────────────────────────────────────────── */
+.inFlightPanel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.inFlightPanel.inFlightAlert { border-color: rgba(255,167,38,0.45); }
+
+.inFlightToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-hover);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+}
+.inFlightToggle:hover { background: var(--bg-hover, rgba(255,255,255,0.06)); }
+
+.inFlightIcon {
+  font-size: 10px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.inFlightLabel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.inFlightLabel > :first-child {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inFlightMeta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.inFlightNeedsUpdate { color: #ffcc80; }
+
+.inFlightBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffcc80;
+  border: 1px solid rgba(255,167,38,0.4);
+  background: rgba(255,167,38,0.1);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.inFlightList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.meetingNote {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+  padding: 7px 10px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+  font-style: italic;
+}
+
+.inFlightAction {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.inFlightAction:last-child { border-bottom: none; }
+.inFlightAction.inFlightActionStale { background: rgba(255,167,38,0.04); }
+
+.inFlightActionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inFlightActionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inFlightActionTitleLink {
+  cursor: pointer;
+}
+.inFlightActionTitleLink:hover {
+  color: var(--amber);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.inFlightActionMeta {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.progressReadRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.progressNotes {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.progressEmpty {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-muted, rgba(255,255,255,0.3));
+  margin: 0;
+  font-style: italic;
+}
+
+.btnLogProgress { composes: btnSecondary btnSm from './buttons.module.css'; flex-shrink: 0; }
+.btnLogProgress.btnLogProgressAlert {
+  border-color: rgba(255,167,38,0.5);
+  color: #ffcc80;
+}
+.btnLogProgress.btnLogProgressAlert:hover { background: rgba(255,167,38,0.1); }
+
+.progressEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progressTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  color: var(--text-primary);
+}
+
+.progressEditButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.btnSave { composes: btnPrimary from './buttons.module.css'; }
+.btnCancel { composes: btnSecondary from './buttons.module.css'; }

@@ -1,0 +1,332 @@
+system_name,component_name,component_type,role,status
+Aircraft fuelling,AirOperations Fuelling Team,people,,operational
+Aircraft fuelling,IT Administrators,people,,operational
+Aircraft fuelling,Shell Aviation FCS,technology,,operational
+Aircraft fuelling,Dr Max Windshear Airport Fuel Bunker,facility,,operational
+Approach radar,AirOperations Engineering,people,,operational
+Approach radar,ATC team,people,,operational
+Approach radar,InfoSec Team,people,,operational
+Approach radar,IT Administrators,people,,operational
+Approach radar,Detective Monitoring,process,,operational
+Approach radar,End point monitoring (EPP),process,,operational
+Approach radar,Incident management,process,,operational
+Approach radar,Incident response playbooks,process,,operational
+Approach radar,Network traffic monitoring for unencrypted traffic,process,,operational
+Approach radar,Physical security,process,,operational
+Approach radar,Resilience and recovery,process,,operational
+Approach radar,System configuration,process,,operational
+Approach radar,Vulnerability management,process,,operational
+Approach radar,Advanced Threat Prevention Network Intrusion Detection platform,technology,,operational
+Approach radar,Crowdstrike Falcon Agent,technology,,operational
+Approach radar,Crowdstrike SaaS,technology,,operational
+Approach radar,ExtremeCloud IQ Site Engine,technology,,unknown
+Approach radar,PaloAlto 850-22,technology,,unknown
+Approach radar,Palo Alto ATP,technology,,unknown
+Approach radar,PaloAlto ATP,technology,,operational
+Approach radar,Thales STAR NG,technology,,operational
+Approach radar,Wazuh,technology,,operational
+Approach radar,Dr Max Windshear Airport ATC tower,facility,,operational
+Approach radar,Shark Point Server Room,facility,,operational
+Approach radar,The Castle server room,facility,,operational
+Billing and meter reading,MIG Utilities billing team,people,,operational
+Billing and meter reading,Super Billing,people,,operational
+Billing and meter reading,Water and electrical usage reporting and billing,process,,operational
+Billing and meter reading,Super Bill SaaS cloud,facility,,operational
+Case Management System,AG Chambers,people,,operational
+Case Management System,IT Administrators,people,,operational
+Case Management System,Crowdstrike Falcon Agent,technology,,operational
+Case Management System,ITsafaircop,technology,,operational
+Case Management System,ME End-Point Central,technology,,degraded
+Case Management System,Veeam Backup,technology,,operational
+Case Management System,Windows Server 2025,technology,,operational
+Case Management System,The Castle server room,facility,,degraded
+Costal Radar and Ship Tracking,Coast Guard,people,,operational
+Costal Radar and Ship Tracking,IT Administrators,people,,operational
+Costal Radar and Ship Tracking,Automatic Identification System (AIS),technology,,operational
+Costal Radar and Ship Tracking,Crowdstrike Falcon Agent,technology,,operational
+Costal Radar and Ship Tracking,SCANTER,technology,,operational
+Costal Radar and Ship Tracking,Veeam Backup,technology,,operational
+Costal Radar and Ship Tracking,Windows Server 2025,technology,,operational
+Costal Radar and Ship Tracking,Bank Street server room,facility,,operational
+Court Management System,Clerk of Court,people,,operational
+Court Management System,Expert People Group,people,,operational
+Court Management System,IT Administrators,people,,operational
+Court Management System,Bantorights,technology,,operational
+Court Management System,Crowdstrike Falcon Agent,technology,,operational
+Court Management System,ME End-Point Central,technology,,degraded
+Court Management System,Veeam Backup,technology,,operational
+Court Management System,Windows Server 2025,technology,,operational
+Court Management System,Bank Street server room,facility,,operational
+Criminal Records and Firearms Licensing System,HR Team,people,,operational
+Criminal Records and Firearms Licensing System,InfoSec Team,people,,operational
+Criminal Records and Firearms Licensing System,Data protection and handling,process,,operational
+Criminal Records and Firearms Licensing System,Physical security,process,,operational
+Criminal Records and Firearms Licensing System,Crowdstrike Falcon Agent,technology,,operational
+Criminal Records and Firearms Licensing System,Crowdstrike SaaS,technology,,operational
+Criminal Records and Firearms Licensing System,Microsoft Active Directory Domain Services,technology,,operational
+Criminal Records and Firearms Licensing System,OSSEC agent,technology,,operational
+Criminal Records and Firearms Licensing System,PaloAlto GlobalProtect VPN,technology,,operational
+Criminal Records and Firearms Licensing System,Wazuh,technology,,operational
+Criminal Records and Firearms Licensing System,Bank Street server room,facility,,operational
+Criminal Records and Firearms Licensing System,MIG Official Premises,facility,,operational
+Criminal Records and Firearms Licensing System,Shark Point Server Room,facility,,operational
+Criminal Records and Firearms Licensing System,The Castle server room,facility,,operational
+Emergency Communications System,Ambulance Service,people,,operational
+Emergency Communications System,Coast Guard,people,,operational
+Emergency Communications System,Fire and Rescue,people,,operational
+Emergency Communications System,IT Administrators,people,,operational
+Emergency Communications System,Police Force,people,,operational
+Emergency Communications System,AlmaLinux 9,technology,,operational
+Emergency Communications System,Crowdstrike Falcon Agent,technology,,operational
+Emergency Communications System,ME End-Point Central,technology,,degraded
+Emergency Communications System,Plotnet Secure Radio,technology,,operational
+Emergency Communications System,Veeam Backup,technology,,operational
+Emergency Communications System,Bank Street server room,facility,,operational
+Environmental GIS research platform,IT Administrators,people,,operational
+Environmental GIS research platform,Science Team,people,,operational
+Environmental GIS research platform,Data protection and handling,process,,operational
+Environmental GIS research platform,Network traffic monitoring for unencrypted traffic,process,,operational
+Environmental GIS research platform,Security awareness training,process,,operational
+Environmental GIS research platform,ArcGIS,technology,,operational
+Environmental GIS research platform,Crowdstrike Falcon Agent,technology,,operational
+Environmental GIS research platform,ME End-Point Central,technology,,degraded
+Environmental GIS research platform,OneWeb,technology,,operational
+Environmental GIS research platform,PaloAlto GlobalProtect VPN,technology,,operational
+Environmental GIS research platform,Plotnet Secure Radio,technology,,operational
+Environmental GIS research platform,Portable USB Media Storage,technology,,unknown
+Environmental GIS research platform,Signal,technology,,operational
+Environmental GIS research platform,Starlink LEO portable terminal,technology,,operational
+Environmental GIS research platform,Ubuntu Server 24.04 LTS,technology,,operational
+Environmental GIS research platform,Veeam Backup,technology,,operational
+Environmental GIS research platform,Bank Street server room,facility,,operational
+Fisheries management system,IT Administrators,people,,operational
+Fisheries management system,Science Team,people,,operational
+Fisheries management system,Crowdstrike Falcon Agent,technology,,operational
+Fisheries management system,ME End-Point Central,technology,,degraded
+Fisheries management system,OneWeb,technology,,operational
+Fisheries management system,Postgres 18,technology,,operational
+Fisheries management system,Ubuntu Server 24.04 LTS,technology,,operational
+Fisheries management system,Veeam Backup,technology,,operational
+Fisheries management system,Bank Street server room,facility,,operational
+Flight information display,AirOperations Team,people,,operational
+Flight information display,IT Administrators,people,,operational
+Flight information display,Crowdstrike Falcon Agent,technology,,operational
+Flight information display,ME End-Point Central,technology,,degraded
+Flight information display,SITA AirportVision Evolved,technology,,operational
+Flight information display,Veeam Backup,technology,,operational
+Flight information display,Windows Server 2025,technology,,operational
+Flight information display,Dr Max Windshear Airport ATC tower,facility,,operational
+Host Intrusion Detection System,InfoSec Team,people,,operational
+Host Intrusion Detection System,IT Administrators,people,,operational
+Host Intrusion Detection System,Detective Monitoring,process,,operational
+Host Intrusion Detection System,Crowdstrike Falcon Agent,technology,,operational
+Host Intrusion Detection System,Crowdstrike SaaS,technology,,operational
+Host Intrusion Detection System,Bank Street server room,facility,,operational
+Information Security Playbooks,Castle Vaults DR room,facility,,unknown
+Information Security Playbooks,Crow's Nest Disaster Management Centre,facility,,unknown
+Medical Imaging System,Healthcare Medical Team,people,,operational
+Medical Imaging System,IT Administrators,people,,operational
+Medical Imaging System,Bahmni radiology integration,technology,,operational
+Medical Imaging System,Crowdstrike Falcon Agent,technology,,operational
+Medical Imaging System,ME End-Point Central,technology,,degraded
+Medical Imaging System,Ubuntu Server 24.04 LTS,technology,,operational
+Medical Imaging System,Veeam Backup,technology,,operational
+Medical Imaging System,Bank Street server room,facility,,operational
+Medical Planning System,Healthcare Medical Team,people,,operational
+Medical Planning System,IT Administrators,people,,operational
+Medical Planning System,Bahmni Appointment Scheduling module,technology,,operational
+Medical Planning System,Crowdstrike Falcon Agent,technology,,operational
+Medical Planning System,ME End-Point Central,technology,,degraded
+Medical Planning System,Ubuntu Server 24.04 LTS,technology,,operational
+Medical Planning System,Veeam Backup,technology,,operational
+Medical Planning System,Bank Street server room,facility,,operational
+Medical Records System,Healthcare Medical Team,people,,operational
+Medical Records System,IT Administrators,people,,operational
+Medical Records System,Crowdstrike Falcon Agent,technology,,operational
+Medical Records System,ME End-Point Central,technology,,degraded
+Medical Records System,OpenMRS,technology,,operational
+Medical Records System,Ubuntu Server 24.04 LTS,technology,,operational
+Medical Records System,Veeam Backup,technology,,operational
+Medical Records System,Bank Street server room,facility,,operational
+"MIG Authentication, Authorisation and Access Control system",IT Administrators,people,,operational
+"MIG Authentication, Authorisation and Access Control system",Internal MS based AAA,process,,operational
+"MIG Authentication, Authorisation and Access Control system",Microsoft Active Directory Domain Services,technology,,operational
+"MIG Authentication, Authorisation and Access Control system",Windows Server 2016,technology,,operational
+"MIG Authentication, Authorisation and Access Control system",The Castle server room,facility,,degraded
+MIG Backup,IT Administrators,people,,operational
+MIG Backup,Resilience and recovery,process,,operational
+MIG Backup,Crowdstrike Falcon Agent,technology,,operational
+MIG Backup,ME End-Point Central,technology,,degraded
+MIG Backup,Veeam Backup,technology,,operational
+MIG Backup,Windows Server 2016,technology,,operational
+MIG Backup,Bank Street server room,facility,,operational
+MIG Banking System,Treasury Team,people,,operational
+MIG Banking System,HSBC banking portal,technology,,operational
+MIG Corporate Email,All desktop users,people,,operational
+MIG Corporate Email,MS Exchange 2019,technology,,degraded
+MIG Corporate Email,MS Outlook,technology,,operational
+MIG Corporate Email,Windows Server 2016,technology,,operational
+MIG Corporate Email,The Castle server room,facility,,degraded
+MIG Desktop (internal),All desktop users,people,,operational
+MIG Desktop (internal),Crowdstrike Falcon Agent,technology,,operational
+MIG Desktop (internal),ME End-Point Central,technology,,degraded
+MIG Desktop (internal),Microsoft 365 Apps,technology,,operational
+MIG Desktop (internal),Veeam Backup,technology,,operational
+MIG Desktop (internal),Windows 11,technology,,operational
+MIG Desktop (internal),MIG Official Premises,facility,,operational
+MIG Desktop (remote),All desktop users,people,,operational
+MIG Desktop (remote),Crowdstrike Falcon Agent,technology,,operational
+MIG Desktop (remote),ME End-Point Central,technology,,degraded
+MIG Desktop (remote),Microsoft 365 Apps,technology,,operational
+MIG Desktop (remote),PaloAlto GlobalProtect VPN,technology,,operational
+MIG Desktop (remote),Veeam Backup,technology,,operational
+MIG Desktop (remote),Windows 11,technology,,operational
+MIG Desktop (remote),Mobile locations,facility,,unknown
+MIG Document Management,All desktop users,people,,operational
+MIG Document Management,HR Team,people,,operational
+MIG Document Management,InfoSec Team,people,,operational
+MIG Document Management,Data protection and handling,process,,operational
+MIG Document Management,Detective Monitoring,process,,operational
+MIG Document Management,Network traffic monitoring for unencrypted traffic,process,,operational
+MIG Document Management,Records Management process,process,,operational
+MIG Document Management,Advanced Threat Prevention Network Intrusion Detection platform,technology,,operational
+MIG Document Management,Microsoft 365 Archive,technology,,operational
+MIG Document Management,Microsoft 365 Backup,technology,,operational
+MIG Document Management,Microsoft Active Directory Domain Services,technology,,operational
+MIG Document Management,Microsoft Sharepoint,technology,,operational
+MIG Document Management,PaloAlto GlobalProtect VPN,technology,,operational
+MIG Document Management,MS O365 UK South,facility,,operational
+MIG File storage,All desktop users,people,,operational
+MIG File storage,Veeam Backup,technology,,operational
+MIG File storage,Windows Server 2016,technology,,operational
+MIG File storage,The Castle server room,facility,,degraded
+MIGNet,IT Administrators,people,,operational
+MIGNet,Unsure Networks,people,,operational
+MIGNet,Cisco IOS XE V26 26.1.1,technology,,operational
+MIGNet,Core Switch 1,technology,,operational
+MIGNet,Core Switch 2,technology,,operational
+MIGNet,Core Switch 3,technology,,operational
+MIGNet,Core Switch 4,technology,,operational
+MIGNet,ExtremeCloud IQ Site Engine,technology,,operational
+MIGNet,OneWeb,technology,,operational
+MIGNet,VXLAN,technology,,operational
+MIGNet,Bank Street server room,facility,,operational
+MIG Telephony and Messaging,All desktop users,people,,operational
+MIG Telephony and Messaging,MS Teams client,technology,,operational
+MIG Video Conferencing,All desktop users,people,,operational
+MIG Video Conferencing,HR Team,people,,operational
+MIG Video Conferencing,InfoSec Team,people,,operational
+MIG Video Conferencing,Data protection and handling,process,,operational
+MIG Video Conferencing,Detective Monitoring,process,,operational
+MIG Video Conferencing,Incident management,process,,operational
+MIG Video Conferencing,Network traffic monitoring for unencrypted traffic,process,,operational
+MIG Video Conferencing,Resilience and recovery,process,,operational
+MIG Video Conferencing,Supply chain management,process,,operational
+MIG Video Conferencing,Advanced Threat Prevention Network Intrusion Detection platform,technology,,missing
+MIG Video Conferencing,Crowdstrike Falcon Agent,technology,,missing
+MIG Video Conferencing,ExtremeCloud IQ Site Engine,technology,,missing
+MIG Video Conferencing,MS Teams desktop application,technology,,operational
+MIG Video Conferencing,MS Teams On-line SaaS,technology,,operational
+MIG Video Conferencing,MS O365 UK South,facility,,operational
+Network Intrusion Detection System,InfoSec Team,people,,operational
+Network Intrusion Detection System,IT Administrators,people,,operational
+Network Intrusion Detection System,Detective Monitoring,process,,operational
+Network Intrusion Detection System,Advanced Threat Prevention Network Intrusion Detection platform,technology,,operational
+Network Intrusion Detection System,PaloAlto 850-22,technology,,operational
+Network Intrusion Detection System,Bank Street server room,facility,,operational
+Pharmacy Inventory System,IT Administrators,people,,operational
+Pharmacy Inventory System,Pharmacists,people,,operational
+Pharmacy Inventory System,Bahmni Pharmacy,technology,,operational
+Pharmacy Inventory System,Crowdstrike Falcon Agent,technology,,operational
+Pharmacy Inventory System,ME End-Point Central,technology,,degraded
+Pharmacy Inventory System,Ubuntu Server 24.04 LTS,technology,,operational
+Pharmacy Inventory System,Veeam Backup,technology,,operational
+Pharmacy Inventory System,Bank Street server room,facility,,operational
+Port operations system,IT Administrators,people,,operational
+Port operations system,Port Authority Team,people,,operational
+Port operations system,Crowdstrike Falcon Agent,technology,,operational
+Port operations system,ME End-Point Central,technology,,degraded
+Port operations system,Open-TOS,technology,,unknown
+Port operations system,Ubuntu Server 24.04 LTS,technology,,operational
+Port operations system,Veeam Backup,technology,,operational
+Port operations system,Shark Point Server Room,facility,,operational
+Power Distribution,IT Administrators,people,,operational
+Power Distribution,Power station operations team,people,,operational
+Power Distribution,Grid supply and balance,process,,operational
+Power Distribution,ABB Switching and protection,technology,,operational
+Power Distribution,My HMI,technology,,operational
+Power Distribution,Shark Point Server Room,facility,,operational
+Power Generation,InfoSec Team,people,,operational
+Power Generation,IT Administrators,people,,operational
+Power Generation,Power station operations team,people,,operational
+Power Generation,Grid supply and balance,process,,operational
+Power Generation,ABB Switching and protection,technology,,operational
+Power Generation,Crowdstrike Falcon Agent,technology,,operational
+Power Generation,Debian 12,technology,,operational
+Power Generation,ME End-Point Central,technology,,degraded
+Power Generation,Veeam Backup,technology,,operational
+Power Generation,Wartsila Control,technology,,operational
+Power Generation,Shark Point Server Room,facility,,operational
+Prison Management System,IT Administrators,people,,operational
+Prison Management System,Prison Service Team,people,,operational
+Prison Management System,Microsoft Access,technology,,degraded
+Prison Management System,Windows 7,technology,,degraded
+Prison Management System,The Castle server room,facility,,degraded
+Pupil/student records system,Education Team,people,,operational
+Pupil/student records system,IT Administrators,people,,operational
+Pupil/student records system,Crowdstrike Falcon Agent,technology,,operational
+Pupil/student records system,Gibbon SMS,technology,,operational
+Pupil/student records system,ME End-Point Central,technology,,degraded
+Pupil/student records system,Ubuntu Server 24.04 LTS,technology,,operational
+Pupil/student records system,Veeam Backup,technology,,operational
+Risk Management System,IT Administrators,people,,operational
+Risk Management System,CIRKS Information Risk Management Process,process,,operational
+Risk Management System,CIRKS Platform,technology,,operational
+Risk Management System,Crowdstrike Falcon Agent,technology,,operational
+Risk Management System,ME End-Point Central,technology,,degraded
+Risk Management System,Node.js,technology,,operational
+Risk Management System,Postgres 18,technology,,operational
+Risk Management System,Raspberry Pi 5,technology,,operational
+Risk Management System,React framework,technology,,operational
+Risk Management System,Ubuntu Server 24.04 LTS,technology,,operational
+Risk Management System,Veeam Backup,technology,,operational
+Risk Management System,Bank Street server room,facility,,operational
+Security monitoring platform,InfoSec Team,people,,operational
+Security monitoring platform,IT Administrators,people,,operational
+Security monitoring platform,Detective Monitoring,process,,operational
+Security monitoring platform,Crowdstrike Falcon Agent,technology,,operational
+Security monitoring platform,ME End-Point Central,technology,,degraded
+Security monitoring platform,Ubuntu Server 24.04 LTS,technology,,operational
+Security monitoring platform,Veeam Backup,technology,,operational
+Security monitoring platform,Wazuh,technology,,operational
+Security monitoring platform,Bank Street server room,facility,,operational
+Student Desktop,Security awareness training,process,,operational
+Student Desktop,Crowdstrike Falcon Agent,technology,,operational
+Student Desktop,KnowB4,technology,,operational
+Tax Records System,Expert People Group,people,,operational
+Tax Records System,Internal revenue team,people,,operational
+Tax Records System,IT Administrators,people,,operational
+Tax Records System,Crowdstrike Falcon Agent,technology,,operational
+Tax Records System,DataTorque RMS,technology,,operational
+Tax Records System,ME End-Point Central,technology,,degraded
+Tax Records System,Veeam Backup,technology,,operational
+Tax Records System,Windows Server 2025,technology,,operational
+Treasury Accounting System,Expert People Group,people,,operational
+Treasury Accounting System,IT Administrators,people,,operational
+Treasury Accounting System,Treasury Team,people,,operational
+Treasury Accounting System,Annual Audit Process,process,,operational
+Treasury Accounting System,Crowdstrike Falcon Agent,technology,,operational
+Treasury Accounting System,ME End-Point Central,technology,,degraded
+Treasury Accounting System,Sage accounting,technology,,operational
+Treasury Accounting System,Veeam Backup,technology,,operational
+Treasury Accounting System,Windows Server 2025,technology,,operational
+Treasury Accounting System,Bank Street server room,facility,,operational
+Water Distribution,IT Administrators,people,,operational
+Water Distribution,Water plant operations team,people,,operational
+Water Distribution,Crowdstrike Falcon Agent,technology,,operational
+Water Distribution,Debian 12,technology,,operational
+Water Distribution,ME End-Point Central,technology,,degraded
+Water Distribution,My HMI,technology,,operational
+Water Distribution,Seven Seas Control Desk,technology,,operational
+Water Distribution,Veeam Backup,technology,,operational
+Water Distribution,"Wellhead Road, Water Treatment Works",facility,,operational

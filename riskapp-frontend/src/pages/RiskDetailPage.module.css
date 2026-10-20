@@ -1,0 +1,2797 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.headingGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headingThreat {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.statusBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.statusPending   { background: rgba(255,167,38,0.15); color: var(--amber, #ffa726); }
+.statusReturned  { background: rgba(229,57,53,0.15);  color: var(--red, #e53935); }
+.statusValidated { background: rgba(76,175,80,0.15);  color: var(--green, #4caf50); }
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Simple / Expert display toggle ─────────────────────────────────────── */
+
+.simpleExpertToggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.simpleExpertBtn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  line-height: 1.6;
+}
+
+.simpleExpertBtn + .simpleExpertBtn {
+  border-left: 1px solid var(--border);
+}
+
+.simpleExpertBtnActive {
+  background: rgba(255, 167, 38, 0.12);
+  color: var(--amber, #ffa726);
+}
+
+.btnArchive { composes: btnSecondary btnSm from '../components/buttons.module.css'; }
+.btnEdit { composes: btnSecondary btnSm from '../components/buttons.module.css'; }
+.btnValidate { composes: btnSuccess btnSm from '../components/buttons.module.css'; }
+.btnSave { composes: btnPrimary btnSm from '../components/buttons.module.css'; }
+.btnCancel { composes: btnSecondary btnSm from '../components/buttons.module.css'; }
+
+.btnArchive {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.loadingBar {
+  height: 2px;
+  background: var(--amber, #ffa726);
+  border-radius: 1px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+.errorMsg { font-size: 13px; color: var(--red, #e53935); margin: 0; }
+
+/* ── Sticky edit bar ─────────────────────────────────────────────────────── */
+
+.editBar {
+  position: sticky;
+  top: 52px; /* sits flush under the Shell header */
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(255, 167, 38, 0.12);
+  border: 1px solid rgba(255, 167, 38, 0.35);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(4px);
+}
+
+.editBarLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--amber, #ffa726);
+  font-weight: 600;
+}
+
+.editBarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cardReturned {
+  border-color: var(--red, #e53935);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.cardCollapsed {
+  gap: 8px;
+}
+
+/* Panel is in edit mode — amber accent matching the (former) edit bar, so it's
+   unmistakable which panel the active Edit/Save/Cancel controls are editing. */
+.cardEditing {
+  border-color: rgba(255, 167, 38, 0.55);
+  background: rgba(255, 167, 38, 0.06);
+  box-shadow: inset 3px 0 0 var(--amber, #ffa726);
+}
+
+/* Header row: title (left) + actions/chevron (right). Replaces the single
+   full-width header button so per-panel Edit/Save/Cancel buttons have a home. */
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cardHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardHeaderToggle {
+  flex: 1;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.chevronBtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+.cardHeader {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.cardHeader:hover .collapseChevron,
+.cardHeaderToggle:hover .collapseChevron,
+.chevronBtn:hover .collapseChevron {
+  color: var(--text-primary);
+}
+
+.collapseChevron {
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: color 120ms ease;
+  user-select: none;
+}
+
+.cardHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin: -8px 0 0;
+}
+
+/* ── Meta grid ───────────────────────────────────────────────────────────── */
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px 20px;
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metaLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metaValue {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.assetList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.assetListItem {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.fieldNote {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Probability rows ────────────────────────────────────────────────────── */
+
+.probTable {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.probRow {
+  display: grid;
+  grid-template-columns: 130px 1fr 28px 16px 28px 16px 52px;
+  align-items: center;
+  gap: 8px;
+}
+
+.probLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.probSlider {
+  accent-color: var(--amber, #ffa726);
+  cursor: pointer;
+}
+
+.probPips {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+}
+.pipFilled {
+  background: var(--amber, #ffa726);
+  border-color: var(--amber, #ffa726);
+}
+
+.probValue, .impactValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.probMult {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ── Scores summary ──────────────────────────────────────────────────────── */
+
+.scoresSummary {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.scoreSummaryItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scoreSummaryMax {
+  padding-left: 8px;
+  border-left: 1px solid var(--border-accent);
+}
+
+.scoreSummaryDim {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.levelPill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+/* Risk level colours */
+/* Score colours moved to ../utils/riskColors.module.css (shared palette). */
+
+.componentTypeChip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.levelLow      { background: rgba(76,175,80,0.12);  color: var(--green, #4caf50); }
+.levelMedium   { background: rgba(255,167,38,0.12); color: var(--amber, #ffa726); }
+.levelHigh     { background: rgba(229,57,53,0.15);  color: var(--red, #e53935); }
+.levelCritical { background: rgba(229,57,53,0.25);  color: var(--red, #e53935); }
+
+/* ── Inherent risk score sub-panel ───────────────────────────────────────── */
+
+.inhScorePanel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Inherent impact — business-view summary, told as a sentence with the
+   driving information asset named so the figure has a clear source. */
+.inherentImpactStory {
+  font-size: 14px;
+  line-height: 2;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 760px;
+}
+
+.inherentImpactStory strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.inherentImpactUnrated {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.inhScorePanelTitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Business-mode current-risk panel: lines left, large PIG right. */
+.residualSplitRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.residualSplitLeft {
+  flex: 1 1 55%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.residualSplitRight {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.residualScoreInline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* Business-mode score panel: split 50/50 — ladder (left) + large PIG (right). */
+.inhScoreColumnsSimple {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.scoreSimpleLeft {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+}
+
+.scoreSimpleRight {
+  flex: 1 1 50%;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Action before→after compare keeps a compact, small, centred PIG. */
+.actionScoreColumnsSimple {
+  display: flex;
+  justify-content: center;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.inhScoreColumnsExpert {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.inhScoreColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.inhScoreColumnMax {
+  border-left: 1px solid var(--border-accent);
+  padding-left: 16px;
+}
+
+.inhScoreColScore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── Linked controls list ────────────────────────────────────────────────── */
+
+.controlTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.controlTh {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.controlRow:hover { background: rgba(255,255,255,0.02); }
+.controlRowClickable { cursor: pointer; }
+
+.controlTd {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.maturitySelect {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* Per-system status selector in the Threat-coverage view. Sits where the read-only
+   status chip would (left on a control row; pushed right on a component row via the
+   .coverageComp override below). */
+.statusSelect {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.maturityEditCell {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-start;
+}
+
+.maturityReadCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controlTdTitle {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.pdcdRow {
+  margin: 4px 0 12px 0;
+}
+
+/* ── Rationale / metadata ────────────────────────────────────────────────── */
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel { composes: fieldLabel from '../components/form.module.css'; }
+.rationaleText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.textarea { composes: textarea from '../components/form.module.css'; }
+.metaEditRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.inputDate {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 8px;
+}
+.inputDate:focus { border-color: var(--border-accent); outline: none; }
+
+.saveErr {
+  font-size: 12px;
+  color: var(--red, #e53935);
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.emptyMsg {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+/* ── Security actions ────────────────────────────────────────────────────── */
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.actionRow {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.actionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.actionHeader:hover { background: rgba(255,255,255,0.03); }
+.actionHeader:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.actionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.actionExpandChevron {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 10px;
+}
+
+.actionTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.actionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 12px 12px 30px;
+  border-top: 1px solid var(--border);
+}
+
+.actionTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.actionOwner {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.actionRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.actionDate {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.actionStatus {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+.action_proposed    { background: rgba(100,181,246,0.12); color: var(--blue, #64b5f6); }
+.action_planned     { background: rgba(255,167,38,0.12);  color: var(--amber, #ffa726); }
+.action_in_progress { background: rgba(76,175,80,0.12);   color: var(--green, #4caf50); }
+.action_completed   { background: rgba(156,39,176,0.12);  color: #ce93d8; }
+.action_verified    { background: rgba(76,175,80,0.18);   color: #81c784; font-weight: 700; }
+.action_rejected    { background: rgba(244,67,54,0.12);   color: var(--red, #e53935); }
+.action_deferred    { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+.action_cancelled   { background: rgba(255,255,255,0.03); color: var(--text-muted); }
+
+/* ── Lifecycle buttons ───────────────────────────────────────────────────── */
+
+.btnEditAction { composes: btnSecondary from '../components/buttons.module.css'; width: 26px; }
+.actionEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btnLifecycle { composes: btnWarning btnSm from '../components/buttons.module.css'; }
+.btnLifecycleVerify {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #ce93d8;
+  background: rgba(156,39,176,0.08);
+  color: #ce93d8;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btnLifecycleVerify:hover { background: rgba(156,39,176,0.18); }
+
+/* ── Target residual display in action row ──────────────────────────────── */
+
+.actionTargetScore {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+}
+.actionTargetLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.actionTargetArrow {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.actionLockedBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* ── Combined target risk panel (below action list) ────────────────────── */
+
+.combinedTargetPanel {
+  margin-top: 8px;
+  padding: 12px 16px 16px;
+  border: 1px solid var(--border-accent, rgba(255,167,38,0.25));
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.combinedTargetTitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber, #ffa726);
+}
+
+/* ── Action score comparison panel ─────────────────────────────────────── */
+
+.actionScoreCompare {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actionScoreSide {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.actionScoreSideLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.actionScoreColumnsExpert {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.actionScoreArrow {
+  font-size: 20px;
+  color: var(--text-muted);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.actionListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.btnAddAction { composes: btnSecondary from '../components/buttons.module.css'; }
+/* ── Threshold note + acceptance exception sub-section ─────────────────────── */
+
+.thresholdNote {
+  color: var(--amber);
+  font-size: 12px;
+  font-style: italic;
+}
+.thresholdNote em {
+  font-style: normal;
+  font-family: var(--font-mono);
+  text-transform: lowercase;
+  color: var(--amber);
+}
+
+.exceptionPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  background: rgba(255, 193, 7, 0.06);
+  border: 1px dashed rgba(255, 193, 7, 0.35);
+  border-radius: var(--radius-sm);
+}
+
+.exceptionPromptText {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.exceptionCard {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--amber);
+  background: rgba(255, 193, 7, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exceptionOk      { border-left-color: var(--green); background: rgba(76, 175, 80, 0.05); }
+.exceptionDueSoon { border-left-color: var(--amber); background: rgba(255, 193, 7, 0.07); }
+.exceptionOverdue { border-left-color: var(--red);   background: rgba(244, 67, 54, 0.07); }
+
+.exceptionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.exceptionTitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.exceptionExpiry {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.exceptionOverdue .exceptionExpiry { color: var(--red); }
+.exceptionDueSoon .exceptionExpiry { color: var(--amber); }
+.exceptionOk      .exceptionExpiry { color: var(--green); }
+
+.exceptionJust {
+  margin: 2px 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.exceptionMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.exceptionNotes {
+  margin: 4px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.exceptionActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btnSecondary { composes: btnSecondary btnSm from '../components/buttons.module.css'; }
+.btnDanger { composes: btnDanger btnSm from '../components/buttons.module.css'; }
+
+/* ── Attach picker + chips ────────────────────────────────────────────────── */
+
+.attachPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.attachChips,
+.actionAttachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.actionAttachments {
+  margin-top: 4px;
+}
+
+.attachChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.attachChip em {
+  font-style: normal;
+  color: var(--text-muted);
+}
+
+.attachChipLabel {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachChipLabelFull {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.attachChipControl {
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+}
+
+.attachChipControlRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.attachMaturity {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.attachMaturityArrow {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 0 1px;
+}
+
+.maturityChipPicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.maturityChipPickerBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 3px;
+  transition: opacity 0.12s;
+}
+
+.maturityChipPickerBtnIdle {
+  opacity: 0.28;
+}
+
+.maturityChipPickerBtn:hover,
+.maturityChipPickerBtn:focus-visible {
+  opacity: 1;
+}
+
+/* ── Progress notes ─────────────────────────────────────────────────────────── */
+.progressSection {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.progressHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.progressLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.btnLogProgress { composes: btnLink from '../components/buttons.module.css'; }
+.progressNotes {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.progressEmpty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.progressEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressTextarea {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.progressTextarea:focus { outline: none; border-color: var(--accent, #64b5f6); }
+
+.progressEditButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.attachChip button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 0 0 2px;
+}
+
+.attachChip button:hover {
+  color: var(--red);
+}
+
+.attachSearch {
+  position: relative;
+}
+
+.attachResults {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-modal);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.attachResult {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.attachResult:hover {
+  background: var(--bg-inset);
+}
+
+.attachResultMsg {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.actionProposed {
+  background: rgba(100,181,246,0.04);
+  border-color: rgba(100,181,246,0.18);
+}
+
+.actionDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.actionRemove {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  line-height: 1;
+}
+.actionRemove:hover { color: var(--red, #e53935); }
+
+.actionForm {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actionFormField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.actionFormLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.actionFormInput,
+.actionFormTextarea,
+.actionFormSelect {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.actionFormInput:focus,
+.actionFormTextarea:focus,
+.actionFormSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.actionFormTextarea { resize: vertical; min-height: 64px; }
+
+.actionFormRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.actionFormButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.actionFormErr {
+  font-size: 12px;
+  color: var(--red, #e53935);
+}
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  z-index: 9999;
+}
+.toast_success { background: rgba(76,175,80,0.15); border: 1px solid var(--green, #4caf50); color: var(--green, #4caf50); }
+.toast_error   { background: rgba(229,57,53,0.15); border: 1px solid var(--red, #e53935); color: var(--red, #e53935); }
+
+/* ── Validation panel ───────────────────────────────────────────────────── */
+
+.validationPanel {
+  border: 1px solid rgba(76,175,80,0.25);
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(76,175,80,0.04);
+  overflow: hidden;
+}
+
+.validationReadiness {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.validationReadinessLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  padding-top: 2px;
+  min-width: 160px;
+}
+
+.validationChecks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.validationCheck {
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.checkOk {
+  background: rgba(76,175,80,0.1);
+  color: #66bb6a;
+  border: 1px solid rgba(76,175,80,0.2);
+}
+
+.checkFail {
+  background: rgba(255,167,38,0.1);
+  color: #ffa726;
+  border: 1px solid rgba(255,167,38,0.25);
+}
+
+.checkLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+.checkLink:hover { opacity: 0.8; }
+
+.validationForm {
+  border-top: 1px solid rgba(76,175,80,0.15);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.validationToggle {
+  display: flex;
+  gap: 8px;
+}
+
+.validationToggleBtn {
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.validationToggleBtn:hover { border-color: var(--text-muted); }
+
+.toggleValidate {
+  background: rgba(76,175,80,0.12);
+  border-color: rgba(76,175,80,0.4);
+  color: #66bb6a;
+  font-weight: 600;
+}
+
+.toggleReturn {
+  background: rgba(255,167,38,0.1);
+  border-color: rgba(255,167,38,0.35);
+  color: #ffa726;
+  font-weight: 600;
+}
+
+.validationNotes {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.validationNotes:focus { outline: none; border-color: var(--accent, #64b5f6); }
+
+.validationError {
+  font-size: 0.8rem;
+  color: var(--red, #e53935);
+  margin: 0;
+}
+
+.validationActions {
+  display: flex;
+  gap: 8px;
+}
+
+.btnConfirmValidate { composes: btnSuccess from '../components/buttons.module.css'; }
+.btnConfirmReturn { composes: btnWarning from '../components/buttons.module.css'; }
+/* ── Linked components section ─────────────────────────────────────────── */
+
+.componentList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.componentGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.componentGroupLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.componentRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.componentLeft {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.componentName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.componentSystems {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.componentStatus {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.componentRemove {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 8px;
+  line-height: 1;
+}
+.componentRemove:hover { border-color: var(--red, #e53935); color: var(--red, #e53935); }
+
+.componentPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* Threat-relevant control suggestions (from the control_threats catalogue). */
+.suggestBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.suggestLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.suggestHint {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ── Threat coverage (gap view inside the Mitigating Controls panel) ── */
+.coverage {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+}
+.coverageHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.coverageCaret { color: var(--text-muted); font-size: 11px; }
+.coverageTitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.coverageVs { text-transform: none; letter-spacing: 0; color: var(--text-muted); }
+.coverageSummary { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+.coverageList {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px 8px;
+  display: flex;
+  flex-direction: column;
+}
+.coverageItem { padding: 5px 0; border-top: 1px solid var(--border); }
+.coverageCtl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.coverageRef { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.coverageCtlTitle { font-size: 13px; color: var(--text-primary); }
+.coverageAdd {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent, #2563eb);
+  background: none;
+  border: 1px solid var(--border-accent, currentColor);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.coverageAdd:hover { background: var(--bg-accent-subtle, rgba(37, 99, 235, 0.08)); }
+.coverageComps {
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 0 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.coverageComp { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.coverageCompName { color: var(--text-secondary); }
+.coverageComp .chipOk,
+.coverageComp .chipGap,
+.coverageComp .chipWarn,
+.coverageComp .chipUnknown,
+.coverageComp .statusSelect { margin-left: auto; }
+.coverageDeployedLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 12px 0 6px;
+}
+
+/* chips shared with the coverage/gap view (mirrors RiskCreateModal) */
+.compType {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  color: var(--text-muted); margin-right: 4px;
+}
+.chipOk { color: var(--green, #16a34a); font-size: 12px; font-weight: 600; }
+/* An off-system component keeps the `missing` colouring of the chip it replaced,
+   while staying selectable — choosing a state links it to the system and stamps
+   that state in one action. */
+.statusSelectGap {
+  composes: statusSelect;
+  border-color: var(--red, #e53935);
+  color: var(--red, #e53935);
+  font-weight: 700;
+}
+
+.chipGap {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
+  color: #fff; background: var(--red, #e53935); padding: 1px 7px; border-radius: var(--radius-sm);
+}
+.chipWarn {
+  display: inline-block; font-size: 11px; font-weight: 700; text-transform: capitalize;
+  color: #7a4a00; background: var(--amber, #f59e0b); padding: 1px 7px; border-radius: var(--radius-sm);
+}
+.chipUnknown {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); background: var(--bg-inset); border: 1px solid var(--border);
+  padding: 1px 7px; border-radius: var(--radius-sm);
+}
+/* Derived "planned" overlay — an open security action targets this element on this
+   system. Not a stored status; sits alongside the status chip. Blue = scheduled work. */
+.plannedTag {
+  display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.02em; color: #60a5fa; background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.5); padding: 1px 6px; border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+/* ── Threat Control Coverage panel (rebuilt Mitigating Controls — 0092 epic) ── */
+.tcPanel { margin-top: 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-inset); }
+.tcHead {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  padding: 9px 12px; border-bottom: 1px solid var(--border);
+}
+.tcHeadTitle {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--text-secondary);
+}
+.tcVs { text-transform: none; letter-spacing: 0; color: var(--text-muted); }
+.tcSummary { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+.tcList { list-style: none; margin: 0; padding: 0; }
+.tcRow { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+.tcRow:first-child { border-top: none; }
+
+/* The control currently setting the score. The aggregate is a MIN over the
+   deployed controls, so exactly one (or a tie) owns the number and the rest look
+   inert — accurate, but invisible until it is drawn. */
+/* A degraded control counts a rung worse than the score shown against it (0115).
+   The chip shows what an analyst SET; this shows what the register USES. Without
+   it the row reads 2 while the risk is computed from 3, which looks like a bug. */
+.tcDegradedEff {
+  display: inline-flex; align-items: center; gap: 1px;
+  margin-left: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--amber, #f59e0b); cursor: help;
+}
+.tcDegradedEffVal {
+  background: var(--amber, #f59e0b); color: #7a4a00;
+  padding: 0 4px; border-radius: var(--radius-sm);
+}
+.tcDegradedNote {
+  display: block; margin-top: 4px; font-size: 11px; line-height: 1.5;
+  color: var(--amber, #f59e0b);
+}
+.tcDegradedNote strong { font-family: var(--font-mono); }
+/* Visually hidden, still read aloud — the arrow alone means nothing spoken. */
+.srOnly {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.tcRowDriver {
+  background: var(--green-dim, rgba(76, 175, 125, 0.12));
+  box-shadow: inset 3px 0 0 0 var(--green, #4caf7d);
+}
+/* Dark text on the green, not white — white on #4caf7d is about 2.3:1 and fails
+   AA. Mirrors .chipWarn, which puts dark brown on amber for the same reason. */
+.tcDriverChip {
+  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; white-space: nowrap;
+  color: #0b3a26; background: var(--green, #4caf7d);
+  padding: 1px 6px; border-radius: var(--radius-sm);
+}
+.tcExplain {
+  margin: 0 0 4px; padding: 10px 12px;
+  font-size: 12px; line-height: 1.55; color: var(--text-secondary);
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.tcExplain strong { color: var(--text-primary); }
+.tcMain { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.tcControl { flex: 1 1 300px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tcRef { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.tcCtlTitleBtn {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: inherit; font-size: 13px; color: var(--text-primary); text-align: left;
+}
+.tcCtlTitleBtn:hover { text-decoration: underline; }
+.tcComponents { flex: 1 1 260px; display: flex; flex-direction: column; gap: 4px; }
+.tcSolutions { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; color: var(--text-primary); margin-bottom: 2px; }
+.tcSolutions b { font-weight: 600; }
+.tcSolutionsSub { font-size: 12px; color: var(--text-secondary); }
+.tcComp { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.tcCompName { color: var(--text-secondary); }
+.tcComp .statusSelect,
+.tcComp .chipGap { margin-left: auto; }
+.tcProb {
+  display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+  padding-top: 6px; border-top: 1px dashed var(--border);
+}
+.tcProbLabel {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--text-muted); cursor: help;
+  padding-top: 4px;
+}
+.tcProbDims { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.tcProbDim { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+.tcProbDimLabel {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  width: 12px; text-align: center;
+}
+/* Dimmed text for a control/component that is missing or unknown on this system. */
+.tcMuted { opacity: 0.5; }
+.tcRemove {
+  margin-left: 4px; background: none; border: none; color: var(--text-muted);
+  cursor: pointer; font-size: 15px; line-height: 1; padding: 0 2px;
+}
+.tcRemove:hover { color: var(--red, #e53935); }
+.tcAddBlock { padding: 10px 12px; border-top: 1px solid var(--border); }
+
+.componentSearchInput {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 7px 10px;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.componentSearchInput:focus { border-color: var(--border-accent); outline: none; }
+
+.componentResults {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+}
+
+.componentResultRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+}
+
+.componentTypeChip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.05);
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.componentAdd {
+  background: var(--amber, #ffa726);
+  border: 1px solid var(--amber, #ffa726);
+  border-radius: var(--radius-sm);
+  color: #000;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  margin-left: auto;
+}
+.componentAdd:hover { opacity: 0.85; }
+
+/* ── View toggle (List / Graph) ──────────────────────────────────────────── */
+
+.viewToggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.viewToggleBtn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  line-height: 1.6;
+}
+
+.viewToggleBtn + .viewToggleBtn {
+  border-left: 1px solid var(--border);
+}
+
+.viewToggleActive {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border: none;
+  background: rgba(255, 167, 38, 0.12);
+  color: var(--amber, #ffa726);
+  cursor: pointer;
+  line-height: 1.6;
+}
+
+/* ── Component panel header ──────────────────────────────────────────────── */
+
+.compPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Compact clustered pill rows — one row per PPITF type */
+.compTypeCluster {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.compPillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+/* A component + its vulnerability status chip, side by side. */
+.compVulnRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Vulnerability status chip. "vulnerable" uses the Critical risk-band colours;
+   "not selected" is a bright grey. Rendered as a <button> in edit mode (clickable
+   to toggle) and a <span> in read mode — same look either way. */
+.vulnChip,
+.notSelectedChip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+button.vulnChip,
+button.notSelectedChip { cursor: pointer; }
+.vulnChip        { background: #3a0a0a; color: #f05a5a; border-color: #f05a5a; }
+.notSelectedChip { background: #cbd5e1; color: #334155; }
+
+.compPickerLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.compSearchRow {
+  display: flex;
+  gap: 8px;
+}
+
+.btnLink { composes: btnLink from '../components/buttons.module.css'; }
+
+/* Modal fields (used by NewComponentModal) */
+
+.overlay { composes: overlay from '../components/modal.module.css'; }
+
+.modal { composes: modal from '../components/modal.module.css'; padding: 24px; width: 440px; max-width: 95vw; }
+
+.modalTitle { composes: modalTitle from '../components/modal.module.css'; }
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.modalInput,
+.modalTextarea,
+.modalSelect {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.modalInput:focus,
+.modalTextarea:focus,
+.modalSelect:focus { border-color: var(--amber, #ffa726); }
+.modalTextarea { resize: vertical; font-family: inherit; }
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* ── CIA line (horizontal: label + C/I/A dropdowns) ──────────────────────── */
+
+.ciaLine {
+  display: grid;
+  /* Label flexes to fill; each CIA column is wide enough to fit
+     "Confidentiality" as a header. Columns stay fixed-width so values and
+     dropdowns line up vertically across every row and panel. */
+  grid-template-columns: 1fr 130px 130px 130px;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.ciaLineLabel {
+  font-size: 13px;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ciaLineSub {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.ciaLineCell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ciaColumnHeader {
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Controls-countering-this-threat strip (decision support) ────────────── */
+/* Advisory context between the threat baseline and the residual-probability
+   selector. Left accent + muted background mark it as derived, read-only
+   reasoning — not an input. */
+.controlsContext {
+  margin: 4px 0 8px 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--border-strong, #c9ccd4);
+  background: var(--surface-muted, rgba(0, 0, 0, 0.025));
+  border-radius: 0 4px 4px 0;
+}
+
+.controlsContextLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.controlsContextList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.controlsContextItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.controlsContextName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.controlsContextTitle {
+  font-size: 13px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controlsContextEmpty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Inherent / Residual panel widgets ───────────────────────────────────── */
+
+.subhead {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 20px 0 8px 0;
+}
+
+/* ── Asset breakdown rows (use same grid as .ciaLine) ────────────────────── */
+
+.assetList {
+  margin: 8px 0 18px 0;
+}
+
+.assetHeader .ciaLineLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.assetMaxRow {
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+  padding-top: 8px;
+}
+
+.assetMaxRow .ciaLineLabel,
+.assetMaxRow .ciaPlainValue {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Plain numeric/text cell — matches .ciaSelect width/centering so it lines
+   up with the dropdowns in CiaLine rows above and below. */
+.ciaPlainValue {
+  width: 58px;
+  padding: 4px 6px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  border: 1px solid transparent;  /* same vertical footprint as .ciaSelect */
+  box-sizing: border-box;
+}
+
+.rationaleLabel {
+  display: block;
+  margin: 12px 0 4px 0;
+}
+
+.rationaleTitle {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.rationaleTextarea {
+  width: 100%;
+  resize: vertical;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+}
+
+.rationaleTextarea:focus { border-color: var(--border-accent); outline: none; }
+
+.rationalePlaceholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 14px 0;
+  font-size: 13px;
+}
+
+.treatmentRadios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin: 4px 0 12px 0;
+}
+
+.treatmentRadio {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.treatmentRadio:hover { border-color: var(--border-accent); }
+
+.treatmentRadioActive {
+  background: var(--bg-elevated);
+  border-color: var(--border-accent);
+}
+
+.treatmentLabel {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  display: block;
+}
+
+.treatmentHint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.treatmentRadio input { margin-top: 3px; }
+
+/* ── Target residual form section ───────────────────────────────────────── */
+
+.targetResidualSection {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--bg-elevated, rgba(255,255,255,0.03));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.targetResidualTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.targetResidualHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.targetWarning {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--amber, #f5a623);
+  background: rgba(245, 166, 35, 0.08);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin: 0;
+}
+
+.targetResidualRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.targetResidualLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.targetResidualSub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.targetResidualVal {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  width: 14px;
+  text-align: center;
+}
+
+.targetResidualChipGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.targetResidualDimLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ── Soft-lock warning (ResidualRiskPanel) ───────────────────────────────── */
+
+.softLockWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,167,38,0.08);
+  border: 1px solid rgba(255,167,38,0.35);
+  font-size: 12px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.softLockIcon {
+  color: var(--amber, #ffa726);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Residual history panel ──────────────────────────────────────────────── */
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.historyEntry {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.historyEntry:last-child { border-bottom: none; }
+
+.historyEntryHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.historyWhen {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.historyBy {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.historySource {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.historyActionRef {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.historyScoreChange {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.historyArrow {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.historyDeltas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.historyDelta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.historyDeltaLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  min-width: 26px;
+}
+
+.historyNotes {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 6px 10px;
+  background: var(--bg-inset);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--border-accent);
+}
+
+/* ── Copy-from-existing-action section ──────────────────────────────────── */
+
+.copyFromSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+}
+
+.copyFromLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.copyFromInput {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.copyFromInput:focus {
+  outline: none;
+  border-color: var(--border-accent);
+}
+
+.copyFromHint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.copyFromResults {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+}
+
+.copyFromResult {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.1s;
+}
+
+.copyFromResult:last-child {
+  border-bottom: none;
+}
+
+.copyFromResult:hover {
+  background: var(--bg-inset);
+}
+
+.copyFromResultTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.copyFromResultMeta {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.copyFromBanner {
+  margin: 0;
+  font-size: 12px;
+  color: var(--amber, #b45309);
+  background: color-mix(in srgb, var(--amber, #b45309) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--amber, #b45309) 30%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+}
+
+/* ── Risk Owner reassign ──────────────────────────────────────────────────── */
+
+.ownerRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Shown when a department has no Information Asset Owner and its risks have
+   fallen through to the SIRO. Amber, matching the "shared" convention: this is
+   a legitimate state, not an error, but it is a staffing signal worth seeing. */
+.ownerFallback {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+  text-transform: uppercase;
+  cursor: help;
+}
+
+.btnPrimarySmall { composes: btnPrimary btnSm from '../components/buttons.module.css'; }
+.btnSecondarySmall { composes: btnSecondary btnSm from '../components/buttons.module.css'; }
+.select { composes: select from '../components/form.module.css'; min-width: 220px; }
+.inlineError {
+  font-size: 11px;
+  color: var(--red, #e53935);
+}
+
+.btnSetDefault {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  background: none;
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.btnSetDefault:hover { color: var(--text-secondary); border-color: var(--accent); }
+
+/* ── Gap-driven security actions (docs/security-actions.md) ── */
+.gapActions { margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
+.gapCandRow { padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-inset); }
+.gapCandHead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; cursor: pointer; font-size: 13px; }
+.gapKind {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em;
+  color: var(--text-secondary); background: var(--bg-inset); border: 1px solid var(--border);
+  padding: 1px 6px; border-radius: var(--radius-sm); white-space: nowrap;
+}
+.gapItemFields { display: flex; gap: 8px; align-items: center; margin: 6px 0 0 24px; flex-wrap: wrap; }
+.gapCommentInput {
+  flex: 1 1 200px; background: var(--bg-inset); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-primary); font-size: 12px; padding: 4px 8px;
+}
+.actionFormButtons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+
+.gapActionCard { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-inset); padding: 8px 10px; }
+.gapActionHead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.gapActionTitle { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.gapActionTitleLink {
+  font: inherit; font-size: 14px; font-weight: 600; color: var(--accent, var(--text-primary));
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+}
+.gapActionTitleLink:hover { text-decoration: underline; }
+.gapActionOwner { font-size: 11px; color: var(--text-muted); }
+.gapItemList { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.gapItemRow {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px;
+  padding: 4px 0; border-top: 1px dashed var(--border);
+}
+.gapItemLabel { color: var(--text-primary); }
+.gapItemOwner { font-size: 11px; color: var(--text-muted); }
+.gapItemTarget { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+/* Was an emoji, which did not render. A word always does — and the full text is
+   in the narrative on the action page, so this only has to say one exists. */
+.gapItemComment {
+  cursor: help; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 4px;
+}
+.gapItemStatus { margin-left: auto; font-size: 11px; color: var(--text-muted); text-transform: capitalize; }
+.gapResidConfirm { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); }
+
+/* "Treated down" — a reduction earned through an accepted action, distinct from
+   a risk that was simply never large. Derived from the accept-time baseline
+   snapshot, so it is attributable to a named action. */
+.treatedDown {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--green-dim);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Control excluded from this system (0118) ─────────────────────────────── */
+.statusSelectExcluded { composes: statusSelect; border-style: dashed; opacity: 0.75; }
+.tcExcludedChip {
+  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; white-space: nowrap;
+  color: var(--text-muted); background: transparent;
+  border: 1px dashed var(--border); padding: 1px 6px; border-radius: var(--radius-sm);
+}
+.tcExcludedReason {
+  margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); font-style: italic;
+}
+.tcExcludeForm {
+  margin-top: 6px; padding: 8px 10px; display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; background: var(--bg-elevated);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.tcExcludeLabel { font-size: 12px; color: var(--text-primary); }
+.tcExcludeInput {
+  flex: 1 1 320px; font-size: 12px; padding: 4px 6px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-inset); color: var(--text-primary);
+}
+
+/* ── Folded coverage panel summary ────────────────────────────────────────────
+   A folded panel showing only its title makes the reader open it to find out
+   whether it needed opening. This is what the panel would have said. */
+.tcFolded {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 2px; font-size: 13px;
+}
+.tcFoldedGap { color: var(--text-primary); font-weight: 600; }
+.tcFoldedOk  { color: var(--green, #4caf7d); font-weight: 600; }
+.tcFoldedForecast {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-secondary);
+}
+.tcPlannedYes {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #0b3a26; background: var(--green, #4caf7d);
+  padding: 1px 6px; border-radius: var(--radius-sm);
+}
+.tcPlannedNo {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #fff; background: var(--red, #e53935);
+  padding: 1px 6px; border-radius: var(--radius-sm);
+}
+.tcPlannedPart {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #7a4a00; background: var(--amber, #f59e0b);
+  padding: 1px 6px; border-radius: var(--radius-sm);
+}
+.tcFoldedUnknown { color: var(--text-muted); font-style: italic; }
+
+/* Degraded controls are IN PLACE and do counter the threat, but count a rung
+   worse than assessed (v115). Separating them says that without a reader having
+   to know the rule. */
+.controlsDegradedLabel {
+  display: block; margin-top: 8px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--amber, #f59e0b);
+}
+.controlsDegradedList { border-left: 2px solid var(--amber, #f59e0b); padding-left: 8px; }
+
+/* The per-item target in the gap builder — the judgement that makes an action
+   mean something. Optional by design; blank says "not yet estimated" rather
+   than asserting no improvement, which is what the old inherent fallback did. */
+.gapTargetFields { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.gapTargetLabel { font-size: 11px; color: var(--text-muted); cursor: help; }
+.gapTargetHint { font-size: 11px; color: var(--text-muted); font-style: italic; }
+
+/* A flattened judgement says so. 467 of 728 stored per-control probabilities
+   differ across C/I/A, and the single picker shows the worst of the three —
+   this keeps the real triple visible rather than hiding the collapse. */
+.tcMixedChip {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.03em;
+  color: var(--text-muted); border: 1px dashed var(--border);
+  border-radius: var(--radius-sm); padding: 0 4px; cursor: help;
+}
+
+/* ── Coverage panel: three sections ───────────────────────────────────────── */
+/* One list was answering three questions. The headings are the answer to
+   "why is this control in front of me", so they carry weight rather than
+   sitting as faint dividers. */
+.tcSection { margin-bottom: 1.4rem; }
+.tcSection:last-child { margin-bottom: 0; }
+
+.tcSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.15rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tcSectionCount {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-subtle, rgba(127, 127, 127, 0.14));
+  color: var(--text-muted);
+}
+
+.tcSectionBlurb {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* A control marked operational whose components are not all here. It sits under
+   "needs improvement", which reads as a mistake unless the row says why. */
+.tcIncompleteChip {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: rgba(214, 158, 46, 0.16);
+  border: 1px solid rgba(214, 158, 46, 0.5);
+  color: #b7791f;
+  white-space: nowrap;
+}
+
+/* ── A withdrawn action item ──────────────────────────────────────────────── */
+/* It stays on the record deliberately (0119/0121), so it must read as settled
+   rather than outstanding — and the reason belongs with it, not a page away. */
+.gapItemWithdrawn { opacity: 0.72; }
+
+.gapItemWithdrawnNote {
+  flex-basis: 100%;
+  margin-top: 0.3rem;
+  padding: 0.35rem 0.55rem;
+  border-left: 3px solid var(--border);
+  background: var(--bg-subtle, rgba(127, 127, 127, 0.1));
+  border-radius: 0 3px 3px 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* The coverage panel's folded forecast, when there is nothing to forecast.
+   Neutral, not amber: "these controls are doing all they have been judged to
+   do" is a statement of fact, not a warning. */
+.tcFoldedNeutral {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* The assumption the forecast rests on. Indented under the figure because it
+   qualifies it rather than standing beside it. */
+.tcFoldedRests {
+  display: block;
+  margin: 0.25rem 0 0 0.9rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--amber, #b7791f);
+}
+
+/* Gap builder: the same work already planned in a live action on this risk.
+   The tag names the action, so it wraps rather than running off the row. */
+.gapCandHead .plannedTag { white-space: normal; }
+.dupWarning {
+  border: 1px solid var(--amber, #f59e0b); background: rgba(245, 158, 11, 0.08);
+  border-radius: var(--radius-sm); padding: 8px 12px; margin: 10px 0 4px;
+  font-size: 13px; line-height: 1.5; color: var(--text-primary);
+}
+.dupWarning ul { margin: 4px 0; padding-left: 18px; }

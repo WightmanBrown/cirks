@@ -1,0 +1,261 @@
+table_name,level,dimension,statement
+Delivery of public and administrative services,1,a,"One person must repeat information, rearrange an appointment or wait briefly; staff recover the service within normal working arrangements."
+Delivery of public and administrative services,1,i,"One person must repeat information, rearrange an appointment or wait briefly; staff recover the service within normal working arrangements."
+Delivery of public and administrative services,2,a,a small group loses or receives a flawed non-essential service for up to one working day; local reprioritisation restores acceptable service.
+Delivery of public and administrative services,2,i,a small group loses or receives a flawed non-essential service for up to one working day; local reprioritisation restores acceptable service.
+Delivery of public and administrative services,3,a,"a department cannot deliver an important service to a substantial group for several days, causing missed statutory targets, significant backlogs or individual financial loss."
+Delivery of public and administrative services,3,i,"a department cannot deliver an important service to a substantial group for several days, causing missed statutory targets, significant backlogs or individual financial loss."
+Delivery of public and administrative services,4,a,"Several important services are substantially disrupted for up to a week, or one essential service fails across the islands; safety or wellbeing of vulnerable people is threatened."
+Delivery of public and administrative services,4,i,"Several important services are substantially disrupted for up to a week, or one essential service fails across the islands; safety or wellbeing of vulnerable people is threatened."
+Delivery of public and administrative services,5,a,"Major government services fail for an extended period, preventing the state from meeting core obligations and directly threatening safety, subsistence or lawful administration."
+Delivery of public and administrative services,5,i,"Major government services fail for an extended period, preventing the state from meeting core obligations and directly threatening safety, subsistence or lawful administration."
+Digital Communications Impacts,1,a,An office losses telecoms for up to 12 hours
+Digital Communications Impacts,1,c,
+Digital Communications Impacts,1,i,
+Digital Communications Impacts,2,a,An office losses telecoms for up to 24 hours
+Digital Communications Impacts,2,c,
+Digital Communications Impacts,2,i,
+Digital Communications Impacts,3,a,Offices in a location loose telecoms for up to 24 hours
+Digital Communications Impacts,3,c,
+Digital Communications Impacts,3,i,
+Digital Communications Impacts,4,a,Loss of telecoms across all locations for up to a week
+Digital Communications Impacts,4,c,
+Digital Communications Impacts,4,i,
+Digital Communications Impacts,5,a,Loss of telecoms across all locations for more than 1 week
+Digital Communications Impacts,5,c,
+Digital Communications Impacts,5,i,
+Drinking water and wastewater,1,a,a short local interruption or minor quality excursion affects fewer than 10 people and is resolved without health consequence.
+Drinking water and wastewater,1,i,a short local interruption or minor quality excursion affects fewer than 10 people and is resolved without health consequence.
+Drinking water and wastewater,2,a,"Up to 50 people lose supply or sewerage for more than a day, or receive a precautionary boil-water notice; alternative supply is readily arranged."
+Drinking water and wastewater,2,i,"Up to 50 people lose supply or sewerage for more than a day, or receive a precautionary boil-water notice; alternative supply is readily arranged."
+Drinking water and wastewater,3,a,"a community loses safe water or wastewater service for several days, or contamination creates a credible outbreak risk requiring public-health intervention."
+Drinking water and wastewater,3,i,"a community loses safe water or wastewater service for several days, or contamination creates a credible outbreak risk requiring public-health intervention."
+Drinking water and wastewater,4,a,"More than 100 people are affected for up to a month, sewage or contamination causes major health and environmental risks, and outside assistance is needed."
+Drinking water and wastewater,4,i,"More than 100 people are affected for up to a month, sewage or contamination causes major health and environmental risks, and outside assistance is needed."
+Drinking water and wastewater,5,a,"Widespread or prolonged loss of potable water or sanitation creates severe health risks, uncontrolled disease or a direct likelihood of limited loss of life."
+Drinking water and wastewater,5,i,"Widespread or prolonged loss of potable water or sanitation creates severe health risks, uncontrolled disease or a direct likelihood of limited loss of life."
+"Education, assessment and pupil welfare",1,a,"One learner’s lesson, application or routine record is delayed or corrected without affecting progress or welfare."
+"Education, assessment and pupil welfare",1,c,"One learner’s lesson, application or routine record is delayed or corrected without affecting progress or welfare."
+"Education, assessment and pupil welfare",1,i,"One learner’s lesson, application or routine record is delayed or corrected without affecting progress or welfare."
+"Education, assessment and pupil welfare",2,a,"a class or small group loses teaching for up to a day, or one assessment, grant or welfare decision must be repeated."
+"Education, assessment and pupil welfare",2,c,"a class or small group loses teaching for up to a day, or one assessment, grant or welfare decision must be repeated."
+"Education, assessment and pupil welfare",2,i,"a class or small group loses teaching for up to a day, or one assessment, grant or welfare decision must be repeated."
+"Education, assessment and pupil welfare",3,a,"a school or significant cohort loses teaching for several days; examination, certification or special-needs information is unreliable, materially disadvantaging learners."
+"Education, assessment and pupil welfare",3,c,"a school or significant cohort loses teaching for several days; examination, certification or special-needs information is unreliable, materially disadvantaging learners."
+"Education, assessment and pupil welfare",3,i,"a school or significant cohort loses teaching for several days; examination, certification or special-needs information is unreliable, materially disadvantaging learners."
+"Education, assessment and pupil welfare",4,a,"Education is disrupted island-wide for weeks, many qualifications or grants are invalid or delayed, or pupil welfare and safeguarding arrangements fail for a significant group."
+"Education, assessment and pupil welfare",4,c,"Education is disrupted island-wide for weeks, many qualifications or grants are invalid or delayed, or pupil welfare and safeguarding arrangements fail for a significant group."
+"Education, assessment and pupil welfare",4,i,"Education is disrupted island-wide for weeks, many qualifications or grants are invalid or delayed, or pupil welfare and safeguarding arrangements fail for a significant group."
+"Education, assessment and pupil welfare",5,a,"Prolonged system-wide failure prevents a generation of learners receiving education or recognised qualifications, or exposes many children to severe safeguarding harm."
+"Education, assessment and pupil welfare",5,c,"Prolonged system-wide failure prevents a generation of learners receiving education or recognised qualifications, or exposes many children to severe safeguarding harm."
+"Education, assessment and pupil welfare",5,i,"Prolonged system-wide failure prevents a generation of learners receiving education or recognised qualifications, or exposes many children to severe safeguarding harm."
+Electricity generation and supply,1,a,a local outage affects a few premises for less than two hours; essential facilities remain supplied.
+Electricity generation and supply,1,i,a local outage affects a few premises for less than two hours; essential facilities remain supplied.
+Electricity generation and supply,2,a,a local outage affects a neighbourhood or government site for up to 12 hours; limited backup power and customer support are required.
+Electricity generation and supply,2,i,a local outage affects a neighbourhood or government site for up to 12 hours; limited backup power and customer support are required.
+Electricity generation and supply,3,a,"a substantial area loses power for up to 24 hours, disrupting businesses, communications and non-critical public services."
+Electricity generation and supply,3,i,"a substantial area loses power for up to 24 hours, disrupting businesses, communications and non-critical public services."
+Electricity generation and supply,4,a,"Most of the islands or critical facilities lose reliable power for one to three days; health, water, fuel and emergency operations are materially constrained."
+Electricity generation and supply,4,i,"Most of the islands or critical facilities lose reliable power for one to three days; health, water, fuel and emergency operations are materially constrained."
+Electricity generation and supply,5,a,"island-wide generation or distribution failure lasts beyond three days, exhausting backup arrangements and directly threatening life and public order."
+Electricity generation and supply,5,i,"island-wide generation or distribution failure lasts beyond three days, exhausting backup arrangements and directly threatening life and public order."
+"Embarrassment, distress and personal standing",1,c,"Short-lived embarrassment or anxiety to one person, resolved without specialist support or lasting effect."
+"Embarrassment, distress and personal standing",1,i,"Short-lived embarrassment or anxiety to one person, resolved without specialist support or lasting effect."
+"Embarrassment, distress and personal standing",2,c,"Significant embarrassment or short-term distress to one person, or minor distress to a small group; reputation can be restored through routine action."
+"Embarrassment, distress and personal standing",2,i,"Significant embarrassment or short-term distress to one person, or minor distress to a small group; reputation can be restored through routine action."
+"Embarrassment, distress and personal standing",3,c,"Prolonged distress, loss of professional standing or serious family or social consequences for one person; significant embarrassment affects many people."
+"Embarrassment, distress and personal standing",3,i,"Prolonged distress, loss of professional standing or serious family or social consequences for one person; significant embarrassment affects many people."
+"Embarrassment, distress and personal standing",4,c,"Extreme distress to one person or prolonged severe distress to a significant group, including exposure of intimate medical, safeguarding or criminal-justice information."
+"Embarrassment, distress and personal standing",4,i,"Extreme distress to one person or prolonged severe distress to a significant group, including exposure of intimate medical, safeguarding or criminal-justice information."
+"Embarrassment, distress and personal standing",5,c,"Severe distress creates a credible risk of self-harm or loss of life, or widespread and enduring distress affects a substantial part of the community."
+"Embarrassment, distress and personal standing",5,i,"Severe distress creates a credible risk of self-harm or loss of life, or widespread and enduring distress affects a substantial part of the community."
+Emergency response and civil contingencies,1,a,a minor incident is handled with a brief delay or local reprioritisation; response standards remain achievable.
+Emergency response and civil contingencies,1,i,a minor incident is handled with a brief delay or local reprioritisation; response standards remain achievable.
+Emergency response and civil contingencies,2,a,"Response to an isolated incident requires divisional reprioritisation or mutual aid, with limited effect on a small number of citizens."
+Emergency response and civil contingencies,2,i,"Response to an isolated incident requires divisional reprioritisation or mutual aid, with limited effect on a small number of citizens."
+Emergency response and civil contingencies,3,a,"a significant fire, rescue, policing, medical or pollution incident cannot be handled to standard; island-wide coordination is required and harm becomes more likely."
+Emergency response and civil contingencies,3,i,"a significant fire, rescue, policing, medical or pollution incident cannot be handled to standard; island-wide coordination is required and harm becomes more likely."
+Emergency response and civil contingencies,4,a,"a major incident overwhelms normal resources for up to 24 hours, requiring external assistance, emergency powers or suspension of other essential services."
+Emergency response and civil contingencies,4,i,"a major incident overwhelms normal resources for up to 24 hours, requiring external assistance, emergency powers or suspension of other essential services."
+Emergency response and civil contingencies,5,a,"Emergency command, warning or response fails during a catastrophic event, leaving a large population without timely aid and creating a direct likelihood of multiple deaths."
+Emergency response and civil contingencies,5,i,"Emergency command, warning or response fails during a catastrophic event, leaving a large population without timely aid and creating a direct likelihood of multiple deaths."
+"Environment, biosecurity, agriculture, fisheries and food safety",1,a,"a small, contained environmental or inspection failure causes negligible habitat, animal-health or food-safety effect."
+"Environment, biosecurity, agriculture, fisheries and food safety",1,i,"a small, contained environmental or inspection failure causes negligible habitat, animal-health or food-safety effect."
+"Environment, biosecurity, agriculture, fisheries and food safety",2,a,"a local pollution, pest, livestock, fisheries or food-safety incident requires targeted controls and causes short-term loss to a few producers or consumers."
+"Environment, biosecurity, agriculture, fisheries and food safety",2,i,"a local pollution, pest, livestock, fisheries or food-safety incident requires targeted controls and causes short-term loss to a few producers or consumers."
+"Environment, biosecurity, agriculture, fisheries and food safety",3,a,"an undetected hazard or flawed regulatory decision causes a significant outbreak, fishery closure, crop or livestock loss, or lasting damage to a protected area."
+"Environment, biosecurity, agriculture, fisheries and food safety",3,i,"an undetected hazard or flawed regulatory decision causes a significant outbreak, fishery closure, crop or livestock loss, or lasting damage to a protected area."
+"Environment, biosecurity, agriculture, fisheries and food safety",4,a,"a major invasive species, pollution or food-safety event spreads across the islands, seriously damaging public health, biodiversity or a principal agricultural or fisheries sector."
+"Environment, biosecurity, agriculture, fisheries and food safety",4,i,"a major invasive species, pollution or food-safety event spreads across the islands, seriously damaging public health, biodiversity or a principal agricultural or fisheries sector."
+"Environment, biosecurity, agriculture, fisheries and food safety",5,a,"Failure to contain a catastrophic biological or environmental event causes irreversible ecosystem loss, collapse of food production or fisheries, or limited loss of human life."
+"Environment, biosecurity, agriculture, fisheries and food safety",5,i,"Failure to contain a catastrophic biological or environmental event causes irreversible ecosystem loss, collapse of food production or fisheries, or limited loss of human life."
+"Fuel, food, medicines and essential supplies",1,a,Delivery of one non-critical product is delayed locally for several days; normal stocks absorb the interruption.
+"Fuel, food, medicines and essential supplies",1,i,Delivery of one non-critical product is delayed locally for several days; normal stocks absorb the interruption.
+"Fuel, food, medicines and essential supplies",2,a,"Local shortages of fuel, food, medicines or essential materials last up to a week, requiring rationing or substitution for a small group."
+"Fuel, food, medicines and essential supplies",2,i,"Local shortages of fuel, food, medicines or essential materials last up to a week, requiring rationing or substitution for a small group."
+"Fuel, food, medicines and essential supplies",3,a,"island supply of one essential category is disrupted for up to a week, closing services or businesses and placing vulnerable people at risk."
+"Fuel, food, medicines and essential supplies",3,i,"island supply of one essential category is disrupted for up to a week, closing services or businesses and placing vulnerable people at risk."
+"Fuel, food, medicines and essential supplies",4,a,"Several essential supply chains are disrupted for weeks; strategic stocks are depleted and health, transport, power or food security is materially impaired."
+"Fuel, food, medicines and essential supplies",4,i,"Several essential supply chains are disrupted for weeks; strategic stocks are depleted and health, transport, power or food security is materially impaired."
+"Fuel, food, medicines and essential supplies",5,a,"Sustained failure of inbound logistics or distribution causes widespread absence of fuel, food or medicines and directly threatens subsistence and life."
+"Fuel, food, medicines and essential supplies",5,i,"Sustained failure of inbound logistics or distribution causes widespread absence of fuel, food or medicines and directly threatens subsistence and life."
+"Healthcare, social care and safeguarding",1,a,"One consultation, care visit or routine appointment is delayed or repeated without clinical deterioration or safeguarding consequence."
+"Healthcare, social care and safeguarding",1,c,"One consultation, care visit or routine appointment is delayed or repeated without clinical deterioration or safeguarding consequence."
+"Healthcare, social care and safeguarding",1,i,"One consultation, care visit or routine appointment is delayed or repeated without clinical deterioration or safeguarding consequence."
+"Healthcare, social care and safeguarding",2,a,"a clinic, ward or care team is disrupted for part of a day, causing cancelled appointments, delayed medication or reduced support to a small group."
+"Healthcare, social care and safeguarding",2,c,"a clinic, ward or care team is disrupted for part of a day, causing cancelled appointments, delayed medication or reduced support to a small group."
+"Healthcare, social care and safeguarding",2,i,"a clinic, ward or care team is disrupted for part of a day, causing cancelled appointments, delayed medication or reduced support to a small group."
+"Healthcare, social care and safeguarding",3,a,"clinical, pharmacy, maternity, mental-health or safeguarding information is unreliable or unavailable long enough to risk serious harm to one person or interrupt care to many."
+"Healthcare, social care and safeguarding",3,c,"clinical, pharmacy, maternity, mental-health or safeguarding information is unreliable or unavailable long enough to risk serious harm to one person or interrupt care to many."
+"Healthcare, social care and safeguarding",3,i,"clinical, pharmacy, maternity, mental-health or safeguarding information is unreliable or unavailable long enough to risk serious harm to one person or interrupt care to many."
+"Healthcare, social care and safeguarding",4,a,"Hospital, public-health or statutory-care functions are substantially impaired; several people face serious harm, an outbreak is harder to control, or vulnerable persons cannot be protected."
+"Healthcare, social care and safeguarding",4,c,"Hospital, public-health or statutory-care functions are substantially impaired; several people face serious harm, an outbreak is harder to control, or vulnerable persons cannot be protected."
+"Healthcare, social care and safeguarding",4,i,"Hospital, public-health or statutory-care functions are substantially impaired; several people face serious harm, an outbreak is harder to control, or vulnerable persons cannot be protected."
+"Healthcare, social care and safeguarding",5,a,"island-wide health or care capability fails, medicines or critical treatment cannot be provided, or safeguarding systems fail in a way likely to cause limited loss of life."
+"Healthcare, social care and safeguarding",5,c,"island-wide health or care capability fails, medicines or critical treatment cannot be provided, or safeguarding systems fail in a way likely to cause limited loss of life."
+"Healthcare, social care and safeguarding",5,i,"island-wide health or care capability fails, medicines or critical treatment cannot be provided, or safeguarding systems fail in a way likely to cause limited loss of life."
+"Identity, entitlement and official records",1,c,incorrect or illicit use of one identity causes inconvenience and can be corrected through routine checks.
+"Identity, entitlement and official records",1,i,incorrect or illicit use of one identity causes inconvenience and can be corrected through routine checks.
+"Identity, entitlement and official records",2,c,"One person’s identity or entitlement is altered or misused, allowing incorrect records, a minor wrongful payment or a credible follow-on impersonation attempt."
+"Identity, entitlement and official records",2,i,"One person’s identity or entitlement is altered or misused, allowing incorrect records, a minor wrongful payment or a credible follow-on impersonation attempt."
+"Identity, entitlement and official records",3,c,"Several identities, licences, qualifications or entitlements are corrupted or misused, causing wrongful denial of service, payments or material distress."
+"Identity, entitlement and official records",3,i,"Several identities, licences, qualifications or entitlements are corrupted or misused, causing wrongful denial of service, payments or material distress."
+"Identity, entitlement and official records",4,c,"Many official identities or records are rendered unreliable, enabling substantial fraud, wrongful legal or administrative decisions, or loss of trust in identity checks."
+"Identity, entitlement and official records",4,i,"Many official identities or records are rendered unreliable, enabling substantial fraud, wrongful legal or administrative decisions, or loss of trust in identity checks."
+"Identity, entitlement and official records",5,c,"Systemic compromise permits creation of convincing false identities, serious organised fraud, or widespread inability to establish legal identity, status or entitlement."
+"Identity, entitlement and official records",5,i,"Systemic compromise permits creation of convincing false identities, serious organised fraud, or widespread inability to establish legal identity, status or entitlement."
+Impact on emergency communications,1,a,
+Impact on emergency communications,1,c,
+Impact on emergency communications,1,i,
+Impact on emergency communications,2,a,
+Impact on emergency communications,2,c,
+Impact on emergency communications,2,i,
+Impact on emergency communications,3,a,
+Impact on emergency communications,3,c,
+Impact on emergency communications,3,i,
+Impact on emergency communications,4,a,
+Impact on emergency communications,4,c,
+Impact on emergency communications,4,i,
+Impact on emergency communications,5,a,
+Impact on emergency communications,5,c,
+Impact on emergency communications,5,i,
+IT services impacts,1,a,Minor interruption of normal services for a few minutes equivalent to a tea break
+IT services impacts,1,c,Loss of minor information relating to a person or service. Resulting in the need to reset passwords and assess leak damage.
+IT services impacts,1,i,Not applicable
+IT services impacts,2,a,Unscheduled shutdown  of a system for a few hours during the working day
+IT services impacts,2,c,"Exposure of multiple email addresses, telephone numbers or names results in the need for higher vigilance for some users. Revealed software details need to be assessed for potential impacts."
+IT services impacts,2,i,Cross checking of data needs to be performed in order to maintain the operation on one external service
+IT services impacts,3,a,Unscheduled shutdown of service for a few hours to a external  facing service.
+IT services impacts,3,c,"Names, emails and numbers are exposed for many users. Exact software versions are publicly revealed . Security configuration details revealed. Loss of a low level encryption key. All of which result in the need to reissue credentials, risk assess software configuration. Potential to take a single service off line for a few hours."
+IT services impacts,3,i,"Data corruption requiring crosschecking between sources to corroborate which data is corrupted on a single system, impacting  the system, business service and its data for longer than a week"
+IT services impacts,4,a,Unscheduled shutdown of more than one external service for a period of 2 days.  Out of hours recovery becomes necessary.
+IT services impacts,4,c,Major loss of confidential IT data resulting in urgent resetting of secrets across multiple systems.
+IT services impacts,4,i,Data corruption resulting in partial permanent loss of data for a single department
+IT services impacts,5,a,"Loss of several external facing service for long enough to draw unwanted press. Knock-on effects last for weeks, multiple systems require rebuilding."
+IT services impacts,5,c,Complete compromise of all sensitive IT data requires extensive replacement of hundreds of accounts and hardening of multiple systems against attack
+IT services impacts,5,i,Data corruption results in complete loss of some critical data for multiple departments
+"Life, safety and liberty",1,a,"Minor inconvenience or discomfort to one person, with no injury and no restriction of liberty."
+"Life, safety and liberty",1,i,"Minor inconvenience or discomfort to one person, with no injury and no restriction of liberty."
+"Life, safety and liberty",2,a,a credible but readily controlled risk to one person’s safety or liberty; minor injury or illness with complete recovery within a week.
+"Life, safety and liberty",2,i,a credible but readily controlled risk to one person’s safety or liberty; minor injury or illness with complete recovery within a week.
+"Life, safety and liberty",3,a,"Serious injury or illness to one person, or minor injuries or temporary loss of liberty affecting a small group; recovery may take several months."
+"Life, safety and liberty",3,i,"Serious injury or illness to one person, or minor injuries or temporary loss of liberty affecting a small group; recovery may take several months."
+"Life, safety and liberty",4,a,"Serious injury, illness or loss of liberty affecting several people, or permanent impairment to one person; emergency intervention is required."
+"Life, safety and liberty",4,i,"Serious injury, illness or loss of liberty affecting several people, or permanent impairment to one person; emergency intervention is required."
+"Life, safety and liberty",5,a,"Direct threat to life affecting a group, causing or being likely to cause limited loss of life or multiple permanent incapacitating injuries."
+"Life, safety and liberty",5,i,"Direct threat to life affecting a group, causing or being likely to cause limited loss of life or multiple permanent incapacitating injuries."
+"Personal, business and island economy",1,a,"Minor financial loss or delay to one person or microbusiness, with no hardship and straightforward reimbursement."
+"Personal, business and island economy",1,c,"Minor financial loss or delay to one person or microbusiness, with no hardship and straightforward reimbursement."
+"Personal, business and island economy",1,i,"Minor financial loss or delay to one person or microbusiness, with no hardship and straightforward reimbursement."
+"Personal, business and island economy",2,a,"Material loss to one household or small business, or minor losses to a group; short-term cash-flow difficulty is possible."
+"Personal, business and island economy",2,c,"Material loss to one household or small business, or minor losses to a group; short-term cash-flow difficulty is possible."
+"Personal, business and island economy",2,i,"Material loss to one household or small business, or minor losses to a group; short-term cash-flow difficulty is possible."
+"Personal, business and island economy",3,a,"Significant loss causes hardship to one household, threatens the viability of a small business, or disrupts a local market or supply chain."
+"Personal, business and island economy",3,c,"Significant loss causes hardship to one household, threatens the viability of a small business, or disrupts a local market or supply chain."
+"Personal, business and island economy",3,i,"Significant loss causes hardship to one household, threatens the viability of a small business, or disrupts a local market or supply chain."
+"Personal, business and island economy",4,a,"Substantial losses affect many households or businesses, causing insolvencies, unemployment or a marked contraction in an important island sector."
+"Personal, business and island economy",4,c,"Substantial losses affect many households or businesses, causing insolvencies, unemployment or a marked contraction in an important island sector."
+"Personal, business and island economy",4,i,"Substantial losses affect many households or businesses, causing insolvencies, unemployment or a marked contraction in an important island sector."
+"Personal, business and island economy",5,a,"Widespread financially devastating losses, collapse of a critical market or sustained material damage to the Misty isles economy and external trade."
+"Personal, business and island economy",5,c,"Widespread financially devastating losses, collapse of a critical market or sustained material damage to the Misty isles economy and external trade."
+"Personal, business and island economy",5,i,"Widespread financially devastating losses, collapse of a critical market or sustained material damage to the Misty isles economy and external trade."
+"Policing, justice, custody and evidential integrity",1,a,"a routine case, advice request or administrative hearing is delayed, with no effect on liberty, evidence or outcome."
+"Policing, justice, custody and evidential integrity",1,c,"a routine case, advice request or administrative hearing is delayed, with no effect on liberty, evidence or outcome."
+"Policing, justice, custody and evidential integrity",1,i,"a routine case, advice request or administrative hearing is delayed, with no effect on liberty, evidence or outcome."
+"Policing, justice, custody and evidential integrity",2,a,"a minor prosecution, licensing action or local court process is delayed or must be repeated; one low-level case may be discontinued."
+"Policing, justice, custody and evidential integrity",2,c,"a minor prosecution, licensing action or local court process is delayed or must be repeated; one low-level case may be discontinued."
+"Policing, justice, custody and evidential integrity",2,i,"a minor prosecution, licensing action or local court process is delayed or must be repeated; one low-level case may be discontinued."
+"Policing, justice, custody and evidential integrity",3,a,"investigation of serious crime is hindered, a low-level prosecution collapses, or one person is wrongfully detained, released or denied due process."
+"Policing, justice, custody and evidential integrity",3,c,"investigation of serious crime is hindered, a low-level prosecution collapses, or one person is wrongfully detained, released or denied due process."
+"Policing, justice, custody and evidential integrity",3,i,"investigation of serious crime is hindered, a low-level prosecution collapses, or one person is wrongfully detained, released or denied due process."
+"Policing, justice, custody and evidential integrity",4,a,"a serious-crime prosecution collapses, critical evidence or witness information is compromised, or custody operations cannot safely maintain order."
+"Policing, justice, custody and evidential integrity",4,c,"a serious-crime prosecution collapses, critical evidence or witness information is compromised, or custody operations cannot safely maintain order."
+"Policing, justice, custody and evidential integrity",4,i,"a serious-crime prosecution collapses, critical evidence or witness information is compromised, or custody operations cannot safely maintain order."
+"Policing, justice, custody and evidential integrity",5,a,"Persistent undetected compromise makes multiple convictions unsafe, facilitates serious organised crime or escape, or causes major long-term impairment of lawful policing and justice."
+"Policing, justice, custody and evidential integrity",5,c,"Persistent undetected compromise makes multiple convictions unsafe, facilitates serious organised crime or escape, or causes major long-term impairment of lawful policing and justice."
+"Policing, justice, custody and evidential integrity",5,i,"Persistent undetected compromise makes multiple convictions unsafe, facilitates serious organised crime or escape, or causes major long-term impairment of lawful policing and justice."
+Privacy of citizens and staff,1,c,"Unauthorised disclosure of limited, routine personal data about one person; easily contained with negligible lasting effect."
+Privacy of citizens and staff,2,c,"Loss of control of routine personal data about a small group, or moderately sensitive data about one person, causing a credible need for protective action."
+Privacy of citizens and staff,3,c,"Disclosure of sensitive health, welfare, employment, policing or financial data about one person, or routine personal data about many people; material distress or misuse is likely."
+Privacy of citizens and staff,4,c,"Loss of control of sensitive or financially significant data about many citizens or staff, increasing their vulnerability to fraud, discrimination, abuse or criminal attack."
+Privacy of citizens and staff,5,c,"Widespread compromise of highly sensitive records or population-scale personal-data systems, exposing a large part of the community to grave or enduring harm."
+"Public confidence, democratic government and external relations",1,a,a contained error or short outage reduces one citizen’s confidence in a service but attracts no sustained public interest.
+"Public confidence, democratic government and external relations",1,c,a contained error or short outage reduces one citizen’s confidence in a service but attracts no sustained public interest.
+"Public confidence, democratic government and external relations",1,i,a contained error or short outage reduces one citizen’s confidence in a service but attracts no sustained public interest.
+"Public confidence, democratic government and external relations",2,a,Repeated or visible failure reduces confidence among a section of the community and requires a public explanation or corrective programme.
+"Public confidence, democratic government and external relations",2,c,Repeated or visible failure reduces confidence among a section of the community and requires a public explanation or corrective programme.
+"Public confidence, democratic government and external relations",2,i,Repeated or visible failure reduces confidence among a section of the community and requires a public explanation or corrective programme.
+"Public confidence, democratic government and external relations",3,a,"Public failures undermine confidence in a department, election, regulator or official decision; senior intervention and independent assurance are required."
+"Public confidence, democratic government and external relations",3,c,"Public failures undermine confidence in a department, election, regulator or official decision; senior intervention and independent assurance are required."
+"Public confidence, democratic government and external relations",3,i,"Public failures undermine confidence in a department, election, regulator or official decision; senior intervention and independent assurance are required."
+"Public confidence, democratic government and external relations",4,a,"confidence in government-wide administration or democratic legitimacy is materially damaged, provoking sustained protest, non-compliance, formal external criticism or diplomatic friction."
+"Public confidence, democratic government and external relations",4,c,"confidence in government-wide administration or democratic legitimacy is materially damaged, provoking sustained protest, non-compliance, formal external criticism or diplomatic friction."
+"Public confidence, democratic government and external relations",4,i,"confidence in government-wide administration or democratic legitimacy is materially damaged, provoking sustained protest, non-compliance, formal external criticism or diplomatic friction."
+"Public confidence, democratic government and external relations",5,a,"Loss of trust threatens internal political stability, the lawful transfer or exercise of authority, or the government’s ability to maintain essential public cooperation."
+"Public confidence, democratic government and external relations",5,c,"Loss of trust threatens internal political stability, the lawful transfer or exercise of authority, or the government’s ability to maintain essential public cooperation."
+"Public confidence, democratic government and external relations",5,i,"Loss of trust threatens internal political stability, the lawful transfer or exercise of authority, or the government’s ability to maintain essential public cooperation."
+"Public finances, revenue and assets",1,a,"Direct loss, avoidable cost or unrecovered revenue below £5,000; corrected within delegated budgets."
+"Public finances, revenue and assets",1,c,"Direct loss, avoidable cost or unrecovered revenue below £5,000; corrected within delegated budgets."
+"Public finances, revenue and assets",1,i,"Direct loss, avoidable cost or unrecovered revenue below £5,000; corrected within delegated budgets."
+"Public finances, revenue and assets",2,a,"Loss between £5,000 and £25,000, or a material error in a small programme; management reprioritisation is required."
+"Public finances, revenue and assets",2,c,"Loss between £5,000 and £25,000, or a material error in a small programme; management reprioritisation is required."
+"Public finances, revenue and assets",2,i,"Loss between £5,000 and £25,000, or a material error in a small programme; management reprioritisation is required."
+"Public finances, revenue and assets",3,a,"Loss between £25,000 and £100,000, significant tax or customs leakage, or unreliable accounts affecting a departmental budget or audit opinion."
+"Public finances, revenue and assets",3,c,"Loss between £25,000 and £100,000, significant tax or customs leakage, or unreliable accounts affecting a departmental budget or audit opinion."
+"Public finances, revenue and assets",3,i,"Loss between £25,000 and £100,000, significant tax or customs leakage, or unreliable accounts affecting a departmental budget or audit opinion."
+"Public finances, revenue and assets",4,a,"Loss between £100,000 and £500,000, sustained revenue failure, or material misstatement that constrains government cash, borrowing or delivery of several services."
+"Public finances, revenue and assets",4,c,"Loss between £100,000 and £500,000, sustained revenue failure, or material misstatement that constrains government cash, borrowing or delivery of several services."
+"Public finances, revenue and assets",4,i,"Loss between £100,000 and £500,000, sustained revenue failure, or material misstatement that constrains government cash, borrowing or delivery of several services."
+"Public finances, revenue and assets",5,a,"Loss above £500,000 or systemic corruption of budgeting, payments, debt or revenue systems causing a fiscal crisis or inability to fund essential government operations."
+"Public finances, revenue and assets",5,c,"Loss above £500,000 or systemic corruption of budgeting, payments, debt or revenue systems causing a fiscal crisis or inability to fund essential government operations."
+"Public finances, revenue and assets",5,i,"Loss above £500,000 or systemic corruption of budgeting, payments, debt or revenue systems causing a fiscal crisis or inability to fund essential government operations."
+"Road, public transport, aviation, port and navigation safety",1,a,"a minor route, bus, harbour or flight-information disruption lasts less than 12 hours and safe alternatives remain available."
+"Road, public transport, aviation, port and navigation safety",1,c,"a minor route, bus, harbour or flight-information disruption lasts less than 12 hours and safe alternatives remain available."
+"Road, public transport, aviation, port and navigation safety",1,i,"a minor route, bus, harbour or flight-information disruption lasts less than 12 hours and safe alternatives remain available."
+"Road, public transport, aviation, port and navigation safety",2,a,"a key local transport service or facility is disrupted for up to 24 hours, causing missed journeys or freight delays but no unsafe movement."
+"Road, public transport, aviation, port and navigation safety",2,c,"a key local transport service or facility is disrupted for up to 24 hours, causing missed journeys or freight delays but no unsafe movement."
+"Road, public transport, aviation, port and navigation safety",2,i,"a key local transport service or facility is disrupted for up to 24 hours, causing missed journeys or freight delays but no unsafe movement."
+"Road, public transport, aviation, port and navigation safety",3,a,"Several routes or a principal port or airport function is unavailable for up to 48 hours, stranding passengers or delaying essential freight; erroneous safety data creates a serious incident risk."
+"Road, public transport, aviation, port and navigation safety",3,c,"Several routes or a principal port or airport function is unavailable for up to 48 hours, stranding passengers or delaying essential freight; erroneous safety data creates a serious incident risk."
+"Road, public transport, aviation, port and navigation safety",3,i,"Several routes or a principal port or airport function is unavailable for up to 48 hours, stranding passengers or delaying essential freight; erroneous safety data creates a serious incident risk."
+"Road, public transport, aviation, port and navigation safety",4,a,"The airport, main port or critical road network is substantially disrupted for up to a week, or corrupted control information places multiple aircraft, vessels or road users in danger."
+"Road, public transport, aviation, port and navigation safety",4,c,"The airport, main port or critical road network is substantially disrupted for up to a week, or corrupted control information places multiple aircraft, vessels or road users in danger."
+"Road, public transport, aviation, port and navigation safety",4,i,"The airport, main port or critical road network is substantially disrupted for up to a week, or corrupted control information places multiple aircraft, vessels or road users in danger."
+"Road, public transport, aviation, port and navigation safety",5,a,"Prolonged loss or unsafe operation of principal transport gateways isolates the islands, stops essential supplies or directly causes or is likely to cause multiple fatalities."
+"Road, public transport, aviation, port and navigation safety",5,c,"Prolonged loss or unsafe operation of principal transport gateways isolates the islands, stops essential supplies or directly causes or is likely to cause multiple fatalities."
+"Road, public transport, aviation, port and navigation safety",5,i,"Prolonged loss or unsafe operation of principal transport gateways isolates the islands, stops essential supplies or directly causes or is likely to cause multiple fatalities."
+"Telecommunications, digital government and public records",1,a,"a local communications or digital-service fault lasts a few hours, or one routine record is temporarily inaccessible and recoverable."
+"Telecommunications, digital government and public records",1,c,"a local communications or digital-service fault lasts a few hours, or one routine record is temporarily inaccessible and recoverable."
+"Telecommunications, digital government and public records",1,i,"a local communications or digital-service fault lasts a few hours, or one routine record is temporarily inaccessible and recoverable."
+"Telecommunications, digital government and public records",2,a,"a site or small user group loses telecoms, systems or records for up to 12 hours; a limited set of official records requires reconciliation."
+"Telecommunications, digital government and public records",2,c,"a site or small user group loses telecoms, systems or records for up to 12 hours; a limited set of official records requires reconciliation."
+"Telecommunications, digital government and public records",2,i,"a site or small user group loses telecoms, systems or records for up to 12 hours; a limited set of official records requires reconciliation."
+"Telecommunications, digital government and public records",3,a,"a department loses communications or authoritative records for up to 24 hours, materially delaying services and decisions or allowing publication of incorrect official information."
+"Telecommunications, digital government and public records",3,c,"a department loses communications or authoritative records for up to 24 hours, materially delaying services and decisions or allowing publication of incorrect official information."
+"Telecommunications, digital government and public records",3,i,"a department loses communications or authoritative records for up to 24 hours, materially delaying services and decisions or allowing publication of incorrect official information."
+"Telecommunications, digital government and public records",4,a,"Government-wide networks, digital identity, archives or public communications are unreliable for several days, impairing emergency coordination and the legal evidential value of records."
+"Telecommunications, digital government and public records",4,c,"Government-wide networks, digital identity, archives or public communications are unreliable for several days, impairing emergency coordination and the legal evidential value of records."
+"Telecommunications, digital government and public records",4,i,"Government-wide networks, digital identity, archives or public communications are unreliable for several days, impairing emergency coordination and the legal evidential value of records."
+"Telecommunications, digital government and public records",5,a,"island-wide telecommunications or core digital and records infrastructure fails for up to a week or is systemically falsified, preventing government coordination and public warning."
+"Telecommunications, digital government and public records",5,c,"island-wide telecommunications or core digital and records infrastructure fails for up to a week or is systemically falsified, preventing government coordination and public warning."
+"Telecommunications, digital government and public records",5,i,"island-wide telecommunications or core digital and records infrastructure fails for up to a week or is systemically falsified, preventing government coordination and public warning."

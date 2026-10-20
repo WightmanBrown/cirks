@@ -1,0 +1,22 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.section { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-inset); padding: 14px 16px; margin: 16px 0; }
+.head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.title { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0; }
+.grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; font-size: 13px; }
+.grid dt { color: var(--text-muted); }
+.grid dd { margin: 0; color: var(--text-primary); overflow-wrap: anywhere; }
+.grid a { color: var(--accent, #64b5f6); }
+.hint { color: var(--text-muted); font-size: 12px; }
+.late { color: var(--amber, #f59e0b); font-weight: 600; }
+.overdue {
+  border: 1px solid var(--amber, #f59e0b); background: rgba(245, 158, 11, 0.08);
+  border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; margin: 0 0 10px;
+}
+.form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 14px; }
+.form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-secondary); }
+.wide { grid-column: 1 / -1; }
+.buttons { display: flex; justify-content: flex-end; gap: 8px; }
+.err { color: var(--red); font-size: 13px; margin: 0; }
+.btnEdit { composes: btnGhost btnSm from './buttons.module.css'; }
+.btnSave { composes: btnPrimary btnSm from './buttons.module.css'; }
+.btnCancel { composes: btnGhost btnSm from './buttons.module.css'; }

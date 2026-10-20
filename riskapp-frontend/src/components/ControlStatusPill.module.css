@@ -1,0 +1,20 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.active        { background: rgba(76,175,125,0.12);  border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.underReview   { background: rgba(245,166,35,0.12);  border: 1px solid rgba(245,166,35,0.3);  color: var(--amber); }
+.notApplicable { background: rgba(120,120,120,0.10); border: 1px solid rgba(120,120,120,0.22); color: var(--text-muted); }
+.ineffective   { background: rgba(224,82,82,0.12);   border: 1px solid rgba(224,82,82,0.3);   color: var(--red); }
+.planned       { background: rgba(100,100,180,0.12); border: 1px solid rgba(100,100,180,0.25); color: #9fa8da; }

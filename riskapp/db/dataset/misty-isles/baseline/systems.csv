@@ -1,0 +1,52 @@
+name,description,department_name,owner_email,manager_email,is_shared,is_active
+Aircraft fuelling,Tankering and fuel logistics,Department of Roads and Airports,C.Giles@mig.local,C.Giles@mig.local,false,true
+Approach radar,Approach radar system including aircraft and payload information systems,Department of Roads and Airports,C.Giles@mig.local,C.Giles@mig.local,false,true
+Billing and meter reading,The decentralised and outsourced billing system,Misty Islands Utilities,e.lectric@miu.local,e.lectric@miu.local,false,true
+Case Management System,Legal case management for the public prosecutor including evidence collection and cataloging,MIG Department of Justice,B.Kirk@mig.local,B.Kirk@mig.local,false,true
+Costal Radar and Ship Tracking,The combined radars and ship identification system. Shared with DEFA (Fisheries),Maritime Department,A.Turing@mig.local,A.Turing@mig.local,true,true
+Court Management System,"Court management for cases, evidence control, witness management, prisoner logistics",MIG Department of Justice,B.Kirk@mig.local,B.Kirk@mig.local,false,true
+Criminal Records and Firearms Licensing System,Handling sensitive information about criminals and controlling the legal possession of firearms.,MIG Department of Justice,B.Kirk@mig.local,B.Liskov@mig.local,true,true
+Driver licensing system,,Department of Roads and Airports,C.Giles@mig.local,K.Johnson@mig.local,false,true
+Electoral Role,,Misty Isles Cabinet Office,A.Kay@mig.local,J.Bartik@mig.local,true,true
+Emergency Communications System,"The RF, Cellular and Internet communications platform",Disaster and Emergency Management,M.Hamilton@mig.local,M.Hamilton@mig.local,true,true
+Environmental GIS research platform,Geospatial record storage for environmental research and record keeping,DEFA,A.Lovelace@mig.local,A.Lovelace@mig.local,false,true
+Fisheries management system,Fish stock tracking,DEFA,A.Lovelace@mig.local,A.Lovelace@mig.local,false,true
+Flight information display,Flight information display systems for public announcement of flight status,Department of Roads and Airports,C.Giles@mig.local,C.Giles@mig.local,false,true
+Flight operations system,"Flight planning, loadmaster, routing",Department of Roads and Airports,C.Giles@mig.local,C.Giles@mig.local,false,true
+GIS Land Register,Our GIS land register stores all records relating to the ownership of land and its addressing. We ended up owning this because we had an expert who knew how to run it.,Misty Islands Utilities,e.lectric@miu.local,M.Faraday@miu.local,true,true
+Host Intrusion Detection System,Security HIDS system,Department of Information Security,S.Topping@mig.local,S.Topping@mig.local,false,true
+HR System,All HR functions excluding salary and expenses,Misty Isles Cabinet Office,A.Kay@mig.local,,true,true
+Information Security Management System,Implemented using the CIRKS tool,Department of Information Security,C.Shannon@mig.local,R.Perlman@mig.local,false,true
+Information Security Playbooks,These are the incident response playbooks which are used to guide response teams. They exist at the two response locations as printed documents as well as being stored electronically in the document management system,Department of Information Security,C.Shannon@mig.local,R.Perlman@mig.local,false,true
+IT Support Ticketing System,,Department of Communications,V.Cerf@mig.local,,false,true
+Maritime and Aviation Radio Communications System,,Department of Roads and Airports,C.Giles@mig.local,K.Johnson@mig.local,false,true
+Medical Imaging System,"Medical imaging equipment, image storage and image sharing system",Misty Isles Department of Health,g.hopper@mig.local,F.Nightingale@mig.local,false,true
+Medical Planning System,"Day to day management of staff, appointments, and operational medical activities",Misty Isles Department of Health,g.hopper@mig.local,F.Nightingale@mig.local,false,true
+Medical Records System,The central medical records system holding full medical records for all registered patients,Misty Isles Department of Health,g.hopper@mig.local,F.Nightingale@mig.local,false,true
+"MIG Authentication, Authorisation and Access Control system","MIG’s authorisation, authentication and access control system which provide internal and external identity management",Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,false,true
+MIG Backup,MIG’s backup servers and agents,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG Banking System,The central payments platform used to move money between external banks,MIG Treasury,M.Karloff@mig.local,M.Karloff@mig.local,true,true
+MIG Corporate Email,MIG’s internal email system part of the MIG desktop,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG Desktop (internal),MIG’s internal desktop service,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG Desktop (remote),MIG’s internal desktop service,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG Document Management,MIG’s internal document management service for formal document storage,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG File storage,"MIG’s file servers, shared drives and cloud based file services",Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIGNet,MIGs network backbone and local area networking,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG Telephony and Messaging,MIG’s voice telephony and text messaging service,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+MIG Video Conferencing,MIG desktop VC solution,Department of Communications,G.Welchman@mig.local,G.Welchman@mig.local,true,true
+Network Intrusion Detection System,Security NIDS system,Department of Information Security,S.Topping@mig.local,S.Topping@mig.local,false,true
+Pharmacy Inventory System,"The pharmacy management system which includes the medicines database, inventory management and pharmacy logistics",Misty Isles Department of Health,g.hopper@mig.local,F.Nightingale@mig.local,false,true
+Port operations system,"Management of all ships, good and maritime supplies for the port authority, shared with Customs",Maritime Department,A.Turing@mig.local,A.Turing@mig.local,true,true
+Power Distribution,The network control systems,Misty Islands Utilities,e.lectric@miu.local,e.lectric@miu.local,false,true
+Power Generation,The Power station control systems,Misty Islands Utilities,e.lectric@miu.local,e.lectric@miu.local,false,true
+Prison Management System,"The prisoner records, shift management and operational records system",MIG Department of Justice,B.Kirk@mig.local,B.Kirk@mig.local,false,true
+Pupil/student records system,The central system for the storage of pupil records which supports the education service,Department of Education,J.Finx@mig.local,J.Finx@mig.local,false,true
+Risk Management System,"CIRKS the information risk management system which ultimately manages risks which belong to MIG, shared across multiple departments and managed by the CISO",Misty Isles Cabinet Office,siro@mig.local,ciso@mig.local,true,true
+Schools facilities management,"School stock management, facilities management, logistics, maintenance scheduling",Department of Education,J.Finx@mig.local,J.Finx@mig.local,false,true
+Security monitoring platform,The central SIEM and XDR platforms,Department of Information Security,S.Topping@mig.local,S.Topping@mig.local,false,true
+Student Desktop,,Department of Education,J.Finx@mig.local,S.Papert@mig.local,false,true
+Support Knowledge base,,Department of Communications,V.Cerf@mig.local,,false,true
+Tax Records System,System for the management and collection of taxes,MIG Treasury,M.Karloff@mig.local,M.Karloff@mig.local,false,true
+Treasury Accounting System,The central government accounting system used by all departments,MIG Treasury,M.Karloff@mig.local,M.Karloff@mig.local,true,true
+Vehicle Licensing System,,Department of Roads and Airports,C.Giles@mig.local,K.Johnson@mig.local,false,true
+Water Distribution,The water network control systems,Misty Islands Utilities,e.lectric@miu.local,e.lectric@miu.local,false,true

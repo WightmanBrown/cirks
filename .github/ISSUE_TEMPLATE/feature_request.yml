@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a change or a new feature.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        CIRKS models only what helps answer a security question. Ideas still taking shape are welcome in [Discussions](https://github.com/WightmanBrown/cirks/discussions) first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Who meets the problem, and what they cannot do today.
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Which security question does it help answer?
+      description: For example, which risk it scores differently, which control objective it shows met or unmet, or who has to act.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like CIRKS to do?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: How do you manage today?
+      description: Any workaround or other tool you use instead.

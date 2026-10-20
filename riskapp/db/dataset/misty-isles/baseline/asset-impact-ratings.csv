@@ -1,0 +1,67 @@
+asset_name,impact_table_name,rated_level,c_level,i_level,a_level
+Aircraft Control and Radar,"Life, safety and liberty",5,1,5,
+Aircraft Control and Radar,"Road, public transport, aviation, port and navigation safety",4,,,
+Aircraft fuelling  signalling control and operations,"Road, public transport, aviation, port and navigation safety",4,1,4,3
+Aviation Band Radio Traffic for ATC,"Life, safety and liberty",3,1,3,3
+Aviation Fuel logistics information,"Public finances, revenue and assets",3,1,,
+Aviation Fuel logistics information,"Road, public transport, aviation, port and navigation safety",3,,4,
+Clinical operations information,"Healthcare, social care and safeguarding",4,1,3,
+Court management,"Policing, justice, custody and evidential integrity",2,,3,
+Court management,"Public confidence, democratic government and external relations",3,,,
+Criminal cases,"Life, safety and liberty",4,,,1
+Criminal cases,"Policing, justice, custody and evidential integrity",5,,,1
+Criminal Records,"Policing, justice, custody and evidential integrity",3,,,
+Detective Monitoring Events,Delivery of public and administrative services,5,,,
+Detective Monitoring Events,Privacy of citizens and staff,4,,,
+Detective Monitoring Events,"Public confidence, democratic government and external relations",4,,,
+Detective Monitoring Events,"Public finances, revenue and assets",5,,,
+Electrical Billing,"Identity, entitlement and official records",4,4,3,1
+Electrical Billing,"Public finances, revenue and assets",3,3,3,3
+Electrical control signalling,Electricity generation and supply,5,,,
+Electrical control signalling,"Life, safety and liberty",5,,,
+Electrical control signalling,"Personal, business and island economy",4,,,
+Electrical control signalling,"Public finances, revenue and assets",4,,,
+Emergency communications,Emergency response and civil contingencies,4,,,
+Firearms and Explosives Licensing Information,"Policing, justice, custody and evidential integrity",3,,,
+Fisheries data,"Environment, biosecurity, agriculture, fisheries and food safety",3,1,,
+Fisheries data,"Public finances, revenue and assets",4,2,3,
+Flight planning information,"Road, public transport, aviation, port and navigation safety",3,2,3,3
+Generation Fuel logistics information,Electricity generation and supply,5,1,1,
+Generation Fuel logistics information,"Public finances, revenue and assets",5,,,
+Information Risk Management Information,Delivery of public and administrative services,4,,4,4
+Information Risk Management Information,"Public confidence, democratic government and external relations",4,,,
+Information Risk Management Information,"Public finances, revenue and assets",4,,,
+Internal MIG user identity,Delivery of public and administrative services,5,1,3,5
+Internal MIG user identity,"Identity, entitlement and official records",5,,3,1
+IT Support information,IT services impacts,4,4,3,4
+Maritime Radio Communications,"Life, safety and liberty",5,1,3,5
+Maritime vessel tracking,"Public finances, revenue and assets",2,,,
+Medical diagnostic information,"Healthcare, social care and safeguarding",3,1,,
+Medical diagnostic information,"Life, safety and liberty",5,1,5,5
+Medical equipment calibration,"Healthcare, social care and safeguarding",3,1,,
+Medical equipment calibration,"Life, safety and liberty",5,1,,
+MIG Financial payments data,"Identity, entitlement and official records",3,,2,1
+MIG Financial payments data,"Public finances, revenue and assets",3,,4,
+MIG Government Communications Traffic,Digital Communications Impacts,5,1,1,5
+Offender/prisoner management,"Life, safety and liberty",3,1,3,3
+Passenger flight information,"Road, public transport, aviation, port and navigation safety",2,,,
+Patient medical records,"Embarrassment, distress and personal standing",4,,1,1
+Patient medical records,"Healthcare, social care and safeguarding",4,,,3
+Patient medical records,"Life, safety and liberty",5,1,,5
+Personal Tax Information,"Identity, entitlement and official records",4,,3,2
+Personal Tax Information,"Public confidence, democratic government and external relations",3,,2,1
+Pharmacy logistics and inventory,"Healthcare, social care and safeguarding",3,,3,
+Pharmacy logistics and inventory,"Life, safety and liberty",5,1,5,3
+Port operations information,"Fuel, food, medicines and essential supplies",4,,,
+Port operations information,"Personal, business and island economy",4,,,
+Port operations information,"Public finances, revenue and assets",1,,,
+Postal addressing and land records,Delivery of public and administrative services,2,1,2,2
+School operational information,Delivery of public and administrative services,2,1,,
+Scientific Environmental Data,"Environment, biosecurity, agriculture, fisheries and food safety",4,1,4,3
+Student created learning material,"Education, assessment and pupil welfare",3,2,,
+Student records,"Identity, entitlement and official records",5,5,2,1
+Water Billing,"Identity, entitlement and official records",4,,,
+Water Billing,"Public finances, revenue and assets",3,,,
+Water control signalling,Drinking water and wastewater,5,,,
+Water control signalling,"Personal, business and island economy",4,,,
+Water control signalling,"Public confidence, democratic government and external relations",4,,,

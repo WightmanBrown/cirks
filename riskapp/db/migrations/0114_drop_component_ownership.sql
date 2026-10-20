@@ -1,0 +1,51 @@
+-- v114 — the component library has no owning department.
+--
+-- Owner's decision 2026-09-10: "One consistent rule across the library, drop
+-- ownership entirely."
+--
+-- v69 gave `control_components` an `owner_department_id`, snapshotted from the
+-- creator's department, and made writes seat-scoped to it. The evidence from
+-- CIRKS-test says that was the wrong model for this table:
+--
+--   * The components that matter most are shared the most widely. The five
+--     most-used entries sit in systems belonging to 12, 12, 12, 12 and 9
+--     departments respectively (IT Administrators, Crowdstrike Falcon Agent,
+--     Veeam Backup, ME End-Point Central, Bank Street server room). For those,
+--     "the owning department" names one of twelve and misdescribes the other
+--     eleven.
+--   * 153 of 155 components carry no owner at all, and the reason is that there
+--     are TWO write paths into the catalogue and only one of them stamps an
+--     owner: `POST /components` does, `db/import.js` does not (the CSV format
+--     has no such column, and there is no sensible value to put in it). The
+--     library was loaded by the importer. So the gate bit on whichever rows
+--     happened to be typed into the UI — inert by accident rather than by rule,
+--     which is worse than either answer.
+--   * The failure it invites is duplication. Someone blocked from editing a
+--     shared component creates a second copy, and the library then answers
+--     "which systems run this?" wrongly — which is the only question it exists
+--     to answer. There is no uniqueness constraint on component names to catch
+--     that; today's zero duplicates are a matter of luck and a small user base.
+--
+-- Departmental ownership stays exactly where it is load-bearing: systems,
+-- information assets, business services and impact tables. Those are things a
+-- department is accountable FOR. A catalogue entry is a shared definition,
+-- more like a threat or a control — and neither of those has an owning
+-- department either. So this also removes an inconsistency rather than
+-- creating one.
+--
+-- Writes are now gated by the `components.write` capability alone.
+--
+-- WHAT IS LOST, stated plainly: nothing else reads this column for authority,
+-- but two derived views used it for grouping and are re-pointed in the same
+-- change — `GET /actions/roll-up` (a component's "library owner" is now null;
+-- `?mine=1` reaches components through the item's own Responsible owner) and
+-- the component candidates in `GET /risks/:id/action-items/candidates`.
+--
+-- Components are NOT covered by the v106 accountability audit triggers (those
+-- watch systems, assets and services), so removing the gate leaves the
+-- catalogue's most-used entries editable by anyone with the capability, with no
+-- field-level trail. That is the accepted cost; a uniqueness constraint on
+-- (name, component_type) is the honest replacement control and is offered
+-- separately rather than smuggled in here.
+
+ALTER TABLE control_components DROP COLUMN IF EXISTS owner_department_id;

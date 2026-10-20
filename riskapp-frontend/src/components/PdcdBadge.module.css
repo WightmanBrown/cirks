@@ -1,0 +1,89 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.badge {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* ── Compact (list rows) ─────────────────────────────────────────────────── */
+
+.compact .pip {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  cursor: help;
+}
+
+.compact .pipLetter {
+  line-height: 1;
+}
+
+.compact .pipLabel,
+.compact .pipCount {
+  display: none;
+}
+
+/* ── Detailed (panel above mitigating controls) ──────────────────────────── */
+
+.detailed {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detailed .pip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 6px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: help;
+}
+
+.detailed .pipLetter {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.detailed .pipLabel {
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+
+.detailed .pipCount {
+  font-weight: 600;
+  margin-left: 2px;
+  opacity: 0.9;
+}
+
+/* ── Lit / Dim states ────────────────────────────────────────────────────── */
+
+.pipLit {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-accent);
+}
+
+.pipDim {
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  opacity: 0.55;
+}

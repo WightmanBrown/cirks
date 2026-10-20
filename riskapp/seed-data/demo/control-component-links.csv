@@ -1,0 +1,81 @@
+control_title,component_name,component_type,role
+"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Data protection and handling,process,Data protection
+"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Microsoft Active Directory Domain Services,technology,
+"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",PaloAlto GlobalProtect VPN,technology,Remote-access VPN & endpoint compliance
+"Backups of data are created, protected, maintained, and tested",Microsoft 365 Backup,technology,Cloud backup
+"Backups of data are created, protected, maintained, and tested",Resilience and recovery,process,Resilience & recovery
+"Backups of data are created, protected, maintained, and tested",Veeam Backup,technology,Backup & recovery
+"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Crowdstrike Falcon Agent,technology,Endpoint detection & response
+"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Crowdstrike SaaS,technology,EDR analytics & management
+"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",End point monitoring (EPP),process,Endpoint protection
+"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",OSSEC agent,technology,Host log / HIDS agent
+Configuration management practices are established and applied,IT Administrators,people,IT operations & hardening
+Configuration management practices are established and applied,ME End-Point Central,technology,Patch & endpoint management
+Configuration management practices are established and applied,System configuration,process,Configuration management
+Critical suppliers are assessed prior to acquisition,Supply chain management,process,Supply-chain risk management
+External service provider activities and services are monitored to find potentially adverse events,Supply chain management,process,Supply-chain risk management
+"Identities and credentials for authorized users, services, and hardware are managed by the organization",Microsoft Active Directory Domain Services,technology,Identity & access management
+Incidents are categorized and prioritized,Incident management,process,Incident response
+Incidents are contained,Incident management,process,Incident response
+Incidents are declared when adverse events meet the defined incident criteria,Incident management,process,Incident response
+Incidents are eradicated,Crowdstrike Falcon Agent,technology,Endpoint detection & response
+Incidents are eradicated,Incident management,process,Incident response
+Individuals in specialized roles are provided with awareness and training so that they possess the knowledge and skills to perform relevant tasks with cybersecurity risks in mind,Security awareness training,process,Awareness & training programme
+Information is correlated from multiple sources,Wazuh,technology,SIEM / log aggregation
+Installation and execution of unauthorized software are prevented,Crowdstrike Falcon Agent,technology,Endpoint detection & response
+Installation and execution of unauthorized software are prevented,End point monitoring (EPP),process,Endpoint protection
+Inventories of hardware managed by the organization are maintained,Asset management,process,Asset inventory
+Inventories of services provided by suppliers are maintained,Supply chain management,process,Supply-chain risk management
+"Inventories of software, services, and systems managed by the organization are maintained",Asset management,process,Asset inventory
+Log records are generated and made available for continuous monitoring,OSSEC agent,technology,Host log / HIDS agent
+Log records are generated and made available for continuous monitoring,Wazuh,technology,SIEM / log aggregation
+Mechanisms are implemented to achieve resilience requirements in normal and adverse situations,Resilience and recovery,process,Resilience & recovery
+Networks and environments are protected from unauthorized logical access and usage,PaloAlto 850-22,technology,Perimeter firewall
+Networks and environments are protected from unauthorized logical access and usage,Palo Alto ATP,technology,Network intrusion detection
+Networks and environments are protected from unauthorized logical access and usage,PaloAlto ATP,technology,Network intrusion detection
+Networks and environments are protected from unauthorized logical access and usage,PaloAlto GlobalProtect VPN,technology,Remote-access VPN & endpoint compliance
+Networks and network services are monitored to find potentially adverse events,Advanced Threat Prevention Network Intrusion Detection platform,technology,Network intrusion detection
+Networks and network services are monitored to find potentially adverse events,Detective Monitoring,process,Security monitoring
+Networks and network services are monitored to find potentially adverse events,ExtremeCloud IQ Site Engine,technology,Network monitoring
+Networks and network services are monitored to find potentially adverse events,Network traffic monitoring for unencrypted traffic,process,Network monitoring
+Networks and network services are monitored to find potentially adverse events,PaloAlto 850-22,technology,Perimeter firewall
+Networks and network services are monitored to find potentially adverse events,Palo Alto ATP,technology,Network intrusion detection
+Networks and network services are monitored to find potentially adverse events,PaloAlto ATP,technology,Network intrusion detection
+Networks and network services are monitored to find potentially adverse events,Wazuh,technology,SIEM / log aggregation
+Personnel are provided with awareness and training so that they possess the knowledge and skills to perform general tasks with cybersecurity risks in mind,Security awareness training,process,Awareness & training programme
+"Physical access to assets is managed, monitored, and enforced commensurate with risk",Bank Street server room,facility,Secure facility
+"Physical access to assets is managed, monitored, and enforced commensurate with risk",MIG Official Premises,facility,Secure premises
+"Physical access to assets is managed, monitored, and enforced commensurate with risk",Physical security,process,Physical security
+"Physical access to assets is managed, monitored, and enforced commensurate with risk",Shark Point Server Room,facility,Secure facility
+"Physical access to assets is managed, monitored, and enforced commensurate with risk",The Castle server room,facility,Secure facility
+Potentially adverse events are analyzed to better understand associated activities,Crowdstrike SaaS,technology,EDR analytics & management
+Potentially adverse events are analyzed to better understand associated activities,Detective Monitoring,process,Security monitoring
+Potentially adverse events are analyzed to better understand associated activities,InfoSec Team,people,Security operations
+"Processes for receiving, analyzing, and responding to vulnerability disclosures are established",Vulnerability management,process,Vulnerability management
+"Recovery actions are selected, scoped, prioritized, and performed",Resilience and recovery,process,Resilience & recovery
+"Risk responses are chosen, prioritized, planned, tracked, and communicated",CIRKS Information Risk Management Process,process,Risk management
+"Software is maintained, replaced, and removed commensurate with risk",IT Administrators,people,IT operations & hardening
+"Software is maintained, replaced, and removed commensurate with risk",ME End-Point Central,technology,Patch & endpoint management
+"Software is maintained, replaced, and removed commensurate with risk",Vulnerability management,process,Vulnerability management
+"The confidentiality, integrity, and availability of data-at-rest are protected",Data protection and handling,process,Data protection
+"The confidentiality, integrity, and availability of data-in-transit are protected",Data protection and handling,process,Data protection
+"The confidentiality, integrity, and availability of data-in-transit are protected",Network traffic monitoring for unencrypted traffic,process,Provides assurance that the traffic on the network is unencrypted
+"The confidentiality, integrity, and availability of data-in-transit are protected",PaloAlto GlobalProtect VPN,technology,Remote-access VPN & endpoint compliance
+"The confidentiality, integrity, and availability of data-in-transit are protected",Plotnet Secure Radio,technology,Encrypted radio comms
+"The confidentiality, integrity, and availability of data-in-transit are protected",Signal,technology,Encrypted messaging
+"The confidentiality, integrity, and availability of data-in-transit are protected",Starlink LEO portable terminal,technology,Provide availability for all government networks
+The incident response plan is executed in coordination with relevant third parties once an incident is declared,Incident management,process,Incident response
+The incident response plan is executed in coordination with relevant third parties once an incident is declared,InfoSec Team,people,Security operations
+The integrity of backups and other restoration assets is verified before using them for restoration,Veeam Backup,technology,Backup & recovery
+The organization's technology assets are protected from environmental threats,Bank Street server room,facility,Secure facility
+The physical environment is monitored to find potentially adverse events,Bank Street server room,facility,Secure facility
+The physical environment is monitored to find potentially adverse events,Physical security,process,Physical security
+The physical environment is monitored to find potentially adverse events,Shark Point Server Room,facility,Secure facility
+The physical environment is monitored to find potentially adverse events,The Castle server room,facility,Secure facility
+The recovery portion of the incident response plan is executed once initiated from the incident response process,Resilience and recovery,process,Resilience & recovery
+The recovery portion of the incident response plan is executed once initiated from the incident response process,Veeam Backup,technology,Backup & recovery
+"Threats, vulnerabilities, likelihoods, and impacts are used to understand inherent risk and inform risk response prioritization",CIRKS Information Risk Management Process,process,Risk management
+"Threats, vulnerabilities, likelihoods, and impacts are used to understand inherent risk and inform risk response prioritization",InfoSec Team,people,Security operations
+"Users, services, and hardware are authenticated",Microsoft Active Directory Domain Services,technology,Identity & access management
+"Vulnerabilities in assets are identified, validated, and recorded",ME End-Point Central,technology,Patch & endpoint management
+"Vulnerabilities in assets are identified, validated, and recorded",Vulnerability management,process,Vulnerability management

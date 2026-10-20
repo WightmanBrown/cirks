@@ -1,0 +1,140 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.widget {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.date {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.nextActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.icalLink,
+.minutesLink,
+.packLink {
+  background: none;
+  border: none;
+  color: var(--accent, #64b5f6);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+.icalLink:hover,
+.minutesLink:hover,
+.packLink:hover { text-decoration: underline; }
+.icalLink:disabled { color: var(--text-muted); cursor: default; text-decoration: none; }
+
+.minutesLink {
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+/* ── "Update required" alert (per-user, meeting-cycle prompt) ── */
+.updateAlert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: rgba(255,183,77,0.10);
+  border: 1px solid rgba(255,183,77,0.35);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font: inherit;
+}
+.updateAlert:hover { background: rgba(255,183,77,0.18); }
+
+.updateIcon { color: #ffb74d; font-size: 0.95rem; line-height: 1; }
+
+.updateText {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.updateArrow { color: #ffb74d; font-weight: 700; }
+
+/* ── Loading skeleton ── */
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+.skeleton { display: flex; flex-direction: column; gap: 12px; }
+
+.skeletonRow { display: flex; flex-direction: column; gap: 4px; }
+
+.skeletonLabel {
+  width: 80px;
+  height: 10px;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--border);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonValue {
+  width: 160px;
+  height: 20px;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--border);
+  animation: shimmer 1.4s ease-in-out infinite 0.2s;
+}

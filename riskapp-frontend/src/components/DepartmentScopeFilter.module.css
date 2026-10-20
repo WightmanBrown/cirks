@@ -1,0 +1,56 @@
+/* SPDX-License-Identifier: Apache-2.0
+   Copyright (C) 2026 Wightman Brown Limited
+
+   Canonical styling for the department scope control. Lifted verbatim from
+   InformationAssetsPage.module.css so the shared component is visually
+   identical to what Assets and Systems already rendered — the refactor should
+   change behaviour on Services and Exceptions, and nothing at all on screen
+   for the two pages that were already correct. */
+
+.filterBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterBtn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.filterActive {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+  background: var(--amber-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.deptSelect {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.deptSelect:focus {
+  border-color: var(--border-accent);
+}

@@ -1,0 +1,147 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Widget shell ────────────────────────────────────────────────────────── */
+
+.widget {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* ── Section (trend + top risks) ─────────────────────────────────────────── */
+/* Each section gets a top border to separate it from the grids / legend.    */
+
+.section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionHeader {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── Trend vertical list ─────────────────────────────────────────────────── */
+
+.trendList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.trendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.trendRowLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.trendRowCount {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: right;
+  line-height: 1;
+}
+
+/* Count colour states — applied directly to the count span */
+.trendNew     { color: var(--accent, #6366f1); }
+.trendWorse   { color: var(--red, #e05252); }
+.trendBetter  { color: var(--green, #4caf50); }
+.trendNeutral { color: var(--text-muted); }
+
+/* ── Department display filter ───────────────────────────────────────────── */
+/* Shown only when the payload spans more than one department (spreadsheet   */
+/* mode, where the backend does not apply dept walls). Presentation only —   */
+/* it never changes what the caller is permitted to see.                     */
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scopeToggle {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.scopeToggle:hover,
+.scopeToggle:focus-visible {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.scopeToggle[aria-pressed='true'] {
+  color: var(--accent, #6366f1);
+  border-color: var(--accent, #6366f1);
+}
+
+.emptyScope {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.inlineLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--accent, #6366f1);
+  cursor: pointer;
+  text-decoration: underline;
+}

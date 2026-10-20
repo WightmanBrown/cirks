@@ -1,0 +1,50 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.header { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+.title { font-size: 1.4rem; margin: 0; }
+.mineToggle { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.sub { color: var(--text-muted); font-size: 13px; margin: 4px 0 16px; }
+.err { color: var(--red, #e53935); font-size: 13px; }
+.empty { color: var(--text-muted); font-size: 14px; padding: 24px 0; }
+
+.section { margin-bottom: 24px; }
+.h2 { font-size: 1rem; color: var(--text-secondary); margin: 0 0 8px; }
+.count {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1px 6px;
+}
+
+.card { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-inset); margin-bottom: 8px; }
+.cardHead {
+  display: flex; align-items: center; gap: 10px; width: 100%; flex-wrap: wrap;
+  padding: 9px 12px; background: none; border: none; cursor: pointer; text-align: left;
+}
+.caret { color: var(--text-muted); font-size: 11px; }
+.ref { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.ctype { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
+.name { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+.owner { font-size: 11px; color: var(--text-muted); }
+.sysCount {
+  margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
+  background: var(--bg-body); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1px 7px;
+}
+
+.sysList { list-style: none; margin: 0; padding: 0 12px 8px; display: flex; flex-direction: column; }
+.sysRow {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; padding: 6px 4px;
+  border-top: 1px dashed var(--border); color: inherit; text-decoration: none; border-radius: var(--radius-sm);
+}
+.sysRow:hover, .sysRow:focus-visible { background: var(--bg-body); }
+.kind {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em;
+  color: var(--text-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1px 6px;
+}
+.sysName { color: var(--text-primary); }
+.status { color: var(--text-muted); text-transform: capitalize; }
+.itemOwner { font-size: 11px; color: var(--text-muted); }
+.actionRef { margin-left: auto; font-size: 12px; color: var(--accent, var(--text-secondary)); }
+.due { color: var(--text-muted); }
+.overdue { color: var(--red, #e53935); }
+.chev { color: var(--text-muted); }

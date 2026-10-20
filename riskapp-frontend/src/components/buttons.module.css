@@ -1,0 +1,179 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Shared button styles ─────────────────────────────────────────────────────
+   Single source of truth for buttons. Modules consume these via CSS-Modules
+   `composes:` so call-sites keep using `styles.btnPrimary` etc. unchanged:
+
+     .btnPrimary { composes: btnPrimary from '../components/buttons.module.css'; }
+
+   Variants: btnPrimary (filled accent), btnSecondary (outline),
+   btnDanger (destructive), btnLink (inline text link).
+   Canonical metrics: --text-body / weight 600 / --space-2 --space-4 / radius-sm / display font. */
+
+.btnPrimary,
+.btnSecondary,
+.btnDanger,
+.btnSuccess {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.btnPrimary:disabled,
+.btnSecondary:disabled,
+.btnDanger:disabled,
+.btnSuccess:disabled,
+.btnGhost:disabled,
+.btnLink:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Filled amber — primary action (brand) */
+.btnPrimary {
+  background: var(--amber);
+  color: var(--bg-base);
+}
+.btnPrimary:hover:not(:disabled) {
+  background: var(--amber-dim);
+}
+
+/* Confirm / approve */
+.btnSuccess {
+  background: var(--green-dim);
+  color: var(--text-primary);
+  border-color: var(--green);
+}
+.btnSuccess:hover:not(:disabled) {
+  background: var(--green);
+  color: #fff;
+}
+
+/* Outline — secondary action */
+.btnSecondary {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.btnSecondary:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Destructive */
+.btnDanger {
+  background: var(--red-dim);
+  color: var(--text-primary);
+  border-color: var(--red);
+}
+.btnDanger:hover:not(:disabled) {
+  background: var(--red);
+  color: #fff;
+}
+
+/* Inline text link */
+.btnLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.btnLink:hover:not(:disabled) {
+  color: var(--accent-hover);
+}
+
+/* Minimal / icon-style — no fill or border */
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-hint);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.btnGhost:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* Amber outline — toggle/advisory actions (mandatory, lifecycle, publish) */
+.btnWarning {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--amber-dim);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1;
+  background: var(--amber-faint);
+  color: var(--amber);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.btnWarning:hover:not(:disabled) {
+  background: var(--amber-glow);
+  border-color: var(--amber);
+}
+.btnWarning:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Blue-tint fill — accent action pills (add, run, generate, plan) */
+.btnAccent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1;
+  background: var(--accent-faint);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.btnAccent:hover:not(:disabled) {
+  background: rgba(91, 141, 238, 0.2);
+}
+.btnAccent:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Compact size modifier — combine with a variant:
+   composes: btnSecondary btnSm from '...'  (must stay last to win on source order) */
+.btnSm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+}

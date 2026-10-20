@@ -1,0 +1,368 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 900px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 640px;
+}
+
+.typeBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid;
+}
+
+.statusBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.status_operational     { background: var(--green-dim); color: var(--green, #4caf50); }
+.status_degraded        { background: var(--amber-faint); color: var(--amber, #f0a500); }
+.status_non_operational { background: var(--red-dim); color: var(--red, #e53935); }
+.status_unknown         { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+
+
+.hostBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--accent, #4f7cff);
+  background: rgba(79, 124, 255, 0.12);
+  border: 1px solid var(--accent, #4f7cff);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.hostnameLine { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.hostnameLabel {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted);
+}
+.hostnameValue { font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); }
+
+.ipChips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ipChip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--text-primary);
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 9px;
+}
+.ipChipLabel { font-size: 10px; color: var(--text-muted); }
+
+/* ── Risk band chip ──────────────────────────────────────────────────────── */
+
+.riskBand {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.risk_low          { background: var(--green-dim);          color: var(--green); }
+.risk_medium       { background: var(--amber-faint);        color: var(--amber); }
+.risk_high         { background: rgba(239,68,68,0.12);      color: #ef4444; }
+.risk_critical     { background: rgba(220,38,38,0.15);      color: #dc2626; }
+.risk_catastrophic { background: rgba(149,40,3,0.18);       color: #ff8036; }
+.noRisk            { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+
+/* ── Section ─────────────────────────────────────────────────────────────── */
+
+.section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionTitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionCount {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── System cards ─────────────────────────────────────────────────────────── */
+
+.systemGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.systemCard {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.systemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: default;
+  gap: 12px;
+}
+
+.systemHeader:has(.riskCount) {
+  cursor: pointer;
+}
+
+.systemHeader:has(.riskCount):hover {
+  background: var(--bg-hover);
+}
+
+.systemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.systemName {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent, #4f7cff);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.12s;
+}
+.systemName:hover { text-decoration-color: var(--accent, #4f7cff); }
+
+.systemDept {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.systemRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.riskCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chevron {
+  font-size: 10px;
+}
+
+/* ── Risk rows ────────────────────────────────────────────────────────────── */
+
+.riskList {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.riskRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border-subtle, var(--border));
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+  width: 100%;
+}
+.riskRow:last-child { border-bottom: none; }
+.riskRow:hover { background: var(--bg-surface); }
+
+.riskThreat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.threatCat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* ── Loading / error ──────────────────────────────────────────────────────── */
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 24px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.errorBanner {
+  background: var(--red-dim);
+  border: 1px solid rgba(232,93,74,0.2);
+  border-radius: var(--radius-md);
+  color: var(--red);
+  font-size: 13px;
+  padding: 14px 18px;
+}
+
+/* ── Edit modal ───────────────────────────────────────────────────────────── */
+
+.overlay { composes: overlay from '../components/modal.module.css'; }
+.modal   { composes: modal   from '../components/modal.module.css'; padding: 28px; width: 480px; max-width: 95vw; }
+.modalTitle { composes: modalTitle from '../components/modal.module.css'; }
+.fieldLabel { composes: fieldLabel from '../components/form.module.css'; display: flex; margin-bottom: 14px; }
+.input      { composes: input    from '../components/form.module.css'; }
+.textarea   { composes: textarea from '../components/form.module.css'; }
+.select     { composes: select   from '../components/form.module.css'; }
+.formError  { color: var(--red); font-size: 12px; margin: 4px 0; }
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btnPrimary   { composes: btnPrimary   from '../components/buttons.module.css'; }
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+
+/* Named-as-a-vulnerability section — the direct signal, sitting above the
+   systems list because it is a judgement about this component rather than
+   proximity to risk. */
+.sectionNote {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 68ch;
+}
+
+.vulnList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+
+.vulnRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: left;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.25);
+  color: inherit;
+  cursor: pointer;
+}
+.vulnRow:hover { border-color: var(--red); }
+.vulnRow:focus-visible { outline: 2px solid var(--red); outline-offset: 1px; }
+
+.vulnThreat { font-weight: 600; }
+.vulnSystem { color: var(--text-muted); }
+.vulnBy { margin-left: auto; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+
+/* Once for the organisation, or on each system (v137). */
+.instRow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; }
+.instLabel { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.instHint { color: var(--text-muted); font-size: 12px; }
+.instErr { color: var(--red); font-size: 12px; }

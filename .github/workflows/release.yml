@@ -1,0 +1,84 @@
+name: Release
+
+# Runs when release/publish.sh pushes a version tag to the PUBLIC repository,
+# WightmanBrown/cirks. It builds the CIRKS container image for Intel/AMD and ARM
+# machines, publishes it to the GitHub Container Registry as
+# ghcr.io/wightmanbrown/cirks:<version>, and creates the GitHub release with
+# that version's section of CHANGELOG.md as its notes.
+#
+# The `if` keeps it from running on tags in the private CIRKS-dev.
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: container image (amd64 + arm64)
+    if: github.repository == 'WightmanBrown/cirks'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/wightmanbrown/cirks
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=CIRKS
+            org.opencontainers.image.description=Cheltenham Information Risk Knowledge System
+            org.opencontainers.image.vendor=Wightman Brown Limited
+            org.opencontainers.image.licenses=Apache-2.0
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  release:
+    name: GitHub release
+    if: github.repository == 'WightmanBrown/cirks'
+    needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release notes from CHANGELOG.md
+        run: |
+          # The section from "## <tag>" up to the next "## ".
+          awk -v tag="## ${GITHUB_REF_NAME}" '
+            $0 == tag { on = 1; next }
+            on && /^## / { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          [ -s notes.md ] || { echo "CHANGELOG.md has no '## ${GITHUB_REF_NAME}' section" >&2; exit 1; }
+          cat >> notes.md <<EOF
+
+          ---
+
+          **Install:** follow the [install guide](https://github.com/WightmanBrown/cirks/blob/${GITHUB_REF_NAME}/docs/INSTALL.md), cloning with \`--branch ${GITHUB_REF_NAME}\`.
+          **Container image:** \`ghcr.io/wightmanbrown/cirks:${GITHUB_REF_NAME#v}\`
+          EOF
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "CIRKS $GITHUB_REF_NAME" --notes-file notes.md --verify-tag

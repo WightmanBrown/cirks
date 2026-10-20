@@ -1,0 +1,266 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.headingGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headingCount {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Stats banner ─────────────────────────────────────────────────────────── */
+
+.statsBanner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+/* ── Breach section (expired exceptions in contravention of policy) ─────────── */
+.breachSection {
+  border: 1px solid var(--red, #e53935);
+  border-radius: var(--radius-md);
+  background: rgba(244, 67, 54, 0.04);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.breachHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.breachTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--red, #e53935);
+}
+.breachCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--red, #e53935);
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+.breachIntro {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 70ch;
+}
+
+.statCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s;
+}
+.statCardRed   { border-color: rgba(229,57,53,0.5); background: rgba(229,57,53,0.05); }
+.statCardAmber { border-color: rgba(255,167,38,0.4); background: rgba(255,167,38,0.04); }
+
+.statNum {
+  font-family: var(--font-display, var(--font-mono));
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+.numRed   { color: var(--red, #e53935); }
+.numAmber { color: var(--amber, #ffa726); }
+.numGreen { color: var(--green, #4caf50); }
+
+.statLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Filter bar ───────────────────────────────────────────────────────────── */
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 4px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.filterChip:hover       { border-color: var(--border-accent); color: var(--text-primary); }
+.filterChipActive       { border-color: var(--border-accent); background: var(--bg-hover, rgba(255,255,255,0.06)); color: var(--text-primary); }
+
+/* ── Loading / error / empty ─────────────────────────────────────────────── */
+
+.loadingBar {
+  height: 2px;
+  background: var(--amber, #ffa726);
+  border-radius: 1px;
+  opacity: 0.5;
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: var(--red, #e53935);
+  margin: 0;
+}
+
+.emptyState { composes: emptyState from '../components/form.module.css'; padding: 48px 0; }
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+.emptyBody {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.thDays { text-align: right; }
+
+.row {
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.row:last-child { border-bottom: none; }
+.row:hover      { background: var(--bg-hover, rgba(255,255,255,0.03)); }
+
+.row_overdue  { border-left: 3px solid var(--red, #e53935); }
+.row_due_soon { border-left: 3px solid var(--amber, #ffa726); }
+.row_ok       { border-left: 3px solid transparent; }
+
+.td {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+.tdMain      { font-weight: 500; }
+.tdMono      { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+.tdSecondary { font-size: 12px; color: var(--text-secondary); }
+
+/* ── Level pills ─────────────────────────────────────────────────────────── */
+
+.levelPill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.levelLow      { background: rgba(76,175,80,0.15);  color: var(--green, #4caf50); }
+.levelMedium   { background: rgba(255,193,7,0.15);  color: var(--amber, #ffa726); }
+.levelHigh     { background: rgba(255,152,0,0.20);  color: #ff9800; }
+.levelCritical { background: rgba(244,67,54,0.20);  color: var(--red, #e53935); }
+
+/* ── Days pill ───────────────────────────────────────────────────────────── */
+
+.daysPill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  float: right;
+}
+.days_overdue  { background: rgba(244,67,54,0.12);  color: var(--red, #e53935);   border: 1px solid rgba(244,67,54,0.3); }
+.days_due_soon { background: rgba(255,193,7,0.10);  color: var(--amber, #ffa726); border: 1px solid rgba(255,193,7,0.3); }
+.days_ok       { background: transparent;           color: var(--text-muted);     border: 1px solid var(--border); }
+
+/* ── Action buttons ──────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.btnRenew { composes: btnSuccess btnSm from '../components/buttons.module.css'; white-space: nowrap; }
+.btnRevoke { composes: btnDanger btnSm from '../components/buttons.module.css'; white-space: nowrap; }

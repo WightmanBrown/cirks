@@ -1,0 +1,57 @@
+{
+  "name": "riskapp",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "ISO 27001-aligned information risk management \u2014 prototype",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "node db/migrate.js up",
+    "migrate:status": "node db/migrate.js status",
+    "seed": "node db/seed.js",
+    "create-admin": "node db/create-admin.js",
+    "import": "node db/import.js",
+    "test": "jest --runInBand --forceExit",
+    "test:integration": "jest -c jest.integration.config.js --runInBand --forceExit",
+    "test:integration:reset": "node test/e2e/db/reset.mjs && jest -c jest.integration.config.js --runInBand --forceExit"
+  },
+  "dependencies": {
+    "archiver": "^6.0.2",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
+    "otplib": "^12.0.1",
+    "pg": "^8.11.5",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/src/__tests__/**/*.test.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/src/__tests__/integration/"
+    ],
+    "setupFiles": [
+      "<rootDir>/src/__tests__/setup.js"
+    ]
+  },
+  "overrides": {
+    "qs": "^6.16.0"
+  }
+}

@@ -1,0 +1,392 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Header */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.pageDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.refreshBtn {
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+}
+
+.refreshBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Stats */
+.statsRow {
+  display: flex;
+  gap: 4px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 80px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Filter tabs */
+.filterRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterTab:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.filterActive {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+  background: var(--amber-faint);
+}
+
+/* Error banner */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--red);
+  font-size: 13px;
+  padding: 12px 16px;
+}
+
+.retryBtn {
+  background: none;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-left: auto;
+  transition: opacity 0.15s;
+}
+
+.retryBtn:hover { opacity: 0.75; }
+
+/* Table */
+.tableWrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.row {
+  transition: background 0.1s;
+}
+
+.row:hover {
+  background: var(--bg-elevated);
+}
+
+.rowClickable {
+  cursor: pointer;
+}
+
+/* Changes cell chips */
+.changesCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chipsRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.chipNew {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.chipUp {
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.2);
+  color: var(--red);
+}
+
+.chipDown {
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+
+.chipAction {
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+}
+
+.chipClosed {
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+
+.rowOverdue {
+  border-left: 2px solid var(--red);
+}
+
+.rowSelected td { background: var(--bg-hover, rgba(255,255,255,0.04)); }
+
+.expandRow td { padding: 0; border-bottom: 1px solid var(--border); }
+
+.expandCell { padding: 0 !important; }
+
+.expandCard {
+  padding: 14px 16px;
+  background: var(--bg-elevated);
+  border-top: 2px solid var(--amber-dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: flex-start;
+}
+
+.expandField {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 480px;
+}
+
+.expandLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.expandValue {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.expandMuted {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.expandActions { margin-left: auto; }
+
+.scoreCell { display: inline-flex; align-items: center; gap: 6px; }
+.scoreArrow { color: var(--text-muted); font-size: 12px; }
+
+/* "My Actions" tab sits at the end of the filter strip, visually separated. */
+.filterTabMine {
+  margin-left: 8px;
+  border-left-color: var(--border-accent);
+}
+
+.expandOpenBtn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.expandOpenBtn:hover { border-color: var(--amber); color: var(--amber); }
+
+.td {
+  padding: 13px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tdTitle {
+  color: var(--text-primary);
+  font-weight: 500;
+  max-width: 260px;
+}
+
+/* "Update needed" flag — progress not refreshed for the scheduled meeting. */
+.updateFlag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  color: #ffb74d;
+  background: rgba(255,183,77,0.12);
+  border: 1px solid rgba(255,183,77,0.35);
+  border-radius: 10px;
+  vertical-align: middle;
+}
+
+/* Context banner above the filter tabs when any row needs an update. */
+.updateBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  background: rgba(255,183,77,0.10);
+  border: 1px solid rgba(255,183,77,0.35);
+  border-radius: 6px;
+}
+.updateBannerIcon { color: #ffb74d; font-size: 1rem; }
+
+.tdPlan {
+  font-size: 12px;
+  color: var(--text-muted);
+  max-width: 160px;
+}
+
+.tdMono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.tdOverdue { color: var(--red); }
+
+.dateCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dateOverdue {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--red);
+}
+
+.dateRemaining {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Type tag */
+.typeTag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+/* Empty / loading state */
+.emptyState { composes: emptyState from '../components/form.module.css'; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 64px 24px; }
+.emptyIcon {
+  font-size: 32px;
+  color: var(--green);
+}
+

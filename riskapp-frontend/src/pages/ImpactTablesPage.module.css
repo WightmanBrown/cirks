@@ -1,0 +1,891 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Page layout ─────────────────────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  display: block;
+}
+
+.scopeTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.scopeTab,
+.scopeTabActive {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.scopeTab:hover {
+  color: var(--text-secondary);
+  border-color: var(--border-accent);
+}
+
+.scopeTabActive {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.muted    { color: var(--text-muted); font-size: 13px; }
+.errorMsg { color: var(--red, #e53935); font-size: 13px; }
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.th {
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tableRow {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.tableRow:hover td { background: var(--bg-elevated); }
+
+.tableRow td {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  vertical-align: middle;
+  color: var(--text-secondary);
+}
+
+.tableRowSelected td {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-bottom-color: transparent !important;
+}
+
+.tdName {
+  font-weight: 500;
+  color: var(--text-primary) !important;
+}
+
+.tdScope, .tdStatus, .tdAttrs {
+  white-space: nowrap;
+}
+
+.scopeBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.deptLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+/* Status + attribute badges */
+.badgePublished {
+  background: var(--green-dim);
+  border: 1px solid rgba(76,175,125,0.25);
+  border-radius: var(--radius-sm);
+  color: var(--green, #4caf50);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.badgeDraft {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.badgeMandatory {
+  background: var(--amber-faint);
+  border: 1px solid var(--amber-dim);
+  border-radius: var(--radius-sm);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+/* ── Unfold summary row ──────────────────────────────────────────────────── */
+
+.tableRowSelected td {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-bottom-color: transparent !important;
+}
+
+.summaryRow td { background: var(--bg-inset); border-top: none !important; }
+
+.summaryCell { padding: 14px 16px !important; }
+
+/* ── Create form ─────────────────────────────────────────────────────────── */
+
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+}
+
+.createInput {
+  background: var(--bg-base);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 8px;
+  width: 100%;
+}
+.createInput:focus { outline: none; border-color: var(--amber-dim); }
+
+.createSelect {
+  background: var(--bg-base);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 8px;
+  width: 100%;
+  cursor: pointer;
+}
+.createSelect:focus { outline: none; border-color: var(--amber-dim); }
+
+.createError {
+  font-size: 11px;
+  color: #ef4444;
+  margin: 0;
+}
+
+.createActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.btnPrimary   { composes: btnPrimary   from '../components/buttons.module.css'; }
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+.btnTiny        { composes: btnSecondary btnSm from '../components/buttons.module.css'; }
+.btnTinyPrimary { composes: btnPrimary   btnSm from '../components/buttons.module.css'; }
+
+
+/* ── Table detail ────────────────────────────────────────────────────────── */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailLoading {
+  padding: 32px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.detailError {
+  padding: 16px;
+  font-size: 13px;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.retryBtn {
+  background: none;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.detailTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detailTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.detailMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.scopeChip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.publishedChip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.draftChip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: var(--bg-base);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.mandatoryChip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--amber);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.rowCountChip {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.detailActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* View mode group: toggle + "Set as default" */
+.viewModeGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnSetDefault {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  background: none;
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.btnSetDefault:hover { color: var(--text-secondary); border-color: var(--accent); }
+
+/* View toggle */
+.viewToggle {
+  display: flex;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.viewToggleBtn,
+.viewToggleActive {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.viewToggleBtn {
+  background: none;
+  color: var(--text-muted);
+}
+.viewToggleBtn:hover { background: var(--bg-elevated); color: var(--text-secondary); }
+
+.viewToggleActive {
+  background: var(--amber-faint);
+  color: var(--amber);
+  font-weight: 600;
+}
+
+/* Action buttons */
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+.btnEditActive { composes: btnWarning from '../components/buttons.module.css'; }
+.btnPublish { composes: btnSuccess from '../components/buttons.module.css'; }
+.btnMandatory { composes: btnWarning from '../components/buttons.module.css'; }
+.btnDelete { composes: btnDanger from '../components/buttons.module.css'; }
+.confirmDel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #ef4444;
+  white-space: nowrap;
+}
+
+.btnDelConfirm { composes: btnDanger from '../components/buttons.module.css'; }
+.btnDelCancel { composes: btnGhost from '../components/buttons.module.css'; }
+.actionError {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  color: #ef4444;
+  font-size: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dismissBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+}
+.dismissBtn:hover { opacity: 1; }
+
+/* Editor embed */
+.editorWrap {
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: var(--bg-surface);
+}
+
+/* Empty rows */
+.emptyRows {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 32px;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-md);
+}
+
+/* ── Row accordion ───────────────────────────────────────────────────────── */
+
+.rowList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowItem {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.12s;
+}
+
+.rowItemOpen {
+  border-color: var(--border-accent);
+}
+
+.rowHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.rowHeader:hover { background: var(--bg-elevated); }
+
+.rowArrow {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 12px;
+}
+
+.rowCategory {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rowSep {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.rowSubcat {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+/* CIA area (expert view row header) */
+.rowCiaArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.ciaChips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ciaOn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.ciaOff {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+}
+
+.ciaUnset {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--amber);
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.ciaStale {
+  font-size: 11px;
+  color: #f97316;
+  cursor: default;
+}
+
+.orgCiaNote {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-left: auto;
+}
+
+.analyseBtn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.12s, color 0.12s;
+}
+.analyseBtn:hover { border-color: var(--amber-dim); color: var(--amber); }
+
+/* ── Expanded row content ────────────────────────────────────────────────── */
+
+.rowExpanded {
+  padding: 0 14px 14px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 1dBIL grid — 5 columns */
+.bilGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.bilCell {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bilCellLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  text-transform: uppercase;
+}
+
+.bilCellText {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.bilCellEmpty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 11px;
+}
+
+/* 3dBIL CIA section */
+.ciaSection {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ciaSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.ciaDimRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.ciaDimOn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.ciaDimOff {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.ciaDimFull {
+  color: var(--text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.ciaDimApplies {
+  color: var(--text-muted);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.ciaDimStatement {
+  color: var(--text-secondary);
+  font-size: 12px;
+  flex: 1;
+  font-style: italic;
+}
+
+/* ── Description + view body ─────────────────────────────────────────────── */
+
+.detailDescription {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.viewBody {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.viewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.viewSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.viewEmpty {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 24px;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-md);
+}
+
+/* ── Top-level BIL grid (view mode) ─────────────────────────────────────── */
+
+/* bilGrid, bilCell, bilCellLabel, bilCellText, bilCellEmpty already defined above */
+
+/* ── CIA read-only table ─────────────────────────────────────────────────── */
+
+.ciaTable {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.ciaTableHead {
+  display: grid;
+  grid-template-columns: 140px repeat(5, 1fr);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.ciaTableRow {
+  display: grid;
+  grid-template-columns: 140px repeat(5, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.ciaTableRow:last-child { border-bottom: none; }
+
+.ciaTableDimCell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-elevated);
+  min-height: 36px;
+}
+
+.ciaTableLevelCell {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.ciaTableLevelCell:last-child { border-right: none; }
+
+.ciaTableDimLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: 0.04em;
+}
+
+.ciaTableDimFull {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.ciaTableCell {
+  padding: 8px 10px;
+  border-right: 1px solid var(--border);
+  min-height: 40px;
+}
+
+.ciaTableCell:last-child { border-right: none; }
+
+.ciaStmt {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ciaEmpty {
+  color: var(--border-accent);
+  font-size: 13px;
+}
+
+/* ── Sidebar dept label ──────────────────────────────────────────────────── */
+
+.sidebarItemDept {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Every impact table has an owning department (v102), so a blank here is a
+   fault, not a legitimate state — make it look like one rather than a dash. */
+.deptMissing {
+  color: var(--red, #e05252);
+}

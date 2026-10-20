@@ -1,0 +1,66 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { max-width: 1000px; margin: 0 auto; padding: 0 1rem 3rem; }
+.header { margin-bottom: 1.25rem; }
+.title { font-size: 1.5rem; margin: 0.5rem 0 0.25rem; }
+.desc { color: var(--text-secondary); font-size: 0.9rem; max-width: 70ch; line-height: 1.5; }
+
+.errorBanner {
+  background: rgba(224,82,82,0.1); border: 1px solid rgba(224,82,82,0.3);
+  color: var(--red); padding: 8px 12px; border-radius: var(--radius-md); margin-bottom: 1rem; font-size: 0.85rem;
+}
+.resultBanner {
+  background: rgba(76,175,125,0.1); border: 1px solid rgba(76,175,125,0.25);
+  color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-md); margin-bottom: 1rem; font-size: 0.85rem;
+}
+.errList { margin: 6px 0 0; padding-left: 1.1rem; color: var(--text-secondary); font-size: 0.8rem; }
+
+.loading { display: flex; align-items: center; gap: 8px; color: var(--text-muted); padding: 2rem 0; }
+
+.block { margin-bottom: 1.75rem; }
+.blockTitle {
+  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-muted); margin: 0 0 0.4rem;
+}
+.blockDesc { color: var(--text-secondary); font-size: 0.85rem; margin: 0 0 0.6rem; line-height: 1.5; }
+.blockDesc code { font-family: var(--font-mono); font-size: 0.8em; background: var(--bg-inset); padding: 1px 4px; border-radius: 3px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.card {
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--bg-elevated); padding: 12px 14px;
+}
+.cardOff { opacity: 0.6; }
+.cardHead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cardName { font-weight: 600; font-size: 0.95rem; }
+.enableToggle { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+.cardMeta { display: flex; align-items: center; gap: 8px; margin: 6px 0; flex-wrap: wrap; }
+.tagBundled, .tagImport {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 2px 6px; border-radius: var(--radius-sm);
+}
+.tagBundled { background: rgba(76,175,125,0.12); border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.tagImport  { background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.3); color: var(--amber); }
+.license { font-size: 0.72rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.cardStats { display: flex; gap: 12px; font-size: 0.78rem; color: var(--text-secondary); margin: 8px 0; }
+.cardStats b { color: var(--text-primary); }
+
+.cardActions { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+
+.uploadBtn {
+  border: 1px solid var(--border-accent); background: transparent; color: var(--accent);
+  padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.82rem;
+}
+.uploadBtn:hover:not(:disabled) { background: var(--bg-inset); }
+.uploadBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.uploadBtnSmall { padding: 4px 9px; font-size: 0.76rem; }
+
+.soaLink { border: none; background: transparent; color: var(--accent); cursor: pointer; font-size: 0.8rem; }
+.soaLink:hover { text-decoration: underline; }
+
+/* Consecutive intro paragraphs need air, or the definition runs into the steps. */
+.desc + .desc { margin-top: 0.6rem; }

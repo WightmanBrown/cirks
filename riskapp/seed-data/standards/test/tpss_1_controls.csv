@@ -1,0 +1,4 @@
+control_type,title,description,is_baseline
+preventive,Stored card numbers are tokenised or truncated,"Primary account numbers are replaced with tokens or truncated before storage, so a copy of the data store does not yield usable card numbers.",false
+preventive,"Cryptographic keys are generated, stored, rotated and destroyed under a documented procedure","Keys that protect sensitive data have a named custodian, a rotation period and a destruction procedure, and are never stored beside the data they protect.",false
+preventive,Multi-factor authentication is enforced for administrative access,"Every administrative login to an in-scope system requires a second factor, including access from inside the corporate network.",false

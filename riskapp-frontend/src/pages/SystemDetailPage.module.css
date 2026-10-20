@@ -1,0 +1,542 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { display: flex; flex-direction: column; gap: 20px; }
+
+.breadcrumb { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.viewModeSlot { margin-left: auto; }
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerLeft { flex: 1; min-width: 0; }
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.metaChip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
+  color: var(--text-muted);
+}
+
+.metaOwner { font-size: 12px; color: var(--text-muted); }
+
+.inactiveBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--red-dim);
+  color: var(--red, #e53935);
+}
+
+/* ── Impact summary strip ───────────────────────────────────────────────── */
+
+.impactStrip {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.impactCard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+}
+
+.impactLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.bilPill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.bil1, .bil2 { background: var(--green-dim); color: var(--green, #4caf50); }
+.bil3        { background: var(--amber-faint); color: var(--amber, #f0a500); }
+.bil4, .bil5 { background: var(--red-dim); color: var(--red,   #e53935); }
+.unset       { color: var(--text-muted); font-size: 12px; }
+
+.changeWarnBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--amber-faint);
+  border: 1px solid var(--amber, #f0a500);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--amber, #f0a500);
+  font-weight: 600;
+}
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  gap: 2px;
+}
+
+.tab, .tabActive {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tabActive {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab:hover { color: var(--text-primary); }
+
+.tabCount {
+  font-size: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 5px;
+  color: var(--text-muted);
+}
+
+/* ── Details form ───────────────────────────────────────────────────────── */
+
+.form { max-width: 560px; }
+.formGrid { display: flex; flex-direction: column; gap: 14px; }
+
+.fieldLabel { composes: fieldLabel from '../components/form.module.css'; display: flex; }
+
+/* Checkbox rows read left-to-right — box, caption, then the live "shared" chip
+   — unlike .fieldLabel, which stacks a caption above a full-width control.
+   width: fit-content stops the label stretching the full 560px of .form, so the
+   click target matches what is actually visible rather than reaching far to the
+   right of the chip. */
+.checkboxLabel {
+  composes: fieldLabel from '../components/form.module.css';
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: fit-content;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  cursor: pointer;
+}
+
+/* flex: none — a checkbox in a flex row is a flex item, and without this it
+   can be squeezed below its intrinsic size. */
+.checkbox {
+  flex: none;
+  margin: 0;
+}
+
+.fieldHint {
+  composes: fieldHint from '../components/form.module.css';
+  margin: var(--space-1) 0 0;
+}
+
+.input { composes: input from '../components/form.module.css'; }
+.textarea { composes: textarea from '../components/form.module.css'; }
+.select { composes: select from '../components/form.module.css'; }
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.savedMsg { font-size: 12px; color: var(--green, #4caf50); }
+.errorMsg { color: var(--red); font-size: 13px; }
+.muted    { color: var(--text-muted); font-size: 13px; }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+.btnPrimary { composes: btnPrimary from '../components/buttons.module.css'; }
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+.btnDanger { composes: btnDanger from '../components/buttons.module.css'; }
+.btnIcon { composes: btnGhost from '../components/buttons.module.css'; }
+/* ── Component section ──────────────────────────────────────────────────── */
+
+.ppitfSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ppitfGroup { display: flex; flex-direction: column; gap: 8px; }
+
+.ppitfGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ppitfGroupTitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.componentCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.componentCardLeft { flex: 1; min-width: 0; }
+.componentName  { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.componentName a { color: inherit; text-decoration: none; }
+.componentName a:hover, .componentName a:focus-visible { color: var(--accent); text-decoration: underline; }
+.componentRole  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.componentStatus {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--bg-base, #1a1a2e);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.emptyGroup {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 0;
+  font-style: italic;
+}
+
+/* ── Component picker ───────────────────────────────────────────────────── */
+
+.pickerBox {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pickerSearchRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pickerHeader {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pickerInput {
+  flex: 1;
+  background: var(--bg-base, var(--bg-surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+}
+.pickerInput:focus { border-color: var(--accent); }
+
+.typeSelect {
+  background: var(--bg-base, var(--bg-surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 6px 8px;
+  outline: none;
+}
+
+.pickerResults {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.pickerOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  background: var(--bg-base, #1a1a2e);
+}
+
+.pickerOptionName { font-weight: 600; flex: 1; }
+.pickerOptionType {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.btnLink { composes: btnLink from '../components/buttons.module.css'; }
+/* ── Information assets section ─────────────────────────────────────────── */
+
+.assetList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assetCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.assetCard:hover { border-color: var(--accent); }
+
+.assetCardLeft { flex: 1; min-width: 0; }
+.assetName  { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.assetDept  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.assetCia {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.assetImpactWord {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.ciaBadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+.ciaGreen { background: var(--green-dim); color: var(--green, #4caf50); }
+.ciaAmber { background: var(--amber-faint); color: var(--amber, #f0a500); }
+.ciaRed   { background: var(--red-dim); color: var(--red,   #e53935); }
+.ciaUnset { color: var(--text-muted); font-size: 12px; }
+
+/* "Shared" is amber everywhere it appears — the systems and services lists, the
+   information-asset list, the department page, the setup wizard. This one was
+   grey, so the same badge on the same entity changed colour depending on which
+   page you were looking at. Matched to the others. */
+.sharedTag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+  text-transform: uppercase;
+}
+
+.assetCardChanged {
+  border-left: 3px solid var(--amber, #f0a500);
+}
+
+.changedTag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--amber-faint, rgba(240,165,0,0.12));
+  border: 1px solid var(--amber, #f0a500);
+  color: var(--amber, #f0a500);
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+
+/* ── Link error ──────────────────────────────────────────────────────────── */
+.linkError { color: var(--red); font-size: 12px; }
+
+/* ── Modal (for inline create-new from picker) ───────────────────────────── */
+
+.overlay { composes: overlay from '../components/modal.module.css'; }
+
+.modal { composes: modal from '../components/modal.module.css'; padding: 28px; width: 480px; max-width: 95vw; }
+
+.modalTitle { composes: modalTitle from '../components/modal.module.css'; }
+
+/* ── Expected but not recorded ────────────────────────────────────────────── */
+/* Components this system's own controls are delivered by, which nobody has put
+   on the record (defect 1d). Deliberately OUTSIDE the component list: they are
+   not on the system, and listing them alongside things that are would be a claim
+   nobody has made. It is a question to settle, so it reads as one. */
+.expectedBlock {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--amber, #d69e2e);
+  border-left-width: 3px;
+  border-radius: 4px;
+  background: rgba(214, 158, 46, 0.07);
+}
+
+.expectedTitle {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.expectedBody {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.expectedRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 5px 0;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+}
+
+.expectedWhy {
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: help;
+}
+
+.expectedActions { margin-left: auto; display: flex; gap: 6px; }
+
+.btnGhostSm {
+  font: inherit;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary, var(--text-muted));
+  cursor: pointer;
+}
+.btnGhostSm:hover { border-color: var(--text-muted); color: var(--text-primary); }
+
+/* Type pill + the primary "record it" action, matching the coverage panel's
+   vocabulary so the same judgement looks the same wherever it is made. */
+.compType {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.componentAdd {
+  font: inherit;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--accent, #3b82f6);
+  background: transparent;
+  color: var(--accent, #3b82f6);
+  cursor: pointer;
+}
+.componentAdd:hover { background: rgba(59, 130, 246, 0.1); }
+
+/* Unrecorded-but-expected count on the Components tab. A question mark, not a
+   number: it is what the record is missing, not what the system has. */
+.tabWarn {
+  margin-left: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(214, 158, 46, 0.18);
+  color: #b7791f;
+}
+
+/* Components tab: its two sections (architecture, security) */
+.tabSectionTitle { margin: 18px 0 0; font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); }
+.tabSectionTitle:first-of-type { margin-top: 0; }
+.tabSubTitle { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; font-size: var(--text-hint); color: var(--text-secondary); }
+.scopeRow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.scopeTrouble { color: var(--amber); }
+
+/* Control objectives tab: an objective that needs a security solution chosen */
+.cardUndecided { border-left: 3px solid var(--amber); }
+.undecided { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-size: var(--text-hint); color: var(--text-secondary); }
+.undecided a { color: var(--accent); text-decoration: none; }
+.undecided a:hover, .undecided a:focus-visible { text-decoration: underline; }
+.undecidedTag { align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase;
+                color: var(--amber); border: 1px solid var(--amber-dim); background: var(--amber-faint); border-radius: 4px; padding: 2px 6px; }
+.undecidedChoose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }

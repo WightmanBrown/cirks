@@ -1,0 +1,92 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* Shared styles for IAM dashboard widgets (assets / services / systems) */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.row:hover {
+  background: var(--bg-hover, var(--bg-surface));
+  border-color: var(--border-accent);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Risk level pill (systems) */
+
+.riskPill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.riskLow      { background: rgba(76, 175, 80, 0.15);  color: var(--green, #4caf50); }
+.riskMedium   { background: rgba(255, 167, 38, 0.15); color: var(--amber, #ffa726); }
+.riskHigh     { background: rgba(229, 57, 53, 0.15);  color: var(--red, #e53935); }
+.riskCritical { background: rgba(229, 57, 53, 0.25);  color: var(--red, #e53935); }
+.riskNone {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Status / empty / loading */
+
+.empty { composes: emptyState from './form.module.css'; padding: 6px 0; }
+.error {
+  font-size: 12px;
+  color: var(--red, #e53935);
+  margin: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link:hover {
+  color: var(--amber);
+}

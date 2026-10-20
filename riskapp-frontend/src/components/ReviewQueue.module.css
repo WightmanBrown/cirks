@@ -1,0 +1,220 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.headingGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headingCount {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.intro {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 680px;
+}
+
+.loadingBar {
+  height: 2px;
+  background: var(--amber, #ffa726);
+  border-radius: 1px;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 1; }
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: var(--red, #e53935);
+}
+
+.emptyState { composes: emptyState from './form.module.css'; padding: 60px 24px; }
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+.emptyBody {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Risk group ──────────────────────────────────────────────────────────── */
+
+.riskGroup {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.riskGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-elevated, rgba(255,255,255,0.02));
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.riskLink {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber, #ffa726);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.riskLink:hover { opacity: 0.8; }
+
+.riskSep {
+  color: var(--text-muted);
+}
+
+.riskThreat {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.riskDept {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.riskLevel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.levelLow      { background: rgba(76,175,80,0.12);  color: #81c784; }
+.levelMedium   { background: rgba(255,167,38,0.12); color: var(--amber, #ffa726); }
+.levelHigh     { background: rgba(244,67,54,0.12);  color: var(--red, #e53935); }
+.levelCritical { background: rgba(244,67,54,0.22);  color: #ff5252; font-weight: 900; }
+
+.curScore {
+  margin-left: 4px;
+}
+
+/* ── Action rows ─────────────────────────────────────────────────────────── */
+
+.actionRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.actionRow:last-child { border-bottom: none; }
+
+.actionLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.actionTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.actionMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.treatPill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(100,181,246,0.1);
+  color: var(--blue, #64b5f6);
+  border: 1px solid rgba(100,181,246,0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.actionDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Right column ────────────────────────────────────────────────────────── */
+
+.actionRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.targetScore {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.targetLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.targetArrow {
+  font-size: 11px;
+  color: var(--text-muted);
+}

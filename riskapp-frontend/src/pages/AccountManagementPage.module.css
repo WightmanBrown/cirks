@@ -1,0 +1,78 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { max-width: 1080px; margin: 0 auto; padding: 24px; }
+.pageHeader { display: flex; align-items: center; gap: 12px; }
+.heading { font-family: var(--font-display); font-size: var(--text-2xl); color: var(--text-primary); margin: 0; }
+.intro { color: var(--text-secondary); font-size: var(--text-hint); margin: 8px 0 20px; }
+
+.loadingBar { height: 3px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--amber), transparent); animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+.errorMsg { color: var(--red); font-size: var(--text-hint); margin: 6px 0 0; }
+
+.card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+  padding: 16px 18px; margin-bottom: 18px;
+}
+.cardTitle {
+  font-family: var(--font-mono); font-size: var(--text-sm);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 0 0 12px;
+}
+
+.input, .select, .nameInput {
+  font: inherit; font-size: var(--text-body);
+  background: var(--bg-inset); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 8px;
+}
+.input::placeholder { color: var(--text-muted); }
+/* Visibly a field — it used to be borderless until hovered, so it read as plain
+   text and nobody could find how to change a name. */
+.nameInput { background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius-sm); width: 100%; min-width: 12rem; }
+.nameInput:hover, .nameInput:focus { border-color: var(--accent, var(--text-secondary)); }
+.nameInput:disabled { color: var(--text-muted); cursor: default; }
+.select:disabled { opacity: 0.45; cursor: default; }
+
+.selfRow td { background: color-mix(in srgb, var(--bg-surface) 96%, var(--text-muted) 4%); }
+
+.youBadge {
+  display: inline-block; margin-left: 6px;
+  font-size: var(--text-xs); font-family: var(--font-mono);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-muted); background: var(--bg-inset);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0 5px; vertical-align: middle; line-height: 1.6;
+}
+
+.createForm { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.primaryBtn {
+  font: inherit; font-size: var(--text-body); font-weight: 600;
+  background: var(--amber); color: var(--bg-base);
+  border: 1px solid var(--amber); border-radius: var(--radius-sm); padding: 6px 16px; cursor: pointer;
+}
+.primaryBtn:disabled { opacity: 0.6; cursor: default; }
+
+.table { width: 100%; border-collapse: collapse; font-size: var(--text-body); }
+.table th {
+  text-align: left; font-family: var(--font-mono); font-size: var(--text-xs);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+  font-weight: 400; padding: 6px 8px; border-bottom: 1px solid var(--border);
+}
+.table td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text-primary); }
+.table tr:last-child td { border-bottom: none; }
+.inactiveRow { opacity: 0.5; }
+.email { color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--text-hint); }
+.extraRoles { color: var(--text-amber); font-size: var(--text-xs); margin-top: 2px; }
+
+.credCell { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pwBox { display: inline-flex; align-items: center; gap: 6px; }
+.smallBtn {
+  font: inherit; font-size: var(--text-sm);
+  background: var(--bg-elevated); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px 10px; cursor: pointer;
+}
+.smallBtn:disabled { color: var(--text-muted); cursor: default; }
+.linkBtn { font: inherit; font-size: var(--text-sm); background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+.okMsg { color: var(--green); font-size: var(--text-hint); }
+.errInline { color: var(--red); font-size: var(--text-hint); }

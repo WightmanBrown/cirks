@@ -1,0 +1,806 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* riskapp-frontend/src/pages/RiskSummaryPage.module.css */
+
+/* ── page shell ───────────────────────────────────────────────────────────── */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 40px 64px;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── page header ──────────────────────────────────────────────────────────── */
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.headingGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.headingTag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.totalCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── loading bar ──────────────────────────────────────────────────────────── */
+
+.loadingBar {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    var(--border-accent) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 1px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.errorMsg {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--red);
+  margin: 0;
+}
+
+.systemFilterBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-accent);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.systemFilterClear {
+  background: none;
+  border: none;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0;
+}
+
+.systemFilterClear:hover { text-decoration: underline; }
+
+/* ── four grids row ───────────────────────────────────────────────────────── */
+
+.gridRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Business view shows a single current-risk grid. Left-aligned at a readable
+   fixed width rather than stretched across the page — one grid pulled to full
+   width reads as a chart, not as the compact selector it is. */
+.gridRowSingle {
+  display: grid;
+  grid-template-columns: minmax(0, 320px);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .gridRow { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 520px) {
+  .gridRow,
+  .gridRowSingle { grid-template-columns: 1fr; }
+}
+
+/* ── grid card ────────────────────────────────────────────────────────────── */
+
+.gridCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.gridLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── mini grid internals ──────────────────────────────────────────────────── */
+
+.gridWrapper {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.axisLabelY {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  user-select: none;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.axisLabelX {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  user-select: none;
+  opacity: 0.7;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.gridArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+}
+
+/* ── cells ────────────────────────────────────────────────────────────────── */
+
+.cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.1s, border-color 0.1s;
+  background: none;
+  padding: 0;
+}
+.cell:hover {
+  transform: scale(1.12);
+  border-color: var(--border-accent);
+}
+
+.cellSelected {
+  border-color: var(--text-primary) !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 1px var(--text-primary);
+}
+
+.cellEmpty {
+  background: var(--bg-elevated);
+  opacity: 0.45;
+  cursor: default;
+}
+.cellEmpty:hover {
+  transform: none;
+  border-color: transparent;
+}
+
+.cellLow      { background: #1a3a2a; }
+.cellMedium   { background: #3a3010; }
+.cellHigh     { background: #3a1e0a; }
+.cellCritical { background: #3a0a0a; }
+
+.cellCount {
+  pointer-events: none;
+  line-height: 1;
+}
+
+.xAxis {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  margin-top: 3px;
+}
+
+.axisTickX {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-muted);
+  text-align: center;
+  opacity: 0.7;
+  user-select: none;
+}
+
+/* ── filter / sort bar ────────────────────────────────────────────────────── */
+
+.listBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filterInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filterActive {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 0.04em;
+}
+
+.filterNone {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.clearFilter {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.clearFilter:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.viewToggle {
+  display: flex;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.viewToggleBtn,
+.viewToggleActive {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.viewToggleBtn {
+  background: none;
+  color: var(--text-muted);
+}
+.viewToggleBtn:hover { background: var(--bg-elevated); color: var(--text-secondary); }
+
+.viewToggleActive {
+  background: var(--amber-faint);
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.sortGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sortLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.sortBtn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.sortBtn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+.sortBtnActive {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: var(--amber-faint);
+}
+
+/* ── risk table ───────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  overflow-x: auto;
+  /* lets the unfolded row size itself to what is VISIBLE, not to the table */
+  container-type: inline-size;
+}
+
+.riskTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.thName {
+  text-align: left;
+  padding: 8px 12px;
+  cursor: pointer;
+  min-width: 220px;
+}
+.thName:hover { color: var(--text-secondary); }
+
+.thOwner {
+  text-align: left;
+  padding: 8px 12px;
+  cursor: pointer;
+  min-width: 130px;
+  white-space: nowrap;
+}
+.thOwner:hover { color: var(--text-secondary); }
+
+.thGroup {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 12px 4px;
+}
+
+.thGroupInh {
+  border-right: 1px solid var(--border-accent);
+  color: var(--text-muted);
+}
+
+.thGroupRes {
+  color: var(--amber);
+  border-right: 1px solid var(--border-accent);
+}
+
+.thGroupTgt {
+  color: var(--blue, #64b5f6);
+}
+
+.thScore {
+  cursor: pointer;
+  min-width: 44px;
+}
+.thScore:hover { color: var(--text-secondary); }
+
+.thScoreActive { color: var(--amber); }
+
+.thScoreTgt { color: var(--text-muted); }
+.thScoreTgt:hover { color: var(--blue, #64b5f6); }
+
+.tdTgt { opacity: 0.75; }
+
+.thGroupInh + .thGroupInh,
+.thScore:nth-child(5) {
+  border-left: 1px solid var(--border-accent);
+}
+
+.riskTr {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.riskTr:last-child { border-bottom: 0; }
+.riskTr:hover td { background: var(--bg-hover, var(--bg-surface)); }
+.riskTrSelected td { background: var(--bg-hover, var(--bg-surface)); }
+
+.summaryRow td { padding: 0; border-bottom: 1px solid var(--border); }
+
+.summaryCard {
+  /* Where the table is wider than the screen the card stays in view, so
+     "Open full risk" never needs a sideways scroll. */
+  position: sticky;
+  left: 0;
+  width: calc(100cqw - 1px);   /* a pixel short: an exact fit rounds up and adds a scrollbar */
+  box-sizing: border-box;
+  padding: 14px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: flex-start;
+  background: var(--bg-elevated);
+  border-top: 2px solid var(--amber-dim);
+}
+
+.summaryField {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 140px;
+}
+
+.summaryLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.summaryValue {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.summaryValueMuted {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.summaryRationale {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  max-width: 420px;
+}
+
+.summaryActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.summaryOpenBtn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.summaryOpenBtn:hover { border-color: var(--amber); color: var(--amber); }
+
+.tdName {
+  padding: 10px 12px;
+  min-width: 220px;
+}
+
+.tdOwner {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.muted { color: var(--text-muted); }
+
+.tdScore {
+  text-align: center;
+  padding: 10px 12px;
+}
+
+/* Expert view shows twelve score columns. Tightened so the whole table,
+   Target risk included, fits the page without a sideways scroll: narrower
+   score cells, and long system and department names wrap instead of
+   pushing the columns out. Business view has one column per group and
+   keeps its room. */
+.riskTableExpert .tdScore,
+.riskTableExpert .thScore { padding-left: 4px; padding-right: 4px; }
+.riskTableExpert .thScore { min-width: 40px; }
+.riskTableExpert .thGroup { padding-left: 4px; padding-right: 4px; }
+.riskTableExpert .systemName { white-space: normal; }
+.riskTableExpert .tdOwner { white-space: normal; }
+.riskTableExpert .thOwner { min-width: 110px; }
+
+.scoreNone {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Vertical separator between inherent and residual groups */
+/* The line closing a score group. A class on the group's last cell, not a
+   column number: the count changes with the view and with the columns. */
+.riskTr td.tdGroupEnd {
+  border-right: 1px solid var(--border-accent);
+}
+
+.sortNeutral {
+  font-size: 8px;
+  opacity: 0.35;
+  margin-left: 2px;
+}
+
+.sortActive {
+  font-size: 9px;
+  color: var(--amber);
+  margin-left: 2px;
+}
+
+.emptyState { composes: emptyState from '../components/form.module.css'; padding: 32px 0; }
+/* ── risk row ─────────────────────────────────────────────────────────────── */
+
+.riskRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s;
+}
+.riskRow:hover {
+  border-color: var(--border-accent);
+}
+
+@media (max-width: 720px) {
+  .riskRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.riskMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.systemName {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.threatName {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.separator {
+  color: var(--border-accent);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+/* ── validation-status chip (New Risks view) ──────────────────────────────── */
+
+.statusChip {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 7px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.statusReturned {
+  background: var(--amber-faint);
+  color: var(--amber);
+  border-color: var(--amber);
+  cursor: help;
+}
+
+.statusPending {
+  background: var(--bg-inset);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+/* ── score chips ──────────────────────────────────────────────────────────── */
+
+.riskScores {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.scoreLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.scoreValue {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.scoreMax {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.scoreLow      { background: #1a3a2a; color: #5af09a; }
+.scoreMedium   { background: #3a3010; color: #f0c85a; }
+.scoreHigh     { background: #3a1e0a; color: #f0905a; }
+.scoreCritical { background: #3a0a0a; color: #f05a5a; }
+
+/* ── mitigation column ────────────────────────────────────────────────────── */
+
+.riskMitigation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.mitigationTitle {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  text-align: right;
+}
+
+.mitigationBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.mitigationActive   { background: #1a3a2a; color: #5af09a; }
+.mitigationProposed { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
+.mitigationStalled  { background: #3a3010; color: #f0c85a; }
+.mitigationNone     { background: var(--bg-elevated); color: var(--red); border: 1px solid var(--border); }
+
+.registerBtn {
+  background: var(--amber, #ffa726);
+  border: 1px solid var(--amber, #ffa726);
+  border-radius: var(--radius-sm);
+  color: #000;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.registerBtn:hover { opacity: 0.85; }
+
+/* Department scope control in the list bar. Sits between the filter summary
+   and the view-mode toggle; the shared component brings its own button style. */
+.deptScope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  margin-right: 12px;
+}

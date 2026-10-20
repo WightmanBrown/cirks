@@ -1,0 +1,360 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.title { font-size: 1.5rem; margin: 0 0 4px; color: var(--text-primary); }
+.desc { margin: 0; color: var(--text-muted); font-size: 0.9rem; max-width: 620px; }
+.headerActions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.exportBtn {
+  background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 6px; padding: 7px 12px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+}
+.exportBtn:hover:not(:disabled) { border-color: var(--accent, #64b5f6); }
+.exportBtn:disabled { opacity: 0.5; cursor: default; }
+
+.errorBanner {
+  background: var(--red-dim, rgba(232,93,74,0.1)); border: 1px solid rgba(232,93,74,0.3);
+  color: var(--text-primary); border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 0.85rem;
+}
+.loading { display: flex; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0; }
+
+/* Summary */
+.summaryRow {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px;
+}
+.stat {
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 16px; min-width: 110px;
+}
+.statValue { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); }
+.statLabel { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+
+/* Risk-traceability strip (Sprint 2b) */
+.covStrip {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 18px;
+  padding: 10px 14px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
+}
+.covStripTitle {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);
+  font-weight: 700; margin-right: 6px;
+}
+
+/* Untreated-risk alert panel — the auditor's key inverse view */
+.untreated {
+  background: rgba(232,93,74,0.08); border: 1px solid rgba(232,93,74,0.35); border-radius: 8px;
+  padding: 12px 16px; margin: 0 0 22px;
+}
+.untreatedTitle { font-size: 0.95rem; margin: 0 0 4px; color: var(--text-primary); }
+.untreatedDesc { margin: 0 0 10px; color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; }
+.untreatedList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.untreatedItem {
+  display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 6px;
+  cursor: pointer; background: var(--bg-surface); border: 1px solid var(--border);
+}
+.untreatedItem:hover { border-color: var(--red, #e85d4a); }
+.untreatedScore {
+  font-weight: 700; color: var(--red, #e85d4a); min-width: 26px; text-align: center;
+  font-family: var(--font-mono, monospace);
+}
+.untreatedMeta { flex: 1; font-size: 0.82rem; color: var(--text-secondary); }
+.untreatedGo { color: var(--text-muted); }
+
+/* Controls bar (gap + band filter) */
+.controlsBar { margin: 0 0 18px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.gapToggle {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 0.85rem; color: var(--text-secondary);
+  cursor: pointer;
+}
+.bandFilterLabel {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.bandFilter {
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 4px 8px; font-size: 0.8rem;
+}
+
+/* Approved versions */
+.versions {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; margin-bottom: 26px;
+}
+.versionsHead { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.versionsTitle { font-size: 1rem; margin: 0; color: var(--text-primary); }
+.approveRow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.noteInput {
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 6px 9px; font-size: 0.82rem; min-width: 240px;
+}
+.approveBtn {
+  background: rgba(76,175,125,0.15); border: 1px solid rgba(76,175,125,0.4); color: var(--green, #4caf7d);
+  border-radius: 6px; padding: 6px 12px; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.approveBtn:hover:not(:disabled) { background: rgba(76,175,125,0.25); }
+.approveBtn:disabled { opacity: 0.5; cursor: default; }
+.versionsEmpty { color: var(--text-muted); font-size: 0.85rem; margin: 10px 0 0; }
+.versionList { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.versionItem {
+  display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--border);
+}
+.versionNo { font-weight: 700; color: var(--accent, #64b5f6); min-width: 34px; }
+.versionMeta { flex: 1; font-size: 0.82rem; color: var(--text-secondary); }
+.versionExport {
+  background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 3px 9px; font-size: 0.76rem; cursor: pointer; white-space: nowrap;
+}
+.versionExport:hover { border-color: var(--accent, #64b5f6); }
+
+/* Themes */
+.theme { margin-bottom: 26px; }
+.themeTitle {
+  font-size: 1.05rem; color: var(--text-primary); margin: 0 0 10px;
+  border-bottom: 1px solid var(--border); padding-bottom: 6px;
+}
+.themeCount { font-size: 0.78rem; color: var(--text-muted); font-weight: 400; margin-left: 6px; }
+.rows { display: flex; flex-direction: column; gap: 8px; }
+
+/* Control row */
+.row {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+}
+.rowExcluded { opacity: 0.62; }
+.rowHead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ref {
+  font-family: var(--font-mono, monospace); font-size: 0.82rem; font-weight: 700;
+  color: var(--accent, #64b5f6); min-width: 54px;
+}
+.ctrlTitle { font-weight: 600; color: var(--text-primary); flex: 1; min-width: 200px; }
+.applicable {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-secondary);
+  cursor: pointer; white-space: nowrap;
+}
+.status {
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 4px 8px; font-size: 0.8rem;
+}
+.ctrlDesc { margin: 6px 0 10px; color: var(--text-muted); font-size: 0.82rem; line-height: 1.4; }
+
+/* Risk-traceability band badge */
+.bandBadge {
+  display: inline-flex; align-items: center; gap: 5px; border-radius: 12px;
+  padding: 2px 9px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.band_treated  { background: rgba(76,175,125,0.15);  border-color: rgba(76,175,125,0.45);  color: var(--green, #4caf7d); }
+.band_baseline { background: rgba(120,144,156,0.15); border-color: rgba(120,144,156,0.4);  color: var(--text-secondary); }
+.band_untraced { background: rgba(214,158,46,0.15);  border-color: rgba(214,158,46,0.45);  color: var(--amber, #d69e2e); }
+.bandCount {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px;
+  border-radius: 8px; padding: 0 4px; background: rgba(76,175,125,0.3); font-size: 0.66rem;
+}
+.verifiedDot { font-size: 0.7rem; }
+
+.treatsLine {
+  margin: 0 0 10px; font-size: 0.8rem; color: var(--green, #4caf7d);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.autoJustBtn {
+  background: transparent; border: 1px solid rgba(76,175,125,0.4); color: var(--green, #4caf7d);
+  border-radius: 5px; padding: 2px 9px; font-size: 0.74rem; cursor: pointer;
+}
+.autoJustBtn:hover { background: rgba(76,175,125,0.12); }
+
+.editRow { display: flex; gap: 20px; flex-wrap: wrap; }
+.drivers { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.fieldLabel {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted);
+  margin-right: 2px;
+}
+.driverChip {
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+  border-radius: 12px; padding: 2px 10px; font-size: 0.74rem; cursor: pointer; text-transform: capitalize;
+}
+.driverChip:hover:not(:disabled) { border-color: var(--accent, #64b5f6); }
+.driverChip:disabled { cursor: default; }
+.driverOn {
+  background: rgba(100,181,246,0.15); border-color: var(--accent, #64b5f6); color: var(--accent, #64b5f6);
+  font-weight: 600;
+}
+
+.justification { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 280px; }
+.justInput {
+  flex: 1; resize: vertical; min-height: 30px;
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 6px 8px; font-size: 0.82rem; font-family: inherit;
+}
+.justInput:disabled { opacity: 0.6; }
+
+/* The banner is the only signal that work has not been saved — this page has no
+   save button — so it carries the retry rather than just reporting the problem. */
+.retryBtn {
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+.retryBtn:hover { background: rgba(255, 255, 255, 0.12); }
+
+.unsavedTag {
+  color: var(--danger, #b3261e);
+  font-weight: 600;
+}
+
+/* ---- Save state ---------------------------------------------------------- */
+/* This page has no save button, so the state has to be legible without one.
+   Quiet when everything is stored; louder as the risk of losing work rises. */
+
+.saveStatus {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.saveClean   { color: var(--text-muted); }
+.saveSaving  { color: var(--text-muted); }
+.saveEditing { color: var(--warning, #b8860b); font-weight: 500; }
+.saveFailed  { color: var(--danger, #b3261e); font-weight: 600; display: inline-flex; align-items: center; }
+
+/* The per-field tick: confirms this save, then gets out of the way. */
+.savedTick {
+  color: var(--success, #2e7d32);
+  font-weight: 700;
+  animation: tickFade 2s ease-out forwards;
+}
+.editingTag { color: var(--warning, #b8860b); }
+
+@keyframes tickFade {
+  0%   { opacity: 0; transform: translateY(2px); }
+  15%  { opacity: 1; transform: none; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .savedTick { animation: none; opacity: 1; }
+}
+
+/* ---- One record, many lenses (v122) --------------------------------------- */
+.viewSwitch {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);
+}
+.viewSwitch select {
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 4px 8px; font-size: 0.8rem; max-width: 260px;
+}
+.stdRefs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.stdRef {
+  font-size: 0.72rem; color: var(--text-secondary); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1px 8px; white-space: nowrap;
+}
+.stdRef b { font-family: var(--font-mono, monospace); color: var(--accent, #64b5f6); font-weight: 600; }
+.implRow { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.reqState {
+  border-radius: 12px; padding: 2px 9px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.03em; border: 1px solid transparent; white-space: nowrap;
+}
+.req_covered  { background: rgba(76,175,125,0.15);  border-color: rgba(76,175,125,0.45);  color: var(--green, #4caf7d); }
+.req_partial  { background: rgba(214,158,46,0.15);  border-color: rgba(214,158,46,0.45);  color: var(--amber, #d69e2e); }
+.req_excluded { background: rgba(120,144,156,0.15); border-color: rgba(120,144,156,0.4);  color: var(--text-secondary); }
+.req_gap      { background: rgba(229,83,75,0.15);   border-color: rgba(229,83,75,0.45);   color: var(--red, #e5534b); }
+.derivedStatus { font-size: 0.78rem; color: var(--text-secondary); white-space: nowrap; }
+.mapped { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+.mappedNone { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+.mappedList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.mappedItem { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 0.8rem; }
+.mappedTitle { color: var(--text-primary); }
+.mappedMeta { color: var(--text-muted); }
+.mappedImpl { flex-basis: 100%; color: var(--text-secondary); font-size: 0.76rem; padding-left: 10px; border-left: 2px solid var(--border); }
+.inherited { margin: 0 0 8px; font-size: 0.8rem; color: var(--text-secondary); }
+.linkBtn {
+  background: transparent; border: none; color: var(--accent, #64b5f6); font-size: 0.78rem;
+  cursor: pointer; padding: 2px 0;
+}
+.linkBtn:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .mapped, .implRow { flex-direction: column; align-items: stretch; }
+}
+
+/* ---- Maturity on the SoA row (2026-09-22) ---------------------------------- */
+.maturityRow { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; }
+.maturityValue { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+.maturityNone { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+.maturityNotes {
+  font-size: 0.78rem; color: var(--text-secondary); max-width: 520px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.maturityForm { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.maturityPicker { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.maturityPick {
+  background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 1px; cursor: pointer; opacity: 0.55;
+}
+.maturityPickOn { opacity: 1; border-color: var(--accent, #64b5f6); }
+.maturityActions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---- The register (2026-09-22): read-only rows + a bulk decision ----------- */
+.ctrlTitleLink { font-weight: 600; color: var(--text-primary); flex: 1; min-width: 200px; text-decoration: none; }
+.ctrlTitleLink:hover { color: var(--accent, #64b5f6); text-decoration: underline; }
+.rowCheck, .groupCheck { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent, #64b5f6); }
+/* A checkbox alone reads as a bullet, so both carry their own word (2026-09-24). */
+.rowSelect, .groupSelect { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 11px;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.rowSelect:hover, .groupSelect:hover { color: var(--accent, #64b5f6); }
+.rowSelectOn { color: var(--accent, #64b5f6); }
+.groupSelect { margin-right: 10px; font-size: 10.5px; }
+.noMatch { font-size: 13px; color: var(--text-secondary); margin: 8px 0 16px; }
+.statBtn { background: none; border: 1px solid transparent; border-radius: 6px; cursor: pointer;
+  font: inherit; text-align: inherit; padding: 4px 8px; }
+.statBtn:hover { border-color: var(--accent, #64b5f6); }
+.statOn { border-color: var(--accent, #64b5f6); background: rgba(100, 181, 246, 0.12); }
+.selectHint { margin: 0 0 12px; font-size: 12.5px; color: var(--text-muted); }
+.groupCheck { margin-right: 8px; vertical-align: middle; }
+.rowSelected { border-color: var(--accent, #64b5f6); }
+.registerLine { margin: 6px 0 0; font-size: 0.82rem; color: var(--text-secondary); display: flex; gap: 8px; line-height: 1.45; }
+.missing { color: var(--amber, #d69e2e); font-style: italic; }
+.bulkBar {
+  position: sticky; top: 60px; z-index: 99; /* just under the 52px Shell header, as RiskDetailPage .editBar */
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  background: var(--bg-surface); border: 1px solid var(--accent, #64b5f6); border-radius: 8px;
+  padding: 10px 12px; margin: 0 0 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+.bulkCount { font-weight: 700; color: var(--text-primary); font-size: 0.85rem; }
+.bulkChoice { display: flex; gap: 12px; font-size: 0.82rem; color: var(--text-secondary); }
+.bulkChoice label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.bulkReason {
+  flex: 1; min-width: 220px; resize: vertical;
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 6px 8px; font-size: 0.82rem; font-family: inherit;
+}
+.bulkDrivers { display: flex; gap: 5px; flex-wrap: wrap; }
+.bulkNote { margin: 0 0 12px; color: var(--green, #4caf7d); font-size: 0.85rem; }
+
+.scopeChip {
+  font-size: 0.72rem; border: 1px dashed var(--accent, #64b5f6); color: var(--accent, #64b5f6);
+  border-radius: 10px; padding: 1px 8px; white-space: nowrap;
+}
+.bulkChoice select {
+  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  border-radius: 5px; padding: 3px 6px; font-size: 0.8rem; margin-left: 6px;
+}
+
+.bulkDelivery { display: flex; align-items: center; gap: 8px; flex-basis: 100%; padding-top: 6px; border-top: 1px dashed var(--border); }
+.deliveryChip { font-size: 0.72rem; border: 1px solid var(--border); color: var(--text-secondary); border-radius: 10px; padding: 1px 8px; white-space: nowrap; }

@@ -1,0 +1,19 @@
+# CIRKS TLS termination.
+#
+# CIRKS terminates TLS itself (no external load balancer). The certificate
+# strategy is chosen by the single env var CIRKS_TLS, substituted into the
+# `tls` directive below — pick ONE in .env:
+#
+#   Bring your own cert:   CIRKS_TLS=tls /certs/cert.pem /certs/key.pem
+#                          (put the files in deploy/certs/, mounted read-only)
+#   ACME / Let's Encrypt:  CIRKS_TLS=             (blank — auto-HTTPS, public domain)
+#     …with an account email: CIRKS_TLS=tls you@example.org
+#   Self-signed / internal: CIRKS_TLS=tls internal   (air-gapped / no public DNS)
+#
+# CIRKS is a single origin: the SPA and /api/v1 are served by the same app.
+
+{$CIRKS_DOMAIN} {
+	encode gzip
+	{$CIRKS_TLS}
+	reverse_proxy app:3000
+}

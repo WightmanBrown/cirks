@@ -1,0 +1,86 @@
+CIRKS — Cheltenham Information Risk Knowledge System
+Copyright (C) 2026 Wightman Brown Limited
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this software except in compliance with the License. You may obtain a copy of
+the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+The full licence text is in the LICENSE file at the root of this repository.
+Under section 4(d) of the License, anyone who redistributes CIRKS, or a work
+derived from it, must include this NOTICE file.
+
+
+TRADEMARKS
+----------
+
+"CIRKS" and "Cheltenham Information Risk Knowledge System" are trademarks of
+Wightman Brown Limited.
+
+The Apache License grants rights in the software only. Section 6 of the License
+grants no permission to use the trade names, trademarks, service marks or
+product names of Wightman Brown Limited. You may run, modify and redistribute
+this software under the License, but you may not use the CIRKS name or marks to
+identify your modified version, or to describe training, certification,
+consultancy or hosted services, without written permission from Wightman Brown
+Limited. TRADEMARKS.md sets out what is and is not permitted.
+
+
+THIRD-PARTY CONTENT
+-------------------
+
+CIRKS distributes NO third-party standards text except where stated below. Every
+other standard is registered in the application as an import-only reference lens:
+the registry names the standard so that an organisation may load its own licensed
+copy at its discretion. Naming a standard is not reproducing it.
+
+  NIST Cybersecurity Framework (CSF) 2.0
+  National Institute of Standards and Technology, U.S. Department of Commerce
+  Bundled: yes — riskapp/seed-data/standards/nist_csf_2.0_reference.csv
+           and riskapp/db/seed/nist_csf_catalogue.sql (106 subcategories)
+  Status:  Work of the U.S. Government, not subject to copyright protection in
+           the United States (17 U.S.C. Sec. 105). Included as a public-domain
+           reference catalogue. NIST does not endorse this software.
+
+  NIST Special Publication 800-53 Rev 5
+  Bundled: no — registry entry only, no control text distributed.
+
+  ISO/IEC 27001:2022 (including Annex A)
+  International Organization for Standardization / International Electrotechnical
+  Commission
+  Bundled: NO. ISO's standards text is copyrighted and is NOT distributed with
+           CIRKS in any form, including paraphrase. The application registers
+           ISO/IEC 27001 only as a reference lens so that an organisation holding
+           its own licensed copy may import it. Obtain the standard from ISO or a
+           national member body.
+
+  CIS Critical Security Controls v8
+  Center for Internet Security
+  Bundled: NO. Licensed by CIS under CC BY-NC-SA 4.0, whose non-commercial term
+           is incompatible with redistribution here. Registry entry only; import
+           your own copy under CIS's terms.
+
+  HMG Information Assurance Standard No. 1 (IS1) Business Impact Levels
+  Bundled: yes — riskapp/db/seed/is1_bil_reference.sql
+  Status:  Contains public sector information licensed under the Open
+           Government Licence v3.0. Source: HMG IA Standard No. 1, Crown
+           copyright. The OGL permits reuse, including commercially, with this
+           acknowledgement.
+
+Neither ISO, IEC, NIST nor CIS endorses, sponsors or is affiliated with CIRKS or
+Wightman Brown Limited.
+
+
+DEPENDENCIES
+------------
+
+CIRKS depends on third-party open-source packages resolved at build time and not
+vendored into this repository. Their licences (predominantly MIT, ISC, BSD and
+Apache-2.0) and copyright notices travel with those packages; see the respective
+package.json and node_modules/<package>/LICENSE after installation.

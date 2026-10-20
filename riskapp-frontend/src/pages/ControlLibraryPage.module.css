@@ -1,0 +1,354 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.pageDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.addBtn {
+  background: var(--amber);
+  border: none;
+  color: #0d0f13;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.addBtn:hover { opacity: 0.88; }
+
+.importBtn {
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.importBtn:hover:not(:disabled) {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+}
+
+.importBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.refreshBtn {
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+}
+
+.refreshBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Stats ───────────────────────────────────────────────────────────────── */
+
+.statsRow {
+  display: flex;
+  gap: 4px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 80px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Import result banners ───────────────────────────────────────────────── */
+
+.importSuccess {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--green-dim, rgba(52, 199, 89, 0.1));
+  border: 1px solid rgba(52, 199, 89, 0.25);
+  border-radius: var(--radius-md);
+  color: var(--green, #34c759);
+  font-size: 13px;
+  padding: 12px 16px;
+}
+
+.importFailure {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--red);
+  font-size: 13px;
+  padding: 12px 16px;
+}
+
+.expandBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.dismissBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: auto;
+  opacity: 0.6;
+  padding: 0 4px;
+}
+
+.dismissBtn:hover { opacity: 1; }
+
+.importErrors {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.importErrorRow {
+  color: var(--red);
+}
+
+/* ── Status filter tabs ──────────────────────────────────────────────────── */
+
+.filterRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterTab:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.filterActive {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+  background: var(--amber-faint);
+}
+
+/* ── Secondary filter chips ──────────────────────────────────────────────── */
+
+.chipRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chipGroupLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chipDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.chip {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.chipActive {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+  background: var(--amber-faint);
+}
+
+/* ── Error ───────────────────────────────────────────────────────────────── */
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--red);
+  font-size: 13px;
+  padding: 12px 16px;
+}
+
+.retryBtn {
+  background: none;
+  border: 1px solid var(--red);
+  color: var(--red);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-left: auto;
+  transition: opacity 0.15s;
+}
+
+.retryBtn:hover { opacity: 0.75; }
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.row {
+  transition: background 0.1s;
+}
+
+.row:hover {
+  background: var(--bg-elevated);
+}
+
+.td {
+  padding: 13px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tdTitle {
+  color: var(--text-primary);
+  font-weight: 500;
+  max-width: 300px;
+}
+
+/* ── Empty / loading ─────────────────────────────────────────────────────── */
+
+.emptyState { composes: emptyState from '../components/form.module.css'; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 64px 24px; }
+.emptyIcon {
+  font-size: 32px;
+  color: var(--green);
+}
+

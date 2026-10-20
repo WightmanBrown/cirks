@@ -1,0 +1,63 @@
+name: Documentation site
+
+# The public user documentation on GitHub Pages. Only the allow-list in
+# docs/site/build.sh is published — design notes, the roadmap and the
+# hardening backlog in docs/ are not (owner, 2026-10-15: "user guides only").
+# Pull requests build the site to prove it still builds; main also deploys it —
+# once Pages is switched on. It is switched on in the PUBLIC repository,
+# WightmanBrown/cirks (GitHub's free plan has no Pages for the private
+# CIRKS-dev): deploying waits for the repository variable PAGES_ENABLED=true
+# (Settings → Secrets and variables → Actions → Variables), set after Pages is
+# enabled with "GitHub Actions" as the source. Without it main only builds.
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', '.github/workflows/pages.yml']
+  pull_request:
+    paths: ['docs/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # The github-pages build looks the site up; without this it gets a 403 and stops.
+  pages: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build the documentation site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the published pages (allow-list)
+        run: docs/site/build.sh _site_src
+      - name: Configure Pages
+        if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+        uses: actions/configure-pages@v5
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./_site_src
+          destination: ./_site
+      - name: Upload the site
+        if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    name: publish to GitHub Pages
+    if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

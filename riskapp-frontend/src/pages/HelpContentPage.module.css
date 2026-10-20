@@ -1,0 +1,111 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { max-width: 1000px; margin: 0 auto; padding: 24px 28px 60px; }
+
+.pageHeader { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.heading {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+.intro {
+  font-size: var(--text-hint);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 70ch;
+  margin: 0 0 18px;
+}
+
+.loading { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); padding: 30px 0; }
+.errorMsg { color: var(--red); font-size: var(--text-hint); }
+
+/* stats */
+.statsRow {
+  display: flex;
+  gap: 28px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.statValue { font-family: var(--font-mono); font-size: 1.3rem; color: var(--text-primary); }
+.statLabel { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+
+/* table */
+.table { width: 100%; border-collapse: collapse; }
+.th {
+  text-align: left;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.td, .tdKey, .tdAction { padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: var(--text-hint); color: var(--text-secondary); vertical-align: middle; }
+.tdKey { font-family: var(--font-mono); color: var(--text-primary); font-size: var(--text-sm); }
+.tdAction { text-align: right; }
+.rowActive td { background: var(--bg-hover); }
+
+.yes { color: var(--green); font-weight: 700; }
+.no  { color: var(--text-muted); }
+
+.srcChip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  border: 1px solid var(--border-accent);
+}
+.srcCustom    { color: var(--green); border-color: var(--green-dim); background: var(--green-dim); }
+.srcDefault   { color: var(--text-secondary); }
+.srcUnwritten { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-faint); }
+
+.editBtn {
+  padding: 4px 12px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-hint);
+  cursor: pointer;
+}
+.editBtn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* inline editor */
+.editorCell { padding: 0 12px 14px; border-bottom: 1px solid var(--border); background: var(--bg-inset); }
+.editor { display: flex; flex-direction: column; gap: 8px; padding: 14px 0 4px; max-width: 560px; }
+.defaultNote { margin: 0; font-size: var(--text-xs); color: var(--text-muted); font-style: italic; }
+.input, .textarea, .select {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-hint);
+}
+.textarea { resize: vertical; line-height: 1.45; }
+.editorRow { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.sideLabel { display: flex; flex-direction: column; gap: 3px; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.select { width: auto; padding: 4px 6px; }
+.editorBtns { display: flex; gap: 8px; }
+.saveBtn, .cancelBtn, .clearBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-hint);
+  cursor: pointer;
+}
+.saveBtn { border-color: var(--accent); background: var(--accent-faint); color: var(--accent); font-weight: 600; }
+.saveBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.clearBtn { border-color: var(--red-dim); color: var(--red); }

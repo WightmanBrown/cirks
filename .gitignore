@@ -1,0 +1,43 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+# Every .env variant at any depth, including hand-made backups
+# (.env.bak-<timestamp>) — which is exactly what a careful person creates
+# before editing a deployment's config. The narrow `.env` rule missed them, and
+# two sat untracked in the CIRKS-test repo root holding real JWT secrets and the
+# database password. Slash-less patterns match at every level, so this one rule
+# also covers riskapp-frontend/ and filesnode/, neither of which has a
+# .gitignore of its own.
+.env*
+!.env*.example
+
+# Database dumps. The container entrypoint writes a pre-migrate backup here on
+# every deployment that has migrations to apply, so on a deployed instance this
+# directory fills with full copies of the database.
+backups/
+# Files a user puts here to load with db/import.js; only the README is tracked.
+import/*
+!import/README.md
+dist/
+build/
+public/
+CLAUDE.md
+filesnode/
+project_documents/
+
+# Meeting file uploads (keep directory scaffold, ignore user content)
+riskapp/uploads/meetings/*/
+
+# Playwright E2E artifacts
+riskapp-frontend/test-results/
+riskapp-frontend/playwright-report/
+riskapp-frontend/.playwright/
+
+# Local project archives
+project_stanley.tgz
+*.tgz
+
+# TLS certs/keys provided by the operator (bring-your-own-cert mode)
+deploy/certs/*
+!deploy/certs/.gitkeep

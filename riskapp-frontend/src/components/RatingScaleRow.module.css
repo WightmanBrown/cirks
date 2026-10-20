@@ -1,0 +1,28 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Unselected rungs — clearly non-interactive: muted, low-contrast, no border.
+   Matches the lit RatingChip word shape (font/padding) so the ladder aligns. */
+.muted {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 3px;
+  border: 2px solid transparent;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  opacity: 0.5;
+  white-space: nowrap;
+}

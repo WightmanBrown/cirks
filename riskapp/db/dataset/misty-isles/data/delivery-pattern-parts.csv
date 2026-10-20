@@ -1,0 +1,45 @@
+pattern_name,component_name,component_type,location,service_system_name
+CrowdStrike EDR,Crowdstrike Falcon Agent,technology,on_system,
+CrowdStrike EDR,Crowdstrike SaaS,technology,service,Host Intrusion Detection System
+CrowdStrike EDR,InfoSec Team,people,service,Host Intrusion Detection System
+CrowdStrike EDR,Detective Monitoring,process,service,Host Intrusion Detection System
+Wazuh agent (OT),Wazuh agent,technology,on_system,
+Wazuh agent (OT),Wazuh,technology,service,Security monitoring platform
+Wazuh agent (OT),InfoSec Team,people,service,Security monitoring platform
+Wazuh agent (OT),Detective Monitoring,process,service,Security monitoring platform
+Syslog to Wazuh (network appliances),Syslog forwarding to Wazuh,technology,on_system,
+Syslog to Wazuh (network appliances),Wazuh,technology,service,Security monitoring platform
+Syslog to Wazuh (network appliances),InfoSec Team,people,service,Security monitoring platform
+Microsoft Defender for Servers (Azure),Microsoft Defender for Servers,technology,on_system,
+Microsoft Defender for Servers (Azure),Microsoft Defender XDR console,technology,service,Microsoft Defender for Cloud
+Microsoft Defender for Servers (Azure),InfoSec Team,people,service,Microsoft Defender for Cloud
+OSSEC agent (being retired),OSSEC agent,technology,on_system,
+OSSEC agent (being retired),Wazuh,technology,service,Security monitoring platform
+Veeam backup,Veeam Backup,technology,on_system,
+Veeam backup,Veeam Backup & Replication server,technology,service,MIG Backup
+Veeam backup,Resilience and recovery,process,service,MIG Backup
+Veeam backup,IT Administrators,people,service,MIG Backup
+Microsoft 365 Backup,Microsoft 365 Backup,technology,on_system,
+Azure Backup,Azure Backup,technology,on_system,
+Configuration backup (network appliances),Network configuration backup,technology,on_system,
+CrowdStrike host containment,Crowdstrike Falcon Agent,technology,on_system,
+CrowdStrike host containment,Crowdstrike SaaS,technology,service,Host Intrusion Detection System
+CrowdStrike host containment,InfoSec Team,people,service,Host Intrusion Detection System
+CrowdStrike host containment,Incident management,process,organisation,
+Network isolation,PaloAlto 850-22,technology,service,Network Intrusion Detection System
+Network isolation,InfoSec Team,people,service,Network Intrusion Detection System
+Network isolation,Incident management,process,organisation,
+Perimeter firewall and segmentation,PaloAlto 850-22,technology,service,Network Intrusion Detection System
+Perimeter firewall and segmentation,IT Administrators,people,service,Network Intrusion Detection System
+NIDS (Palo Alto ATP),PaloAlto ATP,technology,service,Network Intrusion Detection System
+NIDS (Palo Alto ATP),Advanced Threat Prevention Network Intrusion Detection platform,technology,service,Network Intrusion Detection System
+NIDS (Palo Alto ATP),InfoSec Team,people,service,Network Intrusion Detection System
+TLS,TLS 1.2+ configuration,technology,on_system,
+TLS,Encryption Standard,information,organisation,
+Remote-access VPN,PaloAlto GlobalProtect VPN,technology,on_system,
+Remote-access VPN,PaloAlto GlobalProtect gateway,technology,service,MIG Remote Access VPN
+Secure radio,Plotnet Secure Radio,technology,on_system,
+Signal secure messaging,Signal,technology,on_system,
+Active Directory (on-premises),Microsoft Active Directory Domain Services,technology,service,"MIG Authentication, Authorisation and Access Control system"
+Active Directory (on-premises),IT Administrators,people,service,"MIG Authentication, Authorisation and Access Control system"
+Entra ID (cloud),Microsoft Entra ID,technology,service,"MIG Authentication, Authorisation and Access Control system"

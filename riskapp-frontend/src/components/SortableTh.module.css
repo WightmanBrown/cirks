@@ -1,0 +1,33 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* A header cell's sort button — looks exactly like the header text, but is
+   clickable and carries the sort-direction arrow. Inherits font/casing/colour
+   from the surrounding <th> so it blends into any table. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.arrow {
+  font-size: 0.72em;
+  line-height: 1;
+  opacity: 0.3;
+  transition: opacity 0.1s ease;
+}
+
+.btn:hover .arrow { opacity: 0.6; }
+
+.arrowActive,
+.btn:hover .arrowActive { opacity: 1; }

@@ -1,0 +1,66 @@
+pattern_name,control_title
+CrowdStrike EDR,"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events"
+Wazuh agent (OT),"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events"
+Syslog to Wazuh (network appliances),"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events"
+Microsoft Defender for Servers (Azure),"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events"
+OSSEC agent (being retired),"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events"
+Provided by the supplier,"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events"
+CrowdStrike EDR,Information is correlated from multiple sources
+Wazuh agent (OT),Information is correlated from multiple sources
+Syslog to Wazuh (network appliances),Information is correlated from multiple sources
+Microsoft Defender for Servers (Azure),Information is correlated from multiple sources
+OSSEC agent (being retired),Information is correlated from multiple sources
+Provided by the supplier,Information is correlated from multiple sources
+CrowdStrike EDR,Log records are generated and made available for continuous monitoring
+Wazuh agent (OT),Log records are generated and made available for continuous monitoring
+Syslog to Wazuh (network appliances),Log records are generated and made available for continuous monitoring
+Microsoft Defender for Servers (Azure),Log records are generated and made available for continuous monitoring
+OSSEC agent (being retired),Log records are generated and made available for continuous monitoring
+Provided by the supplier,Log records are generated and made available for continuous monitoring
+CrowdStrike EDR,Installation and execution of unauthorized software are prevented
+Wazuh agent (OT),Installation and execution of unauthorized software are prevented
+Syslog to Wazuh (network appliances),Installation and execution of unauthorized software are prevented
+Microsoft Defender for Servers (Azure),Installation and execution of unauthorized software are prevented
+OSSEC agent (being retired),Installation and execution of unauthorized software are prevented
+Provided by the supplier,Installation and execution of unauthorized software are prevented
+CrowdStrike EDR,Incidents are eradicated
+Wazuh agent (OT),Incidents are eradicated
+Syslog to Wazuh (network appliances),Incidents are eradicated
+Microsoft Defender for Servers (Azure),Incidents are eradicated
+OSSEC agent (being retired),Incidents are eradicated
+Provided by the supplier,Incidents are eradicated
+CrowdStrike EDR,Personnel activity and technology usage are monitored to find potentially adverse events
+Wazuh agent (OT),Personnel activity and technology usage are monitored to find potentially adverse events
+Syslog to Wazuh (network appliances),Personnel activity and technology usage are monitored to find potentially adverse events
+Microsoft Defender for Servers (Azure),Personnel activity and technology usage are monitored to find potentially adverse events
+OSSEC agent (being retired),Personnel activity and technology usage are monitored to find potentially adverse events
+Provided by the supplier,Personnel activity and technology usage are monitored to find potentially adverse events
+Veeam backup,"Backups of data are created, protected, maintained, and tested"
+Microsoft 365 Backup,"Backups of data are created, protected, maintained, and tested"
+Azure Backup,"Backups of data are created, protected, maintained, and tested"
+Configuration backup (network appliances),"Backups of data are created, protected, maintained, and tested"
+Provided by the supplier,"Backups of data are created, protected, maintained, and tested"
+Veeam backup,The recovery portion of the incident response plan is executed once initiated from the incident response process
+Microsoft 365 Backup,The recovery portion of the incident response plan is executed once initiated from the incident response process
+Azure Backup,The recovery portion of the incident response plan is executed once initiated from the incident response process
+Configuration backup (network appliances),The recovery portion of the incident response plan is executed once initiated from the incident response process
+Provided by the supplier,The recovery portion of the incident response plan is executed once initiated from the incident response process
+Veeam backup,The integrity of backups and other restoration assets is verified before using them for restoration
+Microsoft 365 Backup,The integrity of backups and other restoration assets is verified before using them for restoration
+Azure Backup,The integrity of backups and other restoration assets is verified before using them for restoration
+Configuration backup (network appliances),The integrity of backups and other restoration assets is verified before using them for restoration
+Provided by the supplier,The integrity of backups and other restoration assets is verified before using them for restoration
+CrowdStrike host containment,Incidents are contained
+Network isolation,Incidents are contained
+Provided by the supplier,Incidents are contained
+Perimeter firewall and segmentation,Networks and environments are protected from unauthorized logical access and usage
+Provided by the supplier,Networks and environments are protected from unauthorized logical access and usage
+NIDS (Palo Alto ATP),Networks and network services are monitored to find potentially adverse events
+Provided by the supplier,Networks and network services are monitored to find potentially adverse events
+TLS,"The confidentiality, integrity, and availability of data-in-transit are protected"
+Remote-access VPN,"The confidentiality, integrity, and availability of data-in-transit are protected"
+Secure radio,"The confidentiality, integrity, and availability of data-in-transit are protected"
+Signal secure messaging,"The confidentiality, integrity, and availability of data-in-transit are protected"
+Provided by the supplier,"The confidentiality, integrity, and availability of data-in-transit are protected"
+Active Directory (on-premises),"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties"
+Entra ID (cloud),"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties"

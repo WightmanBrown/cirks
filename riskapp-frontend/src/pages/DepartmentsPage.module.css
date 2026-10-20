@@ -1,0 +1,104 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { display: flex; flex-direction: column; gap: 20px; }
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  display: block;
+}
+
+.filterBar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.searchInput {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+  width: 240px;
+}
+.searchInput:focus { border-color: var(--accent); }
+
+.tableWrap { overflow-x: auto; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.row { cursor: pointer; }
+.row:hover td { background: var(--bg-hover, var(--bg-surface)); }
+
+.nameCell { font-weight: 600; color: var(--text-primary); }
+.countCell { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); text-align: left; }
+.colNum { width: 90px; }
+.riskCount { color: var(--amber); font-weight: 700; }
+
+.colOptional { font-size: 12px; color: var(--text-secondary); }
+@media (max-width: 900px) { .colOptional { display: none; } }
+
+.muted { color: var(--text-muted); font-size: 13px; }
+.errorMsg { color: var(--red); font-size: 13px; }
+
+.btnPrimary { composes: btnPrimary from '../components/buttons.module.css'; }
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+
+.overlay { composes: overlay from '../components/modal.module.css'; }
+.modal { composes: modal from '../components/modal.module.css'; padding: 28px; width: 480px; max-width: 95vw; }
+.modalTitle { composes: modalTitle from '../components/modal.module.css'; }
+.fieldLabel { composes: fieldLabel from '../components/form.module.css'; display: flex; margin-bottom: 14px; }
+.input { composes: input from '../components/form.module.css'; }
+.textarea { composes: textarea from '../components/form.module.css'; }
+.select { composes: select from '../components/form.module.css'; }
+.error { color: var(--red); font-size: 12px; margin: 4px 0; }
+.modalActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* A department with no IAO is not missing data — it is unfinished. Anything
+   created for it will have no owner until someone is assigned, so the gap is
+   named rather than shown as a dash among dashes. */
+.roleMissing {
+  color: var(--danger, #b3261e);
+  font-size: 0.8rem;
+  font-weight: 500;
+}

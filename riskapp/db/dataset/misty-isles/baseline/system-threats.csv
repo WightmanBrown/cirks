@@ -1,0 +1,226 @@
+system_name,threat_name
+Aircraft fuelling,Hardware or software failure
+Aircraft fuelling,Malware infection
+Aircraft fuelling,Natural disaster or environmental event
+Aircraft fuelling,Physical intrusion or theft
+Aircraft fuelling,Supply chain or third-party compromise
+Approach radar,Denial of service (DoS/DDoS)
+Approach radar,Exploitation of an unpatched vulnerability
+Approach radar,Hardware or software failure
+Approach radar,Natural disaster or environmental event
+Approach radar,Physical intrusion or theft
+Approach radar,Zero-day exploitation
+Billing and meter reading,Accidental data disclosure
+Billing and meter reading,Data exfiltration
+Billing and meter reading,Exploitation of a public-facing application
+Billing and meter reading,Ransomware
+Billing and meter reading,Stolen or compromised credentials
+Billing and meter reading,Supply chain or third-party compromise
+Case Management System,Accidental data disclosure
+Case Management System,Data exfiltration
+Case Management System,Malicious insider misuse
+Case Management System,Privilege escalation
+Case Management System,Ransomware
+Case Management System,Stolen or compromised credentials
+Case Management System,Unauthorised data modification
+Costal Radar and Ship Tracking,Denial of service (DoS/DDoS)
+Costal Radar and Ship Tracking,Exploitation of an unpatched vulnerability
+Costal Radar and Ship Tracking,Hardware or software failure
+Costal Radar and Ship Tracking,Natural disaster or environmental event
+Costal Radar and Ship Tracking,Physical intrusion or theft
+Costal Radar and Ship Tracking,Unauthorised data modification
+Court Management System,Accidental data disclosure
+Court Management System,Malicious insider misuse
+Court Management System,Ransomware
+Court Management System,Stolen or compromised credentials
+Court Management System,Unauthorised data modification
+Criminal Records and Firearms Licensing System,Malicious insider misuse
+Emergency Communications System,Denial of service (DoS/DDoS)
+Emergency Communications System,Hardware or software failure
+Emergency Communications System,Interception of internal network traffic
+Emergency Communications System,Natural disaster or environmental event
+Emergency Communications System,Physical intrusion or theft
+Emergency Communications System,Supply chain or third-party compromise
+Environmental GIS research platform,Accidental data disclosure
+Environmental GIS research platform,Exploitation of an unpatched vulnerability
+Environmental GIS research platform,Hardware or software failure
+Environmental GIS research platform,Supply chain or third-party compromise
+Fisheries management system,Accidental data disclosure
+Fisheries management system,Exploitation of an unpatched vulnerability
+Fisheries management system,Exploitation of a public-facing application
+Fisheries management system,Stolen or compromised credentials
+Fisheries management system,Unauthorised data modification
+Flight information display,Denial of service (DoS/DDoS)
+Flight information display,Exploitation of a public-facing application
+Flight information display,Hardware or software failure
+Flight information display,Unauthorised data modification
+Flight operations system,Denial of service (DoS/DDoS)
+Flight operations system,Exploitation of an unpatched vulnerability
+Flight operations system,Hardware or software failure
+Flight operations system,Ransomware
+Flight operations system,Stolen or compromised credentials
+Flight operations system,Supply chain or third-party compromise
+Flight operations system,Unauthorised data modification
+Host Intrusion Detection System,Exploitation of an unpatched vulnerability
+Host Intrusion Detection System,Hardware or software failure
+Host Intrusion Detection System,Malicious insider misuse
+Host Intrusion Detection System,Security misconfiguration
+Medical Imaging System,Accidental data disclosure
+Medical Imaging System,Exploitation of an unpatched vulnerability
+Medical Imaging System,Hardware or software failure
+Medical Imaging System,Ransomware
+Medical Imaging System,Supply chain or third-party compromise
+Medical Planning System,Accidental data disclosure
+Medical Planning System,Denial of service (DoS/DDoS)
+Medical Planning System,Hardware or software failure
+Medical Planning System,Ransomware
+Medical Planning System,Stolen or compromised credentials
+Medical Records System,Accidental data disclosure
+Medical Records System,Data exfiltration
+Medical Records System,Malicious insider misuse
+Medical Records System,Privilege escalation
+Medical Records System,Ransomware
+Medical Records System,Stolen or compromised credentials
+Medical Records System,Unauthorised data modification
+"MIG Authentication, Authorisation and Access Control system",Denial of service (DoS/DDoS)
+"MIG Authentication, Authorisation and Access Control system",Exploitation of an unpatched vulnerability
+"MIG Authentication, Authorisation and Access Control system",Malicious insider misuse
+"MIG Authentication, Authorisation and Access Control system",Phishing targeting user credentials
+"MIG Authentication, Authorisation and Access Control system",Privilege escalation
+"MIG Authentication, Authorisation and Access Control system",Security misconfiguration
+"MIG Authentication, Authorisation and Access Control system",Stolen or compromised credentials
+MIG Backup,Hardware or software failure
+MIG Backup,Malicious insider misuse
+MIG Backup,Natural disaster or environmental event
+MIG Backup,Physical intrusion or theft
+MIG Backup,Ransomware
+MIG Backup,Unauthorised data modification
+MIG Banking System,Data exfiltration
+MIG Banking System,Exploitation of a public-facing application
+MIG Banking System,Malicious insider misuse
+MIG Banking System,Phishing targeting user credentials
+MIG Banking System,Privilege escalation
+MIG Banking System,Stolen or compromised credentials
+MIG Banking System,Supply chain or third-party compromise
+MIG Banking System,Unauthorised data modification
+MIG Corporate Email,Accidental data disclosure
+MIG Corporate Email,Data exfiltration
+MIG Corporate Email,Denial of service (DoS/DDoS)
+MIG Corporate Email,Malware infection
+MIG Corporate Email,Phishing targeting user credentials
+MIG Corporate Email,Stolen or compromised credentials
+MIG Desktop (internal),Exploitation of an unpatched vulnerability
+MIG Desktop (internal),Lost or stolen device or media
+MIG Desktop (internal),Malware infection
+MIG Desktop (internal),Phishing targeting user credentials
+MIG Desktop (internal),Ransomware
+MIG Desktop (internal),Security misconfiguration
+MIG Desktop (remote),Exploitation of an unpatched vulnerability
+MIG Desktop (remote),Interception of internal network traffic
+MIG Desktop (remote),Lost or stolen device or media
+MIG Desktop (remote),Malware infection
+MIG Desktop (remote),Phishing targeting user credentials
+MIG Desktop (remote),Ransomware
+MIG Desktop (remote),Stolen or compromised credentials
+MIG Document Management,Accidental data disclosure
+MIG Document Management,Data exfiltration
+MIG Document Management,Malicious insider misuse
+MIG Document Management,Stolen or compromised credentials
+MIG Document Management,Unauthorised data modification
+MIG File storage,Accidental data disclosure
+MIG File storage,Data exfiltration
+MIG File storage,Hardware or software failure
+MIG File storage,Malicious insider misuse
+MIG File storage,Ransomware
+MIG File storage,Stolen or compromised credentials
+MIGNet,Denial of service (DoS/DDoS)
+MIGNet,Exploitation of a public-facing application
+MIGNet,Hardware or software failure
+MIGNet,Interception of internal network traffic
+MIGNet,Security misconfiguration
+MIGNet,Zero-day exploitation
+MIG Telephony and Messaging,Denial of service (DoS/DDoS)
+MIG Telephony and Messaging,Hardware or software failure
+MIG Telephony and Messaging,Interception of internal network traffic
+MIG Telephony and Messaging,Supply chain or third-party compromise
+MIG Video Conferencing,Accidental data disclosure
+MIG Video Conferencing,Denial of service (DoS/DDoS)
+MIG Video Conferencing,Interception of internal network traffic
+MIG Video Conferencing,Supply chain or third-party compromise
+Network Intrusion Detection System,Denial of service (DoS/DDoS)
+Network Intrusion Detection System,Exploitation of an unpatched vulnerability
+Network Intrusion Detection System,Hardware or software failure
+Network Intrusion Detection System,Interception of internal network traffic
+Network Intrusion Detection System,Security misconfiguration
+Pharmacy Inventory System,Hardware or software failure
+Pharmacy Inventory System,Malicious insider misuse
+Pharmacy Inventory System,Ransomware
+Pharmacy Inventory System,Supply chain or third-party compromise
+Pharmacy Inventory System,Unauthorised data modification
+Port operations system,Accidental data disclosure
+Port operations system,Exploitation of a public-facing application
+Port operations system,Ransomware
+Port operations system,Stolen or compromised credentials
+Port operations system,Supply chain or third-party compromise
+Port operations system,Unauthorised data modification
+Power Distribution,Denial of service (DoS/DDoS)
+Power Distribution,Exploitation of an unpatched vulnerability
+Power Distribution,Hardware or software failure
+Power Distribution,Malware infection
+Power Distribution,Natural disaster or environmental event
+Power Distribution,Physical intrusion or theft
+Power Distribution,Zero-day exploitation
+Power Generation,Hardware or software failure
+Power Generation,Malware infection
+Power Generation,Natural disaster or environmental event
+Power Generation,Physical intrusion or theft
+Power Generation,Ransomware
+Power Generation,Supply chain or third-party compromise
+Power Generation,Zero-day exploitation
+Prison Management System,Data exfiltration
+Prison Management System,Hardware or software failure
+Prison Management System,Malicious insider misuse
+Prison Management System,Physical intrusion or theft
+Prison Management System,Privilege escalation
+Prison Management System,Unauthorised data modification
+Pupil/student records system,Accidental data disclosure
+Pupil/student records system,Data exfiltration
+Pupil/student records system,Exploitation of a public-facing application
+Pupil/student records system,Phishing targeting user credentials
+Pupil/student records system,Ransomware
+Pupil/student records system,Stolen or compromised credentials
+Pupil/student records system,Unauthorised data modification
+Risk Management System,Accidental data disclosure
+Risk Management System,Hardware or software failure
+Risk Management System,Stolen or compromised credentials
+Risk Management System,Supply chain or third-party compromise
+Risk Management System,Unauthorised data modification
+Schools facilities management,Exploitation of an unpatched vulnerability
+Schools facilities management,Hardware or software failure
+Schools facilities management,Ransomware
+Schools facilities management,Supply chain or third-party compromise
+Security monitoring platform,Data exfiltration
+Security monitoring platform,Hardware or software failure
+Security monitoring platform,Malicious insider misuse
+Security monitoring platform,Privilege escalation
+Security monitoring platform,Supply chain or third-party compromise
+Security monitoring platform,Zero-day exploitation
+Student Desktop,Phishing targeting user credentials
+Tax Records System,Accidental data disclosure
+Tax Records System,Data exfiltration
+Tax Records System,Exploitation of a public-facing application
+Tax Records System,Phishing targeting user credentials
+Tax Records System,Ransomware
+Tax Records System,Unauthorised data modification
+Treasury Accounting System,Malicious insider misuse
+Treasury Accounting System,Phishing targeting user credentials
+Treasury Accounting System,Privilege escalation
+Treasury Accounting System,Ransomware
+Treasury Accounting System,Stolen or compromised credentials
+Treasury Accounting System,Unauthorised data modification
+Water Distribution,Hardware or software failure
+Water Distribution,Malware infection
+Water Distribution,Natural disaster or environmental event
+Water Distribution,Physical intrusion or theft
+Water Distribution,Unauthorised data modification
+Water Distribution,Zero-day exploitation

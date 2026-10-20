@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question or share an idea
+    url: https://github.com/WightmanBrown/cirks/discussions
+    about: Questions about installing, modelling or using CIRKS go to Discussions.
+  - name: Report a security vulnerability
+    url: https://github.com/WightmanBrown/cirks/security/advisories/new
+    about: Never in a public issue. Report it privately; see SECURITY.md.
+  - name: Professional services from Wightman Brown Limited
+    url: mailto:cirks@wightmanbrown.ltd.uk
+    about: Implementation, training, support agreements and virtual CISO services.

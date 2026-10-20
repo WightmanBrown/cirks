@@ -1,0 +1,47 @@
+# TLS overlay — CIRKS terminates its own TLS with a bundled Caddy.
+#
+#   # in .env: CIRKS_DOMAIN=cirks.example.org  + choose CIRKS_TLS (see Caddyfile)
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.tls.yml up -d
+#
+# Caddy faces the internet on 80/443 and proxies to the app over the internal
+# network. The app's own published port is removed so only Caddy is exposed
+# (`!reset` needs Docker Compose v2.24+; on older Compose, delete the app
+# `ports:` block in docker-compose.yml by hand).
+#
+# Bring-your-own-cert mode: drop cert.pem + key.pem into deploy/certs/ (the dir
+# is mounted read-only at /certs) and set CIRKS_TLS=tls /certs/cert.pem /certs/key.pem
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CIRKS_DOMAIN: ${CIRKS_DOMAIN:?set CIRKS_DOMAIN in .env}
+      CIRKS_TLS: ${CIRKS_TLS:-}
+    # Caddy is the only container with a route out — it needs one for ACME.
+    # `edge` reaches the internet; `backend` reaches the app. The app itself is
+    # on `backend` only (H-19).
+    networks:
+      - edge
+      - backend
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./deploy/certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  app:
+    # Behind Caddy the app must not be published directly.
+    ports: !reset []
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  edge:

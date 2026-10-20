@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+
+.select { composes: select from '../pages/SystemsPage.module.css'; }
+
+.warning {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--danger, #b3261e);
+}

@@ -1,0 +1,773 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 860px;
+}
+
+/* ── Breadcrumb ─────────────────────────────────────────────────────────── */
+
+.viewModeSlot { margin-left: auto; }
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.metaChip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.metaOwner {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.inactiveBadge {
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+}
+
+.ciaRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.ciaSummary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ciaSummaryLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── CIA badge ──────────────────────────────────────────────────────────── */
+
+.ciaBadge {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.ciaGreen  { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
+.ciaAmber  { background: var(--amber-faint); color: var(--amber);  border: 1px solid var(--amber-dim); }
+.ciaRed    { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
+.ciaUnset  { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
+
+/* ── Tabs ───────────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.tab,
+.tabActive {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 8px 14px;
+  color: var(--text-muted);
+  transition: color 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -1px;
+}
+
+.tab:hover { color: var(--text-secondary); }
+
+.tabActive {
+  border-bottom-color: var(--amber);
+  color: var(--amber);
+}
+
+.tabCount {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 10px;
+  padding: 1px 6px;
+}
+
+/* ── Form ───────────────────────────────────────────────────────────────── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.spanFull { grid-column: 1 / -1; }
+
+.fieldLabel { composes: fieldLabel from '../components/form.module.css'; display: flex; }
+
+/* .form is a flex column with a 16px gap, so the checkbox and its hint are
+   wrapped as one field — otherwise the gap would push the hint away from the
+   control it explains. */
+.checkboxField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Checkbox rows read left-to-right — box, caption, then the live "shared" chip
+   — unlike .fieldLabel, which stacks a caption above a full-width control.
+   width: fit-content keeps the click target on the visible content. */
+.checkboxLabel {
+  composes: fieldLabel from '../components/form.module.css';
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: fit-content;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+/* flex: none — a checkbox in a flex row is a flex item, and without this it
+   can be squeezed below its intrinsic size. */
+.checkbox {
+  flex: none;
+  margin: 0;
+}
+
+.fieldHint { composes: fieldHint from '../components/form.module.css'; margin: 0; }
+
+/* Amber, matching every other "shared" chip in the app. */
+.sharedTag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+  text-transform: uppercase;
+}
+
+.input { composes: input from '../components/form.module.css'; }
+.select { composes: select from '../components/form.module.css'; }
+.textarea { composes: textarea from '../components/form.module.css'; }
+
+/* ── CIA pickers ─────────────────────────────────────────────────────────  */
+
+.ciaSection {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-surface);
+}
+
+.pickerRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pickerLabel {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 110px;
+}
+
+.pickerBtns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pickerBtn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+  min-width: 56px;
+}
+
+.pickerBtn:hover:not(:disabled) {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.pickerBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pickerNum {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pickerLbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.activeGreen {
+  background: var(--green-dim) !important;
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  box-shadow: 0 0 0 2px rgba(76, 175, 125, 0.15);
+}
+
+.activeAmber {
+  background: var(--amber-faint) !important;
+  border-color: var(--amber-dim) !important;
+  color: var(--amber) !important;
+  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.12);
+}
+
+.activeRed {
+  background: var(--red-dim) !important;
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+  box-shadow: 0 0 0 2px rgba(232, 93, 74, 0.15);
+}
+
+/* ── Form footer ────────────────────────────────────────────────────────── */
+
+.ratedBy {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ── Services panel ─────────────────────────────────────────────────────── */
+
+.servicesPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.table td {
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.serviceLink {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.serviceLink:hover { color: var(--amber); }
+
+.deptCell {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.linkPanel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-surface);
+}
+
+.linkPanelLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.searchInput {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  padding: 7px 10px;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.searchInput:focus { border-color: var(--border-accent); }
+
+.linkResults {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.linkResult {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-primary);
+  padding: 7px 12px;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+.btnPrimary { composes: btnPrimary from '../components/buttons.module.css'; }
+
+.btnDanger { composes: btnDanger from '../components/buttons.module.css'; }
+
+.btnUnlink { composes: btnSecondary from '../components/buttons.module.css'; }
+
+.btnLink { composes: btnLink from '../components/buttons.module.css'; }
+
+/* ── Rating panel ───────────────────────────────────────────────────────── */
+
+.noRatings {
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.noRatingsHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.ratingPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ratingTopBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.viewToggle {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  overflow: hidden;
+}
+
+.viewToggleBtn,
+.viewToggleActive {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  transition: background 0.12s, color 0.12s;
+}
+
+.viewToggleBtn    { color: var(--text-muted); }
+.viewToggleActive { background: var(--amber); color: #000; }
+
+.ciaMaxRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ciaMaxCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+  padding: 12px 16px;
+}
+
+.ciaMaxLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.bilPill {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+}
+
+.bil1 { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
+.bil2 { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
+.bil3 { background: var(--amber-faint); color: var(--amber);  border: 1px solid var(--amber-dim); }
+.bil4 { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
+.bil5 { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
+
+.unset { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+
+.ratingTableSection {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.ratingTableHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.ratingTableDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.bilSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.bilPickerH {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.bilPickerHDisabled { opacity: 0.4; pointer-events: none; }
+
+.bilBtnH {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 6px;
+  transition: border-color 0.12s, background 0.12s;
+  text-align: center;
+}
+
+.bilBtnH:hover:not(:disabled) { border-color: var(--border-accent); color: var(--text-secondary); }
+.bilBtnH:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.bilBtnHActive {
+  border-color: var(--green) !important;
+  background: var(--green-dim) !important;
+  color: var(--green) !important;
+  box-shadow: 0 0 0 2px rgba(76,175,125,0.15);
+}
+
+.bilBtnHLevel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bilBtnHStmt {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: inherit;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.85;
+}
+
+.bilBtnHEmpty { font-size: 12px; color: var(--text-muted); }
+
+.scopeChipOrg  { background: var(--green-dim);   border: 1px solid var(--green);     color: var(--green);  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; letter-spacing: 0.05em; }
+.scopeChipDept { background: var(--amber-faint); border: 1px solid var(--amber-dim); color: var(--amber);  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; letter-spacing: 0.05em; }
+
+.ciaRatingSection { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); padding-top: 12px; }
+
+.ciaRatingRow { display: flex; flex-direction: column; gap: 8px; }
+.ciaRatingRowDropped { opacity: 0.55; }
+.ciaRatingRowHead { display: flex; align-items: center; }
+.ciaDropLabel { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+.ciaDropDim   { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--text-primary); min-width: 14px; }
+.ciaDropFull  { font-size: 12px; color: var(--text-secondary); }
+.ciaDroppedBadge { background: var(--bg-elevated); border: 1px solid var(--border-accent); border-radius: var(--radius-sm); color: var(--text-muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.04em; padding: 2px 7px; }
+
+.ciaConsistencyWarn {
+  background: var(--amber-faint);
+  border: 1px solid var(--amber-dim);
+  border-radius: var(--radius-sm);
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 8px 12px;
+}
+
+.ratingFooter { display: flex; flex-direction: column; gap: 10px; }
+.saveRow { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+
+/* ── Misc ───────────────────────────────────────────────────────────────── */
+
+.muted    { color: var(--text-muted); font-size: 13px; }
+.errorMsg { color: var(--red);   font-size: 13px; }
+.savedMsg { color: var(--green); font-family: var(--font-mono); font-size: 12px; }
+
+/* ── Create-mode heading ─────────────────────────────────────────────────── */
+.createTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+
+/* ── Impact-table selection ──────────────────────────────────────────────── */
+.impactTablesSection {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.itTitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.itGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.itGroupTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+}
+
+.itRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.itName { font-size: 13px; color: var(--text-primary); }
+.itMeta { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+
+.itRated {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--green);
+}
+.itUnrated {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--amber);
+}
+
+.btnSetDefault {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  background: none;
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.btnSetDefault:hover { color: var(--text-secondary); border-color: var(--accent); }
+
+/* ── Mandatory impact tables (docs/reporting-requirements.md) ─────────────────
+   A mandatory table applies to every asset. It used to be indistinguishable
+   from any other in these lists, so skipping one was invisible rather than a
+   choice — and a missing one can only understate the asset's impact. */
+.itGroupRequired {
+  border: 1px solid var(--amber, #f59e0b);
+  background: rgba(245, 158, 11, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+.itRequiredChip {
+  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; white-space: nowrap;
+  color: #7a4a00; background: var(--amber, #f59e0b);
+  padding: 1px 6px; border-radius: var(--radius-sm);
+}
+.itRequiredNote {
+  margin: 4px 0 8px; font-size: 12px; line-height: 1.55; color: var(--text-secondary);
+}

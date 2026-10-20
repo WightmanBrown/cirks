@@ -1,0 +1,72 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Shared form control styles ───────────────────────────────────────────────
+   Consume via composes: — stub keeps only layout overrides (width/max-width/
+   flex/margin etc. that differ per context).
+
+   .input    { composes: input    from '../components/form.module.css'; }
+   .select   { composes: select   from '../components/form.module.css'; }
+   .textarea { composes: textarea from '../components/form.module.css'; }
+   .fieldLabel { composes: fieldLabel from '../components/form.module.css'; } */
+
+.input,
+.select,
+.textarea {
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-body);
+  padding: var(--space-2) var(--space-2);
+  width: 100%;
+  transition: border-color 0.15s ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Label wrapper — stacks label text above control with consistent spacing */
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-hint);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Inline hint text below a field */
+.fieldHint {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Generic empty / no-data state */
+.emptyState {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--text-body);
+}

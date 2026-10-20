@@ -1,0 +1,39 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.title { font-size: 1.4rem; margin: 8px 0 0; }
+.sub { color: var(--text-muted); font-size: 13px; line-height: 1.55; margin: 4px 0 16px; max-width: 820px; }
+.err { color: var(--red, #e53935); font-size: 13px; }
+.empty { color: var(--text-muted); font-size: 14px; padding: 12px 0; }
+.muted { color: var(--text-muted); font-size: 12px; }
+.mono { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+
+.section { margin-bottom: 28px; }
+.h2 { font-size: 1rem; color: var(--text-secondary); margin: 0; display: flex; align-items: center; gap: 8px; }
+.count {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1px 6px;
+}
+
+.tableWrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th {
+  text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border); background: var(--bg-inset);
+}
+.table td { padding: 8px 10px; border-top: 1px solid var(--border); vertical-align: top; color: var(--text-primary); }
+.table tr:first-child td { border-top: none; }
+.never {
+  display: inline-block; margin-right: 6px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  color: var(--amber, #f59e0b); border: 1px solid var(--amber, #f59e0b); border-radius: var(--radius-sm); padding: 0 5px;
+}
+.btn { composes: btnPrimary btnSm from '../components/buttons.module.css'; white-space: nowrap; }
+.soaList { margin: 8px 0 4px; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--text-primary); }
+.btnGhost { composes: btnGhost btnSm from '../components/buttons.module.css'; white-space: nowrap; }
+.btnLink { composes: btnLink from '../components/buttons.module.css'; margin-left: 6px; }
+.buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+.acceptedWord {
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  color: var(--text-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 5px;
+}

@@ -1,0 +1,13 @@
+ref_code,title,description,grouping,implementation_group
+1.1,The boundary of the payment environment is documented and reviewed at least annually,"A diagram and written description show which systems, networks and connections are inside the payment environment and which are not.",Payment environment,
+1.2,Every system inside the payment environment is recorded in an inventory,"The inventory names each in-scope system, its owner and its function, and is updated when systems join or leave the environment.",Payment environment,
+1.3,Network traffic into and out of the payment environment is limited to what is needed,"Connections are denied by default and each permitted flow has a recorded business reason.",Payment environment,
+2.1,Card numbers are never stored in readable form,"Stored card numbers are tokenised, truncated or encrypted so that a copy of storage does not expose them.",Protecting stored payment data,
+2.2,Keys that protect payment data are managed through their whole lifecycle,"Generation, storage, rotation, retirement and destruction of keys follow a written procedure with named custodians.",Protecting stored payment data,
+2.3,Payment data is kept only for as long as there is a documented need,"A retention period is set for each kind of payment data and data beyond it is securely deleted.",Protecting stored payment data,
+3.1,Access to payment data is limited to people whose job requires it,"Access is granted by role, approved by the data owner and reviewed at least twice a year.",Access to the payment environment,
+3.2,Administrative access to payment systems uses multi-factor authentication,"A second factor is required for every administrative login, wherever it originates.",Access to the payment environment,
+4.1,Activity on payment systems is logged and the logs are kept for a year,"Logs capture who did what and when, are protected from alteration and remain available for at least twelve months.",Monitoring and testing,
+4.2,Payment systems are scanned for vulnerabilities at least quarterly,"Scans run after significant change and at least every three months, and high-severity findings are fixed before the next scan.",Monitoring and testing,
+4.3,People who work in the payment environment receive security awareness training every year,"Training covers handling of payment data, recognising social engineering and reporting suspected compromise.",Monitoring and testing,
+5.1,A suspected compromise of payment data is handled under a written incident plan,"The plan names who to notify, including card schemes and the acquiring bank, and within what time.",Incident response,

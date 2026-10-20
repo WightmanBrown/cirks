@@ -1,0 +1,20 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.placement { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.question { display: flex; flex-direction: column; gap: 6px; font-size: var(--text-hint); color: var(--text-secondary); }
+.options { display: flex; flex-wrap: wrap; gap: 8px; }
+.option { flex: 1 1 200px; text-align: left; display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+          border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text-primary); font-size: var(--text-body); font-weight: 500; }
+.option small { color: var(--text-secondary); font-size: var(--text-hint); font-weight: 400; }
+.chip { padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-elevated);
+        color: var(--text-primary); font-size: var(--text-body); }
+.chip em { font-style: normal; color: var(--text-muted); }
+.chip:disabled { opacity: 0.45; cursor: not-allowed; }
+.option[aria-pressed="true"], .chip[aria-pressed="true"] { border-color: var(--blue); background: color-mix(in srgb, var(--blue) 16%, var(--bg-elevated)); }
+.linkBtn { align-self: flex-start; background: none; border: none; padding: 0; color: var(--accent); cursor: pointer; font-size: var(--text-hint); }
+.linkBtn[aria-pressed="true"] { text-decoration: underline; }
+.hint { margin: 0; color: var(--text-muted); }
+.say { margin: 0; color: var(--text-primary); border-left: 3px solid var(--blue); padding: 4px 10px; background: color-mix(in srgb, var(--blue) 8%, transparent); border-radius: 0 6px 6px 0; }
+.warn { margin: 0; color: var(--text-primary); border-left: 3px solid var(--amber); padding: 4px 10px; background: color-mix(in srgb, var(--amber) 9%, transparent); border-radius: 0 6px 6px 0; }

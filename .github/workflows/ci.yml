@@ -1,0 +1,187 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  audit:
+    name: dependency audit (hardening H-10)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Gate on SHIPPED dependencies only. Both packages are at zero production
+      # vulnerabilities as of 2026-08-17, so this is enforceable today — the point
+      # of a gate is that it is green now and goes red on a real regression.
+      #
+      # Dev/build tooling is reported but NOT gated: vite/vitest/esbuild currently
+      # carry dev-server advisories fixable only by a major upgrade, and a check
+      # that is red on day one is a check everybody learns to ignore. That upgrade
+      # is tracked as its own backlog item; when it lands, fold the informational
+      # steps below into the gated ones.
+      - name: Audit backend production dependencies
+        working-directory: riskapp
+        run: npm audit --omit=dev --audit-level=moderate
+
+      - name: Audit frontend production dependencies
+        working-directory: riskapp-frontend
+        run: npm audit --omit=dev --audit-level=moderate
+
+      - name: Report dev/build tooling advisories (informational)
+        continue-on-error: true
+        run: |
+          echo "── backend (incl. dev) ─────────────────────────────"
+          npm audit --prefix riskapp || true
+          echo "── frontend (incl. dev) ────────────────────────────"
+          npm audit --prefix riskapp-frontend || true
+
+  frontend:
+    name: frontend (lint · test · build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: riskapp-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: riskapp-frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  backend-unit:
+    name: backend (mocked unit tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: riskapp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: riskapp/package-lock.json
+      - run: npm ci
+      - run: npm test
+
+  migration-upgrade-path:
+    name: migrations against a POPULATED database (upgrade path)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: riskapp
+    # Every other job builds the database FROM EMPTY — baseline + all migrations
+    # + seed. A migration that only fails against an existing, populated database
+    # therefore passes the whole pipeline and breaks on deployment. That is not
+    # hypothetical: it took CIRKS-test down on 2026-09-10, behind a guard that was
+    # itself correct (grants conditional on role_permissions already being
+    # populated, because db/seed.js seeds that table only when empty). On a fresh
+    # build the guard is false, the statement no-ops, and the failure never runs.
+    #
+    # So this job simulates an UPGRADE: build the schema as `main` has it, seed it
+    # so the tables carry data, and only then apply the migrations this branch
+    # adds. It is the difference between "the migrations work" and "the migrations
+    # work on a real installation".
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: riskapp_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGPASSWORD: postgres
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # need main to diff the migration set against
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: riskapp/package-lock.json
+      - run: npm ci
+
+      - name: Build the schema as main has it
+        run: |
+          git fetch origin main --depth=1
+          git checkout origin/main -- db/migrations
+          npm run migrate
+
+      - name: Populate it — this is what a real installation looks like
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -f test/e2e/db/seed.sql
+          node db/seed.js
+          psql "$DATABASE_URL" -tAc "SELECT 'role_permissions rows: ' || count(*) FROM role_permissions"
+
+      - name: Apply THIS branch's migrations on top
+        run: |
+          git checkout HEAD -- db/migrations
+          npm run migrate
+
+      - name: Re-run the boot seed, as the entrypoint does after migrating
+        run: node db/seed.js
+
+      - name: The permission matrix must still be whole
+        run: |
+          psql "$DATABASE_URL" -tAc "SELECT count(*) FROM role_permissions" | \
+            awk '{ if ($1 < 100) { print "role_permissions collapsed to " $1 " rows — a migration inserted into a table db/seed.js only fills when EMPTY"; exit 1 } else print "role_permissions: " $1 " rows" }'
+
+  backend-integration:
+    name: backend (DB-backed integration tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: riskapp
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: riskapp_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGPASSWORD: postgres
+      # _env.js honours TEST_DATABASE_URL and hard-fails unless it targets riskapp_test.
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: riskapp/package-lock.json
+      - run: npm ci
+      - name: Build riskapp_test via the migration runner, then seed
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
+        run: |
+          npm run migrate            # fresh DB → baseline + pending migrations (exercises the runner)
+          psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f test/e2e/db/seed.sql
+      - run: npm run test:integration

@@ -1,0 +1,15 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+/* A control delivered organisation-wide or for a group (v128): its status is the
+   control's own, so it is shown, not picked. */
+.chip, .chipNotHere {
+  font-size: 11px;
+  border: 1px solid var(--accent, #64b5f6);
+  color: var(--accent, #64b5f6);
+  border-radius: 10px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.chip:hover, .chipNotHere:hover { background: rgba(100, 181, 246, 0.1); }
+.chipNotHere { border-style: dashed; color: var(--text-muted); border-color: var(--text-muted); }

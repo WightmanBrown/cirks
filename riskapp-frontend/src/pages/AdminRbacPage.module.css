@@ -1,0 +1,133 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { max-width: 980px; margin: 0 auto; padding: 24px; }
+.pageHeader { display: flex; align-items: center; gap: 12px; }
+.heading {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  margin: 0;
+}
+.intro { color: var(--text-secondary); font-size: var(--text-hint); margin: 8px 0 20px; }
+
+.loadingBar {
+  height: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+.errorMsg { color: var(--red); font-size: var(--text-hint); }
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+.cardTitle {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+}
+
+.switchRow {
+  display: flex; align-items: center; gap: 10px;
+  font-size: var(--text-body); color: var(--text-primary); cursor: pointer;
+}
+.switchRow input { width: 15px; height: 15px; accent-color: var(--amber); }
+
+.sodList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.sodItem { padding: 6px 0; border-bottom: 1px solid var(--border); }
+.sodItem:last-child { border-bottom: none; }
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-amber);
+  background: var(--bg-inset);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.roleEditorHead { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.roleSelect { font-size: var(--text-body); color: var(--text-secondary); }
+.roleSelect select, .scopeSelect {
+  font: inherit;
+  background: var(--bg-inset);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+.saveBtn {
+  font: inherit; font-size: var(--text-body);
+  padding: 6px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--amber);
+  background: var(--amber); color: var(--bg-base);
+  cursor: pointer; font-weight: 600;
+}
+.saveBtn:disabled {
+  background: transparent; color: var(--text-muted);
+  border-color: var(--border); cursor: default; font-weight: 400;
+}
+.saveMsg { color: var(--green); font-size: var(--text-hint); }
+
+.resourceGroup { margin-top: 14px; }
+.resourceLabel {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin: 0 0 6px; padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.capRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0; }
+.capLabel {
+  display: flex; align-items: center; gap: 8px;
+  font-size: var(--text-body); color: var(--text-primary);
+  cursor: pointer; flex: 1; min-width: 0;
+}
+.capLabel input { accent-color: var(--amber); }
+.capDesc { color: var(--text-muted); font-size: var(--text-hint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scopeSelect { flex-shrink: 0; }
+
+/* Users & roles table */
+.userTable { width: 100%; border-collapse: collapse; font-size: var(--text-body); }
+.userTable th {
+  text-align: left; font-family: var(--font-mono); font-size: var(--text-xs);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+  font-weight: 400; padding: 4px 8px; border-bottom: 1px solid var(--border);
+}
+.userTable td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.userTable tr:last-child td { border-bottom: none; }
+.inactiveRow { opacity: 0.5; }
+.userName { color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.userEmail { color: var(--text-muted); font-size: var(--text-hint); font-family: var(--font-mono); }
+.inactiveTag {
+  font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 5px;
+}
+.roleChips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.roleChip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--amber-faint); color: var(--text-amber);
+  border: 1px solid var(--amber-dim); border-radius: var(--radius-sm);
+  padding: 1px 4px 1px 8px; font-size: var(--text-sm);
+}
+.chipX {
+  background: none; border: none; color: var(--text-amber); cursor: pointer;
+  font-size: var(--text-base); line-height: 1; padding: 0 2px;
+}
+.chipX:hover { color: var(--red); }
+.addRole {
+  font: inherit; font-size: var(--text-sm);
+  background: var(--bg-inset); color: var(--text-secondary);
+  border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 2px 6px;
+}

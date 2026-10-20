@@ -1,0 +1,186 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.wrap {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+/* The ⓘ trigger */
+.dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin: 0 0.15em;
+  padding: 0;
+  border: 1px solid var(--border-accent);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  cursor: help;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.dot:hover,
+.dot:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Edit mode: dot is always present and more prominent; empty ones dashed. */
+.dotEdit {
+  cursor: pointer;
+  color: var(--amber);
+  border-color: var(--amber-dim);
+}
+.dotEdit:hover {
+  color: var(--amber);
+  border-color: var(--amber);
+  background: var(--amber-faint);
+}
+.dotEmpty {
+  border-style: dashed;
+}
+
+/* Popover */
+.pop {
+  position: absolute;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: max-content;
+  max-width: 280px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-modal);
+  font-family: var(--font-body);
+  font-size: var(--text-hint);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-primary);
+  text-align: left;
+  /* Reset the title-span cascade (widget titles are uppercase + tracked). */
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  cursor: default;
+}
+
+.pop_top    { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
+.pop_bottom { top: calc(100% + 6px);    left: 50%; transform: translateX(-50%); }
+.pop_left   { right: calc(100% + 6px);  top: 50%;  transform: translateY(-50%); }
+.pop_right  { left: calc(100% + 6px);   top: 50%;  transform: translateY(-50%); }
+
+.popTitle {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.popBody {
+  color: var(--text-secondary);
+  /* The editor is a textarea, so authors type paragraphs — without this they
+     collapsed into one run of text on display. pre-line honours the line breaks
+     they wrote while still wrapping normally. */
+  white-space: pre-line;
+}
+.fallback {
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* Inline editor */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 280px;
+}
+.editorKey {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  word-break: break-all;
+}
+.editorInput,
+.editorTextarea,
+.editorSelect {
+  width: 100%;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-hint);
+}
+.editorTextarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+.editorRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+.editorSideLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.editorSelect {
+  width: auto;
+  padding: 3px 5px;
+}
+.editorBtns {
+  display: flex;
+  gap: 6px;
+}
+.editorSave,
+.editorCancel,
+.editorClear {
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-accent);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-hint);
+  cursor: pointer;
+}
+.editorSave {
+  border-color: var(--accent);
+  background: var(--accent-faint);
+  color: var(--accent);
+  font-weight: 600;
+}
+.editorSave:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.editorClear {
+  border-color: var(--red-dim);
+  color: var(--red);
+}
+.editorErr {
+  font-size: var(--text-xs);
+  color: var(--red);
+}

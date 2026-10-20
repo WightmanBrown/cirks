@@ -1,0 +1,55 @@
+name: Bug report
+description: Something in CIRKS does not work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting this. **Do not include anything about your own organisation**: no system names, risks, people or internal addresses. Reproduce it with the Misty Isles training data, or use made-up names. Security vulnerabilities go through [SECURITY.md](https://github.com/WightmanBrown/cirks/blob/main/SECURITY.md), not here.
+  - type: input
+    id: version
+    attributes:
+      label: CIRKS version
+      description: The release tag (for example v1.0.0), or the commit if you built from main.
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How is it installed?
+      options:
+        - Docker, following the install guide
+        - Docker, set up some other way
+        - From source, for development
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you saw, including any error message, word for word.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Which role you were signed in as, which page, what you clicked.
+      placeholder: |
+        1. Sign in as the risk analyst
+        2. Open a system's Security tab
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: The relevant lines of `docker compose logs app`, if any. Check them for anything about your organisation first.
+      render: text

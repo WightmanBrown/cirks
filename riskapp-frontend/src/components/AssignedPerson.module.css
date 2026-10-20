@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+
+.unassigned { color: var(--text-muted); }
+
+.differs { white-space: nowrap; }
+
+/* Deliberately quiet: a difference is worth noticing, not alarming. Many are
+   legitimate — a shared system owned outside the using department, say. */
+.marker { color: var(--warning, #b8860b); font-size: 0.7em; vertical-align: middle; }
+
+.srOnly {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

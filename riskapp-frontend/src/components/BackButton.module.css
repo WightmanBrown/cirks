@@ -1,0 +1,29 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* Canonical back-navigation control. One look everywhere: a subtle muted
+   ghost link with a left arrow, top-left of the page header. */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  margin-left: -6px;          /* optical-align the arrow to the page edge */
+  padding: var(--space-2) var(--space-2);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.backButton:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-accent);
+}

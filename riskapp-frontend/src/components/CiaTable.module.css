@@ -1,0 +1,162 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/*
+ * Impact Table Style 1 — canonical CIA grid layout
+ *
+ * Design rules:
+ *   chipEditable    White-bordered chip: value was set by the user, is editable
+ *   (no border)     Reference / derived value — not directly editable
+ *   simple mode     Single max value placed at the Integrity (centre) column
+ *   expert mode     Full three-column C / I / A layout
+ *
+ * Exported components (CiaTable.jsx):
+ *   ChipSelector      Clickable 1–5 severity chip row (edit mode)
+ *   CiaValueCell      Single display cell — chip or column header
+ *   CiaTableHeader    Header row: "Information asset | C | I | A"
+ *   CiaLine           Label + value row (editable or display-only)
+ *   ProbabilityLine   Like CiaLine but for probability (sets all dims in simple)
+ *   SuggestedProbRow  Display-only probability row from threat profile
+ */
+
+/* ── Grid ──────────────────────────────────────────────────────────────────── */
+
+.ciaLine {
+  display: grid;
+  grid-template-columns: 1fr 130px 130px 130px;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 0;
+}
+
+/* ── Label ─────────────────────────────────────────────────────────────────── */
+
+.ciaLineLabel {
+  font-size: 13px;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ciaHeaderLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ciaLineSub {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+/* ── Value cells ───────────────────────────────────────────────────────────── */
+
+.ciaLineCell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Read-only business value spanning the three value columns — room for the
+   full word ladder (RatingScaleRow), right-aligned. */
+.ciaLineScaleCell {
+  grid-column: 2 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.ciaColumnHeader {
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ciaPlainValue {
+  width: 58px;
+  padding: 4px 6px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+}
+
+/* ── Editable chip indicator ───────────────────────────────────────────────── */
+
+/* Applied to display chips on rows where the value was set by the user.
+   Signals "you can edit this" even before edit mode is entered. */
+.chipEditable {
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+}
+
+/* ── Section label row ─────────────────────────────────────────────────────── */
+
+/* Same 4-column grid as .ciaLine; heading sits at the Integrity position. */
+.ciaSectionLabelRow {
+  display: grid;
+  grid-template-columns: 1fr 130px 130px 130px;
+  align-items: center;
+  padding: 10px 0 2px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.ciaSectionLabel {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Chip selector (edit mode) ─────────────────────────────────────────────── */
+
+.chipSelector {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+/* Live word-chip feedback beside the 1–5 selector */
+.chipSelectorWord {
+  margin-left: 8px;
+}
+
+.chipSelectorBtn {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: opacity 0.1s;
+}
+
+.chipSelectorDim {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.chipSelectorBtn:disabled {
+  cursor: not-allowed;
+}

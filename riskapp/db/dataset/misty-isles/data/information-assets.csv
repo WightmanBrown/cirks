@@ -1,0 +1,45 @@
+name,description,department_name,owner_email,managed_by_email,is_shared,is_active
+Aircraft Control and Radar,Aircraft control and air traffic control systems which are not provided on-board and used for the positioning and control of air traffic,Department of Roads and Airports,C.Giles@mig.local,,false,true
+Aircraft fuelling  signalling control and operations,"The data which supports the supply and demand of fuel from the bunkering volume, quality testing and delivery to the aircraft.",Department of Roads and Airports,C.Giles@mig.local,,false,true
+Aviation Band Radio Traffic for ATC,ATC radio traffic,Department of Roads and Airports,C.Giles@mig.local,K.Johnson@mig.local,false,true
+Aviation Fuel logistics information,Everything which controls fuel demand and supply,Department of Roads and Airports,C.Giles@mig.local,,false,true
+Clinical operations information,"All information which keep the hospital and clinics operating. This includes the scheduling of clinical and surgical time, the provision of all services which are not pharmaceutical or treatment related (handled by other specific information assets).",Misty Isles Department of Health,g.hopper@mig.local,,false,true
+Court management,All information which supports the operation of the court excluding case material,MIG Department of Justice,B.Kirk@mig.local,B.Liskov@mig.local,false,true
+Criminal cases,Any information which forms the basis of a criminal case brought by MIG,MIG Department of Justice,B.Kirk@mig.local,B.Liskov@mig.local,false,true
+Criminal Records,,MIG Department of Justice,B.Kirk@mig.local,B.Liskov@mig.local,false,true
+Cyber Response Playbooks,These are the printed set of incident response playbooks which are stored at both DR locations,Department of Information Security,C.Shannon@mig.local,R.Perlman@mig.local,false,true
+Detective Monitoring Events,All detective monitoring feeds to the SOC,Department of Information Security,S.Topping@mig.local,,false,true
+Electrical Billing,The billing to payment flow on which the electrical system finance operates,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Electrical control signalling,Generation and grid control signalling with direct implications for the safe operation of the grid.,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Emergency communications,Radio and emergency communications provided by RF and GSM services.,Disaster and Emergency Management,M.Hamilton@mig.local,,false,true
+Firearms and Explosives Licensing Information,All records for firearms and explosives held within the Misty Isles,MIG Department of Justice,B.Kirk@mig.local,B.Liskov@mig.local,false,true
+Fisheries data,"All information required to manage the fisheries, this includes licensing data, fish stocks, catches and market data.",DEFA,A.Lovelace@mig.local,,false,true
+Flight planning information,"Air operations information which is used to plan flights, including: passenger manifest, cargo manifest, maintenance scheduling.",Department of Roads and Airports,C.Giles@mig.local,,false,true
+Generation Fuel logistics information,Everything which controls fuel demand and supply,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Information Risk Knowledge,MIG's knowledge of its own systems and assets as rated but he ISMS process. This asset represents all of the assets of the organisation in the context of information security and can be used to query the information risk and security of any system stored within.,Department of Information Security,C.Shannon@mig.local,R.Perlman@mig.local,false,true
+Information Risk Management Information,,Department of Information Security,S.Topping@mig.local,,false,true
+Internal MIG user identity,Used for the authentication of users to internal systems,Department of Communications,G.Welchman@mig.local,,false,true
+IT Support Activity,"User support ticketing, support messages, systems reference information, technical support details and other information which is required to provide support for users on all systems operated by the Department of Communications",Department of Communications,G.Welchman@mig.local,V.Cerf@mig.local,false,true
+IT Support information,"This is a combination of the details within support tickets, email, phone calls, messages etc which allow users to receive support from the IT team. Crucially this may contain confidential password information",Department of Communications,G.Welchman@mig.local,V.Cerf@mig.local,false,true
+Maritime Radio Communications,All routine and emergency maritime radio traffic,Department of Roads and Airports,C.Giles@mig.local,K.Johnson@mig.local,false,true
+Maritime vessel tracking,Ship tracking information used for tracking all activity within our waters and fishery operations for our registered fleet.,Maritime Department,A.Turing@mig.local,,false,true
+Medical diagnostic information,Any information used by a clinician to support the diagnosis of a patient medical condition. This asset was created because of a heavy reliance on remote diagnostics and telemedicine.,Misty Isles Department of Health,g.hopper@mig.local,,false,true
+Medical equipment calibration,"X-Ray, drug delivery and other information related to the safe calibration and operation of any medical equipment used to treat patients.",Misty Isles Department of Health,g.hopper@mig.local,,false,true
+MIG Financial payments data,All payment data which drive the movement of money between accounts both external and internal,MIG Treasury,M.Karloff@mig.local,,false,true
+MIG Government budgetary information,All the internal budgetary information,MIG Treasury,M.Karloff@mig.local,,false,true
+MIG Government Communications Traffic,This is a special catch all information asset which covers any information carries by the communications systems of MIG. It is only rated for impact against Availability because the confidentiality and integrity of data is the responsibility of the originating systems where controls such as TLS and other network encryption standards are implemented,Department of Communications,G.Welchman@mig.local,V.Cerf@mig.local,false,true
+Offender/prisoner management,Management of convicted offenders within the prison and for the duration of their sentence,MIG Department of Justice,B.Kirk@mig.local,B.Liskov@mig.local,false,true
+Passenger flight information,Flight information display for the general public,Department of Roads and Airports,C.Giles@mig.local,,false,true
+Patient medical records,All medical records which can be attributed to a patient,Misty Isles Department of Health,g.hopper@mig.local,,false,true
+Personal Tax Information,Tax information which relates to personal tax and company tax,MIG Treasury,M.Karloff@mig.local,,false,true
+Pharmacy logistics and inventory,Everything associated with the provision of drugs. This includes supply and drug specific information,Misty Isles Department of Health,g.hopper@mig.local,,false,true
+Port operations information,"Anything related to the safe and efficient operation of the port. This includes container handing, berthing, labour management, logistics, and security",Maritime Department,A.Turing@mig.local,,false,true
+Postal addressing and land records,,Misty Islands Utilities,A.Lovelace@mig.local,R.Franklin@mig.local,false,true
+Public Identity Records,"General identity records for the public, this includes all the information required to establish or verify the identity of a MIG citizen",Misty Isles Cabinet Office,A.Kay@mig.local,J.Bartik@mig.local,false,true
+School operational information,"Everything associated with the operation of the school, exam scheduling , transport, finances etc...",Department of Education,J.Finx@mig.local,,false,true
+Scientific Environmental Data,"All scientific data relating to the environment. Of very high value over a long period of time, usually irreplaceable. Usually published and shared",DEFA,A.Lovelace@mig.local,,false,true
+Student created learning material,Any course material or other student created content which forms part of the educational process,Department of Education,J.Finx@mig.local,S.Papert@mig.local,false,true
+Student records,All student record. High impact for confidentiality due to privacy and legal,Department of Education,J.Finx@mig.local,,false,true
+Water Billing,The billing to payment flow on which the water system finance operates,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Water control signalling,Water treatment and distribution,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Workforce management actives,Short term and long term planning of resources for the delivery of MIG activity,Misty Isles Cabinet Office,A.Kay@mig.local,J.Bartik@mig.local,false,true

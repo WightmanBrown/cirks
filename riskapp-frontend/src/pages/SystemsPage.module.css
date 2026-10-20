@@ -1,0 +1,268 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Filter bar ─────────────────────────────────────────────────────────── */
+
+.filterBar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.viewModeSlot {
+  margin-left: auto;
+}
+
+.filters {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterBtn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.filterActive {
+  border-color: var(--amber-dim);
+  color: var(--amber);
+  background: var(--amber-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.searchInput,
+.deptSelect {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+}
+.searchInput { width: 240px; }
+.searchInput:focus,
+.deptSelect:focus { border-color: var(--accent); }
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.row { cursor: pointer; }
+.row:hover td { background: var(--bg-hover, var(--bg-surface)); }
+
+.rowSelected td {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-bottom-color: transparent !important;
+}
+
+.summaryRow td {
+  background: var(--bg-inset);
+  padding: 14px 16px !important;
+  border-top: none !important;
+}
+
+.summaryCell {
+  padding: 14px 16px !important;
+}
+
+.nameCell { font-weight: 600; color: var(--text-primary); }
+.deptCell { color: var(--text-muted); font-size: 12px; }
+.countCell { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+
+/* ── CIA badges ─────────────────────────────────────────────────────────── */
+
+.ciaBadge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.ciaGreen { background: var(--green-dim); color: var(--green, #4caf50); }
+.ciaAmber { background: var(--amber-faint); color: var(--amber, #f0a500); }
+.ciaRed   { background: var(--red-dim); color: var(--red,   #e53935); }
+.ciaUnset { color: var(--text-muted); font-size: 12px; }
+
+/* ── Shared badge ────────────────────────────────────────────────────────── */
+
+.sharedBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* ── Change warning badge ───────────────────────────────────────────────── */
+
+.changeWarn {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--amber-faint);
+  color: var(--amber, #f0a500);
+  margin-left: 6px;
+}
+
+/* ── Misc ───────────────────────────────────────────────────────────────── */
+
+.muted   { color: var(--text-muted); font-size: 13px; }
+.errorMsg { color: var(--red); font-size: 13px; }
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+.btnPrimary { composes: btnPrimary from '../components/buttons.module.css'; }
+.btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+/* ── Modal ──────────────────────────────────────────────────────────────── */
+
+.overlay { composes: overlay from '../components/modal.module.css'; }
+
+.modal { composes: modal from '../components/modal.module.css'; padding: 28px; width: 480px; max-width: 95vw; }
+
+.modalTitle { composes: modalTitle from '../components/modal.module.css'; }
+.fieldLabel { composes: fieldLabel from '../components/form.module.css'; display: flex; margin-bottom: 14px; }
+
+.input { composes: input from '../components/form.module.css'; }
+.textarea { composes: textarea from '../components/form.module.css'; }
+.select { composes: select from '../components/form.module.css'; }
+
+/* Checkbox rows read left-to-right — box, caption, then the live "shared" chip
+   — unlike .fieldLabel, which stacks a caption above a full-width control.
+   width: fit-content stops the label stretching the full width of the modal, so
+   the click target matches what is actually visible rather than reaching far to
+   the right of the chip. */
+.checkboxLabel {
+  composes: fieldLabel from '../components/form.module.css';
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: fit-content;
+  gap: var(--space-2);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+/* flex: none — a checkbox in a flex row is a flex item, and without this it
+   can be squeezed below its intrinsic size. */
+.checkbox {
+  flex: none;
+  margin: 0;
+}
+
+.fieldHint {
+  composes: fieldHint from '../components/form.module.css';
+  margin: 0 0 14px;
+}
+
+.error { color: var(--red); font-size: 12px; margin: 4px 0; }
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Responsive optional columns (owner/manager) */
+.colOptional { font-size: 12px; color: var(--text-secondary); }
+@media (max-width: 900px) { .colOptional { display: none; } }
+
+/* Risk level pill */
+.riskPill     { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: var(--radius-sm); white-space: nowrap; }
+.riskCritical { background: rgba(180,30,30,0.15);  border: 1px solid rgba(180,30,30,0.3);  color: #e05252; }
+.riskHigh     { background: var(--red-dim);         border: 1px solid rgba(232,93,74,0.25); color: var(--red); }
+.riskMedium   { background: var(--amber-faint);     border: 1px solid rgba(245,166,35,0.25); color: var(--amber); }
+.riskLow      { background: var(--green-dim);       border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.riskNone     { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }

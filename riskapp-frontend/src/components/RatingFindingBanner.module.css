@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.banner {
+  display: flex; gap: 16px; align-items: flex-start; justify-content: space-between;
+  border: 1px solid var(--amber, #f59e0b);
+  background: rgba(245, 158, 11, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 12px 0;
+}
+.body { min-width: 0; }
+.title { font-weight: 600; font-size: 14px; }
+.detail { margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+.side { flex-shrink: 0; align-self: center; }
+.btn { composes: btnPrimary btnSm from './buttons.module.css'; }
+.btnGhost { composes: btnGhost btnSm from './buttons.module.css'; }
+.buttons { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.accepted { margin-top: 6px; font-size: 13px; color: var(--text-primary); }
+.link { font-size: 13px; white-space: nowrap; }
+.muted { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.error { margin-top: 6px; color: var(--red); font-size: 13px; }
+
+@media (max-width: 640px) {
+  .banner { flex-direction: column; }
+  .side { align-self: flex-start; }
+}
+
+/* Links inside the finding (the objectives a reason names). Without this they
+   took the browser's default blue, unreadable on the dark theme. */
+.title a, .detail a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dotted var(--border); }
+.title a:hover, .detail a:hover { color: var(--accent, #64b5f6); border-bottom-color: currentColor; }

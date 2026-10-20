@@ -1,0 +1,220 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.modal { composes: modal from './modal.module.css'; max-width: 560px; }
+
+/* Header */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modalLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+}
+
+.riskId {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: var(--text-primary);
+}
+
+/* Summary rows */
+.summary {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Rationale */
+.rationaleBlock,
+.prevNotesBlock {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel { composes: fieldLabel from './form.module.css'; }
+
+.rationale {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.prevNotesBlock {
+  background: var(--red-dim);
+  border-color: rgba(232, 93, 74, 0.15);
+}
+
+.prevNotes {
+  font-size: 13px;
+  color: var(--red);
+  line-height: 1.6;
+}
+
+/* Form */
+.form {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actionToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.actionToggleBtn {
+  border: 1px solid var(--border-accent);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.actionToggleBtn:hover:not(:disabled) {
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.actionToggleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.active_validate {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.active_return {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.notesField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.required {
+  color: var(--red);
+}
+
+.textarea { composes: textarea from './form.module.css'; }
+
+.textarea::placeholder { color: var(--text-muted); }
+
+.error {
+  font-size: 13px;
+  color: var(--red);
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.submitBtn {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: opacity 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submitBtn.validate {
+  background: var(--green);
+  color: #0d0f13;
+}
+
+.submitBtn.validate:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.submitBtn.return {
+  background: var(--red);
+  color: #fff;
+}
+
+.submitBtn.return:hover:not(:disabled) {
+  opacity: 0.88;
+}

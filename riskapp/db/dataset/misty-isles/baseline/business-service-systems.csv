@@ -1,0 +1,270 @@
+service_name,system_name
+Adult and community learning,MIG Backup
+Adult and community learning,MIG Corporate Email
+Adult and community learning,MIG Desktop (internal)
+Adult and community learning,MIG File storage
+Adult and community learning,MIGNet
+Adult and community learning,MIG Telephony and Messaging
+Adult and community learning,MIG Video Conferencing
+Adult and community learning,Pupil/student records system
+Adult and community learning,Schools facilities management
+Adult social care,Medical Records System
+Agricultural development,Environmental GIS research platform
+Agricultural development,Fisheries management system
+Agricultural development,MIG Backup
+Agricultural development,MIG Desktop (remote)
+Agricultural development,MIGNet
+Agricultural development,MIG Video Conferencing
+Airport operations,Aircraft fuelling
+Airport operations,Flight information display
+Airport operations,MIG Corporate Email
+Airport operations,MIGNet
+Air traffic and aeronautical information,Aircraft fuelling
+Air traffic and aeronautical information,Approach radar
+Air traffic and aeronautical information,Flight operations system
+Air traffic and aeronautical information,MIG Backup
+Air traffic and aeronautical information,MIG Corporate Email
+Air traffic and aeronautical information,MIG Desktop (internal)
+Air traffic and aeronautical information,MIG File storage
+Air traffic and aeronautical information,MIGNet
+Air traffic and aeronautical information,MIG Video Conferencing
+Animal health and veterinary services,Environmental GIS research platform
+Animal health and veterinary services,Fisheries management system
+Animal health and veterinary services,MIG Backup
+Animal health and veterinary services,MIG Desktop (remote)
+Animal health and veterinary services,MIGNet
+Animal health and veterinary services,MIG Video Conferencing
+Aviation security and safety oversight,Approach radar
+Aviation security and safety oversight,Flight operations system
+Biosecurity and quarantine,Costal Radar and Ship Tracking
+Biosecurity and quarantine,Environmental GIS research platform
+Biosecurity and quarantine,Fisheries management system
+Biosecurity and quarantine,MIG Backup
+Biosecurity and quarantine,MIG Desktop (remote)
+Biosecurity and quarantine,MIGNet
+Biosecurity and quarantine,MIG Video Conferencing
+Border and customs clearance,Costal Radar and Ship Tracking
+Border and customs clearance,Port operations system
+Child and family social services,Case Management System
+Child and family social services,Medical Records System
+Civil service workforce management,HR System
+Coastguard monitoring and response,Approach radar
+Coastguard monitoring and response,Costal Radar and Ship Tracking
+Coastguard monitoring and response,Emergency Communications System
+Coastguard monitoring and response,MIGNet
+Coastguard monitoring and response,MIG Telephony and Messaging
+Community policing,Case Management System
+Community policing,Criminal Records and Firearms Licensing System
+Community policing,Emergency Communications System
+Criminal investigation,Case Management System
+Criminal investigation,Court Management System
+Criminal prosecution,Case Management System
+Criminal prosecution,Court Management System
+Criminal prosecution,MIG Video Conferencing
+Custodial services,Prison Management System
+Customs revenue collection,Port operations system
+Customs revenue collection,Tax Records System
+Cyber incident response,Information Security Management System
+Cyber risk management,Information Security Management System
+Disaster relief and recovery,Information Security Playbooks
+Drinking-water supply,MIGNet
+Drinking-water supply,Water Distribution
+Early-years education,Pupil/student records system
+Early-years education,Schools facilities management
+Early-years education,Student Desktop
+Economic statistics and advice,MIG Document Management
+Elections and democratic administration,Electoral Role
+Electricity generation and supply,Billing and meter reading
+Electricity generation and supply,Power Generation
+Emergency call handling and dispatch,Emergency Communications System
+Emergency call handling and dispatch,MIGNet
+Emergency call handling and dispatch,MIG Telephony and Messaging
+Emergency operations coordination,Costal Radar and Ship Tracking
+Emergency operations coordination,Emergency Communications System
+Emergency operations coordination,MIG Telephony and Messaging
+Emergency operations coordination,MIG Video Conferencing
+Emergency police response,Emergency Communications System
+Environmental protection,Costal Radar and Ship Tracking
+Environmental protection,Environmental GIS research platform
+Environmental protection,Fisheries management system
+Executive government coordination,MIG Backup
+Executive government coordination,MIG Corporate Email
+Executive government coordination,MIG Document Management
+Executive government coordination,MIG Telephony and Messaging
+Executive government coordination,MIG Video Conferencing
+External public audit,MIG Banking System
+External public audit,MIG Document Management
+External public audit,MIG File storage
+External public audit,Tax Records System
+External public audit,Treasury Accounting System
+Financial-services regulation,MIG Desktop (internal)
+Financial-services regulation,MIG Document Management
+Fire and rescue response,Emergency Communications System
+Fire prevention and protection,MIG Corporate Email
+Fire prevention and protection,MIG Desktop (internal)
+Fisheries management,Costal Radar and Ship Tracking
+Fisheries management,Environmental GIS research platform
+Fisheries management,Fisheries management system
+Fisheries management,MIG Backup
+Food safety inspection,MIG Corporate Email
+Food safety inspection,MIG Desktop (remote)
+Fuel distribution and retail,MIG Banking System
+Fuel distribution and retail,MIG Corporate Email
+Fuel distribution and retail,MIG Desktop (internal)
+Fuel importation and storage,Aircraft fuelling
+Fuel importation and storage,MIG Banking System
+Fuel importation and storage,MIG Corporate Email
+Fuel importation and storage,Treasury Accounting System
+Government accounting and payments,MIG Banking System
+Government accounting and payments,MIG Document Management
+Government accounting and payments,Treasury Accounting System
+Government and public legal advice,MIG Backup
+Government and public legal advice,MIG Corporate Email
+Government and public legal advice,MIG Desktop (remote)
+Government and public legal advice,MIG Document Management
+Government budgeting,MIG Desktop (internal)
+Government budgeting,MIG Desktop (remote)
+Government budgeting,MIG Document Management
+Government budgeting,Tax Records System
+Government budgeting,Treasury Accounting System
+Government communications,MIG Backup
+Government communications,MIG Corporate Email
+Government communications,MIGNet
+Government communications,MIG Telephony and Messaging
+Government communications,MIG Video Conferencing
+Government digital services,Electoral Role
+Government digital services,IT Support Ticketing System
+Government digital services,Medical Records System
+Government digital services,"MIG Authentication, Authorisation and Access Control system"
+Government digital services,MIGNet
+Government digital services,Support Knowledge base
+Government internal audit,Fisheries management system
+Government internal audit,Medical Records System
+Government internal audit,MIG Banking System
+Government internal audit,Security monitoring platform
+Government internal audit,Treasury Accounting System
+Government legal services,MIG Backup
+Government legal services,MIG Desktop (internal)
+Government legal services,MIG Document Management
+Government procurement support,MIG Backup
+Government procurement support,MIG Corporate Email
+Government procurement support,MIG Desktop (internal)
+Government procurement support,MIG Document Management
+Government procurement support,MIG Telephony and Messaging
+Government procurement support,MIG Video Conferencing
+Government records and archives,MIG Backup
+Government records and archives,MIG Document Management
+Health records and patient administration,Medical Imaging System
+Health records and patient administration,Medical Planning System
+Health records and patient administration,Medical Records System
+Health records and patient administration,MIG Backup
+Health records and patient administration,MIG Corporate Email
+Health records and patient administration,MIG Desktop (internal)
+Health records and patient administration,MIG Telephony and Messaging
+Health records and patient administration,MIG Video Conferencing
+Health records and patient administration,Pharmacy Inventory System
+Hospital and emergency clinical care,Medical Imaging System
+Hospital and emergency clinical care,Medical Planning System
+Hospital and emergency clinical care,Medical Records System
+Hospital and emergency clinical care,MIG Corporate Email
+Hospital and emergency clinical care,MIG Telephony and Messaging
+Hospital and emergency clinical care,MIG Video Conferencing
+Hospital and emergency clinical care,Pharmacy Inventory System
+Identity and privileged-access assurance,Electoral Role
+Identity and privileged-access assurance,"MIG Authentication, Authorisation and Access Control system"
+Information security governance,Information Security Management System
+IT Helpdesk,IT Support Ticketing System
+IT Helpdesk,Support Knowledge base
+Land and conservation management,Environmental GIS research platform
+Land and conservation management,MIG Corporate Email
+Land and conservation management,MIG Desktop (internal)
+Land and conservation management,MIG Desktop (remote)
+Marine pollution response,Costal Radar and Ship Tracking
+Marine pollution response,Emergency Communications System
+Marine pollution response,Environmental GIS research platform
+Marine pollution response,Fisheries management system
+Marine pollution response,MIG Telephony and Messaging
+Maritime search and rescue,Costal Radar and Ship Tracking
+Maritime search and rescue,Emergency Communications System
+Maritime search and rescue,MIG Telephony and Messaging
+Maritime search and rescue,Port operations system
+Maternity and child health,Medical Imaging System
+Maternity and child health,Medical Planning System
+Maternity and child health,Medical Records System
+Maternity and child health,MIG Backup
+Maternity and child health,MIG Corporate Email
+Maternity and child health,MIG Telephony and Messaging
+Maternity and child health,Pharmacy Inventory System
+Mental health services,Medical Records System
+Mental health services,MIG Backup
+Mental health services,MIG Desktop (internal)
+Mental health services,MIG Video Conferencing
+National emergency planning,Emergency Communications System
+National emergency planning,Information Security Management System
+National emergency planning,Information Security Playbooks
+National emergency planning,MIG Telephony and Messaging
+Offender rehabilitation and resettlement,Case Management System
+Offender rehabilitation and resettlement,Criminal Records and Firearms Licensing System
+Offender rehabilitation and resettlement,MIG Backup
+Offender rehabilitation and resettlement,MIG Corporate Email
+Offender rehabilitation and resettlement,MIG Desktop (remote)
+Offender rehabilitation and resettlement,Prison Management System
+Pharmacy and medicines management,MIG Backup
+Pharmacy and medicines management,MIG Banking System
+Pharmacy and medicines management,MIG Corporate Email
+Pharmacy and medicines management,MIG Desktop (internal)
+Pharmacy and medicines management,Pharmacy Inventory System
+Pharmacy and medicines management,Treasury Accounting System
+Port operations,Costal Radar and Ship Tracking
+Port operations,MIG Backup
+Port operations,MIG Telephony and Messaging
+Port operations,Port operations system
+Postal and addressing oversight,GIS Land Register
+Primary education,Pupil/student records system
+Primary education,Schools facilities management
+Primary education,Student Desktop
+Primary healthcare,Medical Imaging System
+Primary healthcare,Medical Planning System
+Primary healthcare,Medical Records System
+Primary healthcare,MIG Backup
+Primary healthcare,Pharmacy Inventory System
+Public bus transport,MIG Telephony and Messaging
+Public debt and cash management,Tax Records System
+Public debt and cash management,Treasury Accounting System
+Public health protection,Medical Planning System
+Public records access,"MIG Authentication, Authorisation and Access Control system"
+Public records access,MIG Backup
+Public records access,MIG Corporate Email
+Public records access,MIG Document Management
+Public warning and emergency information,Emergency Communications System
+Radio spectrum management,MIG Corporate Email
+Radio spectrum management,MIG Desktop (internal)
+Radio spectrum management,MIG Document Management
+Road network management,MIG Corporate Email
+Road network management,MIG Desktop (internal)
+Road network management,MIG Telephony and Messaging
+School meals and pupil welfare,Schools facilities management
+Secondary education,Pupil/student records system
+Secondary education,Schools facilities management
+Secondary education,Student Desktop
+Security architecture and assurance,Information Security Management System
+Security monitoring and detection,Host Intrusion Detection System
+Security monitoring and detection,Network Intrusion Detection System
+Security monitoring and detection,Security monitoring platform
+Special educational needs support,Pupil/student records system
+Student assessment and certification,Pupil/student records system
+Student assessment and certification,Student Desktop
+Student grants and overseas study,Pupil/student records system
+Student grants and overseas study,Treasury Accounting System
+Tax administration,Tax Records System
+Tax administration,Treasury Accounting System
+Telecommunications regulation,MIG Desktop (internal)
+Telecommunications regulation,MIG Document Management
+Telecommunications regulation,MIG File storage
+Utility customer services and billing,Billing and meter reading
+Vehicle roadworthiness testing,Vehicle Licensing System
+Vessel traffic and harbour control,Costal Radar and Ship Tracking
+Vessel traffic and harbour control,Port operations system
+Vulnerability management,Host Intrusion Detection System
+Vulnerability management,Information Security Management System
+Vulnerability management,Security monitoring platform

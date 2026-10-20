@@ -1,0 +1,14 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* Muted "- <kind>" suffix appended to entity titles on detail pages and
+   summary cards, so the user can always tell at a glance whether they are
+   looking at a risk, system, asset, service, control, etc. */
+.kind {
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0;
+  white-space: nowrap;
+  margin-left: 6px;
+}

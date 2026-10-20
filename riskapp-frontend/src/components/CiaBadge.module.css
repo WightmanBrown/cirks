@@ -1,0 +1,15 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.badge {
+  /* chipClass() from riskColors provides the bulk of the look; this just
+     tweaks the minimum width so single-digit + letter fits cleanly. */
+  min-width: 28px;
+}
+
+.unset {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}

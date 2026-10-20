@@ -1,0 +1,96 @@
+name,description,department_name,owner_department_name,manager_email,is_shared,is_active
+Adult and community learning,"Provides literacy, vocational, professional and personal-development learning for adults.",Department of Education,Department of Education,J.Finx@mig.local,false,true
+Adult social care,Assesses needs and provides or commissions care and safeguarding support for adults.,Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Agricultural development,"Provides advice, grants and practical support to improve local food production.",DEFA,DEFA,A.Lovelace@mig.local,false,true
+Airport operations,"Operates the airport, runway, terminal and ground services safely and reliably.",Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Air traffic and aeronautical information,"Provides air traffic services, flight information and notices required for safe aviation.",Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Animal health and veterinary services,Prevents and controls animal disease and provides statutory veterinary services.,DEFA,DEFA,A.Lovelace@mig.local,false,true
+Aviation security and safety oversight,Protects civil aviation and assures compliance with applicable safety and security requirements.,Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Biosecurity and quarantine,"Controls the import and movement of animals, plants and biological materials.",DEFA,DEFA,A.Lovelace@mig.local,false,true
+Border and customs clearance,"Clears arriving people, vessels and goods and enforces customs, excise and border requirements.",Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Child and family social services,"Provides child protection, family support, fostering and other statutory social-work services.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Civil service workforce management,"Manages government recruitment, employment policy, payroll coordination, performance and workforce planning.",Misty Isles Cabinet Office,Misty Isles Cabinet Office,siro@mig.local,true,true
+Coastguard monitoring and response,"Monitors maritime activity and coordinates response to distress, hazards and marine incidents.",Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Community policing,"Prevents and investigates crime, protects the public and maintains public order.",MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Criminal investigation,"Investigates offences, manages evidence and prepares cases for prosecution.",MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Criminal prosecution,Reviews evidence and conducts prosecutions on behalf of the Crown.,MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Critical infrastructure resilience,Assesses dependencies and coordinates resilience planning for essential services and infrastructure.,Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,true,true
+Custodial services,"Safely detains prisoners and provides secure custody, welfare and rehabilitation.",MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Customs revenue collection,"Assesses and collects customs duties, excise and related charges on imported goods.",Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Customs revenue policy,"Sets customs and excise policy, rates and revenue-control requirements.",MIG Treasury,MIG Treasury,M.Karloff@mig.local,false,true
+Cyber incident response,"Coordinates containment, investigation, recovery and reporting for cyber incidents.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Cyber risk management,"Supports departments in identifying, assessing, treating and reporting information and cyber risks.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Digital inclusion and connectivity,"Supports affordable access, digital skills and connectivity for underserved communities.",Department of Communications,Department of Communications,A.James@mig.local,false,true
+Disaster relief and recovery,"Coordinates shelter, humanitarian assistance, damage assessment and recovery after disasters.",Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,true,true
+Drinking-water supply,"Abstracts, treats, tests, stores and distributes safe drinking water.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Early-years education,Provides and regulates education and development services for pre-school children.,Department of Education,Department of Education,J.Finx@mig.local,false,true
+Economic statistics and advice,"Produces official economic statistics, forecasts and advice for government decision-making.",MIG Treasury,MIG Treasury,M.Karloff@mig.local,true,true
+Elections and democratic administration,Maintains electoral arrangements and supports the lawful conduct of elections and referendums.,Misty Isles Cabinet Office,Misty Isles Cabinet Office,siro@mig.local,false,true
+Electricity generation and supply,"Generates, distributes and meters electricity for domestic, commercial and government customers.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Emergency call handling and dispatch,"Receives emergency calls, assesses incidents and mobilises appropriate responders.",Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,true,true
+Emergency operations coordination,Activates and operates command arrangements for major incidents and national emergencies.,Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,true,true
+Emergency police response,Receives requests for police assistance and deploys officers to urgent incidents.,MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Environmental protection,"Regulates pollution, waste, protected habitats and activities affecting the natural environment.",DEFA,DEFA,A.Lovelace@mig.local,false,true
+Executive government coordination,"Coordinates Cabinet business, cross-government priorities and implementation of executive decisions.",Misty Isles Cabinet Office,Misty Isles Cabinet Office,siro@mig.local,true,true
+External public audit,Audits public accounts and reports independently on the stewardship of public money.,MIG Treasury,MIG Treasury,M.Karloff@mig.local,false,true
+Financial-services regulation,Licenses and supervises financial institutions and enforces regulatory requirements.,MIG Treasury,MIG Treasury,M.Karloff@mig.local,false,true
+Fire and rescue response,"Responds to fires, road collisions, hazardous materials and other rescue incidents.",Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,false,true
+Fire prevention and protection,"Inspects premises, promotes fire safety and enforces applicable fire-protection requirements.",Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,false,true
+Fisheries management,"Licenses, monitors and protects commercial and recreational fisheries.",DEFA,DEFA,A.Lovelace@mig.local,false,true
+Food safety inspection,Inspects food businesses and production to protect public health and market confidence.,DEFA,DEFA,A.Lovelace@mig.local,false,true
+Fuel distribution and retail,"Distributes and sells petrol, diesel, aviation fuel and other regulated fuels.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Fuel importation and storage,"Procures, imports, stores and safeguards the islands' strategic fuel supply.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Government accounting and payments,Maintains the public accounts and processes government receipts and payments.,MIG Treasury,MIG Treasury,M.Karloff@mig.local,true,true
+Government and public legal advice,"Provides independent legal advice on public law, criminal justice and constitutional matters.",MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Government budgeting,Prepares the national budget and monitors departmental expenditure against approved plans.,MIG Treasury,MIG Treasury,M.Karloff@mig.local,false,true
+Government communications,"Coordinates official announcements, media relations and emergency public information.",Department of Communications,Department of Communications,A.James@mig.local,true,true
+Government digital services,"Provides common hosting, identity, workplace technology and technical support to government bodies.",Department of Communications,Department of Communications,A.James@mig.local,true,true
+Government internal audit,"Provides independent assurance on governance, risk management and internal controls.",MIG Treasury,MIG Treasury,M.Karloff@mig.local,true,true
+Government legal services,"Provides legal advice, legislative drafting and representation for government bodies.",Misty Isles Cabinet Office,Misty Isles Cabinet Office,siro@mig.local,true,true
+Government procurement support,"Sets procurement rules and supports departments with tendering, contracting and supplier management.",Misty Isles Cabinet Office,Misty Isles Cabinet Office,siro@mig.local,true,true
+Government records and archives,Preserves official records and provides authorised access to current and historical government information.,Department of Communications,Department of Communications,A.James@mig.local,true,true
+Health records and patient administration,"Maintains patient records, registrations, appointments, referrals and clinical-service administration.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Hospital and emergency clinical care,"Provides inpatient, outpatient, surgical and emergency medical services.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Identity and privileged-access assurance,"Oversees identity controls, privileged accounts and periodic access reviews across government.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Information security governance,"Sets government security policy, standards, roles and assurance requirements.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Land and conservation management,"Manages public countryside, protected areas, biodiversity and invasive-species control.",DEFA,DEFA,A.Lovelace@mig.local,false,true
+Marine pollution response,"Prepares for and responds to oil spills, hazardous cargo releases and other marine pollution.",Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Maritime search and rescue,Coordinates and conducts rescue operations for people and vessels at sea.,Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Maternity and child health,"Provides antenatal, maternity, postnatal and child-development services.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Mental health services,"Provides assessment, treatment, crisis response and continuing support for mental-health needs.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+National emergency planning,"Maintains national emergency plans, capabilities, exercises and inter-agency arrangements.",Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,true,true
+Offender rehabilitation and resettlement,"Supports rehabilitation, sentence planning and the safe return of offenders to the community.",MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Pharmacy and medicines management,"Procures, stores, dispenses and monitors medicines and clinical supplies.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Port operations,"Operates berths, cargo facilities, passenger areas and other port infrastructure.",Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Postal and addressing oversight,Maintains national addressing arrangements and oversees regulated postal services.,Department of Communications,Department of Communications,A.James@mig.local,false,true
+Primary education,Provides compulsory primary schooling and associated pupil support.,Department of Education,Department of Education,J.Finx@mig.local,false,true
+Primary healthcare,"Provides community-based medical consultations, diagnosis, treatment and referral.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Public bus transport,Plans and operates scheduled public bus services and passenger facilities.,Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Public debt and cash management,"Manages government borrowing, reserves, banking and short-term liquidity.",MIG Treasury,MIG Treasury,M.Karloff@mig.local,false,true
+Public health protection,"Monitors and manages communicable disease, vaccination, environmental health and public-health emergencies.",Misty Isles Department of Health,Misty Isles Department of Health,g.hopper@mig.local,false,true
+Public records access,Administers public requests for government information and access to published records.,Department of Communications,Department of Communications,A.James@mig.local,true,true
+Public warning and emergency information,"Issues authoritative alerts, warnings and protective instructions to the public.",Disaster and Emergency Management,Disaster and Emergency Management,M.Hamilton@mig.local,true,true
+Radio spectrum management,"Plans, assigns and monitors radio frequencies and investigates harmful interference.",Department of Communications,Department of Communications,A.James@mig.local,false,true
+Road network management,"Plans, constructs, inspects and maintains public roads, bridges, drainage and related assets.",Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Road safety and traffic management,"Manages road safety, traffic controls, signs, permits and incident-related restrictions.",Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+School meals and pupil welfare,"Provides school meals, safeguarding and other services supporting pupil wellbeing.",Department of Education,Department of Education,J.Finx@mig.local,false,true
+Secondary education,"Provides secondary schooling, qualifications and preparation for employment or further study.",Department of Education,Department of Education,J.Finx@mig.local,false,true
+Security architecture and assurance,"Reviews projects, systems and suppliers to ensure that security requirements are designed and implemented.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Security awareness and training,"Provides government-wide security education, exercises and targeted role-based training.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Security monitoring and detection,Monitors government systems and networks to identify suspicious or malicious activity.,Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Special educational needs support,Assesses and supports learners who have special educational needs or disabilities.,Department of Education,Department of Education,J.Finx@mig.local,false,true
+Student assessment and certification,"Administers examinations, assessments, qualifications and learner records.",Department of Education,Department of Education,J.Finx@mig.local,false,true
+Student grants and overseas study,"Administers scholarships, grants and placements for education unavailable locally.",Department of Education,Department of Education,J.Finx@mig.local,false,true
+Tax administration,"Registers taxpayers, assesses liabilities, collects tax and manages compliance.",MIG Treasury,MIG Treasury,M.Karloff@mig.local,false,true
+Telecommunications regulation,"Licenses and regulates telecommunications operators, spectrum use and service standards.",Department of Communications,Department of Communications,A.James@mig.local,false,true
+Utility customer services and billing,"Registers customers, manages meters, issues bills, collects payment and handles service enquiries.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Utility incident response,"Responds to outages, leaks, contamination and other disruptions to essential utility services.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Utility network maintenance,"Inspects, repairs and renews electricity, water and wastewater infrastructure.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Vehicle and driver licensing,"Registers vehicles, licenses drivers and maintains associated statutory records.",Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Vehicle roadworthiness testing,Inspects vehicles and certifies that they meet safety and environmental standards.,Department of Roads and Airports,Department of Roads and Airports,J.Finx@mig.local,false,true
+Vessel registration and licensing,"Registers vessels, licenses operators and maintains statutory maritime records.",Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Vessel traffic and harbour control,Controls vessel movements and maintains safe navigation within territorial harbours.,Maritime Department,Maritime Department,A.Turing@mig.local,false,true
+Victim and witness support,Protects and supports victims and witnesses through investigation and court proceedings.,MIG Department of Justice,MIG Department of Justice,B.Kirk@mig.local,false,true
+Vulnerability management,"Identifies, prioritises and tracks remediation of technical vulnerabilities across government.",Department of Information Security,Department of Information Security,A.Turing@mig.local,true,true
+Wastewater collection and treatment,"Collects, treats and safely discharges sewage and wastewater.",Misty Islands Utilities,Misty Islands Utilities,e.lectric@miu.local,false,true
+Weather and climate information,"Provides weather observations, forecasts, warnings and climate records.",DEFA,DEFA,A.Lovelace@mig.local,true,true

@@ -1,0 +1,32 @@
+name,description,department_name,owner_email,managed_by_email,is_shared,is_active
+Aircraft Control and Radar,Aircraft control and air traffic control systems which are not provided on-board and used for the positioning and control of air traffic,Department of Roads and Airports,C.Giles@mig.local,,false,true
+Aircraft fuelling  signalling control and operations,"The data which supports the supply and demand of fuel from the bunkering volume, quality testing and delivery to the aircraft.",Department of Roads and Airports,C.Giles@mig.local,,false,true
+Aviation Fuel logistics information,Everything which controls fuel demand and supply,Department of Roads and Airports,C.Giles@mig.local,,false,true
+Clinical operations information,"All information which keep the hospital and clinics operating. This includes the scheduling of clinical and surgical time, the provision of all services which are not pharmaceutical or treatment related (handled by other specific information assets).",Misty Isles Department of Health,K.Hummer@mig.local,,false,true
+Court management,All information which supports the operation of the court excluding case material,MIG Department of Justice,B.Kirk@mig.local,,false,true
+Criminal cases,Any information which forms the basis of a criminal case brought by MIG,MIG Department of Justice,B.Kirk@mig.local,,false,true
+Detective Monitoring Events,All detective monitoring feeds to the SOC,Department of Information Security,S.Topping@mig.local,,false,true
+Electrical Billing,The billing to payment flow on which the electrical system finance operates,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Electrical control signalling,Generation and grid control signalling with direct implications for the safe operation of the grid.,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Emergency communications,Radio and emergency communications provided by RF and GSM services.,Disaster and Emergency Management,M.Hamilton@mig.local,,false,true
+Fisheries data,"All information required to manage the fisheries, this includes licensing data, fish stocks, catches and market data.",DEFA,A.Lovelace@mig.local,,false,true
+Flight planning information,"Air operations information which is used to plan flights, including: passenger manifest, cargo manifest, maintenance scheduling.",Department of Roads and Airports,C.Giles@mig.local,,false,true
+Generation Fuel logistics information,Everything which controls fuel demand and supply,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Information Risk Management Information,,Department of Information Security,S.Topping@mig.local,,false,true
+Internal MIG user identity,Used for the authentication of users to internal systems,Department of Communications,G.Welchman@mig.local,,false,true
+Maritime vessel tracking,Ship tracking information used for tracking all activity within our waters and fishery operations for our registered fleet.,Maritime Department,A.Turing@mig.local,,false,true
+Medical diagnostic information,Any information used by a clinician to support the diagnosis of a patient medical condition. This asset was created because of a heavy reliance on remote diagnostics and telemedicine.,Misty Isles Department of Health,K.Hummer@mig.local,,false,true
+Medical equipment calibration,"X-Ray, drug delivery and other information related to the safe calibration and operation of any medical equipment used to treat patients.",Misty Isles Department of Health,K.Hummer@mig.local,,false,true
+MIG Financial payments data,All payment data which drive the movement of money between accounts both external and internal,MIG Treasury,M.Karloff@mig.local,,false,true
+MIG Government budgetary information,All the internal budgetary information,MIG Treasury,M.Karloff@mig.local,,false,true
+Offender/prisoner management,Management of convicted offenders within the prison and for the duration of their sentence,MIG Department of Justice,B.Kirk@mig.local,,false,true
+Passenger flight information,Flight information display for the general public,Department of Roads and Airports,C.Giles@mig.local,,false,true
+Patient medical records,All medical records which can be attributed to a patient,Misty Isles Department of Health,K.Hummer@mig.local,,false,true
+Personal Tax Information,Tax information which relates to personal tax and company tax,MIG Treasury,M.Karloff@mig.local,,false,true
+Pharmacy logistics and inventory,Everything associated with the provision of drugs. This includes supply and drug specific information,Misty Isles Department of Health,K.Hummer@mig.local,,false,true
+Port operations information,"Anything related to the safe and efficient operation of the port. This includes container handing, berthing, labour management, logistics, and security",Maritime Department,A.Turing@mig.local,,false,true
+School operational information,"Everything associated with the operation of the school, exam scheduling , transport, finances etc...",Department of Education,J.Finx@mig.local,,false,true
+Scientific Environmental Data,"All scientific data relating to the environment. Of very high value over a long period of time, usually irreplaceable. Usually published and shared",DEFA,A.Lovelace@mig.local,,false,true
+Student records,All student record. High impact for confidentiality due to privacy and legal,Department of Education,J.Finx@mig.local,,false,true
+Water Billing,The billing to payment flow on which the water system finance operates,Misty Islands Utilities,e.lectric@miu.local,,false,true
+Water control signalling,Water treatment and distribution,Misty Islands Utilities,e.lectric@miu.local,,false,true

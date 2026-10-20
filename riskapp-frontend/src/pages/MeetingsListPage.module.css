@@ -1,0 +1,105 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.pageTitle {
+  flex: 1;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btnPlanMeeting { composes: btnPrimary from '../components/buttons.module.css'; }
+.loading,
+.error {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 16px;
+}
+.error { color: var(--red); }
+
+.empty { composes: emptyState from '../components/form.module.css'; padding: 48px 0; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.row:hover td { background: var(--bg-hover); }
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.tdDate  { white-space: nowrap; font-weight: 500; }
+.tdCycle { color: var(--text-secondary); }
+.tdNum   { text-align: right; color: var(--text-muted); }
+
+/* State badges */
+.stateBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.state_draft   { background: rgba(150,150,150,0.15); color: #aaa; }
+.state_planned { background: rgba(100,181,246,0.15); color: #64b5f6; }
+.state_closed  { background: rgba(255,183,77,0.15);  color: #ffb74d; }
+.state_issued  { background: rgba(129,199,132,0.15); color: #81c784; }
+
+/* Closed-but-unissued meetings need the secretary to issue minutes — flag them. */
+.stateCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.outstandingFlag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255,183,77,0.18);
+  color: #ffb74d;
+  white-space: nowrap;
+}
+
+.rowNeedsAction td:first-child {
+  box-shadow: inset 3px 0 0 var(--amber);
+}

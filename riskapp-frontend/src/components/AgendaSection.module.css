@@ -1,0 +1,376 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+/* Header */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.totalTimebox {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-right: 4px;
+  white-space: nowrap;
+}
+/* Soft over-budget warning — sections allocate more than the target. */
+.totalTimeboxOver {
+  color: #ffb74d;
+  font-weight: 600;
+}
+
+.btnGenerate { composes: btnAccent from './buttons.module.css'; }
+.btnAddItem { composes: btnSecondary from './buttons.module.css'; }
+/* Add item form */
+.addForm {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addFormRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.select { composes: select from './form.module.css'; }
+.input { composes: input from './form.module.css'; }
+
+.input { flex: 1; min-width: 200px; }
+
+.timeboxInputSmall {
+  width: 64px;
+  padding: 7px 8px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.textarea { composes: textarea from './form.module.css'; }
+
+.btnSave { composes: btnPrimary from './buttons.module.css'; }
+.btnCancel { composes: btnSecondary from './buttons.module.css'; }
+/* Empty state */
+.emptyState { composes: emptyState from './form.module.css'; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px 0; }
+.empty { composes: emptyState from './form.module.css'; }
+.error {
+  color: var(--red);
+  font-size: 0.875rem;
+  margin: 0 0 12px;
+}
+
+/* Phase grouping */
+.phase {
+  margin-bottom: 24px;
+}
+
+.phaseHeader {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0 0 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Category grouping */
+.category {
+  margin-bottom: 12px;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0 4px;
+}
+
+.categoryLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.categoryTimebox {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.05);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.sectionTimeboxBtn {
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 1px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.sectionTimeboxBtn:hover { border-color: var(--accent, #64b5f6); color: var(--accent, #64b5f6); }
+
+.sectionTimeboxInput {
+  width: 52px;
+  padding: 1px 6px;
+  background: var(--bg-inset);
+  border: 1px solid var(--accent, #64b5f6);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-family: inherit;
+}
+.sectionTimeboxInput:focus { outline: none; }
+
+/* Agenda item */
+.agendaItem {
+  border-left: 2px solid var(--border);
+  margin-left: 8px;
+  margin-bottom: 4px;
+  transition: border-color 0.15s;
+}
+.agendaItem:hover { border-color: var(--accent, #64b5f6); }
+
+.itemMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+}
+
+.itemIndex {
+  min-width: 24px;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.itemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.btnLink { composes: btnLink from './buttons.module.css'; }
+.itemSummary {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.itemNotes {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Decision display block (closed meeting) */
+.decisionBlock {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.decisionRow {
+  display: flex;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+.decisionLabel {
+  color: var(--text-secondary);
+  font-weight: 600;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+.decisionText {
+  color: var(--text-primary);
+}
+
+.editLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+/* Inline edit form */
+.editForm {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.timeboxInput {
+  width: 64px;
+  padding: 5px 8px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-family: inherit;
+}
+
+/* Item action buttons */
+.itemActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.agendaItem:hover .itemActions { opacity: 1; }
+
+/* Always-visible variant (closed-state edit decisions) */
+.itemActionsAlways {
+  opacity: 1;
+}
+
+/* Activity summary chips */
+.activityRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.activityChip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 1px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipDiscussed {
+  background: rgba(102,187,106,0.12);
+  color: #66bb6a;
+  border: 1px solid rgba(102,187,106,0.25);
+}
+
+.chipDecision {
+  background: rgba(100,181,246,0.1);
+  color: var(--accent, #64b5f6);
+  border: 1px solid rgba(100,181,246,0.2);
+  cursor: default;
+}
+
+.chipNotes {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.chipMissing {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  opacity: 0.6;
+}
+
+.btnMove { composes: btnGhost from './buttons.module.css'; }
+.btnEdit { composes: btnSecondary from './buttons.module.css'; }
+.btnDelete { composes: btnGhost from './buttons.module.css'; }
+/* Badges */
+.timeboxChip {
+  display: inline-block;
+  padding: 1px 5px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-muted);
+  border-radius: 3px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.sourceBadge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.auto   { background: rgba(100,181,246,0.08); color: var(--text-muted); }
+.pinned { background: rgba(255,183,77,0.1);   color: #ffb74d; }
+
+.divergeWarning {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: #ffb74d;
+  background: rgba(255,183,77,0.08);
+  border: 1px solid rgba(255,183,77,0.25);
+  border-radius: 3px;
+  padding: 3px 8px;
+  display: inline-block;
+}

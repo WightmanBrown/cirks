@@ -1,0 +1,45 @@
+-- v99 — retire the business-service ↔ impact-table link and the dead service
+-- rating table.
+--
+-- RATIONALE. v61 made a business service's C/I/A strictly DERIVED: the
+-- recompute_service_impact trigger takes MAX over the service's linked active
+-- information assets, and services stopped being rated directly (the old
+-- PUT /services/:id/rate went at the same time). Two artefacts of the pre-v61
+-- model were left behind:
+--
+--   service_impact_ratings         — where a service's own per-table rating used
+--                                    to live. Nothing has written it since v61:
+--                                    no INSERT or UPDATE exists anywhere in the
+--                                    codebase, it is read in exactly one place
+--                                    (the detail endpoint's JSON), and it held
+--                                    0 rows on every live instance. Dead.
+--
+--   business_service_impact_tables — which impact tables "apply" to a service.
+--                                    It never fed a score: recompute_service_impact
+--                                    does not consult it, and the API's own
+--                                    cia_source field can only ever report
+--                                    'none' or 'assets'. What it did do was
+--                                    accumulate — making an org table mandatory
+--                                    broadcast a row to EVERY active service —
+--                                    and then drive a "N without impact table"
+--                                    prompt on the services list, sending users
+--                                    to fix something that changes no number.
+--
+-- Impact tables reach a service through its information assets, which is where
+-- ratings genuinely live (asset_impact_ratings). The set of tables relevant to a
+-- service is therefore derivable on read — service -> business_service_assets ->
+-- asset_impact_ratings -> impact_tables — and the services API now does exactly
+-- that, presenting it as a read-only summary instead of an editable link.
+--
+-- This also removes the transfer-time rule that unlinked department-scoped
+-- non-mandatory tables when a service moved department; with the link gone the
+-- question does not arise (and that DELETE carried a latent bug — it cast
+-- impact_table_id to int[] where the column is integer but the array was built
+-- from a UUID-shaped list in the response payload).
+--
+-- No data migration is needed: nothing derived from either table, so nothing
+-- downstream changes value. Dropping them is the whole change.
+
+DROP TABLE IF EXISTS public.service_impact_ratings;
+
+DROP TABLE IF EXISTS public.business_service_impact_tables;

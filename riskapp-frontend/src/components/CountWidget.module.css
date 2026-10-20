@@ -1,0 +1,137 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.widget {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: border-color 0.15s;
+}
+
+.widget:hover {
+  border-color: var(--border-accent);
+}
+
+.accentAmber {
+  border-color: var(--amber, #f5a623);
+}
+.accentRed {
+  border-color: var(--red, #e05252);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 56px;
+}
+
+.count {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.countAmber {
+  color: var(--amber, #f5a623);
+}
+.countRed {
+  color: var(--red, #e05252);
+}
+
+.countLabel {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+@keyframes shimmer {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 0.9; }
+  100% { opacity: 0.4; }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonCount {
+  width: 72px;
+  height: 48px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonLabel {
+  width: 160px;
+  height: 14px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.4s ease-in-out infinite 0.2s;
+}
+
+.error {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--red, #e05252);
+  margin: 0;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  text-decoration: none;
+  transition: opacity 0.15s;
+  cursor: pointer;
+}
+
+.link:hover {
+  opacity: 0.75;
+}

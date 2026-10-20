@@ -1,0 +1,14 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.wrap { display: inline-flex; flex-direction: column; gap: 3px; min-width: 0; }
+.row { display: flex; align-items: stretch; gap: 4px; position: relative; }
+.row > input[type="text"] { flex: 1; min-width: 0; }
+.calendar {
+  background: transparent; border: 1px solid var(--border); border-radius: 5px; cursor: pointer;
+  padding: 0 8px; font-size: 13px; line-height: 1; color: var(--text-secondary);
+}
+.calendar:disabled { opacity: 0.45; cursor: not-allowed; }
+/* Present for showPicker(), never seen. */
+.hiddenPicker { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }
+.read { font-size: 11.5px; color: var(--text-muted); }
+.problem { font-size: 11.5px; color: var(--red, #e5534b); }

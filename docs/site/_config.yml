@@ -1,0 +1,16 @@
+# GitHub Pages site for CIRKS's user documentation. Built by
+# .github/workflows/pages.yml from the allow-list in docs/site/build.sh.
+title: CIRKS documentation
+description: Cheltenham Information Risk Knowledge System — installing, running and modelling with CIRKS
+theme: jekyll-theme-primer
+# Where GitHub Pages serves a project site; set here so links do not depend on
+# looking the site up (which fails until Pages is enabled).
+url: https://wightmanbrown.github.io
+baseurl: /cirks
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+relative_links:
+  enabled: true
+  collections: false

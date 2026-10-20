@@ -1,0 +1,25 @@
+supplier_name,relationship_type,department_name,system_name,component_name,component_type,description,contract_ref,contract_url,contract_start,contract_end,status
+CrowdStrike,product,Department of Information Security,,Crowdstrike SaaS,technology,,,,,,active
+CrowdStrike,product,Department of Information Security,,Crowdstrike Falcon Agent,technology,,,,,,active
+Microsoft,service_provider,Department of Communications,MIG Video Conferencing,,,,,,,,active
+Super Bill,service_provider,Misty Islands Utilities,Billing and meter reading,,,,,,,,active
+Island Mutual Bank,service_provider,MIG Treasury,MIG Banking System,,,,IMB-PAY-2024,,2025-06-02,2028-06-06,active
+Helix ServiceDesk,service_provider,Department of Communications,IT Support Ticketing System,,,,HSD-0931,,2025-06-02,2028-06-06,active
+Helix ServiceDesk,service_provider,Department of Communications,Support Knowledge base,,,,HSD-0931,,2025-06-02,2028-06-06,active
+PeopleFirst HR,service_provider,Misty Isles Cabinet Office,HR System,,,,PF-HR-7710,,2025-06-02,2028-06-06,active
+SkyPlan Ops,service_provider,Department of Roads and Airports,Flight operations system,,,,SKY-OPS-12,,2026-08-16,2028-06-06,active
+FacilityFlow,service_provider,Department of Education,Schools facilities management,,,,FF-EDU-3,,2025-06-02,2028-06-06,active
+Microsoft,service_provider,Department of Communications,MIG Telephony and Messaging,,,,MS-EA-2024,,2025-06-02,2028-06-06,active
+Microsoft,service_provider,Department of Communications,MIG Document Management,,,,MS-EA-2024,,2025-06-02,2028-06-06,active
+Microsoft,service_provider,Department of Information Security,Information Security Management System,,,,MS-EA-2024,,2025-06-02,2028-06-06,active
+Microsoft,service_provider,Department of Information Security,Microsoft Defender for Cloud,,,,MS-EA-2024,,2025-06-02,2028-06-06,active
+Microsoft,service_provider,Misty Islands Utilities,GIS Land Register,,,,MS-EA-2024,,2025-06-02,2028-06-06,active
+Microsoft,service_provider,Misty Isles Cabinet Office,Electoral Roll,,,,MS-EA-2024,,2025-06-02,2028-06-06,active
+Aerowatch Systems,contracted_service,Department of Roads and Airports,Approach radar,,,,AW-RADAR-5,,2025-06-02,2028-06-06,active
+Harbour Fuel Services,contracted_service,Department of Roads and Airports,Aircraft fuelling,,,,HFS-22,,2025-06-02,2028-06-06,active
+Gridline Controls,contracted_service,Misty Islands Utilities,Power Generation,,,,GLC-2025,,2025-06-02,2028-06-06,active
+Gridline Controls,contracted_service,Misty Islands Utilities,Power Distribution,,,,GLC-2025,,2025-06-02,2028-06-06,active
+Island Staffing Agency,onshore,Department of Communications,,Agency IT contractors,people,,ISA-IT-4,,2025-06-02,2028-06-06,active
+Palo Alto Networks,product,Department of Information Security,,PaloAlto 850-22,technology,,PAN-SUP-3,,2025-06-02,2028-06-06,active
+Veeam,product,Department of Information Security,,Veeam Backup,technology,,VEEAM-UL-9,,2025-06-02,2028-06-06,active
+Plotnet,product,Disaster and Emergency Management,,Plotnet Secure Radio,technology,,PLT-77,,2025-06-02,2028-06-06,active

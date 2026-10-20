@@ -1,0 +1,302 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+/* ── Widget shell ────────────────────────────────────────────────────────── */
+
+.widget {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.countChip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── User list ───────────────────────────────────────────────────────────── */
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: background 0.1s;
+}
+
+.row:hover {
+  background: var(--bg-hover);
+  border-color: var(--border);
+}
+
+.rowInactive {
+  opacity: 0.55;
+}
+
+/* ── Status dot ──────────────────────────────────────────────────────────── */
+
+.dotActive,
+.dotInactive {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotActive   { background: var(--green, #4caf50); }
+.dotInactive { background: var(--text-muted); }
+
+/* ── User info ───────────────────────────────────────────────────────────── */
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.userName {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.selfBadge,
+.systemBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.userMeta {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.additionalRoles {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent, #6366f1);
+  letter-spacing: 0.03em;
+}
+
+/* ── Role read-only (system accounts) ───────────────────────────────────── */
+
+.roleReadOnly {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding: 3px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Role select ─────────────────────────────────────────────────────────── */
+
+.roleSelect {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.roleSelect:hover:not(:disabled) {
+  border-color: var(--accent, #6366f1);
+}
+
+.roleSelect:focus {
+  outline: none;
+  border-color: var(--accent, #6366f1);
+}
+
+.roleSelect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── State indicator ─────────────────────────────────────────────────────── */
+
+.stateIndicator {
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spinning {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--text-muted);
+  animation: spin 0.8s linear infinite;
+}
+
+.savedMark {
+  font-size: 12px;
+  color: var(--green, #4caf50);
+}
+
+.errorMark {
+  font-size: 12px;
+  color: var(--red, #e05252);
+  cursor: help;
+}
+
+/* ── Deactivate / Reactivate buttons ─────────────────────────────────────── */
+
+.deactivateBtn,
+.reactivateBtn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 3px 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.deactivateBtn {
+  color: var(--text-muted);
+}
+.deactivateBtn:hover:not(:disabled) {
+  border-color: var(--red, #e05252);
+  color: var(--red, #e05252);
+}
+
+.reactivateBtn {
+  color: var(--text-muted);
+}
+.reactivateBtn:hover:not(:disabled) {
+  border-color: var(--green, #4caf50);
+  color: var(--green, #4caf50);
+}
+
+.deactivateBtn:disabled,
+.reactivateBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Skeleton ────────────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 0.9; }
+  100% { opacity: 0.4; }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonRow {
+  height: 44px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ── Empty / error ───────────────────────────────────────────────────────── */
+
+.empty { composes: emptyState from './form.module.css'; }
+.error { font-family: var(--font-body);
+  font-size: 12px;
+  margin: 0; }
+
+.empty { color: var(--text-muted); }
+.error { color: var(--red, #e05252); }

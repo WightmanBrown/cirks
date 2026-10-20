@@ -1,0 +1,21 @@
+name,description,threat_category,source,probability_c,probability_i,probability_a,probability_notes,default_baseline_probability,reference_code,is_active
+Accidental data disclosure,"An authorised user inadvertently exposes information — misdirected email, wrong recipient, public share, or misdelivery.",accidental,internal,,,,,,,true
+Hardware or software failure,"An unplanned outage or malfunction of equipment or software degrades or interrupts service, or corrupts data.",accidental,internal,,,,,,,true
+Lost or stolen device or media,"A laptop, phone, or removable medium containing information is lost or stolen.",accidental,internal,,,,,,,true
+Security misconfiguration,"A system, service or cloud resource is deployed with insecure settings (open storage, default credentials, excess permissions).",accidental,internal,,,,,,,true
+Data exfiltration,Unauthorised transfer of information out of the organisation's control.,deliberate,external,,,,,,,true
+Denial of service (DoS/DDoS),Flooding or resource-exhaustion attack that degrades or removes the availability of a system or service.,deliberate,external,,,,,,,true
+Exploitation of an unpatched vulnerability,"Compromise via a known, unremediated vulnerability for which a patch or mitigation exists but has not been applied.",deliberate,external,,,,,,,true
+Exploitation of a public-facing application,"An attacker abuses a vulnerability or weakness in an internet-facing web application or service (e.g. injection, insecure logic).",deliberate,external,,,,,,,true
+Interception of internal network traffic,Interception of traffic travelling across the organisation's internal networks.,deliberate,internal,,,,,,,true
+Malicious insider misuse,"An authorised person deliberately abuses their access to steal, alter, or sabotage information or systems.",deliberate,internal,,,,,,,true
+Malware infection,"Non-ransomware malicious code (trojans, spyware, loaders) that establishes a foothold, steals data, or disrupts operations.",deliberate,external,,,,,,,true
+Phishing targeting user credentials,"Deceptive messages that trick users into revealing their sign-in credentials, typically by email or a lookalike sign-in page.",deliberate,external,,,,,,,true
+Physical intrusion or theft,"Unauthorised physical access to premises, equipment, or storage to obtain or damage information assets.",deliberate,external,,,,,,,true
+Privilege escalation,"An attacker or user gains rights beyond those authorised, moving from limited to elevated or administrative access.",deliberate,external,,,,,,,true
+Ransomware,"Malicious software encrypts systems and data for extortion, increasingly combined with data theft (double extortion).",deliberate,external,,,,,,,true
+Stolen or compromised credentials,"Use of valid but illegitimately obtained credentials (theft, reuse, brute force, or purchase) to access systems.",deliberate,external,,,,,,,true
+Supply chain or third-party compromise,"Attack delivered through a trusted supplier, service provider, or software component (e.g. compromised update or vendor access).",deliberate,external,,,,,,,true
+Unauthorised data modification,"Deliberate tampering with data or configuration to corrupt records, falsify information, or undermine trust.",deliberate,external,,,,,,,true
+Zero-day exploitation,Compromise using a previously unknown vulnerability for which no patch yet exists.,deliberate,external,,,,,,,true
+Natural disaster or environmental event,"Fire, flood, storm, extended power loss, or similar event that damages facilities or interrupts operations.",environmental,natural,,,,,,,true

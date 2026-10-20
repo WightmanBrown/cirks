@@ -1,0 +1,145 @@
+name,component_type,status,description,notes,created_by_email
+AG Chambers,people,operational,,,K.Hummer@mig.local
+AirOperations Engineering,people,operational,AirOps Engineering team,,K.Hummer@mig.local
+AirOperations Fuelling Team,people,operational,,,A.James@mig.local
+AirOperations Team,people,operational,,,K.Hummer@mig.local
+Airport Operations Team,people,operational,,,K.Hummer@mig.local
+All desktop users,people,operational,Everyone with desktop access,Used to capture the general user population with email access etc..,K.Hummer@mig.local
+Ambulance Service,people,operational,,,K.Hummer@mig.local
+ATC team,people,operational,Air traffic controllers,,K.Hummer@mig.local
+Clerk of Court,people,operational,,,K.Hummer@mig.local
+Coast Guard,people,operational,,,K.Hummer@mig.local
+Customs Team,people,operational,,,K.Hummer@mig.local
+Education Team,people,operational,,,K.Hummer@mig.local
+Expert People Group,people,operational,Our external contractor and provider of consulting skills,,K.Hummer@mig.local
+Fire and Rescue,people,operational,,,K.Hummer@mig.local
+FIU Investigations Team,people,operational,,,K.Hummer@mig.local
+Healthcare Medical Team,people,operational,,,K.Hummer@mig.local
+HR Team,people,operational,Our beloved HR Team,,K.Hummer@mig.local
+InfoSec Team,people,operational,,,K.Hummer@mig.local
+Internal revenue team,people,operational,,,K.Hummer@mig.local
+IT Administrators,people,operational,,,K.Hummer@mig.local
+IT Team,people,operational,,,K.Hummer@mig.local
+MIG Utilities billing team,people,operational,,,K.Hummer@mig.local
+Pharmacists,people,operational,,,K.Hummer@mig.local
+Police Back Office Team,people,operational,,,K.Hummer@mig.local
+Police Force,people,operational,,,K.Hummer@mig.local
+Port Authority Team,people,operational,,,K.Hummer@mig.local
+Power station operations team,people,operational,,,A.James@mig.local
+Prison Service Team,people,operational,,,K.Hummer@mig.local
+Science Team,people,operational,,,K.Hummer@mig.local
+Super Billing,people,operational,The utility billing and metering provider,Contract renewal in June,K.Hummer@mig.local
+Treasury Team,people,operational,,,K.Hummer@mig.local
+Unsure Networks,people,operational,,,K.Hummer@mig.local
+Utilities Team,people,operational,,,K.Hummer@mig.local
+Water plant operations team,people,operational,,,K.Hummer@mig.local
+Annual Audit Process,process,operational,The MIG annual government accounts audit process,,K.Hummer@mig.local
+Asset management,process,operational,,This is a security control,K.Hummer@mig.local
+Background HR checks,process,operational,,This is a security control,K.Hummer@mig.local
+CIRKS Information Risk Management Process,process,operational,,,K.Hummer@mig.local
+Data protection and handling,process,operational,,This is a security control,K.Hummer@mig.local
+Detective Monitoring,process,operational,,,K.Hummer@mig.local
+End point monitoring (EPP),process,operational,,This is a security control,K.Hummer@mig.local
+Grid supply and balance,process,operational,,,A.James@mig.local
+Inbound Excise process,process,operational,Inbound goods taxation process,,K.Hummer@mig.local
+Incident management,process,operational,,This is a security control,K.Hummer@mig.local
+Internal MS based AAA,process,operational,,"Internal authentication, authorisation and access control",K.Hummer@mig.local
+Network traffic monitoring for unencrypted traffic,process,operational,,,A.James@mig.local
+Outbound Excise process,process,operational,Tax process for goods export,,K.Hummer@mig.local
+Pharmacy logistics,process,operational,,,K.Hummer@mig.local
+Physical security,process,operational,,This is a security control,K.Hummer@mig.local
+Records Management process,process,operational,,,K.Hummer@mig.local
+Remote medical diagnostics,process,operational,,,K.Hummer@mig.local
+Resilience and recovery,process,operational,,This is a security control,K.Hummer@mig.local
+Security awareness training,process,operational,,This is a security control,K.Hummer@mig.local
+Supply chain management,process,operational,,This is a security control,K.Hummer@mig.local
+System configuration,process,operational,,This is a security control,K.Hummer@mig.local
+Vulnerability management,process,operational,,This is a security control,K.Hummer@mig.local
+Water and electrical usage reporting and billing,process,operational,,,K.Hummer@mig.local
+ABB Switching and protection,technology,operational,ABB grid control and protection suite,,K.Hummer@mig.local
+Advanced Threat Prevention Network Intrusion Detection platform,technology,operational,,,A.James@mig.local
+AlmaLinux 9,technology,operational,Linux OS,,K.Hummer@mig.local
+ArcGIS,technology,operational,MIG’s GIS database,,K.Hummer@mig.local
+Automatic Identification System (AIS),technology,operational,Ship tracking data system,,K.Hummer@mig.local
+AWS EC2 IaaS Instance,technology,operational,A generic host instance on EC2,,K.Hummer@mig.local
+Bahmni,technology,operational,OpenMRS based MRS implementation,,K.Hummer@mig.local
+Bahmni Appointment Scheduling module,technology,operational,Medical appointment management system,,K.Hummer@mig.local
+Bahmni Pharmacy,technology,operational,OpenMRS pharmacy tooling,,K.Hummer@mig.local
+Bahmni radiology integration,technology,operational,Imaging integration for Bahmni,,K.Hummer@mig.local
+Bantorights,technology,operational,Court management system,,K.Hummer@mig.local
+CIRKS Platform,technology,operational,CIRKS Platform software dist,,K.Hummer@mig.local
+Cisco IOS XE V26 26.1.1,technology,operational,CISCO operating system,,K.Hummer@mig.local
+Core Switch 1,technology,operational,CISCO catalyst core switch in rack 1,,K.Hummer@mig.local
+Core Switch 2,technology,operational,CISCO catalyst core switch in rack 2,,K.Hummer@mig.local
+Core Switch 3,technology,operational,CISCO catalyst core switch in rack 3,,K.Hummer@mig.local
+Core Switch 4,technology,operational,CISCO catalyst core switch in rack 4,,K.Hummer@mig.local
+Crowdstrike Falcon Agent,technology,operational,The host Crowdstrike Falcon agent,,K.Hummer@mig.local
+Crowdstrike SaaS,technology,operational,The cloud backend to Crowdstrike Falcon,,K.Hummer@mig.local
+DataTorque RMS,technology,operational,The tax office DataTorque Revenue Management System,,K.Hummer@mig.local
+Debian 12,technology,operational,Linus operating system,,K.Hummer@mig.local
+ExtremeCloud IQ Site Engine,technology,operational,Monitoring solution,We’re going to move to Extreme networks so this solution preempts that,K.Hummer@mig.local
+Gibbon SMS,technology,operational,School management system,,K.Hummer@mig.local
+Host 15,technology,operational,A single host instance located in Rack 10 - slot 16,The HR pro host raspberry Pi,K.Hummer@mig.local
+HR Pro (on-prem),technology,operational,HR Pro,Installed on Host 15,K.Hummer@mig.local
+HSBC banking portal,technology,operational,The main HSBC banking portal via WWW,,K.Hummer@mig.local
+IOS 26.5,technology,operational,iPhone Operating System,,K.Hummer@mig.local
+ITsafaircop,technology,operational,Criminal case management tools,,K.Hummer@mig.local
+MacOS Sequoia (15),technology,operational,MacOS operating System,,K.Hummer@mig.local
+ME End-Point Central,technology,degraded,"End point assessment, mitigation and patching tools",Not fleet-wide yet (June 2026),K.Hummer@mig.local
+Microsoft 365 Apps,technology,operational,"MS Productivity suite, Word, Powerpoint, Excel. Onenote",,K.Hummer@mig.local
+Microsoft 365 Archive,technology,operational,MS based archival document storage,,K.Hummer@mig.local
+Microsoft 365 Backup,technology,operational,MS backup specific to the MIG Archive,,K.Hummer@mig.local
+Microsoft Access,technology,degraded,End of life rubbish,,K.Hummer@mig.local
+Microsoft Active Directory Domain Services,technology,operational,MIG’s AAA solution,,A.James@mig.local
+Microsoft Sharepoint,technology,operational,MIG’s central Sharepoint Service,,K.Hummer@mig.local
+MS Exchange 2019,technology,degraded,Enterprise email and calendaring,This is planned for replacement,K.Hummer@mig.local
+MS Outlook,technology,operational,The email client of choice,,K.Hummer@mig.local
+MS Teams client,technology,operational,Our Video Conferencing solution,,K.Hummer@mig.local
+MS Teams desktop application,technology,operational,,,A.James@mig.local
+MS Teams On-line SaaS,technology,operational,SaaS back end for Teams,,K.Hummer@mig.local
+My HMI,technology,operational,Utility company’s choice of human machine interface tooling,,K.Hummer@mig.local
+Node.js,technology,operational,,,K.Hummer@mig.local
+OneWeb,technology,operational,LEO Remote WAN service,,K.Hummer@mig.local
+OpenELIS Global,technology,operational,Laboratory Information System (LIS/LIMS),,K.Hummer@mig.local
+OpenMRS,technology,operational,,,A.James@mig.local
+Open-TOS,technology,unknown,In testing port operating system.,,K.Hummer@mig.local
+OSSEC agent,technology,operational,The OSSEC agent used by Wazuh,,K.Hummer@mig.local
+PaloAlto 850-22,technology,operational,Our hardware firewall solution.,,K.Hummer@mig.local
+Palo Alto ATP,technology,operational,The NIDS suite installed on the firewalls,,K.Hummer@mig.local
+PaloAlto ATP,technology,operational,Advanced Threat Prevention Network Intrusion Detection platform,,K.Hummer@mig.local
+PaloAlto GlobalProtect VPN,technology,operational,VPN and end-point compliance agent,,K.Hummer@mig.local
+Plotnet Secure Radio,technology,operational,RFJunkie Encrypted Radio,Everything associated with this system,K.Hummer@mig.local
+Portable USB Media Storage,technology,operational,USB sticks and HDDs,,K.Hummer@mig.local
+Postgres 18,technology,operational,,,K.Hummer@mig.local
+Raspberry Pi 5,technology,operational,,,K.Hummer@mig.local
+React framework,technology,operational,,,K.Hummer@mig.local
+Sage accounting,technology,operational,Treasury accounting system,,K.Hummer@mig.local
+SCANTER,technology,operational,Terma’s SCANTER radar,,K.Hummer@mig.local
+Seven Seas Control Desk,technology,operational,The Seven Seas control suite for lift and filter systems,,K.Hummer@mig.local
+Shell Aviation FCS,technology,operational,Dr Max Windshear Airport Fuel Control System,Bespoke SCADA solution,K.Hummer@mig.local
+Signal,technology,operational,Signal for messaging and telephony,,K.Hummer@mig.local
+SITA AirportVision Evolved,technology,operational,Dr Max Windshear Airport Flight Information Display system,,K.Hummer@mig.local
+Starlink LEO portable terminal,technology,operational,,,A.James@mig.local
+Thales STAR NG,technology,operational,Airport approach radar,,K.Hummer@mig.local
+Ubuntu Server 24.04 LTS,technology,operational,The LTS version of Ubuntu,Our current linux disto of choice.,K.Hummer@mig.local
+Unsure WAN,technology,operational,Unsure’s WAN and leased lines,Our monopoly telco,K.Hummer@mig.local
+Veeam Backup,technology,operational,Veeam Data Platform / Backup & Replication,,K.Hummer@mig.local
+VXLAN,technology,operational,SD-WAN architecture,,K.Hummer@mig.local
+Wartsila Control,technology,operational,generation manufacturer control suite,,K.Hummer@mig.local
+Wazuh,technology,operational,Log aggregation and platform assessment tool,,K.Hummer@mig.local
+Windows 10,technology,degraded,A version of Microsoft’s operating system,We really shouldn’t be running this!!,K.Hummer@mig.local
+Windows 11,technology,operational,A version of Microsoft’s operating system,,K.Hummer@mig.local
+Windows 7,technology,degraded,A version of Microsoft’s operating system,We really shouldn’t be running this!!,K.Hummer@mig.local
+Windows Server 2016,technology,operational,A version of Microsoft’s operating system,We really shouldn’t be running this!!,K.Hummer@mig.local
+Windows Server 2025,technology,operational,A version of Microsoft’s operating system,,K.Hummer@mig.local
+AWS Swindon Data Centre,facility,operational,AWS eu-west-2a,,K.Hummer@mig.local
+Bank Street server room,facility,operational,Our main server room at Bank Street,,K.Hummer@mig.local
+Dr Max Windshear Airport ATC tower,facility,operational,The air traffic control tower server room,,K.Hummer@mig.local
+Dr Max Windshear Airport Fuel Bunker,facility,operational,The fuel bunker control room,,K.Hummer@mig.local
+MIG Official Premises,facility,operational,All of MIG’s physically secure offices,Does not include publicly accessible or unmonitored locations,K.Hummer@mig.local
+Mobile locations,facility,unknown,Any acceptable mobile or remote location,As defined within the acceptable use policy,K.Hummer@mig.local
+MS O365 UK South,facility,operational,MS 365 data centre in London UK South,,K.Hummer@mig.local
+Shark Point Server Room,facility,operational,,,K.Hummer@mig.local
+Super Bill SaaS cloud,facility,operational,Super Bill SaaS platform,,K.Hummer@mig.local
+The Castle server room,facility,degraded,The old server room in the castle,degraded air conditioning,K.Hummer@mig.local
+"Wellhead Road, Water Treatment Works",facility,operational,,,K.Hummer@mig.local

@@ -1,0 +1,33 @@
+applies_to,control_title
+all,"A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders"
+all,"Cybersecurity roles and responsibilities for suppliers, customers, and partners are established, communicated, and coordinated internally and externally"
+all,"Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes"
+all,Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement
+all,Inventories of services provided by suppliers are maintained
+all,Planning and due diligence are performed to reduce risks before entering into formal supplier or other third-party relationships
+all,"Relevant suppliers and other third parties are included in incident planning, response, and recovery activities"
+all,"Requirements to address cybersecurity risks in supply chains are established, prioritized, and integrated into contracts and other types of agreements with suppliers and other relevant third parties"
+all,Suppliers are known and prioritized by criticality
+all,"Supply chain security practices are integrated into cybersecurity and enterprise risk management programs, and their performance is monitored throughout the technology product and service life cycle"
+all,"The risks posed by a supplier, their products and services, and other third parties are understood, recorded, prioritized, assessed, responded to, and monitored over the course of the relationship"
+contracted_service,"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties"
+contracted_service,Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement
+contracted_service,External service provider activities and services are monitored to find potentially adverse events
+contracted_service,Log records are generated and made available for continuous monitoring
+contracted_service,"Relevant suppliers and other third parties are included in incident planning, response, and recovery activities"
+onshore,"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties"
+onshore,Cybersecurity is included in human resources practices
+onshore,"Identities and credentials for authorized users, services, and hardware are managed by the organization"
+onshore,Identities are proofed and bound to credentials based on the context of interactions
+onshore,Personnel activity and technology usage are monitored to find potentially adverse events
+onshore,Personnel are provided with awareness and training so that they possess the knowledge and skills to perform general tasks with cybersecurity risks in mind
+product,Critical suppliers are assessed prior to acquisition
+product,"Inventories of software, services, and systems managed by the organization are maintained"
+product,"Software is maintained, replaced, and removed commensurate with risk"
+product,"Vulnerabilities in assets are identified, validated, and recorded"
+service_provider,"Backups of data are created, protected, maintained, and tested"
+service_provider,Critical suppliers are assessed prior to acquisition
+service_provider,Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement
+service_provider,"The confidentiality, integrity, and availability of data-at-rest are protected"
+service_provider,"The confidentiality, integrity, and availability of data-in-transit are protected"
+service_provider,The recovery portion of the incident response plan is executed once initiated from the incident response process

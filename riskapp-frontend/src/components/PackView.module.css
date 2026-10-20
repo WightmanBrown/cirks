@@ -1,0 +1,236 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.packView {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.loading, .error {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 24px 0;
+}
+.error { color: var(--red); }
+
+.emptyMsg {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  margin: 0;
+}
+
+/* ── Section ─────────────────────────────────────────────────────────────── */
+
+.packSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sectionHeader {
+  margin-bottom: 10px;
+}
+
+.sectionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chevron {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sectionCount {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.sectionDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+}
+
+.sectionItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Pack item ───────────────────────────────────────────────────────────── */
+
+.packItem {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.packItem.packItemPresenter {
+  border-color: var(--accent, #1976d2);
+  background: rgba(25, 118, 210, 0.04);
+}
+
+.packItemHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.packItemCat {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.presenterBadge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent, #1976d2);
+  border: 1px solid rgba(25,118,210,0.4);
+  background: rgba(25,118,210,0.1);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.timeboxChip {
+  font-size: 10px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+}
+
+.packItemTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btnLink { composes: btnLink from './buttons.module.css'; }
+.packItemSummary {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.packItemNotes {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+/* ── Attachments panel ───────────────────────────────────────────────────── */
+
+.attachPanel {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+.attachToggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.attachToggle:hover { color: var(--text-primary); }
+
+.attachCount {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  padding: 0 5px;
+  border-radius: var(--radius-sm);
+}
+
+.attachList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.attachEmpty {
+  font-size: 11px;
+  color: var(--text-muted, rgba(255,255,255,0.3));
+  margin: 0;
+  font-style: italic;
+}
+
+.attachRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.attachLabel {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachMeta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btnDownload { composes: btnSecondary from './buttons.module.css'; flex-shrink: 0; }
+.btnDeleteAtt { composes: btnGhost from './buttons.module.css'; flex-shrink: 0; }
+.uploadLabel {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  color: var(--accent, #1976d2);
+  cursor: pointer;
+  padding: 4px 0;
+}
+.uploadLabel:hover { opacity: 0.8; }
+
+.fileInput {
+  display: none;
+}
+
+.uploadError {
+  font-size: 11px;
+  color: var(--red);
+  margin: 4px 0 0 0;
+}

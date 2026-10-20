@@ -1,0 +1,34 @@
+# Keep the build context small + reproducible — node_modules and the prior
+# frontend build are rebuilt inside the image; nothing host-local leaks in.
+**/node_modules
+public/
+dist/
+build/
+
+# Secrets / local env — never bake into an image.
+**/.env
+**/.env.*
+!**/.env.example
+
+# VCS + tooling
+.git
+.github
+.githooks
+.claude
+
+# Tests / artifacts that have no place in a runtime image
+riskapp-frontend/test-results
+riskapp-frontend/playwright-report
+riskapp-frontend/.playwright
+**/coverage
+
+# Uploaded content + local backups (provided by volumes at runtime)
+riskapp/uploads/meetings/*/
+backups/
+import/
+
+# Local archives / scratch
+*.tgz
+CLAUDE.md
+filesnode/
+project_documents/

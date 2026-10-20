@@ -1,0 +1,12 @@
+# Force git (and GitHub) to diff JavaScript sources as text.
+#
+# riskapp/db/import.js carried two literal NUL bytes — a cache-key separator
+# written as a raw byte rather than the \0 escape. Git's binary heuristic trips
+# on a NUL anywhere in the blob, so the whole file rendered as "Binary files
+# differ" and every change to it was invisible in review. The bytes are gone,
+# but this keeps any recurrence reviewable rather than silently unreadable.
+#
+# `diff` only affects diff generation — it does not touch storage or line
+# endings (which `text` would).
+*.js  diff
+*.jsx diff

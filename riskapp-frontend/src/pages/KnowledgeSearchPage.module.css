@@ -1,0 +1,227 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright (C) 2026 Wightman Brown Limited
+ */
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 1000px; }
+
+.header { display: flex; flex-direction: column; gap: 6px; }
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+.subtitle { font-size: 13px; color: var(--text-muted); margin: 0; max-width: 70ch; }
+
+/* ── Search bar ─────────────────────────────────────────────────────────── */
+
+.searchBar { display: flex; gap: 10px; align-items: center; }
+.searchInput {
+  composes: input from '../components/form.module.css';
+  flex: 1;
+  font-size: 15px;
+  padding: 12px 14px;
+}
+.searchBtn { composes: btnPrimary from '../components/buttons.module.css'; white-space: nowrap; }
+
+.error { color: var(--red); font-size: 13px; margin: 0; }
+
+.loadingState {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--text-muted); font-size: 13px; padding: 20px 0;
+}
+
+/* ── No match ───────────────────────────────────────────────────────────── */
+
+.noMatch {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  padding: 20px;
+}
+.noMatchIcon { font-size: 28px; color: var(--text-muted); line-height: 1; }
+.noMatchTitle { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
+.noMatchHint { font-size: 12px; color: var(--text-muted); margin: 0; max-width: 60ch; }
+
+/* ── Results ────────────────────────────────────────────────────────────── */
+
+.results { display: flex; flex-direction: column; gap: 24px; }
+.section { display: flex; flex-direction: column; gap: 12px; }
+.sectionTitle {
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-muted); font-weight: 600; margin: 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.count {
+  font-family: var(--font-mono); font-size: 11px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1px 8px; color: var(--text-secondary);
+}
+.empty { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+/* ── Architecture entity results ────────────────────────────────────────── */
+
+.entityList { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius, 8px); overflow: hidden; }
+
+.entityRow {
+  display: grid;
+  grid-template-columns: 140px 1fr 130px auto;
+  grid-template-rows: auto auto;
+  align-items: baseline;
+  gap: 0 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.entityRow:last-child { border-bottom: none; }
+.entityRow:hover { background: var(--bg-hover, var(--bg-elevated)); }
+
+.entityType {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--text-muted);
+  grid-column: 1; grid-row: 1;
+}
+.entityName {
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
+  grid-column: 2; grid-row: 1;
+}
+.entityDept {
+  font-size: 12px; color: var(--text-secondary);
+  grid-column: 3; grid-row: 1; text-align: right;
+}
+.graphBtn {
+  grid-column: 4; grid-row: 1; align-self: center;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 12px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+  line-height: 1; cursor: pointer; white-space: nowrap;
+}
+.graphBtn:hover {
+  background: var(--bg-hover, var(--bg-elevated));
+  color: var(--accent, #4f7cff);
+  border-color: var(--accent, #4f7cff);
+}
+.graphIcon { width: 15px; height: 15px; flex-shrink: 0; }
+.entityDesc {
+  font-size: 12px; color: var(--text-muted);
+  grid-column: 2 / 5; grid-row: 2;
+  margin-top: 2px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Host cards */
+.hostList { display: flex; flex-wrap: wrap; gap: 10px; }
+.hostCard {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 6px); padding: 10px 14px;
+}
+.hostName { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.hostFqdn { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+.hostIps { display: flex; gap: 6px; flex-wrap: wrap; }
+.ipChip {
+  font-family: var(--font-mono); font-size: 11px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 7px; color: var(--text-primary);
+}
+
+/* System table */
+.sysTable { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius, 8px); overflow: hidden; }
+.sysRow {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr 1.6fr auto;
+  align-items: center; gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.sysRow:last-child { border-bottom: none; }
+.sysHead {
+  background: var(--bg-elevated);
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted);
+}
+.sysName { font-size: 14px; font-weight: 600; color: var(--text-primary); display: flex; flex-direction: column; gap: 2px; }
+.viaHosts { font-size: 11px; font-weight: 400; color: var(--text-muted); }
+.sysDept { font-size: 12px; color: var(--text-secondary); }
+.colCia { display: flex; }
+.colRisk { }
+.riskCell { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bandWord { font-size: 11px; text-transform: capitalize; color: var(--text-secondary); }
+.activeCount { font-size: 11px; color: var(--text-muted); }
+.noRisk { font-size: 12px; color: var(--text-muted); }
+.sysActions { display: flex; gap: 6px; }
+.linkBtn {
+  background: none; border: 1px solid var(--border);
+  color: var(--accent, #4f7cff); font-size: 11px; font-family: var(--font-mono);
+  border-radius: 4px; padding: 3px 8px; cursor: pointer; white-space: nowrap;
+}
+.linkBtn:hover { background: var(--bg-hover, var(--bg-elevated)); }
+
+/* ── Chips of interest ───────────────────────────────────────────────────────
+   A triage summary on each search row: one impact figure, one risk figure, and
+   a vulnerability flag. Deliberately 1-dimensional — the C/I/A triple lives on
+   the detail page the row links to. */
+.chipStrip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.chipCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chipCap {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Red, not amber: unlike "shared", this is not a neutral property — the
+   component is named as a reason a live threat succeeds. */
+.vulnChip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--red-dim);
+  border: 1px solid rgba(232, 93, 74, 0.25);
+  color: var(--red);
+  text-transform: uppercase;
+  cursor: help;
+}
+
+/* Only rendered when the component is NOT operational, so it always carries
+   information — a vulnerable component that is also degraded is a worse story
+   than a vulnerable one that is running fine. */
+.statusChip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--amber-faint);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  color: var(--amber);
+  text-transform: uppercase;
+  cursor: help;
+}
