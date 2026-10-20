@@ -3,8 +3,8 @@
 
 # CIRKS trademark policy
 
-**"CIRKS"** and **"Cheltenham Information Risk Knowledge System"** are
-trademarks of **Wightman Brown Limited**.
+**"CIRKS"**, **"Cheltenham Information Risk Knowledge System"** and the **CIRKS
+logo** are trademarks of **Wightman Brown Limited**.
 
 The CIRKS software is open source under the [Apache License 2.0](LICENSE). That
 licence gives you broad rights in the **software**: you may use, copy, modify and

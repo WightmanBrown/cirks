@@ -1,6 +1,11 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 <!-- Copyright (C) 2026 Wightman Brown Limited -->
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/brand/cirks-logo-dark.png">
+  <img src="docs/images/brand/cirks-logo.png" alt="CIRKS — Cheltenham Information Risk Knowledge System" width="420">
+</picture>
+
 # CIRKS — Cheltenham Information Risk Knowledge System
 
 **Information risk your board can trust: every score traced to the evidence
@@ -179,6 +184,6 @@ Copyright © 2026 Wightman Brown Limited. Open source under the
 [Apache License 2.0](LICENSE). See [NOTICE](NOTICE) for copyright, trademark and
 third-party attributions.
 
-"CIRKS" and "Cheltenham Information Risk Knowledge System" are trademarks of
-**Wightman Brown Limited**. The licence grants rights in the software, not in the
+"CIRKS", "Cheltenham Information Risk Knowledge System" and the CIRKS logo are
+trademarks of **Wightman Brown Limited**. The licence grants rights in the software, not in the
 name: see the [trademark policy](TRADEMARKS.md) for how you may use it.

@@ -11,6 +11,12 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.0.1
+
+- The CIRKS logo on the sign-in screen, in the README and as the browser-tab
+  icon, recoloured to match CIRKS's dark theme.
+- The documentation site's home page links to every guide again.
+
 ## v1.0.0
 
 The first public release.

@@ -21,7 +21,7 @@ import/*
 !import/README.md
 dist/
 build/
-public/
+/public/
 CLAUDE.md
 filesnode/
 project_documents/

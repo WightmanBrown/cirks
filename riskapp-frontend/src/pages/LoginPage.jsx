@@ -9,6 +9,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/cirks-logo-dark.png';
 import styles from './LoginPage.module.css';
 
 export function LoginPage() {
@@ -78,8 +79,10 @@ export function LoginPage() {
 
       <div className={styles.card}>
         <div className={styles.header}>
-          <span className={styles.mark}>▲</span>
-          <h1 className={styles.title}>CIRKS</h1>
+          <h1 className={styles.title}>
+            <img src={logo} className={styles.logo}
+              alt="CIRKS — Cheltenham Information Risk Knowledge System" />
+          </h1>
           <p className={styles.subtitle}>Governance Console — Restricted Access</p>
         </div>
 

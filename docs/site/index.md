@@ -38,5 +38,5 @@ opinion.
 
 © 2026 Wightman Brown Limited. CIRKS is open source under the
 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-"CIRKS" and "Cheltenham Information Risk Knowledge System" are trademarks of
-Wightman Brown Limited.
+"CIRKS", "Cheltenham Information Risk Knowledge System" and the CIRKS logo are
+trademarks of Wightman Brown Limited.
