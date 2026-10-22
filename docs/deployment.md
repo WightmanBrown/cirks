@@ -57,7 +57,9 @@ docker compose exec -e ADMIN_PASSWORD='a-strong-password' app \
   node db/create-admin.js --email you@org --name "Your Name"
 ```
 
-Passwords are bcrypt-hashed (cost 12), minimum 12 characters. Then log in at
+Passwords are bcrypt-hashed (cost 12), 12 characters to 72 bytes: bcrypt ignores
+everything after the first 72 bytes, so a longer password is refused rather than
+quietly cut short. Then log in at
 `http://localhost:${APP_PORT}` and use **Setup** to stand up departments, impact
 tables, systems and the rest of the picture (the org starts in *setup phase*).
 
@@ -77,7 +79,7 @@ docker compose exec -e NEW_PASSWORD='a-strong-password' app \
   node db/reset-password.js --email you@org
 ```
 
-Same rules as create: bcrypt cost 12, minimum 12 characters. Behind the TLS
+Same rules as create: bcrypt cost 12, 12 characters to 72 bytes. Behind the TLS
 overlay, add both `-f` flags (`-f docker-compose.yml -f
 deploy/docker-compose.tls.yml`) as with every command for that stack.
 

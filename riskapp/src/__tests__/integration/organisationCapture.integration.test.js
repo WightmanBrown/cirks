@@ -64,6 +64,25 @@ describe('the capture workbook, loaded one sheet at a time', () => {
     expect((await query(`SELECT 1 FROM users WHERE email = 'ocw.nopw@example.org'`)).rowCount).toBe(0);
   });
 
+  // 2026-10-22: the importer checked no length at all. One rule now, as the API.
+  test('a starting password the rule refuses stops the run before anything loads', async () => {
+    const out = load('users.csv', [
+      ['email', 'full_name', 'role', 'department_name', 'is_active', 'view_mode', 'password'],
+      ['ocw.shortstart@example.org', 'OCW Short Start', 'information_asset_owner', '', 'yes', 'business', ''],
+    ], ['--password', 'tooshort']);
+    expect(out).toMatch(/The starting password \(--password\): Password must be at least 12 characters/);
+    expect((await query(`SELECT 1 FROM users WHERE email = 'ocw.shortstart@example.org'`)).rowCount).toBe(0);
+  });
+
+  test("a person's own password the rule refuses is that row's error", async () => {
+    const out = load('users.csv', [
+      ['email', 'full_name', 'role', 'department_name', 'is_active', 'view_mode', 'password'],
+      ['ocw.shortrow@example.org', 'OCW Short Row', 'information_asset_owner', '', 'yes', 'business', 'tooshort'],
+    ]);
+    expect(counts(out, 'users')).toEqual([0, 0, 1]);
+    expect(out).toMatch(/password: Password must be at least 12 characters/);
+  });
+
   test('departments, saved from Excel with a byte-order mark', () => {
     const out = load('departments.csv', [['name', 'description', 'owner_email'], ['OCW Finance', 'Budgets, payments', 'ocw.head@example.org']]);
     expect(counts(out, 'departments')).toEqual([1, 0, 0]);

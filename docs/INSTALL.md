@@ -20,6 +20,10 @@ a training instance is never turned into a real one.
 > Docker 29.7.2, Compose v5.4 — by following this guide from a fresh clone on
 > fresh Docker volumes, once for each path.
 >
+> **Also installed on 2026-10-22** by an outside tester on Ubuntu 26.04 LTS
+> (x86_64) under VMware Workstation Pro, with Docker from apt (`docker.io`).
+> That install is where the snap check in 1.1 comes from.
+>
 > [`deployment.md`](deployment.md) is the operations runbook (upgrades,
 > rollback, air-gapped installs, backup and restore, TLS options, secrets). This
 > file is the straight line from nothing to a working CIRKS.
@@ -37,7 +41,24 @@ plenty) where you can use `sudo`, and internet access while installing.
 . /etc/os-release && echo "$PRETTY_NAME"; uname -m
 docker --version 2>/dev/null || echo "docker: not installed"
 git --version    2>/dev/null || echo "git: not installed"
+snap list docker curl 2>/dev/null                 # should print nothing
 ```
+
+**If that last line lists `docker`, remove the snap before going further.** The
+Ubuntu installer offers Docker on its *featured snaps* screen, and the snap's
+confinement refuses to start the CIRKS application container: it fails at once
+with `exec /usr/local/bin/cirks-entrypoint: operation not permitted` and
+restarts in a loop, while the database and Caddy run normally. CIRKS needs the
+`docker.io` package from apt (1.2). On a new machine, with nothing in Docker
+yet:
+
+```bash
+sudo snap remove --purge docker      # --purge also deletes the snap's containers and volumes
+```
+
+If it lists `curl`, swap that too (`sudo snap remove curl`; 1.2 installs it from
+apt). The snap works, but prints a banner that muddles the health-check output
+in 2.4.
 
 ### 1.2 Install Docker and Git
 
@@ -47,7 +68,7 @@ plugin.
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y docker.io docker-compose-v2 docker-buildx git
+sudo apt-get install -y docker.io docker-compose-v2 docker-buildx git curl
 sudo usermod -aG docker $USER
 ```
 
@@ -86,17 +107,22 @@ To install a particular release rather than the latest code, add
 ### 2.1 Write the configuration file
 
 CIRKS reads its settings from `.env`, which is never committed. Copy the template
-and generate the secrets (`openssl` comes with Ubuntu):
+and generate the secrets (`openssl` comes with Ubuntu). The secrets are made
+**once**: if `.env` already exists, the block leaves it alone, because new
+secrets on a CIRKS that has started would no longer match its database.
 
 ```bash
 cd ~/cirks
-cp .env.docker.example .env
-
-sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=$(openssl rand -hex 24)|"               .env
-sed -i "s|^APP_DB_PASSWORD=.*|APP_DB_PASSWORD=$(openssl rand -hex 24)|"       .env
-sed -i "s|^JWT_ACCESS_SECRET=.*|JWT_ACCESS_SECRET=$(openssl rand -hex 64)|"   .env
-sed -i "s|^JWT_REFRESH_SECRET=.*|JWT_REFRESH_SECRET=$(openssl rand -hex 64)|" .env
-chmod 600 .env
+if [ -e .env ]; then
+  echo ".env already exists: keeping its secrets"
+else
+  cp .env.docker.example .env
+  sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=$(openssl rand -hex 24)|"               .env
+  sed -i "s|^APP_DB_PASSWORD=.*|APP_DB_PASSWORD=$(openssl rand -hex 24)|"       .env
+  sed -i "s|^JWT_ACCESS_SECRET=.*|JWT_ACCESS_SECRET=$(openssl rand -hex 64)|"   .env
+  sed -i "s|^JWT_REFRESH_SECRET=.*|JWT_REFRESH_SECRET=$(openssl rand -hex 64)|" .env
+  chmod 600 .env
+fi
 ```
 
 - `DB_PASSWORD` is the database owner's password.
@@ -111,8 +137,8 @@ chmod 600 .env
 > **These are machine secrets, not your password.** Each `openssl rand` line
 > writes a long random value into `.env`. Nobody types them, and none of them
 > signs you in to CIRKS. You choose your own sign-in password in Part 3, and
-> it is kept in the database, not in `.env`. Keep a copy of `.env` somewhere
-> safe, apart from the machine: a restore is quicker with it. **Do not
+> it is kept in the database, not in `.env`. 2.2 adds more lines to `.env`;
+> you save a copy of the finished file after 2.3. **Do not
 > edit these values once CIRKS has started.** To change them, see
 > [Changing the generated secrets](#changing-the-generated-secrets) in Part 4.
 
@@ -125,8 +151,13 @@ Set the name, how the certificate is made, and that Caddy always runs:
 ```bash
 sed -i "s|^CIRKS_DOMAIN=.*|CIRKS_DOMAIN=cirks.local|" .env
 sed -i "s|^CIRKS_TLS=.*|CIRKS_TLS=tls internal|"      .env
-printf '\n# Always run with the bundled Caddy (docs/INSTALL.md 2.2)\nCOMPOSE_FILE=docker-compose.yml:deploy/docker-compose.tls.yml\n' >> .env
+grep -q '^COMPOSE_FILE=' .env ||
+  printf '\n# Always run with the bundled Caddy (docs/INSTALL.md 2.2)\nCOMPOSE_FILE=docker-compose.yml:deploy/docker-compose.tls.yml\n' >> .env
 ```
+
+Every block in Part 2 is safe to run again: 2.1 keeps an existing `.env` and
+its secrets, and the lines above set a value, or add a line only if it is
+missing.
 
 - **`CIRKS_TLS=tls internal`** — Caddy makes its own certificate. Browsers
   warn until you trust it (2.4). Right for a training VM, or an internal server
@@ -164,6 +195,11 @@ capabilities, standards, role permissions, the impact descriptors and the NIST
 CSF 2.0 catalogue (106 control objectives) — then `App will connect as
 restricted role 'cirks_app'` and `riskapp listening`.
 
+**Now save a copy of `.env`** somewhere safe, apart from the machine: it is
+complete, and a restore is much quicker with it. It holds secrets, so keep it
+where you would keep a password. (If you clone the VM below, save the training
+clone's `.env` again once you have changed its secrets.)
+
 > **On a virtual machine, now is the time to clone it.** CIRKS is installed,
 > configured and running, but holds no organisation yet. One VM can become two:
 > a **training** instance for Part 3A and an **operational** one for Part 3B.
@@ -199,9 +235,15 @@ to itself, and on every computer people will browse from to this machine's
 address (`hostname -I` shows it):
 
 ```bash
-echo "127.0.0.1  cirks.local" | sudo tee -a /etc/hosts      # on the CIRKS machine
-curl -sk https://cirks.local/health                         # expect {"status":"ok",…}
+grep -q '\scirks\.local$' /etc/hosts ||
+  echo "127.0.0.1  cirks.local" | sudo tee -a /etc/hosts      # on the CIRKS machine
+curl -sk https://cirks.local/health                           # expect {"status":"ok",…}
 ```
+
+**Browsing from the CIRKS machine itself.** On a training VM running Ubuntu
+Desktop, you can simply use the browser inside the VM: the line above is all it
+needs, and nothing on your own computer changes. The steps below for other
+computers then do not apply.
 
 On Windows, add `<machine address>  cirks.local` to
 `C:\Windows\System32\drivers\etc\hosts`, editing as Administrator. If a firewall
@@ -220,7 +262,10 @@ docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./cirks-root.
 
 On Windows, double-click the file → *Install Certificate* → *Local Machine* →
 *Trusted Root Certification Authorities*. On macOS, open it in Keychain Access
-and set it to *Always Trust*.
+and set it to *Always Trust*. In Firefox (including the one inside an Ubuntu
+VM, which keeps its own list): *Settings* → *Privacy & Security* → *View
+Certificates* → *Authorities* → *Import*, and tick *Trust this CA to identify
+websites*.
 
 **Now choose: Part 3A for a training instance, Part 3B for your organisation.**
 
@@ -237,7 +282,8 @@ docker compose exec app node riskapp/db/dataset/misty-isles/install.js
 ```
 
 First it asks for **the administrator's password** — typed twice, not shown, at
-least 12 characters. There is no default. Then it reports eight steps as it
+least 12 characters and at most 72 bytes (the rule is in 3B.1). There is no
+default. Then it reports eight steps as it
 goes. It builds the organisation from its story, imports it, then works through
 a year of risk management through CIRKS's own interface as the people who would
 have done it: a first risk assessment, the backlog, security actions,
@@ -278,13 +324,19 @@ docker compose down -v && docker compose up -d
 
 ### 3B.1 Create the first administrator
 
-There is no built-in account. Create yours; it asks for the password twice (at
-least 12 characters):
+There is no built-in account. Create yours; it asks for the password twice:
 
 ```bash
 cd ~/cirks
 docker compose exec app node riskapp/db/create-admin.js --email you@example.org --name "Your Name"
 ```
+
+> **The password rule, wherever CIRKS sets a password** (these tools, the
+> importer, and *Account Management*): **at least 12 characters and at most 72
+> bytes.** bcrypt, which CIRKS uses to store passwords, ignores everything after
+> the first 72 bytes, so CIRKS refuses a longer password rather than quietly use
+> only its start. 72 bytes is 72 plain English characters; accented and other
+> non-English letters take two bytes or more each.
 
 Sign in at `https://cirks.local/` with that email and password.
 
@@ -329,10 +381,12 @@ into the container does not work: its file system is read-only.
 
 ### 3B.4 Check, then load
 
-Check first. Every row is tried and then rolled back, so nothing is written:
+Check first. Every row is tried and then rolled back, so nothing is written.
+Give it the starting password you will load with (below), so the check covers
+that too — it must meet the password rule (3B.1):
 
 ```bash
-docker compose exec app node riskapp/db/import.js /import --dry-run --password 'check-only'
+docker compose exec app node riskapp/db/import.js /import --dry-run --password '<starting password>'
 ```
 
 Each file reports `imported / skipped / errors`, and each error names the row and
@@ -571,6 +625,7 @@ do not contain these secrets.
 
 | What you see | Why, and what to do |
 |---|---|
+| The app container restarts in a loop with `exec /usr/local/bin/cirks-entrypoint: operation not permitted`; the database and Caddy are fine | Docker is the snap, not the apt package (`snap list docker`). The snap's confinement clashes with the app container's hardening. Remove the snap and install `docker.io` from apt (1.1, 1.2), then `docker compose up -d --build` again. |
 | `curl https://cirks.local/health` fails, though the containers are up | The name does not resolve (2.4); or `.env` lacks the `COMPOSE_FILE` line, so Caddy is not running — `docker compose ps` shows no `caddy`. |
 | `tlsv1 alert internal error` | `CIRKS_DOMAIN` is an IP address or a placeholder. Use a host name (2.2), then `docker compose up -d --force-recreate caddy`. |
 | The browser says the certificate is not trusted | Expected with `tls internal`: continue, or trust Caddy's certificate authority (2.4). |

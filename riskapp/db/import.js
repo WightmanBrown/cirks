@@ -35,6 +35,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
+const { passwordProblem, assertPassword } = require('../src/auth/passwordPolicy');
 const { pool } = require('../src/db/pool');
 const { parse } = require('./csv');
 
@@ -156,6 +157,8 @@ const DATASETS = [
       if ((await c.q('SELECT 1 FROM users WHERE lower(email) = lower($1)', [email])).rowCount) return 'skipped';
       const pw = txt(r.password) || c.demoPassword;
       if (!pw) throw new Error('no password: load with --password <starting password> (or give this row a password)');
+      const pwProblem = passwordProblem(pw);
+      if (pwProblem) throw new Error(`password: ${pwProblem}`);
       const hash = await bcrypt.hash(pw, BCRYPT_COST);
       await insertRow(c, 'users', {
         email,
@@ -648,6 +651,9 @@ async function run(opts) {
   if (!fs.existsSync(opts.dir)) throw new Error(`Directory not found: ${opts.dir}`);
 
   const demoPassword = opts.password || process.env.DEMO_PASSWORD || null;
+  // Checked before anything loads, so a short starting password stops the run
+  // instead of failing every person row.
+  if (demoPassword) assertPassword(demoPassword, 'The starting password (--password)');
   const client = await pool.connect();
   const ctx = makeContext(client, opts.actor, demoPassword);
   let totalErrors = 0;

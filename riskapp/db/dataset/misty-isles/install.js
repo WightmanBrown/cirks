@@ -57,8 +57,6 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(0);
 }
 const ADMIN_EMAIL = 'A.James@mig.local';
-const MIN_PASSWORD_LEN = 12;
-const MAX_PASSWORD_LEN = 128;   // the application's own limit (routes/admin)
 const BASE = opt('--base', `http://127.0.0.1:${process.env.PORT || 3000}/api/v1`);
 
 require('dotenv').config({ path: path.join(RISKAPP, '.env') });
@@ -66,6 +64,7 @@ const { pool, query } = require(path.join(RISKAPP, 'src/db/pool'));
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { resolvePassword } = require(path.join(RISKAPP, 'db/promptPassword'));
+const { assertPassword } = require(path.join(RISKAPP, 'src/auth/passwordPolicy'));
 
 function step(n, label, script, scriptArgs, env = {}) {
   console.log(`\n[misty-isles] ── step ${n} of 8: ${label}`);
@@ -112,8 +111,7 @@ async function lockPersonas() {
     process.exit(1);
   }
   const PASSWORD = await resolvePassword(`Password for the administrator, ${ADMIN_EMAIL}: `);
-  if (PASSWORD.length < MIN_PASSWORD_LEN) throw new Error(`Password too short — at least ${MIN_PASSWORD_LEN} characters.`);
-  if (PASSWORD.length > MAX_PASSWORD_LEN) throw new Error(`Password too long — at most ${MAX_PASSWORD_LEN} characters.`);
+  assertPassword(PASSWORD);
   await waitForApi();
 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'misty-isles-'));

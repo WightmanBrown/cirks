@@ -6,11 +6,10 @@ const { Router }   = require('express');
 const bcrypt       = require('bcrypt');
 const authenticate = require('../../middleware/authenticate');
 const { requireCapability } = require('../../auth/permissions');
+const { passwordProblem } = require('../../auth/passwordPolicy');
 const { query }    = require('../../db/pool');
 
 const SALT_ROUNDS = 12;
-// See the note beside the length checks below (H-17 / v112).
-const MAX_PASSWORD_LENGTH = 128;
 
 const router = Router();
 router.use(authenticate);
@@ -390,16 +389,9 @@ router.post('/users', async (req, res, next) => {
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'A valid email is required.' });
     if (!full_name || !full_name.trim()) return res.status(400).json({ error: 'full_name is required.' });
     if (!VALID_ROLES.has(role)) return res.status(400).json({ error: `Invalid role: ${role}` });
-    // Upper bound added with v112 (H-17). The password check now runs in the
-    // database via pgcrypto, whose crypt() implements $2a$ while node-bcrypt
-    // writes $2b$. They are the same algorithm and agree for every password
-    // under 256 bytes; the prefixes differ only over a length-handling bug that
-    // $2b$ fixed. Capping well below that boundary means the two can never
-    // disagree — a password that node could set but the database could not
-    // verify would lock the account out. 128 is far more than anyone types and
-    // far less than 256. (bcrypt itself only consumes the first 72 bytes.)
-    if (!password || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-    if (password.length > MAX_PASSWORD_LENGTH) return res.status(400).json({ error: `Password must be at most ${MAX_PASSWORD_LENGTH} characters.` });
+    // 12 characters to 72 bytes — the one rule, and why, in auth/passwordPolicy.js.
+    const pwProblem = passwordProblem(password);
+    if (pwProblem) return res.status(400).json({ error: pwProblem });
     if (department_id) {
       const { rows: d } = await query('SELECT 1 FROM departments WHERE id = $1', [department_id]);
       if (!d.length) return res.status(400).json({ error: 'Unknown department.' });
@@ -431,16 +423,9 @@ router.post('/users', async (req, res, next) => {
 router.post('/users/:id/reset-password', async (req, res, next) => {
   try {
     const { password } = req.body;
-    // Upper bound added with v112 (H-17). The password check now runs in the
-    // database via pgcrypto, whose crypt() implements $2a$ while node-bcrypt
-    // writes $2b$. They are the same algorithm and agree for every password
-    // under 256 bytes; the prefixes differ only over a length-handling bug that
-    // $2b$ fixed. Capping well below that boundary means the two can never
-    // disagree — a password that node could set but the database could not
-    // verify would lock the account out. 128 is far more than anyone types and
-    // far less than 256. (bcrypt itself only consumes the first 72 bytes.)
-    if (!password || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters.' });
-    if (password.length > MAX_PASSWORD_LENGTH) return res.status(400).json({ error: `Password must be at most ${MAX_PASSWORD_LENGTH} characters.` });
+    // 12 characters to 72 bytes — the one rule, and why, in auth/passwordPolicy.js.
+    const pwProblem = passwordProblem(password);
+    if (pwProblem) return res.status(400).json({ error: pwProblem });
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
     const { rowCount } = await query(
       'UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2',

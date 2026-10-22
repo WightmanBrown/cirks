@@ -10,6 +10,7 @@ import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { useAuth }    from '../context/AuthContext';
 import { HelpDot } from '../components/HelpDot';
+import { passwordProblem } from '../utils/passwordPolicy';
 import styles from './AccountManagementPage.module.css';
 
 // Assignable (human) roles. An explicit ALLOW-list, which is why the machine
@@ -58,7 +59,10 @@ export function AccountManagementPage() {
 
   async function handleCreate(e) {
     e.preventDefault();
-    setCreateErr(null); setCreateBusy(true);
+    setCreateErr(null);
+    const pwProblem = passwordProblem(form.password);
+    if (pwProblem) { setCreateErr(pwProblem); return; }
+    setCreateBusy(true);
     try {
       const payload = { ...form, department_id: form.department_id || null };
       const created = await createUser(payload);
@@ -88,7 +92,8 @@ export function AccountManagementPage() {
 
   async function doResetPassword(u) {
     setErr(u.id, null); setMsg(u.id, null);
-    if (!pwValue || pwValue.length < 8) { setErr(u.id, 'Password must be at least 8 characters.'); return; }
+    const pwProblem = passwordProblem(pwValue);
+    if (pwProblem) { setErr(u.id, pwProblem); return; }
     try {
       await resetUserPassword(u.id, pwValue);
       setPwOpenFor(null); setPwValue('');
@@ -140,7 +145,7 @@ export function AccountManagementPage() {
                   <option value="">— no department —</option>
                   {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
-                <input className={styles.input} type="password" placeholder="temporary password (min 8)" required
+                <input className={styles.input} type="password" placeholder="temporary password (12+ characters)" required
                   autoComplete="new-password"
                   value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
                 <button className={styles.primaryBtn} type="submit" disabled={createBusy}>
@@ -218,7 +223,7 @@ export function AccountManagementPage() {
                                 <input type="text" value={u.email} readOnly autoComplete="username"
                                   aria-hidden="true" tabIndex={-1}
                                   style={{ position: 'absolute', width: 1, height: 1, opacity: 0, pointerEvents: 'none' }} />
-                                <input className={styles.input} type="password" placeholder="new password"
+                                <input className={styles.input} type="password" placeholder="new password (12+ characters)"
                                   autoComplete="new-password"
                                   value={pwValue} onChange={(e) => setPwValue(e.target.value)} autoFocus />
                                 <button className={styles.smallBtn} onClick={() => doResetPassword(u)}>Set</button>

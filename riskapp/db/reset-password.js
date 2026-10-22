@@ -22,9 +22,9 @@ require('dotenv').config();
 const readline = require('readline');
 const bcrypt = require('bcrypt');
 const { pool } = require('../src/db/pool');
+const { assertPassword } = require('../src/auth/passwordPolicy');
 
 const SALT_ROUNDS = 12;
-const MIN_PASSWORD_LEN = 12;
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 function parseArgs(argv) {
@@ -106,9 +106,7 @@ async function main() {
   const user = found.rows[0];
 
   const password = await resolvePassword();
-  if (password.length < MIN_PASSWORD_LEN) {
-    throw new Error(`Password too short — minimum ${MIN_PASSWORD_LEN} characters.`);
-  }
+  assertPassword(password);
 
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
   await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, user.id]);
