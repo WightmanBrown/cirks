@@ -13,7 +13,8 @@
 
 services:
   caddy:
-    image: caddy:2
+    # An exact release, for the same reason as postgres in docker-compose.yml.
+    image: caddy:2.11.7
     restart: unless-stopped
     depends_on:
       - app

@@ -11,6 +11,41 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.0.3
+
+A security release: the runtime, the database and the web server move to
+patched releases, and the images now name exact versions so an upgrade always
+fetches them. No schema change.
+
+**To upgrade:** back up first (`deploy/backup.sh`, see *Back up* in the install
+guide), then `git pull` and `docker compose up -d --build`. CIRKS backs itself
+up only before a schema change, and this release has none. The database
+container restarts on PostgreSQL 17.11; a minor release changes no data
+format. If you have never
+rebuilt since installing, this is the upgrade that matters: until now the image
+tags were floating (`postgres:17`, `caddy:2`, `node:20`), and Docker never
+fetches a tag it already has, so an instance kept the releases it was first
+installed with.
+
+- **Node.js 24.22.1** (was 20). Node.js 20 reached end of life on 2026-04-30,
+  so the Node.js security release of 2026-10-21 — four high-severity issues,
+  among them remote code execution in the Brotli decoder and TLS hostname
+  checks — has no fix for it. CIRKS does not decode Brotli request bodies and
+  makes no outbound connections, so none of the high-severity issues is known
+  to reach it; it moves because version 20 will receive no fixes at all.
+- **PostgreSQL 17.11.** Fixes some 25 issues, many rated 8.8, among them code
+  execution in the server (`to_char`, regular expressions, cursors) and in the
+  `pg_dump` and `psql` clients that the application image carries. The build
+  refuses an older client.
+- **Caddy 2.11.7.** 2.11.6 fixed a request reaching the wrong upstream when
+  `forward_auth` is used, which CIRKS does not use; 2.11.7 fixes 2.11.6's
+  regressions.
+- **`ip-address` 10.7.4** (GHSA-rxp7-6hxx-x8q5, moderate), used by the sign-in
+  rate limiter to read client addresses: a long crafted IPv6 address could
+  stall the server.
+- `make bundle` (the air-gapped install) carries the database image that
+  `docker-compose.yml` names; it saved `postgres:17` by name.
+
 ## v1.0.2
 
 Fixes from the first external tester's install, and a dependency update. No

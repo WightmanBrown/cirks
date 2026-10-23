@@ -13,7 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+          check-latest: true   # the newest 24.x, not an older one cached on the runner
 
       # Gate on SHIPPED dependencies only. Both packages are at zero production
       # vulnerabilities as of 2026-08-17, so this is enforceable today — the point
@@ -50,7 +51,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+          check-latest: true   # the newest 24.x, not an older one cached on the runner
           cache: npm
           cache-dependency-path: riskapp-frontend/package-lock.json
       - run: npm ci
@@ -68,7 +70,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+          check-latest: true   # the newest 24.x, not an older one cached on the runner
           cache: npm
           cache-dependency-path: riskapp/package-lock.json
       - run: npm ci
@@ -116,7 +119,8 @@ jobs:
           fetch-depth: 0          # need main to diff the migration set against
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+          check-latest: true   # the newest 24.x, not an older one cached on the runner
           cache: npm
           cache-dependency-path: riskapp/package-lock.json
       - run: npm ci
@@ -174,7 +178,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
+          check-latest: true   # the newest 24.x, not an older one cached on the runner
           cache: npm
           cache-dependency-path: riskapp/package-lock.json
       - run: npm ci

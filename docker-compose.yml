@@ -9,7 +9,13 @@
 
 services:
   db:
-    image: postgres:17
+    # An exact release, not postgres:17: a tag already on the machine is never
+    # fetched again, so a floating tag stays on whatever release it first got
+    # (CIRKS-test was still on 17.10 after 17.11 shipped). A new tag here is
+    # fetched by the next `docker compose up -d`. A minor release changes no
+    # data format. Move it with each PostgreSQL security release, with
+    # PG_CLIENT_MIN in the Dockerfile.
+    image: postgres:17.11
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-cirks}

@@ -2,6 +2,9 @@
 IMAGE       ?= cirks:latest
 COMPOSE     ?= docker compose
 BUNDLE_DIR  ?= dist-bundle
+# The database image, read from docker-compose.yml so the bundle carries exactly
+# the release compose will ask for (an air-gapped host cannot fetch another).
+DB_IMAGE    := $(shell awk '/image: postgres:/ {print $$2; exit}' docker-compose.yml)
 
 .DEFAULT_GOAL := help
 
@@ -73,8 +76,8 @@ restore: ## Restore FILE=backups/<f>.sql.gz — DESTRUCTIVE: drops + reloads the
 .PHONY: bundle
 bundle: build ## Build an air-gapped offline bundle (docker save + compose + runbook)
 	mkdir -p $(BUNDLE_DIR)
-	docker pull postgres:17
-	docker save $(IMAGE) postgres:17 | gzip > $(BUNDLE_DIR)/cirks-images.tar.gz
+	docker pull $(DB_IMAGE)
+	docker save $(IMAGE) $(DB_IMAGE) | gzip > $(BUNDLE_DIR)/cirks-images.tar.gz
 	cp docker-compose.yml .env.docker.example $(BUNDLE_DIR)/
 	cp docs/deployment.md $(BUNDLE_DIR)/README.md
 	@echo "Bundle ready in $(BUNDLE_DIR)/ — transfer it, then on the host:"

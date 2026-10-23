@@ -8,9 +8,16 @@
 #
 # Build context is the repo ROOT (needs both riskapp/ and riskapp-frontend/).
 #   docker build -t cirks:latest .
+#
+# Node.js is pinned to an exact release, in all three stages, so a rebuild
+# always gets that release: a floating tag such as node:24-bookworm-slim, once
+# cached on a machine, is not fetched again by `docker compose up --build`.
+# Move it on with each Node.js security release (nodejs.org/en/blog/vulnerability).
+# 24 is the LTS line, supported until 2028-04-30; 20 ended on 2026-04-30.
+ARG NODE_IMAGE=node:24.22.1-bookworm-slim
 
 # ── Stage 1: build the React/Vite frontend ──────────────────────────────────────
-FROM node:20-bookworm-slim AS frontend-build
+FROM ${NODE_IMAGE} AS frontend-build
 WORKDIR /build/riskapp-frontend
 # Install deps first (cached unless the lockfile changes).
 COPY riskapp-frontend/package.json riskapp-frontend/package-lock.json ./
@@ -20,18 +27,25 @@ COPY riskapp-frontend/ ./
 RUN npm run build
 
 # ── Stage 2: production backend dependencies ────────────────────────────────────
-FROM node:20-bookworm-slim AS backend-deps
+FROM ${NODE_IMAGE} AS backend-deps
 WORKDIR /app/riskapp
 COPY riskapp/package.json riskapp/package-lock.json ./
 RUN npm ci --omit=dev
 
 # ── Stage 3: runtime ────────────────────────────────────────────────────────────
-FROM node:20-bookworm-slim AS runtime
+FROM ${NODE_IMAGE} AS runtime
 
 # postgresql-client-17 from the PGDG repo. The bundled DB server is PG17, and
 # pg_dump refuses to dump a server newer than itself — so the client major
 # version must match (Debian's own psql is 15). Installed at build time; the
 # resulting image is fully self-contained for air-gapped `docker save` bundles.
+#
+# PG_CLIENT_MIN is the oldest client the build accepts (17.11 fixes code
+# execution in pg_dump and psql: CVE-2026-19385, CVE-2026-18408). Raise it with
+# each PostgreSQL security release, together with the db image in
+# docker-compose.yml: changing it also makes Docker rebuild this layer instead of
+# reusing a cached one holding the old client.
+ARG PG_CLIENT_MIN=17.11
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends curl ca-certificates gnupg; \
@@ -42,6 +56,9 @@ RUN set -eux; \
       > /etc/apt/sources.list.d/pgdg.list; \
     apt-get update; \
     apt-get install -y --no-install-recommends postgresql-client-17; \
+    v="$(psql --version | awk '{print $3}')"; \
+    dpkg --compare-versions "$v" ge "$PG_CLIENT_MIN" \
+      || { echo "postgresql-client-17 is $v, older than PG_CLIENT_MIN $PG_CLIENT_MIN" >&2; exit 1; }; \
     apt-get purge -y --auto-remove curl gnupg; \
     rm -rf /var/lib/apt/lists/*
 

@@ -207,7 +207,7 @@ Transfer `dist-bundle/` to the air-gapped host, then:
 
 ```bash
 cd dist-bundle
-docker load < cirks-images.tar.gz      # loads cirks:latest + postgres:17
+docker load < cirks-images.tar.gz      # loads cirks:latest + the postgres image docker-compose.yml names
 cp .env.docker.example .env            # edit secrets as in §1
 docker compose up -d
 ```
