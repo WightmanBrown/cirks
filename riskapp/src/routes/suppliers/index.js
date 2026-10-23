@@ -262,6 +262,13 @@ router.get('/:id', canRead, async (req, res, next) => {
     // v144: whether each is met by current evidence, until when.
     const objectives = ids.length ? (await query(`
       SELECT ro.relationship_id, ro.sources, ro.met, ro.expired_only, ro.covered_until::text AS covered_until,
+             -- v160: ours = met (or not) by our own control in the SoA, not by evidence.
+             ro.ours, ro.our_status,
+             CASE WHEN ro.ours THEN COALESCE((
+               SELECT array_agg(dp.name ORDER BY lower(dp.name))
+                 FROM delivery_pattern_objectives dpo
+                 JOIN delivery_patterns dp ON dp.id = dpo.pattern_id
+                WHERE dpo.control_id = c.id), '{}') END AS our_solutions,
              ${OBJECTIVE_COLUMNS}
         FROM v_supplier_objective_coverage ro
         JOIN controls c ON c.id = ro.control_id
@@ -553,6 +560,16 @@ async function outsideTheSet(db, relationshipId, controlIds) {
   return rows.length;
 }
 
+// v160: an objective that is ours — delivered organisation-wide — is met by our own
+// control in the SoA, so a supplier's evidence cannot be recorded against it.
+const OURS_ERROR = 'Evidence from a supplier cannot cover an objective that is ours: it is delivered once for the organisation, and met by our own control in the Statement of Applicability.';
+async function oursIn(db, relationshipId, controlIds) {
+  const { rows } = await db.query(
+    `SELECT 1 FROM v_supplier_objective_coverage
+      WHERE relationship_id = $1 AND control_id = ANY($2::uuid[]) AND ours`, [relationshipId, controlIds]);
+  return rows.length;
+}
+
 const evidenceScope = { via: { sql: `SELECT sr.department_id FROM supplier_evidence e
   JOIN supplier_relationships sr ON sr.id = e.relationship_id WHERE e.id = $1` } };
 
@@ -571,6 +588,7 @@ router.post('/relationships/:rid/evidence', canWrite, async (req, res, next) => 
       if (await outsideTheSet(db, req.params.rid, ids)) {
         return { status: 400, error: 'Evidence can only cover objectives this relationship is expected to meet.' };
       }
+      if (await oursIn(db, req.params.rid, ids)) return { status: 400, error: OURS_ERROR };
       const { rows } = await db.query(
         `INSERT INTO supplier_evidence (relationship_id, kind, title, reference, url, issued_on, expires_on, created_by)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
@@ -616,6 +634,9 @@ router.patch('/evidence/:eid', canWrite, async (req, res, next) => {
         const ids = [...new Set(b.control_ids)];
         if (await outsideTheSet(db, cur.rows[0].relationship_id, ids)) {
           const e = new Error('Evidence can only cover objectives this relationship is expected to meet.'); e.status = 400; throw e;
+        }
+        if (await oursIn(db, cur.rows[0].relationship_id, ids)) {
+          const e = new Error(OURS_ERROR); e.status = 400; throw e;
         }
         await db.query(`DELETE FROM supplier_evidence_objectives WHERE evidence_id = $1`, [req.params.eid]);
         await db.query(`INSERT INTO supplier_evidence_objectives (evidence_id, control_id) SELECT $1, unnest($2::uuid[])`, [req.params.eid, ids]);

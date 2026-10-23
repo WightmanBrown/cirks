@@ -41,6 +41,20 @@ jobs:
           echo "── frontend (incl. dev) ────────────────────────────"
           npm audit --prefix riskapp-frontend || true
 
+  install-script:
+    name: install guide and install.sh agree
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # deploy/install.sh carries the guide's marked blocks word for word; the
+      # Install workflow then proves those blocks install CIRKS.
+      - run: node deploy/check-install-script.mjs
+      - run: node --test deploy/
+      - run: shellcheck deploy/install.sh .github/scripts/remove-preinstalled-docker.sh
+
   frontend:
     name: frontend (lint · test · build)
     runs-on: ubuntu-latest

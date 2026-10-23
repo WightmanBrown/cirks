@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   getSupplier, updateSupplier, deleteSupplier,
   createSupplierRelationship, updateSupplierRelationship, deleteSupplierRelationship,
@@ -26,6 +26,10 @@ import styles from './ScopesPage.module.css';
 export function SupplierDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  // ?relationship=<id>: opened for one relationship (a finding links here), so
+  // its assurance starts open and scrolls into view.
+  const [search] = useSearchParams();
+  const focusRel = search.get('relationship');
   const { user, hasCapability, departmentIsolation } = useAuth();
   const canWrite = hasCapability('suppliers.write');
   const viewMode = useViewMode();
@@ -109,7 +113,7 @@ export function SupplierDetailPage() {
                 onSubmit={async (body) => { await updateSupplierRelationship(editRel.id, body); setEditRel(null); await load(); }} />
             ) : (
               <SupplierRelationshipCard key={r.id} relationship={r} isExpert={viewMode.isExpert}
-                canEdit={canEditRel(r)} onChanged={load}
+                canEdit={canEditRel(r)} onChanged={load} focus={r.id === focusRel}
                 onEdit={() => { setAdding(false); setEditRel(r); }}
                 onDelete={() => run(() => deleteSupplierRelationship(r.id))} />
             )

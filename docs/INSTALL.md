@@ -28,6 +28,10 @@ a training instance is never turned into a real one.
 > rollback, air-gapped installs, backup and restore, TLS options, secrets). This
 > file is the straight line from nothing to a working CIRKS.
 
+**To install with nobody at the keyboard** — a training VM from a cloud-init
+file, or a script — see [Unattended install](#unattended-install) after Part 3B.
+It runs this guide's own commands.
+
 **What you need:** an Ubuntu machine or VM (2 CPUs, 4 GB memory and 20 GB disk is
 plenty) where you can use `sudo`, and internet access while installing.
 
@@ -37,11 +41,12 @@ plenty) where you can use `sudo`, and internet access while installing.
 
 ### 1.1 Check the host
 
+<!-- install.sh: 1.1 -->
 ```bash
 . /etc/os-release && echo "$PRETTY_NAME"; uname -m
 docker --version 2>/dev/null || echo "docker: not installed"
 git --version    2>/dev/null || echo "git: not installed"
-snap list docker curl 2>/dev/null                 # should print nothing
+snap list docker curl 2>/dev/null || true         # should print nothing
 ```
 
 **If that last line lists `docker`, remove the snap before going further.** The
@@ -66,10 +71,11 @@ CIRKS runs as three containers: the application, a PostgreSQL 17 database, and a
 Caddy web server in front of them. You need Docker Engine with the **Compose v2**
 plugin.
 
+<!-- install.sh: 1.2-install -->
 ```bash
 sudo apt-get update
 sudo apt-get install -y docker.io docker-compose-v2 docker-buildx git curl
-sudo usermod -aG docker $USER
+sudo usermod -aG docker "$USER"
 ```
 
 > If `docker-compose-v2` is not found (older Ubuntu), install Docker from
@@ -78,6 +84,7 @@ sudo usermod -aG docker $USER
 **Log out and back in** so the group change takes effect, then check — without
 `sudo`:
 
+<!-- install.sh: 1.2-check -->
 ```bash
 docker compose version          # must report v2 or later
 docker buildx version           # the image builder; without it Compose warns "buildx isn't installed"
@@ -111,6 +118,7 @@ and generate the secrets (`openssl` comes with Ubuntu). The secrets are made
 **once**: if `.env` already exists, the block leaves it alone, because new
 secrets on a CIRKS that has started would no longer match its database.
 
+<!-- install.sh: 2.1 -->
 ```bash
 cd ~/cirks
 if [ -e .env ]; then
@@ -148,6 +156,7 @@ People reach CIRKS through Caddy, over HTTPS, at a **host name**. Not a bare IP
 address: browsers cannot select a certificate for one, and the connection fails.
 Set the name, how the certificate is made, and that Caddy always runs:
 
+<!-- install.sh: 2.2 -->
 ```bash
 sed -i "s|^CIRKS_DOMAIN=.*|CIRKS_DOMAIN=cirks.local|" .env
 sed -i "s|^CIRKS_TLS=.*|CIRKS_TLS=tls internal|"      .env
@@ -183,12 +192,18 @@ you never need `-f` options.
 The first start builds the image: a few minutes, and it needs the internet.
 Later starts take seconds.
 
+<!-- install.sh: 2.3 -->
 ```bash
 cd ~/cirks
 docker compose up -d --build
+until [ "$(docker compose ps app --format '{{.Health}}')" = healthy ]; do sleep 5; done
 docker compose ps               # app and db "healthy", caddy "Up"
 docker compose logs app | grep -E "entrypoint|seed|listening"
 ```
+
+The `until` line waits for the application to finish starting: a minute or
+two the first time, while it creates and seeds the database. If it is still
+waiting after five minutes, press Ctrl-C and look at `docker compose logs app`.
 
 On the first start the log shows the database being created and seeded —
 capabilities, standards, role permissions, the impact descriptors and the NIST
@@ -234,6 +249,7 @@ If `cirks.local` is not in your DNS, map it in the hosts file — on this machin
 to itself, and on every computer people will browse from to this machine's
 address (`hostname -I` shows it):
 
+<!-- install.sh: 2.4 -->
 ```bash
 grep -q '\scirks\.local$' /etc/hosts ||
   echo "127.0.0.1  cirks.local" | sudo tee -a /etc/hosts      # on the CIRKS machine
@@ -276,6 +292,7 @@ websites*.
 One command builds the whole organisation, inside the application container, in
 about six minutes:
 
+<!-- install.sh: 3A -->
 ```bash
 cd ~/cirks
 docker compose exec app node riskapp/db/dataset/misty-isles/install.js
@@ -407,6 +424,10 @@ docker compose exec app node riskapp/db/import.js /import --password '<starting 
   **Admin → Account Management → Reset password**, and pass it to them
   yourself.
 - Loading again is safe: anything already there is skipped.
+- The load ends by bringing the security record up to date: every system's
+  control objectives get their status from their security solutions. For a
+  large organisation that can take a minute, and the report says
+  `security record: settled`.
 
 Once it has loaded, **delete the files from `import/`** — the people sheet lists
 everyone who can sign in:
@@ -425,6 +446,51 @@ rm ~/cirks/import/*.csv
 - CIRKS starts in its **setup phase**. When onboarding is finished, a person with
   the *security consultant* role moves it to operational (one way only).
 - **Do not load Misty Isles into this instance**, and never use its password.
+
+---
+
+## Unattended install
+
+`deploy/install.sh` follows Parts 1 and 2 of this guide, then Part 3A or 3B.1,
+with nobody at the keyboard. It runs the guide's own commands: each block marked
+for it in this file is copied into the script word for word, CI fails if the two
+ever differ, and CI installs CIRKS with the script on new Ubuntu machines (x86_64
+and arm64) to prove the commands work.
+
+Run it on a new Ubuntu machine, as an ordinary user who can use `sudo` without a
+password prompt, from the checkout at `~/cirks` (1.3). The administrator's
+password follows the password rule (3B.1):
+
+```bash
+ADMIN_PASSWORD='…' ~/cirks/deploy/install.sh --training     # Misty Isles, as 3A
+
+ADMIN_PASSWORD='…' ADMIN_EMAIL=you@example.org ADMIN_NAME='Your Name' \
+  ~/cirks/deploy/install.sh --empty                         # your organisation: 3B.1, then carry on from 3B.2
+```
+
+It stops, before changing anything, if Docker is installed as a snap (1.1) or
+the password breaks the rule. CIRKS is at `https://cirks.local/`, as in the
+guide.
+
+**A training VM from a cloud-init file.**
+[`deploy/cloud-init/cirks-training.yaml`](https://github.com/WightmanBrown/cirks/blob/main/deploy/cloud-init/cirks-training.yaml)
+builds a Misty Isles training instance on a new Ubuntu cloud-image VM (24.04 or
+later; 2 CPUs, 4 GB memory, 20 GB disk) — in Multipass, LXD, a cloud provider,
+or any hypervisor that takes cloud-init user data. For example:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/WightmanBrown/cirks/main/deploy/cloud-init/cirks-training.yaml
+multipass launch 24.04 --name cirks --cpus 2 --memory 4G --disk 20G \
+  --cloud-init cirks-training.yaml
+```
+
+It clones the latest release and runs `install.sh --training` as the image's
+default user, `ubuntu`; allow about 20 minutes. The administrator's password is
+random, and is written to `/home/ubuntu/cirks-admin-password.txt`, which only
+`ubuntu` can read: no password is kept in the cloud-init file, which stays on
+the VM. Progress is in `/home/ubuntu/cirks-install.log`, and
+`cloud-init status --wait` returns once it has finished. The file says where to
+add your SSH key.
 
 ---
 
@@ -625,6 +691,7 @@ do not contain these secrets.
 
 | What you see | Why, and what to do |
 |---|---|
+| After loading an organisation with `import.js`, every save takes about 15 seconds, the *Findings* page or a meeting agenda says *An unexpected error occurred*, and `docker compose logs app` shows `[settle] canceling statement due to statement timeout` | The load was made before v1.0.4, which left the security record unsettled; the application's first attempt to settle it runs out of time, and so does every attempt after. Settle it once as the database owner: `docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT settle_system_security()"'`. It prints how many changes it made; run it again and it prints 0. |
 | The app container restarts in a loop with `exec /usr/local/bin/cirks-entrypoint: operation not permitted`; the database and Caddy are fine | Docker is the snap, not the apt package (`snap list docker`). The snap's confinement clashes with the app container's hardening. Remove the snap and install `docker.io` from apt (1.1, 1.2), then `docker compose up -d --build` again. |
 | `curl https://cirks.local/health` fails, though the containers are up | The name does not resolve (2.4); or `.env` lacks the `COMPOSE_FILE` line, so Caddy is not running — `docker compose ps` shows no `caddy`. |
 | `tlsv1 alert internal error` | `CIRKS_DOMAIN` is an IP address or a placeholder. Use a host name (2.2), then `docker compose up -d --force-recreate caddy`. |

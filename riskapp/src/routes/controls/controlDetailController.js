@@ -3,6 +3,13 @@
 // Copyright (C) 2026 Wightman Brown Limited
 
 const { query } = require('../../db/pool');
+const { CIRKS_NAME, cirksReasonFor } = require('../../lib/cirksDelivers');
+
+// CIRKS itself can deliver this objective: the reason, and whether it is chosen.
+function cirksSuggestion(standardRefs, patterns) {
+  const why = cirksReasonFor(standardRefs);
+  return why && { ...why, chosen: patterns.some((p) => p.name.toLowerCase() === CIRKS_NAME.toLowerCase()) };
+}
 
 async function getControl(req, res, next) {
   const { id } = req.params;
@@ -229,6 +236,9 @@ async function getControl(req, res, next) {
       deployments,
       delivery_patterns: deliveryPatterns,
       delivery_by_system: deliveryBySystem,
+      // CIRKS itself can deliver this objective (lib/cirksDelivers.js): the reason,
+      // and whether it has been chosen. Only a suggestion until someone chooses it.
+      cirks: cirksSuggestion(control.standard_refs, deliveryPatterns),
     });
   } catch (err) {
     next(err);

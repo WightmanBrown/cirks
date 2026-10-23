@@ -61,6 +61,7 @@ router.patch('/:id/rate', canCreate, rateControl);
 
 // Delivery patterns (v145): the valid ways an objective is delivered.
 router.post('/:id/patterns',                              canCreate, patterns.createPattern);
+router.post('/:id/patterns/cirks',                        canCreate, patterns.useCirks);
 router.patch('/:id/patterns/:patternId',                  canCreate, patterns.updatePattern);
 router.delete('/:id/patterns/:patternId',                 canCreate, patterns.deletePattern);
 router.post('/:id/patterns/:patternId/parts',             canCreate, patterns.addPart);

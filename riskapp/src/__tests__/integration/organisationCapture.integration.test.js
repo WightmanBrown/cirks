@@ -144,4 +144,23 @@ describe('the capture workbook, loaded one sheet at a time', () => {
     const service = (await query(`SELECT confidentiality c, integrity i, availability a FROM business_services WHERE name = 'OCW Paying staff'`)).rows[0];
     expect(service).toEqual({ c: 4, i: 4, a: 1 });
   });
+
+  // 2026-10-23: the importer left the security record unsettled. The first
+  // settle after a large import is the expensive one (20 s for Misty Isles here),
+  // and the application runs it as the restricted role, whose 15 s statement
+  // timeout cancelled it every time: saves stalled, and agenda generation and
+  // the findings page answered 500. The importer now settles, as the owner,
+  // before it commits.
+  test('an import leaves the security record settled: the next settle has nothing to do', async () => {
+    const out = load('departments.csv', [['name', 'description', 'owner_email'], ['OCW Settle check', 'For the settle check', '']]);
+    expect(out).toMatch(/security record: settled, \d+ changes? \(/);
+    const { rows: [{ n }] } = await query('SELECT settle_system_security() AS n');
+    expect(n).toBe(0);
+  });
+
+  test('an import that adds nothing does not settle', () => {
+    const out = load('departments.csv', [['name', 'description', 'owner_email'], ['OCW Settle check', 'Again', '']]);
+    expect(counts(out, 'departments')).toEqual([0, 1, 0]);
+    expect(out).not.toMatch(/security record/);
+  });
 });

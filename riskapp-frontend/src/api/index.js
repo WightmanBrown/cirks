@@ -1325,6 +1325,11 @@ export async function listSecuritySolutions() {
   const { data } = await client.get('/controls/solutions');
   return data.solutions;
 }
+// Choose CIRKS itself as this objective's security solution (lib/cirksDelivers.js).
+export async function chooseCirksForControl(controlId) {
+  const { data } = await client.post(`/controls/${controlId}/patterns/cirks`);
+  return data.patterns;
+}
 export async function createDeliveryPattern(controlId, body) {
   const { data } = await client.post(`/controls/${controlId}/patterns`, body);
   return data.patterns;

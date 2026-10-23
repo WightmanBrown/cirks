@@ -11,6 +11,65 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.0.4
+
+Supplier assurance that asks each supplier only for what a supplier can give,
+CIRKS offered as the security solution for the objectives it delivers, an
+unattended install, and a fix for a fault that could leave a newly loaded
+organisation stuck.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. One migration
+(0160) runs on start, and CIRKS backs up the database before applying it. If
+you loaded an organisation with `db/import.js` on an earlier release and saving
+has been slow since, see the first row of *Troubleshooting* in the install
+guide: one command fixes it.
+
+- **CIRKS as a security solution.** CIRKS itself delivers some control
+  objectives: GV.SC-04 (*suppliers are known and prioritized*) is met by its
+  supplier register, ID.RA-04 and ID.RA-05 by its risk register, and so on, 11
+  NIST CSF objectives in all. The page of each such objective now says so, with
+  what in CIRKS does the work, and offers *Use CIRKS for this objective*.
+  Nothing is chosen for you: the first choice creates the CIRKS security
+  solution, and the Statement of Applicability still says whether the objective
+  is implemented.
+
+- **Supplier assurance: the objectives that are ours.** An objective delivered
+  once for the whole organisation, such as GV.SC-04 (*suppliers are known and
+  prioritized*), is now met on every supplier relationship by our own control
+  when the Statement of Applicability says it is implemented. It is no longer
+  asked of each supplier, and it no longer counts towards a supplier's finding;
+  each relationship lists them apart, with how they stand and the security
+  solution that delivers them.
+- **Recording a supplier's evidence is quicker.** A supplier assurance finding
+  opens the supplier at that relationship, with its assurance open, and each
+  unmet control objective has its own *Record evidence* button.
+
+- **Loading an organisation no longer leaves CIRKS stuck.** `db/import.js` now
+  brings the security record up to date before it finishes. It left that to the
+  application, whose first attempt after a large load could take longer than
+  the application's 15-second database time limit: it was cancelled, nothing was
+  saved, and every later attempt was cancelled the same way. Every save then
+  took about 15 seconds, and the *Findings* page and meeting agendas failed. An
+  instance loaded before this release: see the first row of *Troubleshooting*
+  in the install guide.
+- **Unattended install.** `deploy/install.sh` installs CIRKS with nobody at the
+  keyboard: the guide's Parts 1 and 2, then a Misty Isles training instance
+  (`--training`) or the first administrator of an empty one (`--empty`), with
+  the password passed in. It runs the guide's own commands, copied word for
+  word, and CI fails if the two ever differ.
+- **A training VM from a cloud-init file,**
+  `deploy/cloud-init/cirks-training.yaml`, for Multipass, LXD, a cloud provider
+  or any hypervisor that takes cloud-init. The administrator's password is
+  random and kept in a file only the VM's user can read.
+- **The install guide is tested on every change to it:** CI installs CIRKS
+  with the script on new Ubuntu machines, x86_64 and arm64, for both a training
+  instance and an empty one, checks that Docker installed as a snap is refused,
+  and every week builds training VMs from the cloud-init file on Ubuntu 24.04
+  and 26.04.
+- Install guide: 2.3 waits until the application is healthy before reading its
+  log, and 1.1's snap check no longer exits with an error when there is no snap.
+  Suggested by the first external tester.
+
 ## v1.0.3
 
 A security release: the runtime, the database and the web server move to

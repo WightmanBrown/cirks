@@ -169,9 +169,9 @@ const KINDS = {
   },
   'supplier-assurance': {
     key: 'relationship_id', name: 'supplier_name', path: '/suppliers', readCap: 'suppliers.read',
-    link: (r) => `/suppliers/${r.supplier_id}`,
+    link: (r) => `/suppliers/${r.supplier_id}?relationship=${r.relationship_id}`,
     heading: 'Supplier assurance incomplete',
-    intro: 'Each live supplier relationship is expected to meet the objectives for its supplier type, and an objective is met only by current evidence — an assurance report, or terms in the contract. A report expires on its date; contract terms end with the contract. Record the evidence on the supplier — or accept the gap until a date, for a reason.',
+    intro: 'Each live supplier relationship is expected to meet the objectives for its supplier type, and the supplier\'s objectives are met only by current evidence — an assurance report, or terms in the contract. A report expires on its date; contract terms end with the contract. Objectives delivered once for the organisation are ours, met by our own control in the Statement of Applicability, and are not counted here. Open a supplier to record the evidence for that relationship — or accept the gap until a date, for a reason.',
     empty: 'None outstanding — every live supplier relationship is covered by current evidence.',
     counts: (rows) => `${rows.filter(r => r.reason === 'expired').length} with evidence that has expired; `,
     cols: ['Supplier', 'Department', 'Owner', 'Not covered', 'Covered'],

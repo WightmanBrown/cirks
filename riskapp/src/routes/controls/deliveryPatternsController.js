@@ -17,6 +17,7 @@
 // Report only: what is derived from them never changes a status or a score.
 
 const { query, withActor } = require('../../db/pool');
+const { CIRKS_NAME, CIRKS_COMPONENT_DESCRIPTION, CIRKS_SOLUTION_NOTES, cirksReasonFor } = require('../../lib/cirksDelivers');
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const LOCATIONS = ['on_system', 'service', 'organisation'];
@@ -509,5 +510,71 @@ async function removeSolutionPart(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { getSolution, createSolution, updateSolution, deleteSolution, addSolutionObjective,
+// POST /controls/:id/patterns/cirks — choose CIRKS itself as a security solution
+// for this objective (owner, 2026-10-23; lib/cirksDelivers.js says which objectives
+// it can deliver, and why). The first choice creates the CIRKS component and
+// solution, as the person choosing; every choice is audited with the reason.
+// Choosing it says HOW the objective is delivered; whether it is implemented is
+// still the SoA's to say.
+async function useCirks(req, res, next) {
+  try {
+    const out = await withActor(req.user.id, async (db) => {
+      const c = await db.query(
+        `SELECT c.title,
+                COALESCE((SELECT json_agg(json_build_object('standard', s.code, 'ref', sc.ref_code))
+                            FROM control_mappings cm
+                            JOIN standard_controls sc ON sc.id = cm.standard_control_id
+                            JOIN standards s ON s.id = sc.standard_id
+                           WHERE cm.control_id = c.id), '[]'::json) AS refs
+           FROM controls c WHERE c.id = $1`, [req.params.id]);
+      if (!c.rows.length) return { status: 404, error: 'Control objective not found.' };
+      const why = cirksReasonFor(c.rows[0].refs);
+      if (!why) return { status: 400, error: 'CIRKS does not deliver this control objective. Choose or create the security solution that does.' };
+
+      // The component: CIRKS, once for the organisation. Created operational: the
+      // person choosing it is using it, so it is demonstrably running.
+      let comp = (await db.query(
+        `SELECT id, instantiation FROM control_components
+          WHERE component_type = 'technology' AND lower(btrim(name)) = lower($1)`, [CIRKS_NAME])).rows[0];
+      if (!comp) {
+        comp = (await db.query(
+          `INSERT INTO control_components (component_type, name, description, instantiation, status, last_verified_at, created_by)
+           VALUES ('technology', $1, $2, 'organisational', 'operational', now(), $3) RETURNING id, instantiation`,
+          [CIRKS_NAME, CIRKS_COMPONENT_DESCRIPTION, req.user.id])).rows[0];
+      } else if (comp.instantiation !== 'organisational') {
+        return { status: 409, error: `A technology component called "${CIRKS_NAME}" exists, but is not recorded as existing once for the organisation. Say that on the component first.` };
+      }
+
+      // The solution: CIRKS, with that component as its one part, organisation-wide.
+      let sol = (await db.query(
+        `SELECT id, kind FROM delivery_patterns WHERE lower(btrim(name)) = lower($1)`, [CIRKS_NAME])).rows[0];
+      if (!sol) {
+        sol = (await db.query(
+          `INSERT INTO delivery_patterns (name, kind, notes, created_by) VALUES ($1, 'parts', $2, $3) RETURNING id, kind`,
+          [CIRKS_NAME, CIRKS_SOLUTION_NOTES, req.user.id])).rows[0];
+        await db.query(
+          `INSERT INTO delivery_pattern_parts (pattern_id, component_id, location) VALUES ($1, $2, 'organisation')`,
+          [sol.id, comp.id]);
+        await solutionAudit(db, req.user.id, 'create', sol.id, CIRKS_NAME,
+          `Security solution "${CIRKS_NAME}" created, with CIRKS itself as its part, once for the organisation`);
+      } else if (sol.kind !== 'parts') {
+        return { status: 409, error: `A security solution called "${CIRKS_NAME}" exists and is not made of parts. Rename it first.` };
+      }
+
+      const ins = await db.query(
+        `INSERT INTO delivery_pattern_objectives (pattern_id, control_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`, [sol.id, req.params.id]);
+      if (!ins.rowCount) return { status: 409, error: `"${CIRKS_NAME}" already delivers this objective.` };
+      await audit(db, req.user.id, 'create', req.params.id, c.rows[0].title,
+        `Security solution "${CIRKS_NAME}" chosen for "${c.rows[0].title}" (${why.ref}): ${why.reason}`);
+      return { id: sol.id };
+    });
+    if (out.error) return res.status(out.status).json({ error: out.error });
+    res.status(201).json({ id: out.id, patterns: await patternsFor(req.params.id) });
+  } catch (err) {
+    const r = refusal(err); if (r) return res.status(r[0]).json({ error: r[1] });
+    next(err);
+  }
+}
+
+module.exports = { useCirks, getSolution, createSolution, updateSolution, deleteSolution, addSolutionObjective,
   removeSolutionObjective, addSolutionPart, removeSolutionPart, patternsFor, deliveryFor, listSolutions, recordedOn, createPattern, updatePattern, deletePattern, addPart, removePart };

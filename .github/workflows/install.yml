@@ -1,0 +1,166 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Wightman Brown Limited
+#
+# Installs CIRKS the way docs/INSTALL.md says, on machines that start without
+# Docker, and checks the result signs in. deploy/install.sh runs the guide's own
+# commands (deploy/check-install-script.mjs, in ci.yml, keeps them identical),
+# so this is the guide being followed, not a separate install.
+#
+#   guide      install.sh, training and empty, on a GitHub runner. x86_64 in
+#              CIRKS-dev; x86_64 and arm64 in the public repository, where
+#              arm64 runners are free.
+#   snap       install.sh stops when Docker is the snap (INSTALL.md 1.1).
+#   cloud-init deploy/cloud-init/cirks-training.yaml on real Ubuntu VMs.
+#
+# Pull requests run it only when the install itself changes; everything else
+# (a migration, say) is covered by the weekly run in the public repository and
+# by the push of each release there.
+
+name: Install
+
+on:
+  pull_request:
+    paths:
+      - docs/INSTALL.md
+      - deploy/**
+      - Dockerfile
+      - docker-compose.yml
+      - docker/**
+      - .env.docker.example
+      - .github/workflows/install.yml
+      - .github/scripts/remove-preinstalled-docker.sh
+  push:
+    branches: [main]
+    paths:
+      - docs/INSTALL.md
+      - deploy/**
+      - Dockerfile
+      - docker-compose.yml
+      - docker/**
+      - .env.docker.example
+      - .github/workflows/install.yml
+      - .github/scripts/remove-preinstalled-docker.sh
+  schedule:
+    - cron: '17 5 * * 1'      # Mondays, 05:17 UTC
+  workflow_dispatch:
+
+env:
+  PUBLIC_REPO: WightmanBrown/cirks
+
+jobs:
+  guide:
+    name: install guide, ${{ matrix.path }} (${{ matrix.runner }})
+    # The weekly run is for the public repository; CIRKS-dev's minutes are not free.
+    if: github.event_name != 'schedule' || github.repository == 'WightmanBrown/cirks'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: ${{ fromJSON(github.repository == 'WightmanBrown/cirks' && '["ubuntu-24.04","ubuntu-24.04-arm"]' || '["ubuntu-24.04"]') }}
+        path: [training, empty]
+    env:
+      ADMIN_PASSWORD: ci-install-Password-1
+      ADMIN_EMAIL: admin@example.org
+      ADMIN_NAME: CI Administrator
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make this runner a new Ubuntu machine
+        run: .github/scripts/remove-preinstalled-docker.sh
+      - name: Put the checkout where the guide clones it (~/cirks)
+        run: ln -s "$GITHUB_WORKSPACE" ~/cirks
+      - name: deploy/install.sh --${{ matrix.path }}
+        run: ~/cirks/deploy/install.sh --${{ matrix.path }}
+      - name: Check it answers and the administrator can sign in
+        run: |
+          set -euo pipefail
+          curl -sfk https://cirks.local/health
+          email=$([ "${{ matrix.path }}" = training ] && echo A.James@mig.local || echo "$ADMIN_EMAIL")
+          token=$(jq -n --arg e "$email" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}' \
+            | curl -sfk -H 'Content-Type: application/json' -d @- https://cirks.local/api/v1/auth/login \
+            | jq -r .access_token)
+          [ -n "$token" ] && [ "$token" != null ]
+          departments=$(curl -sfk -H "Authorization: Bearer $token" https://cirks.local/api/v1/departments | jq length)
+          echo "signed in as $email; $departments departments"
+          want=$([ "${{ matrix.path }}" = training ] && echo 12 || echo 0)
+          [ "$departments" = "$want" ] || { echo "expected $want departments"; exit 1; }
+      - name: On failure, the containers' state and logs
+        if: failure()
+        run: |
+          cd ~/cirks
+          sudo docker compose ps -a || true
+          sudo docker compose logs --tail 150 || true
+
+  snap:
+    name: install.sh stops on Docker installed as a snap
+    if: github.event_name != 'schedule' || github.repository == 'WightmanBrown/cirks'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: .github/scripts/remove-preinstalled-docker.sh
+      - name: Install Docker as a snap, as Ubuntu's installer offers it
+        run: sudo snap install docker
+      - name: install.sh must refuse, naming the snap
+        run: |
+          ln -s "$GITHUB_WORKSPACE" ~/cirks
+          if out=$(ADMIN_PASSWORD=ci-install-Password-1 ~/cirks/deploy/install.sh --training 2>&1); then
+            echo "$out"; echo "install.sh carried on with Docker installed as a snap"; exit 1
+          fi
+          echo "$out" | tail -3
+          [[ "$out" == *"Docker is installed as a snap"* ]]
+
+  cloud-init:
+    name: cloud-init training VM, Ubuntu ${{ matrix.ubuntu }}
+    # Real VMs: slow, so weekly and on demand, or when the cloud-init file changes.
+    if: >-
+      (github.event_name == 'schedule' && github.repository == 'WightmanBrown/cirks')
+      || github.event_name == 'workflow_dispatch'
+      || contains(github.event.head_commit.message, '[cloud-init]')
+      || contains(github.event.pull_request.title, '[cloud-init]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ['24.04', '26.04']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up LXD for virtual machines
+        run: |
+          [ -e /dev/kvm ] || { echo "this runner has no KVM, so it cannot run a VM"; exit 1; }
+          sudo snap install lxd
+          sudo lxd init --auto
+          # Docker on the runner sets the forward policy to DROP, which cuts the
+          # VM off from the internet.
+          sudo iptables -P FORWARD ACCEPT
+      - name: Serve this commit to the VM, in place of the release it would clone
+        run: |
+          git archive --format=tar.gz -o /tmp/cirks.tar.gz HEAD
+          host=$(sudo lxc network get lxdbr0 ipv4.address | cut -d/ -f1)
+          (cd /tmp && nohup python3 -m http.server 8765 >/dev/null 2>&1 &)
+          sed "s|git clone https://github.com/WightmanBrown/cirks.git ~/cirks|mkdir ~/cirks \&\& curl -fsS http://$host:8765/cirks.tar.gz \| tar -xz -C ~/cirks|" \
+            deploy/cloud-init/cirks-training.yaml > /tmp/user-data.yaml
+          grep -n 'cirks.tar.gz' /tmp/user-data.yaml
+      - name: Start an Ubuntu ${{ matrix.ubuntu }} VM with the cloud-init file
+        run: |
+          sudo lxc launch "ubuntu:${{ matrix.ubuntu }}" cirks --vm \
+            -c limits.cpu=2 -c limits.memory=4GiB -d root,size=20GiB \
+            -c user.user-data="$(cat /tmp/user-data.yaml)"
+          until sudo lxc exec cirks -- true 2>/dev/null; do sleep 5; done
+      - name: Wait for cloud-init to finish the install
+        run: sudo lxc exec cirks -- cloud-init status --wait --long
+      - name: Check it answers and the administrator can sign in
+        run: |
+          sudo lxc exec cirks -- su - ubuntu -c '
+            set -eu
+            curl -sfk https://cirks.local/health; echo
+            body=$(printf "{\"email\":\"A.James@mig.local\",\"password\":\"%s\"}" "$(cat ~/cirks-admin-password.txt)")
+            curl -sfk -H "Content-Type: application/json" -d "$body" https://cirks.local/api/v1/auth/login | grep -q access_token
+            echo "signed in as A.James@mig.local"'
+      - name: On failure, the install log
+        if: failure()
+        run: |
+          sudo lxc exec cirks -- tail -80 /home/ubuntu/cirks-install.log || true
+          sudo lxc exec cirks -- tail -40 /var/log/cloud-init-output.log || true
+          sudo lxc exec cirks -- su - ubuntu -c 'cd ~/cirks && sudo docker compose ps -a && sudo docker compose logs --tail 300 app' || true

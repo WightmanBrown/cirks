@@ -4,7 +4,7 @@ import { PatternChip } from './PatternChip';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  createDeliveryPattern, deleteDeliveryPattern, addDeliveryPatternPart, removeDeliveryPatternPart,
+  createDeliveryPattern, deleteDeliveryPattern, chooseCirksForControl, addDeliveryPatternPart, removeDeliveryPatternPart,
   listComponents, listSecuritySolutions,
 } from '../api';
 import { COMPONENT_TYPE_LABEL } from '../utils/componentTypes';
@@ -16,7 +16,9 @@ import styles from './DeliveryPatternsSection.module.css';
 // patterns; shared across objectives since v147), and how each system the
 // objective is deployed on is actually delivered. Report only: the status someone
 // set on each system is shown beside what the solutions say, never changed by them.
-export function DeliveryPatternsSection({ controlId, patterns, canEdit, onChanged }) {
+// `cirks`: CIRKS itself can deliver this objective ({ ref, reason, chosen }), from
+// GET /controls/:id. Offered, never assumed: choosing it is a person's act.
+export function DeliveryPatternsSection({ controlId, patterns, canEdit, onChanged, cirks = null }) {
   const [error, setError] = useState('');
   const [adding, setAdding] = useState(null); // null | 'existing' | 'new'
   const [existingId, setExistingId] = useState('');
@@ -61,6 +63,24 @@ export function DeliveryPatternsSection({ controlId, patterns, canEdit, onChange
         eradicates — so its parts are written once and shared. Solutions only <b>report</b> how each system is
         delivered; they do not change the status set on any system, or any risk score.
       </p>
+      {cirks && !cirks.chosen && (
+        <div className={styles.card} role="note" aria-label="CIRKS can deliver this objective">
+          <p className={styles.explain}>
+            <b>CIRKS itself can deliver this objective</b> ({cirks.ref}). {cirks.reason}
+          </p>
+          {canEdit && (
+            <div className={styles.buttons}>
+              <button className={styles.primary} type="button"
+                onClick={() => run(() => chooseCirksForControl(controlId))}>
+                Use CIRKS for this objective
+              </button>
+              <span className={styles.muted}>
+                This records how the objective is delivered. Whether it is implemented is still for the Statement of Applicability to say.
+              </span>
+            </div>
+          )}
+        </div>
+      )}
       {patterns.length === 0 && (
         <p className={styles.muted}>
           No security solutions deliver this objective yet. Until one does, every system this objective is on is

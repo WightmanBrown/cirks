@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createSupplierEvidence, updateSupplierEvidence, deleteSupplierEvidence } from '../api';
 import { SupplierEvidenceForm } from './SupplierEvidenceForm';
@@ -18,6 +18,16 @@ export function evidenceLabel(e) {
   return `${e.title} (${until})`;
 }
 
+// How an objective that is ours stands in the Statement of Applicability (v160).
+const OUR_STATUS = {
+  implemented:     'Yes',
+  partial:         'Not yet: partially implemented',
+  planned:         'Not yet: planned',
+  not_implemented: 'No: not implemented',
+  not_applicable:  'No: not applicable in the SoA',
+  not_stated:      'No: no status stated in the SoA',
+};
+
 // For one control objective: the current evidence covering it, and any expired.
 export function coverageOf(objective, evidence) {
   const covering = evidence.filter(e => e.control_ids.includes(objective.control_id));
@@ -28,14 +38,30 @@ export function coverageOf(objective, evidence) {
 // the evidence — assurance reports and contract terms — recorded to show it. Any
 // number of pieces of evidence can be recorded; a control objective is covered
 // when at least one CURRENT piece covers it. What nothing covers stays open.
-export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
+//
+// v160: an objective delivered once for the organisation is OURS. It is met by
+// our own control, when the SoA says it is implemented, never by the supplier's
+// evidence, and it does not count towards the supplier's finding. It is shown
+// apart, with how it stands and which security solution delivers it.
+//
+// `focus`: the page was opened for this relationship (from a finding), so the
+// details start open and scroll into view.
+export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus = false }) {
+  // false, or the control objectives to start the new evidence with ticked.
   const [adding, setAdding]           = useState(false);
   const [editing, setEditing]         = useState(null);
   const [showCovered, setShowCovered] = useState(false);
   // Folded by default: the summary line says how it stands; open it for detail.
-  const [open_, setOpen]              = useState(false);
+  const [open_, setOpen]              = useState(focus);
   const [error, setError]             = useState('');
-  const objectives = r.objectives || [];
+  const sectionRef = useRef(null);
+  useEffect(() => {
+    if (focus) sectionRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }, [focus]);
+  const all        = r.objectives || [];
+  const ours       = all.filter(o => o.ours);
+  const oursMet    = ours.filter(o => o.met).length;
+  const objectives = all.filter(o => !o.ours);
   const evidence   = r.evidence || [];
   const covered    = objectives.filter(o => o.met);
   const open       = objectives.filter(o => !o.met);
@@ -54,7 +80,10 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
     catch (err) { setError(err?.response?.data?.error || 'That change was not saved.'); }
   };
 
-  if (!objectives.length) {
+  // Start the evidence form with these objectives ticked (the person can change them).
+  const recordFor = (ids) => { setEditing(null); setAdding(ids); setOpen(true); };
+
+  if (!all.length) {
     return (
       <section className={styles.body}>
         <h3 className={styles.h3}>Assurance</h3>
@@ -67,15 +96,16 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
 
   const expanded = open_ || Boolean(adding || editing);
   return (
-    <section className={`${styles.body} ${open.length ? styles.gap : styles.ok}`}>
+    <section ref={sectionRef} className={`${styles.body} ${open.length ? styles.gap : styles.ok}`}>
       <button type="button" className={styles.foldHead} aria-expanded={expanded} onClick={() => setOpen(v => !v)}>
         <span className={styles.chevron} aria-hidden="true">{expanded ? '▾' : '▸'}</span>
         <span className={styles.h3}>Assurance</span>
         <span className={styles.foldSummary}>
-          <b>{covered.length} of {objectives.length}</b> control objectives met
+          <b>{covered.length} of {objectives.length}</b> supplier control objectives met
           {open.length === 0
             ? <span className={styles.yes}> — all met</span>
             : <span className={styles.no}> — {open.length} not met</span>}
+          {ours.length > 0 && <span> · ours: {oursMet} of {ours.length} in place</span>}
           {f && !f.accepted_until && !f.action_id && <span className={styles.no}> · open finding</span>}
           {f?.action_id && <span> · action open</span>}
           {f?.accepted_until && <span> · gap accepted until {fmtDay(f.accepted_until)}</span>}
@@ -85,9 +115,12 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
 
       {expanded && (<>
       <p className={styles.explain}>
-        A control objective is met when current evidence covers it. This relationship must meet {plural(everySupplier, 'control objective')} expected of every supplier
-        {typeOnly > 0 && <>, plus {typeOnly} for its supplier type, {supplierTypeLabel(r.relationship_type)}</>}
-        {deliveredHere > 0 && <>, plus {deliveredHere} it is relied on to deliver on {r.system_name || 'the system'} (its security solutions say the supplier provides {deliveredHere === 1 ? 'it' : 'them'})</>}
+        A control objective is met when current evidence covers it. This supplier must meet {plural(objectives.length, 'control objective')}:{' '}
+        {[
+          everySupplier > 0 && <span key="all">{everySupplier} expected of every supplier</span>,
+          typeOnly > 0 && <span key="type">{typeOnly} for its supplier type, {supplierTypeLabel(r.relationship_type)}</span>,
+          deliveredHere > 0 && <span key="here">{deliveredHere} it is relied on to deliver on {r.system_name || 'the system'} (its security solutions say the supplier provides {deliveredHere === 1 ? 'it' : 'them'})</span>,
+        ].filter(Boolean).flatMap((part, i) => (i ? [', ', part] : [part]))}
         {' '}(<Link to="/suppliers/control-sets">supplier control sets</Link>). Evidence is an assurance report or
         terms in the contract, and one piece of evidence does not have to cover them all: record as many as you
         need. One current piece covering a control objective is enough.
@@ -109,7 +142,7 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
 
       <h4 className={styles.h4}>Control objectives</h4>
       <table className={styles.objTable}>
-        <thead><tr><th>Control objective</th><th>Met?</th><th>Met by</th></tr></thead>
+        <thead><tr><th>Control objective</th><th>Met?</th><th>Met by</th>{canEdit && <th />}</tr></thead>
         <tbody>
           {rows.map(o => {
             const c = coverageOf(o, evidence);
@@ -126,6 +159,14 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
                     : c.expired.length > 0 ? <>Only by expired evidence: {c.expired.map(evidenceLabel).join('; ')}</>
                     : 'No evidence recorded covers this'}
                 </td>
+                {canEdit && (
+                  <td>
+                    {!o.met && (
+                      <button className={styles.linkBtn} onClick={() => recordFor([o.control_id])}
+                        aria-label={`Record evidence for ${o.ref || o.title}`}>Record evidence</button>
+                    )}
+                  </td>
+                )}
               </tr>
             );
           })}
@@ -136,6 +177,31 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
           {showCovered ? `Hide the ${covered.length} control objectives that are met` : `Also show the ${covered.length} control objectives that are met`}
         </button>
       )}
+
+      {ours.length > 0 && (<>
+        <h4 className={styles.h4}>Ours: met by our own control ({oursMet} of {ours.length} in place)</h4>
+        <p className={styles.explain}>
+          These control objectives are delivered once for the whole organisation, so no report or contract from this
+          supplier can meet them. Each is met when the <Link to="/soa">Statement of Applicability</Link> says our own
+          control is implemented. They do not count towards this supplier's finding: where one is not in place, the gap
+          is ours to close in the SoA.
+        </p>
+        <table className={styles.objTable}>
+          <thead><tr><th>Control objective</th><th>In place?</th><th>Delivered by</th></tr></thead>
+          <tbody>
+            {ours.map(o => (
+              <tr key={o.control_id}>
+                <td>
+                  {o.ref && <span className={styles.ref}>{o.ref}</span>}
+                  <Link to={`/controls/${o.control_id}`}>{o.title}</Link>
+                </td>
+                <td>{o.met ? <span className={styles.yes}>Yes</span> : <span className={styles.no}>{OUR_STATUS[o.our_status] || 'No'}</span>}</td>
+                <td>{o.our_solutions?.length ? o.our_solutions.join('; ') : 'No security solution recorded'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>)}
 
       <h4 className={styles.h4}>Evidence recorded ({evidence.length})</h4>
       {error && <div className={styles.error} role="alert">{error}</div>}
@@ -177,16 +243,18 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged }) {
       {editing && (
         <SupplierEvidenceForm key={editing.id} objectives={objectives} evidence={evidence} editingId={editing.id}
           submitLabel="Save changes"
-          initial={{ ...editing, reference: editing.reference || '', url: editing.url || '',
+          initial={{ ...editing, control_ids: editing.control_ids.filter(id => objectives.some(o => o.control_id === id)),
+                     reference: editing.reference || '', url: editing.url || '',
                      issued_on: editing.issued_on || '', expires_on: editing.expires_on || '' }}
           onCancel={() => setEditing(null)}
           onSubmit={async (body) => { await updateSupplierEvidence(editing.id, body); setEditing(null); await onChanged(); }} />
       )}
       {canEdit && !editing && (adding ? (
-        <SupplierEvidenceForm objectives={objectives} evidence={evidence} onCancel={() => setAdding(false)}
+        <SupplierEvidenceForm key={adding.join()} objectives={objectives} evidence={evidence}
+          initial={adding.length ? { control_ids: adding } : null} onCancel={() => setAdding(false)}
           onSubmit={async (body) => { await createSupplierEvidence(r.id, body); setAdding(false); await onChanged(); }} />
       ) : (
-        <button className={styles.secondary} onClick={() => setAdding(true)}>Record an assurance report or contract terms</button>
+        <button className={styles.secondary} onClick={() => setAdding([])}>Record an assurance report or contract terms</button>
       ))}
       </>)}
     </section>

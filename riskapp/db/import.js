@@ -692,6 +692,21 @@ async function run(opts) {
       console.log(`  ${ds.slug}: imported ${imported}, skipped ${skipped}, errors ${errors}${tail}`);
     }
 
+    // Settle the security record once, here (v152). An import leaves every system
+    // unsettled, and the first settle after it is the expensive one: 12 seconds for
+    // Misty Isles on a small machine. Left to the application, it runs as the
+    // restricted role, whose 15-second statement timeout can cancel it; then
+    // nothing is saved, every later write tries again and times out again, and
+    // agenda generation and the findings page fail. This runs as the owner, with
+    // no timeout, inside the import's transaction, so the import and its settled
+    // record land together, and the settle's audit rows carry the same actor.
+    if (totalImported > 0) {
+      await ctx.actor().catch(() => null);   // attribution only; settling does not need it
+      const t0 = Date.now();
+      const { rows: [{ n }] } = await client.query('SELECT settle_system_security() AS n');
+      console.log(`  security record: settled, ${n} change${n === 1 ? '' : 's'} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
+    }
+
     if (opts.dryRun) {
       await client.query('ROLLBACK');
       console.log(`[import] DRY RUN — rolled back. Would import ${totalImported} rows (${totalErrors} errors).`);

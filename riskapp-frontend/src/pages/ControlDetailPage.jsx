@@ -79,6 +79,7 @@ export function ControlDetailPage() {
   const [readout,  setReadout]  = useState(null);
   const [deployments, setDeployments] = useState([]);
   const [deliveryPatterns, setDeliveryPatterns] = useState([]);
+  const [cirks, setCirks] = useState(null);   // CIRKS itself can deliver this objective
   const [deliveryBySystem, setDeliveryBySystem] = useState([]);
   const [users,    setUsers]    = useState([]);
   const [loading,  setLoading]  = useState(true);
@@ -172,6 +173,7 @@ export function ControlDetailPage() {
           setReadout(data.readout || null);
           setDeployments(data.deployments || []);
           setDeliveryPatterns(data.delivery_patterns || []);
+          setCirks(data.cirks || null);
           setDeliveryBySystem(data.delivery_by_system || []);
           setAllThreats(allT);
           setUsers(Array.isArray(allU) ? allU : (allU?.users || []));
@@ -385,7 +387,7 @@ export function ControlDetailPage() {
         <div className={styles.cols}>
           <div className={styles.col}>
             <Section title="Security solutions">
-              <DeliveryPatternsSection controlId={id} patterns={deliveryPatterns}
+              <DeliveryPatternsSection controlId={id} patterns={deliveryPatterns} cirks={cirks}
                 canEdit={canWrite} onChanged={(p) => { setDeliveryPatterns(p); setReloadKey(k => k + 1); }} />
               {/* One list per system: how it is delivered there, and why it is
                   there. Was two panels over the same systems (owner, 2026-10-06). */}

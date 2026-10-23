@@ -11,7 +11,7 @@ import styles from './SupplierRelationshipCard.module.css';
 // touches, contract, who is accountable), then — directly beneath and part of the
 // same card — its assurance: the control objectives it must meet and the
 // evidence that shows it.
-export function SupplierRelationshipCard({ relationship: r, isExpert, canEdit, onEdit, onDelete, onChanged }) {
+export function SupplierRelationshipCard({ relationship: r, isExpert, canEdit, onEdit, onDelete, onChanged, focus = false }) {
   return (
     <article className={styles.card} aria-label={`${supplierTypeLabel(r.relationship_type)} relationship`}>
       <header className={styles.head}>
@@ -58,7 +58,7 @@ export function SupplierRelationshipCard({ relationship: r, isExpert, canEdit, o
           {r.description && <div><dt>What they do for us</dt><dd>{r.description}</dd></div>}
         </dl>
       </header>
-      <SupplierAssurance relationship={r} canEdit={canEdit} onChanged={onChanged} />
+      <SupplierAssurance relationship={r} canEdit={canEdit} onChanged={onChanged} focus={focus} />
     </article>
   );
 }

@@ -1,0 +1,35 @@
+#cloud-config
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Wightman Brown Limited
+#
+# A CIRKS training instance (Misty Isles), built with nobody at the keyboard:
+# give this file as the user data of a NEW Ubuntu cloud-image VM (24.04 or
+# later; 2 CPUs, 4 GB memory, 20 GB disk). See "Unattended install" in
+# docs/INSTALL.md.
+#
+# It clones the latest release into ~/cirks of the image's default user,
+# `ubuntu`, and runs deploy/install.sh --training. Allow about 20 minutes.
+#
+# - The administrator, A.James@mig.local, gets a random password, written to
+#   /home/ubuntu/cirks-admin-password.txt, which only `ubuntu` can read. No
+#   password is kept in this file, which cloud-init stores on the VM.
+# - Progress is in /home/ubuntu/cirks-install.log; `cloud-init status --wait`
+#   returns when it has finished, and reports an error if the install failed.
+# - CIRKS is at https://cirks.local/ inside the VM. To browse from another
+#   computer, map cirks.local to the VM's address there (INSTALL.md 2.4).
+#
+# Add your own SSH key to reach the VM, for example:
+#
+# ssh_authorized_keys:
+#   - ssh-ed25519 AAAA… you@laptop
+
+runcmd:
+  - - su
+    - '-'
+    - ubuntu
+    - -c
+    - |
+      set -e
+      git clone https://github.com/WightmanBrown/cirks.git ~/cirks
+      ( umask 077; openssl rand -base64 18 > ~/cirks-admin-password.txt )
+      ADMIN_PASSWORD="$(cat ~/cirks-admin-password.txt)" ~/cirks/deploy/install.sh --training > ~/cirks-install.log 2>&1
