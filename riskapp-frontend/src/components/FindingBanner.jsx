@@ -16,6 +16,7 @@ import { componentRecordReasonItems } from '../utils/componentRecord';
 import { FindingReason } from './FindingReason';
 import { raiseFindingAction, revokeFindingAcceptance } from '../api';
 import { FindingAcceptForm } from './FindingAcceptForm';
+import { HelpDot } from './HelpDot';
 import styles from './RatingFindingBanner.module.css';
 
 const STATUS_WORD = {
@@ -23,7 +24,8 @@ const STATUS_WORD = {
   deferred: 'deferred',
 };
 
-export function FindingBanner({ kind, subjectId, departmentId, title, detail, action, accepted, onChanged }) {
+// `helpKey` adds an ⓘ after the title; each banner below passes its own key.
+export function FindingBanner({ kind, subjectId, departmentId, title, detail, action, accepted, onChanged, helpKey = null }) {
   const { user, hasCapability, departmentIsolation } = useAuth();
   const [busy, setBusy] = useState(false);
   const [err, setErr]   = useState('');
@@ -51,7 +53,7 @@ export function FindingBanner({ kind, subjectId, departmentId, title, detail, ac
   return (
     <div className={styles.banner} role="status">
       <div className={styles.body}>
-        <div className={styles.title}>{title}</div>
+        <div className={styles.title}>{title}{helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>}</div>
         <div className={styles.detail}>{detail}</div>
         {accepted && (
           <div className={styles.accepted}>
@@ -100,7 +102,7 @@ export function RatingFindingBanner({ asset, onChanged }) {
   if (!f) return null;
   const n = f.missing_count;
   return (
-    <FindingBanner kind="rating-incomplete" subjectId={asset.id} departmentId={asset.department_id}
+    <FindingBanner kind="rating-incomplete" helpKey="finding_banner.rating_incomplete" subjectId={asset.id} departmentId={asset.department_id}
       action={asset.rating_action} accepted={asset.rating_exception} onChanged={onChanged}
       title={<>{f.band === 'never_rated' ? 'Not yet rated' : 'Not fully rated'} — {n} mandatory impact table{n === 1 ? '' : 's'} missing</>}
       detail={<>{f.missing_table_names.join(', ')}. Until {n === 1 ? 'it is' : 'they are'} rated,
@@ -121,7 +123,7 @@ export function DocumentReviewFindingBanner({ component, onChanged }) {
         .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
   return (
-    <FindingBanner kind="document-review" subjectId={component.id} departmentId={null}
+    <FindingBanner kind="document-review" helpKey="finding_banner.document_review" subjectId={component.id} departmentId={null}
       action={component.review_action} accepted={component.review_exception} onChanged={onChanged}
       title={noDate ? <>Published with no review date</> : <>Overdue for review{due && <> — was due {due}</>}</>}
       detail={noDate
@@ -140,7 +142,7 @@ export function ComponentRecordFindingBanner({ system, onChanged }) {
   const items = componentRecordReasonItems(f);
   const reasons = items;
   return (
-    <FindingBanner kind="component-record" subjectId={system.id} departmentId={system.department_id}
+    <FindingBanner kind="component-record" helpKey="finding_banner.component_record" subjectId={system.id} departmentId={system.department_id}
       action={f.action} accepted={f.exception} onChanged={onChanged}
       title={<>Record incomplete — {reasons.length === 1 ? <FindingReason item={items[0]} /> : `${reasons.length} things to record or decide`}</>}
       detail={<>

@@ -33,7 +33,8 @@ const show = (props = {}) => render(
 describe('SupplierAssurance', () => {
   test("counts only the supplier's objectives, and says how many of ours are in place", () => {
     show();
-    const summary = screen.getByRole('button', { expanded: false });
+    // The header row: the title toggle, its help dot, the summary and Show details.
+    const summary = screen.getByRole('button', { expanded: false }).parentElement;
     expect(summary).toHaveTextContent('1 of 2 supplier control objectives met');
     expect(summary).toHaveTextContent('1 not met');
     expect(summary).toHaveTextContent('ours: 1 of 2 in place');

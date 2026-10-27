@@ -9,6 +9,7 @@ import {
 } from '../api/index';
 import styles from './AgendaSection.module.css';
 import { ReadOnlyBadge } from './ReadOnlyBadge';
+import { HelpDot } from './HelpDot';
 
 // ── Category metadata ─────────────────────────────────────────────────────────
 
@@ -18,6 +19,7 @@ const CATEGORY_LABELS = {
   change_briefing:  'Change Briefings',
   cycle_overview:   'Cycle Overview',
   isms_objectives:  'ISMS Objectives & Interested Parties',
+  threat_identification: 'Identified Exposures Awaiting Assessment',
   new_risks:        'New Risks and Incidents Requiring Action',
   action_progress:  'Action Progress',
   sap_health:       'SAP Health',
@@ -36,6 +38,7 @@ const CATEGORY_PHASE = {
   change_briefing:  'Change Briefings',
   cycle_overview:   'Change Briefings',
   isms_objectives:  'Change Briefings',
+  threat_identification: 'Change Briefings',
   new_risks:        'Change Briefings',
   action_progress:  'Change Briefings',
   sap_health:       'Change Briefings',
@@ -51,13 +54,41 @@ const CATEGORY_PHASE = {
 const CATEGORY_ORDER = [
   'opening', 'previous_minutes',
   'change_briefing', 'cycle_overview', 'isms_objectives',
-  'new_risks', 'action_progress', 'sap_health',
+  'threat_identification', 'new_risks', 'action_progress', 'sap_health',
   'assurance',
   'risk_validation', 'action_adoption', 'exceptions', 'verification',
   'aob', 'close',
 ];
 
 const PHASE_ORDER = ['Procedural', 'Change Briefings', 'Assurance Reports', 'Decisions'];
+
+// Help for each fixed phase and category heading (literal keys, so the help
+// drafts test can find them).
+const PHASE_HELP = {
+  'Procedural':        { helpKey: 'agenda.phase.procedural' },
+  'Change Briefings':  { helpKey: 'agenda.phase.change_briefings' },
+  'Assurance Reports': { helpKey: 'agenda.phase.assurance_reports' },
+  'Decisions':         { helpKey: 'agenda.phase.decisions' },
+};
+
+const CATEGORY_HELP = {
+  opening:          { helpKey: 'agenda.category.opening' },
+  previous_minutes: { helpKey: 'agenda.category.previous_minutes' },
+  change_briefing:  { helpKey: 'agenda.category.change_briefing' },
+  cycle_overview:   { helpKey: 'agenda.category.cycle_overview' },
+  isms_objectives:  { helpKey: 'agenda.category.isms_objectives' },
+  threat_identification: { helpKey: 'agenda.category.threat_identification' },
+  new_risks:        { helpKey: 'agenda.category.new_risks' },
+  action_progress:  { helpKey: 'agenda.category.action_progress' },
+  sap_health:       { helpKey: 'agenda.category.sap_health' },
+  assurance:        { helpKey: 'agenda.category.assurance' },
+  risk_validation:  { helpKey: 'agenda.category.risk_validation' },
+  action_adoption:  { helpKey: 'agenda.category.action_adoption' },
+  exceptions:       { helpKey: 'agenda.category.exceptions' },
+  verification:     { helpKey: 'agenda.category.verification' },
+  aob:              { helpKey: 'agenda.category.aob' },
+  close:            { helpKey: 'agenda.category.close' },
+};
 
 const ALL_CATEGORIES = CATEGORY_ORDER;
 
@@ -481,7 +512,7 @@ export function AgendaSection({ meetingId, isSecretary, isClosed, minutesIssued,
   return (
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Agenda</h2>
+        <h2 className={styles.sectionTitle}>Agenda <HelpDot k="agenda.title" placement="bottom" /></h2>
         <div className={styles.headerActions}>
           {hasItems && (targetDurationMin > 0 ? (
             <span
@@ -589,7 +620,10 @@ export function AgendaSection({ meetingId, isSecretary, isClosed, minutesIssued,
 
         return (
           <div key={phase} className={styles.phase}>
-            <div className={styles.phaseHeader}>{phase}</div>
+            <div className={styles.phaseHeader}>
+              {phase}
+              {PHASE_HELP[phase] && <HelpDot k={PHASE_HELP[phase].helpKey} placement="bottom" />}
+            </div>
 
             {cats.map(cat => {
               const catItems = byCategory[cat] ?? [];
@@ -600,6 +634,7 @@ export function AgendaSection({ meetingId, isSecretary, isClosed, minutesIssued,
                   <div className={styles.categoryHeader}>
                     <span className={styles.categoryLabel}>
                       {CATEGORY_LABELS[cat] ?? cat}
+                      {CATEGORY_HELP[cat] && <HelpDot k={CATEGORY_HELP[cat].helpKey} placement="bottom" />}
                     </span>
                     {canEditTimebox ? (
                       <SectionTimeboxInput

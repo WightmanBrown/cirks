@@ -9,6 +9,7 @@ import { BackButton } from '../components/BackButton';
 import { SecuritySolutionSummaryCard } from '../components/SecuritySolutionSummaryCard';
 import { PatternChip } from '../components/PatternChip';
 import styles from './ThreatsPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 // The security solutions library from the solution's side (v147). An objective's
 // page lists the solutions that can deliver it; this page lists each solution
@@ -55,7 +56,7 @@ export function SecuritySolutionsPage() {
         <BackButton fallback="/controls" />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Security solutions</h1>
+            <h1 className={styles.title}>Security solutions <HelpDot k="security_solutions.title" placement="bottom" /></h1>
             {solutions && (
               <span className={styles.subtitle}>
                 {filtered.length} security solution{filtered.length !== 1 ? 's' : ''}
@@ -88,10 +89,10 @@ export function SecuritySolutionsPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Security solution</th>
-                  <th className={styles.th}>Delivers</th>
-                  <th className={styles.th}>Component parts</th>
-                  <th className={styles.th}>In place on</th>
+                  <th className={styles.th}>Security solution <HelpDot k="col.solution" placement="bottom" /></th>
+                  <th className={styles.th}>Delivers <HelpDot k="security_solutions.col.delivers" placement="bottom" /></th>
+                  <th className={styles.th}>Component parts <HelpDot k="security_solutions.col.parts" placement="bottom" /></th>
+                  <th className={styles.th}>In place on <HelpDot k="security_solutions.col.in_place_on" placement="bottom" /></th>
                 </tr>
               </thead>
               <tbody>

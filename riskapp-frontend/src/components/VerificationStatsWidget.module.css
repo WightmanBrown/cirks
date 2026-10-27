@@ -14,7 +14,7 @@
   transition: border-color 0.15s;
 }
 .widget:hover { border-color: var(--border-accent); }
-.widget.alert { border-color: #ce93d8; }
+.widget.alert { border-color: var(--violet); }
 
 .header {
   display: flex;
@@ -36,9 +36,9 @@
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #ce93d8;
-  border: 1px solid rgba(156,39,176,0.4);
-  background: rgba(156,39,176,0.08);
+  color: var(--violet);
+  border: 1px solid color-mix(in srgb, var(--violet) 40%, transparent);
+  background: color-mix(in srgb, var(--violet) 8%, transparent);
   padding: 2px 7px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
@@ -46,7 +46,7 @@
 
 .loadingBar {
   height: 2px;
-  background: var(--amber, #ffa726);
+  background: var(--amber);
   border-radius: 1px;
   opacity: 0.5;
 }
@@ -73,13 +73,13 @@
   margin: 0 -4px;
   transition: background 0.1s;
 }
-.statRowClickable:hover { background: var(--bg-hover, rgba(255,255,255,0.04)); }
+.statRowClickable:hover { background: var(--bg-hover); }
 
 .statRowAlert {
   border-radius: var(--radius-sm);
   padding: 6px 4px;
   margin: 0 -4px;
-  background: rgba(244,67,54,0.06);
+  background: color-mix(in srgb, var(--red) 6%, transparent);
 }
 
 .statLabel {
@@ -94,9 +94,9 @@
   color: var(--text-primary);
 }
 
-.statAlert { color: #ce93d8; }
-.statGreen { color: var(--green, #4caf50); }
-.statRed   { color: var(--red, #e53935); }
+.statAlert { color: var(--violet); }
+.statGreen { color: var(--green); }
+.statRed   { color: var(--red); }
 
 .queueBtn,
 .footerBtn {
@@ -105,15 +105,15 @@
   font-weight: 600;
   padding: 7px 14px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(156,39,176,0.4);
-  background: rgba(156,39,176,0.08);
-  color: #ce93d8;
+  border: 1px solid color-mix(in srgb, var(--violet) 40%, transparent);
+  background: color-mix(in srgb, var(--violet) 8%, transparent);
+  color: var(--violet);
   cursor: pointer;
   transition: background 0.12s;
   align-self: flex-start;
 }
 .queueBtn:hover,
-.footerBtn:hover { background: rgba(156,39,176,0.16); }
+.footerBtn:hover { background: color-mix(in srgb, var(--violet) 16%, transparent); }
 
 .footer {
   display: flex;

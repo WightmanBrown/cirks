@@ -9,7 +9,7 @@
   padding: 4px 9px;
   border-radius: 4px;
   border: 1.5px solid transparent;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
@@ -63,10 +63,10 @@
 }
 
 .actionBtn {
-  background: rgba(0, 0, 0, 0.12);
+  background: color-mix(in srgb, var(--shade) 12%, transparent);
   border: 1px solid;
   font-size: 9px;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -79,14 +79,14 @@
 }
 
 .actionBtn:hover {
-  background: rgba(0, 0, 0, 0.22);
+  background: color-mix(in srgb, var(--shade) 22%, transparent);
 }
 
 .typeBadge {
   display: inline-block;
   padding: 2px 9px;
   border-radius: 3px;
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;

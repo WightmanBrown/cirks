@@ -6,6 +6,7 @@ import { getPublishedMinutes } from '../api/index';
 import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import styles from './PublishedMinutesPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 function formatYmd(ymd) {
   if (!ymd) return '—';
@@ -35,7 +36,7 @@ export function PublishedMinutesPage() {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <BackButton />
-          <h1 className={styles.title}>SWG Minutes</h1>
+          <h1 className={styles.title}>SWG Minutes <HelpDot k="published_minutes.title" placement="bottom" /></h1>
         </div>
 
         {loading && <p className={styles.muted}>Loading…</p>}

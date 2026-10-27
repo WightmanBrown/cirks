@@ -13,8 +13,8 @@
   white-space: nowrap;
 }
 
-.active        { background: rgba(76,175,125,0.12);  border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
-.underReview   { background: rgba(245,166,35,0.12);  border: 1px solid rgba(245,166,35,0.3);  color: var(--amber); }
-.notApplicable { background: rgba(120,120,120,0.10); border: 1px solid rgba(120,120,120,0.22); color: var(--text-muted); }
-.ineffective   { background: rgba(224,82,82,0.12);   border: 1px solid rgba(224,82,82,0.3);   color: var(--red); }
-.planned       { background: rgba(100,100,180,0.12); border: 1px solid rgba(100,100,180,0.25); color: #9fa8da; }
+.active        { background: color-mix(in srgb, var(--green) 12%, transparent);  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); color: var(--green-light); }
+.underReview   { background: color-mix(in srgb, var(--amber) 12%, transparent);  border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);  color: var(--amber-light); }
+.notApplicable { background: color-mix(in srgb, var(--ink) 5%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent); color: var(--text-secondary); }
+.ineffective   { background: color-mix(in srgb, var(--red) 12%, transparent);   border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);   color: var(--red-light); }
+.planned       { background: color-mix(in srgb, var(--violet) 12%, transparent); border: 1px solid color-mix(in srgb, var(--violet) 25%, transparent); color: var(--violet); }

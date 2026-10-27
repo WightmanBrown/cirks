@@ -74,7 +74,7 @@
 
 .filterActive {
   border-color: var(--amber-dim);
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -201,9 +201,9 @@
   padding: 2px 6px;
 }
 
-.ciaGreen  { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
-.ciaAmber  { background: var(--amber-faint); color: var(--amber);  border: 1px solid var(--amber-dim); }
-.ciaRed    { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
+.ciaGreen  { background: var(--green-dim);   color: var(--green-light);  border: 1px solid var(--green); }
+.ciaAmber  { background: var(--amber-faint); color: var(--amber-light);  border: 1px solid var(--amber-dim); }
+.ciaRed    { background: var(--red-dim);     color: var(--red-light);    border: 1px solid var(--red); }
 .ciaUnset  { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
 
 /* ── CIA level picker (modal) ───────────────────────────────────────────── */
@@ -283,21 +283,21 @@
   background: var(--green-dim) !important;
   border-color: var(--green) !important;
   color: var(--green) !important;
-  box-shadow: 0 0 0 2px rgba(76, 175, 125, 0.15);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 15%, transparent);
 }
 
 .activeAmber {
   background: var(--amber-faint) !important;
   border-color: var(--amber-dim) !important;
   color: var(--amber) !important;
-  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.12);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 12%, transparent);
 }
 
 .activeRed {
   background: var(--red-dim) !important;
   border-color: var(--red) !important;
-  color: var(--red) !important;
-  box-shadow: 0 0 0 2px rgba(232, 93, 74, 0.15);
+  color: var(--red-light) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 15%, transparent);
 }
 
 /* ── Modal ──────────────────────────────────────────────────────────────── */
@@ -369,7 +369,7 @@
   background: var(--green-dim);
   border: 1px solid var(--green);
   border-radius: var(--radius-sm);
-  color: var(--green);
+  color: var(--green-light);
   display: flex;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -414,7 +414,7 @@
   background: var(--amber-faint);
   border: 1px solid var(--amber-dim);
   border-radius: var(--radius-sm);
-  color: var(--amber);
+  color: var(--amber-light);
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.05em;
@@ -428,10 +428,10 @@
 
 /* Risk level pill */
 .riskPill     { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: var(--radius-sm); white-space: nowrap; }
-.riskCritical { background: rgba(180,30,30,0.15);  border: 1px solid rgba(180,30,30,0.3);  color: #e05252; }
-.riskHigh     { background: var(--red-dim);         border: 1px solid rgba(232,93,74,0.25); color: var(--red); }
-.riskMedium   { background: var(--amber-faint);     border: 1px solid rgba(245,166,35,0.25); color: var(--amber); }
-.riskLow      { background: var(--green-dim);       border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.riskCritical { background: color-mix(in srgb, var(--red) 15%, transparent);  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);  color: var(--red-light); }
+.riskHigh     { background: var(--red-dim);         border: 1px solid color-mix(in srgb, var(--red) 25%, transparent); color: var(--red-light); }
+.riskMedium   { background: var(--amber-faint);     border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent); color: var(--amber-light); }
+.riskLow      { background: var(--green-dim);       border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); color: var(--green-light); }
 .riskNone     { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
 
 /* An asset missing a mandatory impact table. Its CIA is a MAX over whatever was

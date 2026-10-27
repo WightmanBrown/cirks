@@ -110,7 +110,7 @@ export function ControlSetsSetupPage() {
         ) : (
           <>
             <section className={styles.block}>
-              <h2 className={styles.blockTitle}>1 · Control objectives</h2>
+              <h2 className={styles.blockTitle}>1 · Control objectives <HelpDot k="setup.step_objectives" placement="bottom" /></h2>
               <p className={styles.blockDesc}>
                 Import control objectives into the library (columns: <code>title, control_type, description, is_baseline</code>,
                 and optionally <code>reference_code</code> — your own reference, e.g. ORG-AC-01, for objectives mapped to no standard).
@@ -124,7 +124,7 @@ export function ControlSetsSetupPage() {
             </section>
 
             <section className={styles.block}>
-              <h2 className={styles.blockTitle}>2 · Standards and their requirements</h2>
+              <h2 className={styles.blockTitle}>2 · Standards and their requirements <HelpDot k="setup.step_standards" placement="bottom" /></h2>
               <div className={styles.cards}>
                 {standards.map((s) => (
                   <StandardCard
@@ -140,7 +140,7 @@ export function ControlSetsSetupPage() {
             </section>
 
             <section className={styles.block}>
-              <h2 className={styles.blockTitle}>3 · Map control objectives to standard requirements</h2>
+              <h2 className={styles.blockTitle}>3 · Map control objectives to standard requirements <HelpDot k="setup.step_mappings" placement="bottom" /></h2>
               <p className={styles.blockDesc}>
                 Import which control objectives meet which standard requirements, fully or partly
                 (columns: <code>control_title, standard, standard_ref, coverage</code>).
@@ -162,7 +162,7 @@ function StandardCard({ s, busy, onToggle, onFile, onOpenSoa }) {
   return (
     <div className={`${styles.card} ${s.is_enabled ? '' : styles.cardOff}`}>
       <div className={styles.cardHead}>
-        <span className={styles.cardName}>{s.name}{s.version ? ` ${s.version}` : ''}</span>
+        <span className={styles.cardName}>{s.name}{s.version ? ` ${s.version}` : ''} <HelpDot k="setup.standard_card" placement="bottom" /></span>
         <label className={styles.enableToggle} title="Show this standard as a view on the Statement of Applicability">
           <input type="checkbox" checked={s.is_enabled} onChange={onToggle} />
           {s.is_enabled ? 'Enabled' : 'Disabled'}

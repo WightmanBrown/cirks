@@ -11,7 +11,7 @@ export function PoliciesDocumentsPage() {
   return (
     <ComponentLibraryPage
       componentType="information" title="Policies & documents" singular="policy or document"
-      supportsControls
+      supportsControls helpKey="policies.title"
       intro="The policies, standards and procedures your control objectives rely on — the documented information the ISMS runs on. Guidelines are advisory and do not deliver a control. These are not the information assets a system holds; those are under Business Architecture." />
   );
 }

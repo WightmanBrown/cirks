@@ -9,6 +9,7 @@
 //
 // The state is derived from it: a Published document past its review date reads
 // as Under review everywhere, on the day it falls due, without anyone changing it.
+import { HelpDot } from './HelpDot';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { updateComponent, getUsers } from '../api';
@@ -85,7 +86,7 @@ export function DocumentLifecycle({ component, onSaved }) {
   return (
     <section className={styles.section}>
       <div className={styles.head}>
-        <h2 className={styles.title}>Document</h2>
+        <h2 className={styles.title}>Document <HelpDot k="document_lifecycle.title" placement="bottom" /></h2>
         {canEdit && !editing && <button className={styles.btnEdit} onClick={open}>Edit</button>}
       </div>
 

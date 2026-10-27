@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createControl } from '../api';
 import styles from './AddControlModal.module.css';
 import { Modal } from './Modal';
+import { HelpDot } from './HelpDot';
 
 // A control is CIRKS-native and belongs to no single standard (v87). This form
 // used to offer a framework, reference and function; the server has ignored all
@@ -72,7 +73,7 @@ export function AddControlModal({ onClose, onSuccess }) {
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <span className={styles.modalLabel}>ADD CONTROL OBJECTIVE</span>
-            <h2 className={styles.modalTitle}>New catalogue entry</h2>
+            <h2 className={styles.modalTitle}>New catalogue entry <HelpDot k="add_control.title" placement="bottom" /></h2>
           </div>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Close" disabled={busy}>✕</button>
         </div>

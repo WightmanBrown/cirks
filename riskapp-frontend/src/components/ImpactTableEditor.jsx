@@ -8,6 +8,7 @@ import {
   getBilReference,
 } from '../api';
 import styles from './ImpactTableEditor.module.css';
+import { HelpDot } from './HelpDot';
 
 const DIM_LABELS = { c: 'Confidentiality', i: 'Integrity', a: 'Availability' };
 
@@ -130,7 +131,7 @@ export function ImpactTableEditor({ impactTable, onSaved, isExpert = false }) {
 
       {/* 1dBIL section */}
       <div className={styles.sectionHeader}>
-        <span className={styles.sectionTitle}>1dBIL — Business impact level descriptions</span>
+        <span className={styles.sectionTitle}>1dBIL — Business impact level descriptions <HelpDot k="impact_tables.bil" placement="bottom" /></span>
         <span className={styles.sectionFill}>{bilFilled}/5 defined</span>
         <button
           type="button"
@@ -180,7 +181,7 @@ export function ImpactTableEditor({ impactTable, onSaved, isExpert = false }) {
       {isExpert && (
         <>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionTitle}>3dBIL — CIA implications per level</span>
+            <span className={styles.sectionTitle}>3dBIL — CIA implications per level <HelpDot k="impact_tables.cia" placement="bottom" /></span>
             <span className={styles.sectionHint}>
               Describe the CIA implication at each BIL level. Leave blank if a dimension is not affected.
             </span>

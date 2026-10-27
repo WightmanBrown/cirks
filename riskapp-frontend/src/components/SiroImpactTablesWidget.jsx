@@ -5,6 +5,7 @@ import { Link }                from 'react-router-dom';
 import { getSiroPublishedImpactTables } from '../api';
 import styles from './SiroWidget.module.css';
 import tableStyles from './SiroImpactTablesWidget.module.css';
+import { HelpDot } from './HelpDot';
 
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -38,7 +39,7 @@ export function SiroImpactTablesWidget() {
   return (
     <div className={`${styles.widget} ${hasTables ? styles.pending : ''}`}>
       <div className={styles.header}>
-        <span className={styles.title}>Impact Tables</span>
+        <span className={styles.title}>Impact Tables<HelpDot k="widget.siro_impact_tables" placement="bottom" /></span>
         <span className={styles.badge}>SIRO</span>
       </div>
 

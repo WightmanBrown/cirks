@@ -5,7 +5,7 @@
 .wrapper {
   position: relative;
   background: var(--bg-surface);
-  border: 1px solid var(--border, #1e293b);
+  border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
   height: 460px;
@@ -19,18 +19,18 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: color-mix(in srgb, var(--shade) 45%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
 }
 .errorMsg {
-  color: var(--red, #ef4444);
+  color: var(--red);
 }
 
 .emptyMsg {
-  color: var(--text-muted, #64748b);
+  color: var(--text-muted);
 }
 
 .fitBtn {
@@ -38,9 +38,9 @@
   top: 10px;
   right: 10px;
   z-index: 20;
-  background: var(--bg-surface, #1e293b);
-  border: 1px solid var(--border, #334155);
-  color: var(--text-secondary, #94a3b8);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
   border-radius: 4px;
   width: 28px;
   height: 28px;
@@ -54,8 +54,8 @@
 }
 
 .fitBtn:hover {
-  background: var(--bg-hover, #334155);
-  color: var(--text-primary, #f1f5f9);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .legend {
@@ -66,8 +66,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px 14px;
-  background: rgba(12, 17, 23, 0.85);
-  border: 1px solid var(--border, #1e293b);
+  background: color-mix(in srgb, var(--shade) 85%, transparent);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 8px 10px;
   max-width: 360px;
@@ -87,9 +87,9 @@
 }
 
 .legendLabel {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }

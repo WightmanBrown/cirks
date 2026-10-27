@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { levelClass, scoreLevel } from '../utils/riskColors';
 import styles from './EntitySummaryCard.module.css';
 
@@ -25,12 +26,13 @@ function Node({ name, kind }) {
   );
 }
 
-export function RiskPath({ paths, label = 'Highest risk path', emptyMessage = 'No active risks contributing.' }) {
+export function RiskPath({ paths, label = 'Highest risk path', emptyMessage = 'No active risks contributing.', helpKey = null }) {
+  const dot = helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>;
   if (paths == null) {
     return (
       <div className={styles.riskPathSection}>
         <div className={styles.riskPathHeader}>
-          <span className={styles.riskPathLabel}>{label}</span>
+          <span className={styles.riskPathLabel}>{label}{dot}</span>
         </div>
         <span className={styles.riskPathEmpty}>Open details to see risk path.</span>
       </div>
@@ -40,7 +42,7 @@ export function RiskPath({ paths, label = 'Highest risk path', emptyMessage = 'N
     return (
       <div className={styles.riskPathSection}>
         <div className={styles.riskPathHeader}>
-          <span className={styles.riskPathLabel}>{label}</span>
+          <span className={styles.riskPathLabel}>{label}{dot}</span>
         </div>
         <span className={styles.riskPathEmpty}>{emptyMessage}</span>
       </div>
@@ -54,7 +56,7 @@ export function RiskPath({ paths, label = 'Highest risk path', emptyMessage = 'N
   return (
     <div className={styles.riskPathSection}>
       <div className={styles.riskPathHeader}>
-        <span className={styles.riskPathLabel}>{label}</span>
+        <span className={styles.riskPathLabel}>{label}{dot}</span>
         {more > 0 && (
           <span className={styles.riskPathMore}>+{more} more risk{more === 1 ? '' : 's'}</span>
         )}

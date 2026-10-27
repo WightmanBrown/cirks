@@ -50,6 +50,7 @@ export function AcceptanceQueuePage() {
   return (
     <ReviewQueue
       title="Acceptance Queue"
+      helpKey="acceptance_queue.title"
       countLabel={(n) => `${n} proposed action${n !== 1 ? 's' : ''} awaiting SWG acceptance`}
       emptyBody="No proposed actions are awaiting acceptance."
       intro="Review proposed remediation below and formally accept what the SWG has approved. Accepting freezes the action's items, owners and targets and, for an action on a risk, records the risk's current scores as the baseline to measure progress against — this cannot be undone. Actions raised from an assurance finding are grouped under what they are about."

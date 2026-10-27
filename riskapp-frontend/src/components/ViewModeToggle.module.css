@@ -33,7 +33,7 @@
 
 .active {
   background: var(--amber-faint);
-  color: var(--amber);
+  color: var(--amber-light);
   font-weight: 600;
 }
 

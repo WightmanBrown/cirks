@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { previewSystemBuild, applySystemBuild } from '../api';
 import { PatternChip } from './PatternChip';
+import { HelpDot } from './HelpDot';
 import { componentTypeShort } from '../utils/componentTypes';
 import styles from './SystemPatternAdoption.module.css';
 
@@ -175,6 +176,7 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
                 {builds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             )}
+          <HelpDot k="pattern_adoption.title" placement="bottom" />
         </div>
         <div className={styles.seg} role="group" aria-label="View of the pattern">
           <button type="button" aria-pressed={view === 'picture'} onClick={() => setView('picture')}>Picture</button>
@@ -205,7 +207,11 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
       )}
       {preview && view === 'list' && (
         <table className={styles.table}>
-          <thead><tr><th>Component</th><th>Type</th><th>On this system</th></tr></thead>
+          <thead><tr>
+            <th>Component <HelpDot k="col.component" placement="bottom" /></th>
+            <th>Type <HelpDot k="pattern_adoption.col.type" placement="bottom" /></th>
+            <th>On this system <HelpDot k="pattern_adoption.col.on_system" placement="bottom" /></th>
+          </tr></thead>
           <tbody>
             {rows.map(c => (
               <tr key={c.id}>

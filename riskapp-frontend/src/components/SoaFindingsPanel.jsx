@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { getSoaFindings } from '../api';
 import { groupFindings } from '../utils/soaFindings';
 import styles from './SoaFindingsPanel.module.css';
+import { HelpDot } from './HelpDot';
 
 // Where the Statement of Applicability contradicts what is deployed or linked
 // (v130). Derived: a finding goes away when the fact is fixed, so there is no
@@ -44,6 +45,9 @@ export default function SoaFindingsPanel({ controlId, refreshKey, findingsData, 
     <section className={styles.panel} aria-label="SoA findings">
       <h2 className={styles.heading}>
         {controlId ? 'This objective contradicts itself' : 'Findings — where the SoA and the register disagree'}
+        {controlId
+          ? <HelpDot k="soa_findings.objective" placement="bottom" />
+          : <HelpDot k="soa_findings.register" placement="bottom" />}
       </h2>
       {groups.map(g => (
         <div key={g.type} className={styles.group}>

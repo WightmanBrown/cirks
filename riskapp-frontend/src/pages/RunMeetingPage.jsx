@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { getMeeting, getAgenda, recordDecision } from '../api/index';
 import styles from './RunMeetingPage.module.css';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
+import { HelpDot } from '../components/HelpDot';
 
 const CATEGORY_LABELS = {
   opening:          'Opening',
@@ -13,6 +14,7 @@ const CATEGORY_LABELS = {
   change_briefing:  'Change Briefings',
   cycle_overview:   'Cycle Overview',
   isms_objectives:  'ISMS Objectives & Interested Parties',
+  threat_identification: 'Identified Exposures Awaiting Assessment',
   new_risks:        'New Risks and Incidents Requiring Action',
   action_progress:  'Action Progress',
   sap_health:       'SAP Health',
@@ -386,7 +388,7 @@ export function RunMeetingPage() {
         <div className={styles.headerLeft}>
           <button className={styles.btnExit} onClick={() => navigate(`/meetings/${id}`)}>← Exit kiosk</button>
           <span className={styles.headerTitle}>
-            SWG Meeting — {formatDate(meeting?.meeting_date)}
+            SWG Meeting — {formatDate(meeting?.meeting_date)} <HelpDot k="run_meeting.title" placement="bottom" />
           </span>
           <span className={`${styles.stateBadge} ${styles[`state_${state}`]}`}>{state}</span>
           {!canEdit && <ReadOnlyBadge reason="Your role can observe this meeting but cannot record decisions." />}
@@ -459,7 +461,7 @@ export function RunMeetingPage() {
                 <div className={styles.itemMeta}>
                   <span className={styles.itemCat}>{CATEGORY_LABELS[current.category] ?? current.category}</span>
                 </div>
-                <h2 className={styles.itemTitle}>{current.title}</h2>
+                <h2 className={styles.itemTitle}>{current.title} <HelpDot k="run_meeting.item" placement="bottom" /></h2>
 
                 {DECISION_CATEGORIES.has(current.category) && (
                   <span className={styles.decisionRequired}>Decision required</span>

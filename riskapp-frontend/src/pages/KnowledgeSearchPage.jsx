@@ -9,6 +9,7 @@ import { CiaChipGroup } from '../components/CiaChipGroup';
 import { RatingChip } from '../components/RatingChip';
 import { useViewMode } from '../hooks/useViewMode';
 import { EntityKind } from '../components/EntityKind';
+import { HelpDot } from '../components/HelpDot';
 import styles from './KnowledgeSearchPage.module.css';
 
 const ENTITY_CONFIG = {
@@ -104,7 +105,7 @@ export function KnowledgeSearchPage() {
     <Shell>
       <div className={styles.page}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Knowledge search<EntityKind kind="architecture" /></h1>
+          <h1 className={styles.title}>Knowledge search<EntityKind kind="architecture" /> <HelpDot k="knowledge.title" placement="bottom" /></h1>
           <p className={styles.subtitle}>
             Search across business services, information assets, systems, components,
             risks, security actions, threats, and controls — results are scoped to what
@@ -148,28 +149,28 @@ export function KnowledgeSearchPage() {
             {hasArch && (
               <>
                 {archResult.services.length > 0 && (
-                  <EntitySection title="Business Services" items={archResult.services} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Business Services" helpKey="knowledge.section.services" items={archResult.services} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.assets.length > 0 && (
-                  <EntitySection title="Information Assets" items={archResult.assets} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Information Assets" helpKey="knowledge.section.assets" items={archResult.assets} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.systems.length > 0 && (
-                  <EntitySection title="Systems" items={archResult.systems} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Systems" helpKey="knowledge.section.systems" items={archResult.systems} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.components.length > 0 && (
-                  <EntitySection title="System Components" items={archResult.components} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="System Components" helpKey="knowledge.section.components" items={archResult.components} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.risks?.length > 0 && (
-                  <EntitySection title="Risks" items={archResult.risks} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Risks" helpKey="knowledge.section.risks" items={archResult.risks} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.actions?.length > 0 && (
-                  <EntitySection title="Security Actions" items={archResult.actions} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Security Actions" helpKey="knowledge.section.actions" items={archResult.actions} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.threats?.length > 0 && (
-                  <EntitySection title="Threats" items={archResult.threats} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Threats" helpKey="knowledge.section.threats" items={archResult.threats} navigate={navigate} isExpert={isExpert} />
                 )}
                 {archResult.controls?.length > 0 && (
-                  <EntitySection title="Controls" items={archResult.controls} navigate={navigate} isExpert={isExpert} />
+                  <EntitySection title="Controls" helpKey="knowledge.section.controls" items={archResult.controls} navigate={navigate} isExpert={isExpert} />
                 )}
               </>
             )}
@@ -181,6 +182,7 @@ export function KnowledgeSearchPage() {
                   <h2 className={styles.sectionTitle}>
                     Matched host{enrichResult.hosts.length !== 1 ? 's' : ''}
                     <span className={styles.count}>{enrichResult.hosts.length}</span>
+                    <HelpDot k="knowledge.matched_hosts" placement="bottom" />
                   </h2>
                   <div className={styles.hostList}>
                     {enrichResult.hosts.map(h => (
@@ -201,16 +203,17 @@ export function KnowledgeSearchPage() {
                   <h2 className={styles.sectionTitle}>
                     System{enrichResult.systems.length !== 1 ? 's' : ''} at risk
                     <span className={styles.count}>{enrichResult.systems.length}</span>
+                    <HelpDot k="knowledge.systems_at_risk" placement="bottom" />
                   </h2>
                   {enrichResult.systems.length === 0 ? (
                     <p className={styles.empty}>The matched host(s) are not linked to any active system.</p>
                   ) : (
                     <div className={styles.sysTable}>
                       <div className={`${styles.sysRow} ${styles.sysHead}`}>
-                        <span>System</span>
-                        <span>Department</span>
-                        <span className={styles.colCia}>Impact (C/I/A)</span>
-                        <span className={styles.colRisk}>Max risk</span>
+                        <span>System <HelpDot k="knowledge.col.system" placement="bottom" /></span>
+                        <span>Department <HelpDot k="col.department" placement="bottom" /></span>
+                        <span className={styles.colCia}>Impact (C/I/A) <HelpDot k="knowledge.col.impact" placement="bottom" /></span>
+                        <span className={styles.colRisk}>Max risk <HelpDot k="knowledge.col.max_risk" placement="bottom" /></span>
                         <span />
                       </div>
                       {enrichResult.systems.map(s => (
@@ -254,12 +257,13 @@ export function KnowledgeSearchPage() {
   );
 }
 
-function EntitySection({ title, items, navigate, isExpert }) {
+function EntitySection({ title, helpKey, helpPlacement = 'bottom', items, navigate, isExpert }) {
   return (
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>
         {title}
         <span className={styles.count}>{items.length}</span>
+        {helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}
       </h2>
       <div className={styles.entityList}>
         {items.map(item => {

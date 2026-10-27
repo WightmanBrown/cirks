@@ -7,6 +7,7 @@ import { BackButton } from '../components/BackButton';
 import styles from './PlanMeetingPage.module.css';
 import { personLabel } from '../utils/roles';
 import { DateField } from '../components/DateField';
+import { HelpDot } from '../components/HelpDot';
 
 const ROLES_AT_MEETING = ['chair', 'secretary', 'presenter', 'member', 'observer'];
 
@@ -96,14 +97,14 @@ export function PlanMeetingPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <BackButton />
-        <h1 className={styles.title}>Plan a Meeting</h1>
+        <h1 className={styles.title}>Plan a Meeting <HelpDot k="plan_meeting.title" placement="bottom" /></h1>
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form}>
 
         {/* Step 1 — Date */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>1. Meeting date</h2>
+          <h2 className={styles.sectionTitle}>1. Meeting date <HelpDot k="plan_meeting.date" placement="bottom" /></h2>
           <p className={styles.hint}>
             Calendar co-ordination happens outside the system — confirm the date before planning.
           </p>
@@ -140,7 +141,7 @@ export function PlanMeetingPage() {
 
         {/* Step 2 — Cycle link */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>2. Link to a review cycle <span className={styles.optional}>(optional)</span></h2>
+          <h2 className={styles.sectionTitle}>2. Link to a review cycle <span className={styles.optional}>(optional)</span> <HelpDot k="plan_meeting.cycle" placement="bottom" /></h2>
           <p className={styles.hint}>
             Linking allows the agenda to be auto-populated from the cycle's pending items.
           </p>
@@ -164,7 +165,7 @@ export function PlanMeetingPage() {
 
         {/* Step 3 — Chair */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>3. Chair <span className={styles.optional}>(optional)</span></h2>
+          <h2 className={styles.sectionTitle}>3. Chair <span className={styles.optional}>(optional)</span> <HelpDot k="plan_meeting.chair" placement="bottom" /></h2>
           <label className={styles.label}>
             Chair
             <select
@@ -184,7 +185,7 @@ export function PlanMeetingPage() {
 
         {/* Step 4 — Attendees */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>4. Attendees</h2>
+          <h2 className={styles.sectionTitle}>4. Attendees <HelpDot k="plan_meeting.attendees" placement="bottom" /></h2>
           <p className={styles.hint}>
             Add system users or named external attendees (e.g. HR rep, auditor).
           </p>

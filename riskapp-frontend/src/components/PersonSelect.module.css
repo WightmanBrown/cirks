@@ -6,5 +6,5 @@
 .warning {
   margin: 0.35rem 0 0;
   font-size: 0.8rem;
-  color: var(--danger, #b3261e);
+  color: var(--danger);
 }

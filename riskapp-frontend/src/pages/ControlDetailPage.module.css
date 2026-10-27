@@ -50,7 +50,7 @@
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.06em;
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
   border: 1px solid var(--amber-dim);
   padding: 3px 8px;
@@ -193,21 +193,21 @@
 }
 
 .statusActive {
-  background: var(--green-dim, rgba(52, 199, 89, 0.1));
-  border: 1px solid rgba(52, 199, 89, 0.25);
-  color: var(--green, #34c759);
+  background: var(--green-dim);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
+  color: var(--green-light);
 }
 
 .statusUnderReview {
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
 }
 
 .statusIneffective {
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.2);
-  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 20%, transparent);
+  color: var(--red-light);
 }
 
 .statusPlanned {
@@ -343,7 +343,7 @@
   gap: 6px;
   padding: 14px;
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
   border-radius: var(--radius-sm);
 }
 
@@ -432,12 +432,12 @@
 .ciaActive {
   font-size: 13px;
   font-weight: 700;
-  color: var(--green, #34c759);
+  color: var(--green);
 }
 
 .ciaInactive {
   font-size: 13px;
-  color: var(--border-accent);
+  color: var(--text-muted);
 }
 
 /* ── Empty / loading / error ─────────────────────────────────────────────── */
@@ -455,9 +455,9 @@
 
 .errorBanner {
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.2);
+  border: 1px solid color-mix(in srgb, var(--red) 20%, transparent);
   border-radius: var(--radius-md);
-  color: var(--red);
+  color: var(--red-light);
   font-size: 13px;
   padding: 14px 18px;
 }
@@ -473,7 +473,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
   border: 1px solid var(--amber-dim);
   border-radius: var(--radius-sm);
@@ -482,7 +482,7 @@
 }
 
 .rateBtn:hover {
-  background: rgba(245, 166, 35, 0.15);
+  background: color-mix(in srgb, var(--amber) 15%, transparent);
   border-color: var(--amber);
 }
 
@@ -522,7 +522,7 @@
   letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
 }
 .ceilingSelect {
-  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border);
+  background: var(--bg-inset); border: 1px solid var(--border);
   color: var(--text-primary); border-radius: 6px; padding: 7px 9px; font-size: 13px; max-width: 360px;
 }
 .ceilingCard { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
@@ -710,7 +710,7 @@
 
 .linkErr {
   font-size: 12px;
-  color: var(--red, #e53935);
+  color: var(--red);
   margin: 0;
 }
 
@@ -735,12 +735,12 @@
   padding: 1px 6px;
   cursor: pointer;
 }
-.refCodeBtn:hover { border-color: var(--accent, #64b5f6); color: var(--text-primary); }
+.refCodeBtn:hover { border-color: var(--accent); color: var(--text-primary); }
 .refEdit { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .refInput {
   font-family: var(--font-mono);
   font-size: 13px;
-  background: var(--bg-input, var(--bg-hover));
+  background: var(--bg-inset);
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: 4px;
@@ -756,14 +756,14 @@
   background: transparent;
   color: var(--text-secondary);
 }
-.refBtn { border-color: var(--accent, #64b5f6); color: var(--accent, #64b5f6); }
-.refError { color: var(--red, #e5534b); font-size: 12px; }
+.refBtn { border-color: var(--accent); color: var(--accent); }
+.refError { color: var(--red); font-size: 12px; }
 
 /* ---- Control objective page (2026-09-22): what it asks · how well it is met · our control ---- */
 .reqList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .reqList li { display: flex; gap: 10px; align-items: baseline; font-size: 13px; }
 .reqStd { color: var(--text-secondary); }
-.reqRef { font-family: var(--font-mono); color: var(--accent, #64b5f6); text-decoration: none; }
+.reqRef { font-family: var(--font-mono); color: var(--accent); text-decoration: none; }
 .reqRef:hover { text-decoration: underline; }
 
 .readout { display: flex; flex-direction: column; gap: 12px; }
@@ -774,17 +774,17 @@
 }
 .readoutNote { color: var(--text-secondary); font-size: 12.5px; line-height: 1.45; }
 .readoutMeta { color: var(--text-muted); font-size: 12px; }
-.adoptedYes { color: var(--green, #4caf7d); font-weight: 600; }
+.adoptedYes { color: var(--green); font-weight: 600; }
 .adoptedNo { color: var(--text-secondary); font-weight: 600; }
-.adoptedUndecided { color: var(--amber, #d69e2e); font-weight: 600; }
+.adoptedUndecided { color: var(--amber); font-weight: 600; }
 .deployChips { display: flex; flex-wrap: wrap; gap: 6px; }
 .deployChip {
   font-size: 11.5px; border: 1px solid var(--border); border-radius: 10px; padding: 1px 8px; color: var(--text-secondary);
 }
-.deploy_operational { border-color: rgba(52,211,153,0.5); color: #34d399; }
-.deploy_degraded    { border-color: rgba(214,158,46,0.5); color: var(--amber, #d69e2e); }
-.deploy_missing     { border-color: rgba(229,83,75,0.5);  color: var(--red, #e5534b); }
-.soaLink { font-size: 13px; color: var(--accent, #64b5f6); text-decoration: none; margin-top: 4px; }
+.deploy_operational { border-color: color-mix(in srgb, var(--teal) 50%, transparent); color: var(--ppitf-technology); }
+.deploy_degraded    { border-color: color-mix(in srgb, var(--amber) 50%, transparent); color: var(--amber); }
+.deploy_missing     { border-color: color-mix(in srgb, var(--red) 50%, transparent);  color: var(--red); }
+.soaLink { font-size: 13px; color: var(--accent); text-decoration: none; margin-top: 4px; }
 .soaLink:hover { text-decoration: underline; }
 
 .controlHeader {
@@ -793,7 +793,7 @@
 }
 .controlTitle { font-size: 1.05rem; margin: 0; color: var(--text-primary); }
 .notAdopted { color: var(--text-secondary); font-size: 14px; margin: 0 0 24px; }
-.notAdopted a { color: var(--accent, #64b5f6); }
+.notAdopted a { color: var(--accent); }
 
 @media (max-width: 640px) {
   .readoutRow { grid-template-columns: 1fr; gap: 2px; }
@@ -806,22 +806,22 @@
 .wordsForm { display: flex; flex-direction: column; gap: 10px; }
 .wordsField { display: flex; flex-direction: column; gap: 5px; }
 .wordsInput {
-  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  background: var(--bg-inset); border: 1px solid var(--border); color: var(--text-primary);
   border-radius: 5px; padding: 6px 8px; font-size: 13px; font-family: inherit; resize: vertical;
 }
 .wordsActions { display: flex; gap: 8px; }
 .wordsEditBtn {
   align-self: flex-start; background: transparent; border: none; padding: 0; margin: 4px 0 10px;
-  color: var(--accent, #64b5f6); font-size: 12.5px; cursor: pointer;
+  color: var(--accent); font-size: 12.5px; cursor: pointer;
 }
 .wordsEditBtn:hover { text-decoration: underline; }
-.errorMsg { color: var(--red, #e5534b); font-size: 13px; margin: 0; }
-.outside { color: var(--amber, #d69e2e); font-size: 12.5px; }
+.errorMsg { color: var(--red); font-size: 13px; margin: 0; }
+.outside { color: var(--amber); font-size: 12.5px; }
 
 /* Taking a control out of use (v131): destructive, so it looks it. */
 .btnDanger {
   font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
-  background: none; border: 1px solid var(--red, #c04040); color: var(--red, #e05252);
+  background: none; border: 1px solid var(--red); color: var(--red);
 }
-.btnDanger:hover { background: rgba(192, 64, 64, 0.12); }
+.btnDanger:hover { background: color-mix(in srgb, var(--red) 12%, transparent); }
 .subHeading { font-size: 0.85rem; margin: 16px 0 0; color: var(--text-primary); font-weight: 600; }

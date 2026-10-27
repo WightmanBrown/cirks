@@ -6,6 +6,7 @@ import cytoscape from 'cytoscape';
 import { getGraphNeighbors } from '../api';
 import { buildStylesheet, DETAIL_PATH, TYPE_LABELS, LEGEND_ITEMS } from '../utils/graphNodeStyle';
 import { Spinner } from './Spinner';
+import { HelpDot } from './HelpDot';
 import styles from './WalkableGraph.module.css';
 
 const COSE = {
@@ -174,7 +175,7 @@ export function WalkableGraph({ rootType, rootId }) {
         ) : (
           <>
             <span className={styles.panelType}>{TYPE_LABELS[selected.type] || selected.type}</span>
-            <h3 className={styles.panelName}>{selected.label}</h3>
+            <h3 className={styles.panelName}>{selected.label} <HelpDot k="graph.node_panel" placement="left" /></h3>
             <dl className={styles.panelMeta}>
               {selected.risk_score != null && (<><dt>Risk score</dt><dd>{selected.risk_score}</dd></>)}
               {selected.maturity != null && (<><dt>Maturity</dt><dd>{selected.maturity}</dd></>)}

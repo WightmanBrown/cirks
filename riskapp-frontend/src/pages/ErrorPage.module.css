@@ -21,7 +21,7 @@
   font-family: var(--font-mono);
   font-size: 64px;
   font-weight: 500;
-  color: var(--border-accent);
+  color: var(--text-muted);
   line-height: 1;
   margin-bottom: 16px;
 }
@@ -51,7 +51,7 @@
   background: var(--amber);
   border: none;
   border-radius: var(--radius-md);
-  color: #0d0f13;
+  color: var(--text-on-fill);
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;

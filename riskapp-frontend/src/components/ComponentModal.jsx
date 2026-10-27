@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { useState, useEffect } from 'react';
 import { createComponent, updateComponent, addComponentIp, removeComponentIp, getArchitecture, addArchitectureComponent } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -130,7 +131,7 @@ export function ComponentModal({ componentType = 'technology', singular, existin
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h2 className={styles.modalTitle}>{isEdit ? `Edit ${label}` : `New ${label}`}</h2>
+        <h2 className={styles.modalTitle}>{isEdit ? `Edit ${label}` : `New ${label}`} <HelpDot k="component_modal.title" placement="bottom" /></h2>
         <form onSubmit={handleSubmit}>
           <label className={styles.fieldLabel}>
             Name

@@ -17,6 +17,7 @@ import {
 import styles from './ExceptionFormModal.module.css';
 import { Modal } from './Modal';
 import { DateField } from './DateField';
+import { HelpDot } from './HelpDot';
 
 const CADENCES = [
   { value: 'monthly',   label: 'Monthly' },
@@ -97,7 +98,12 @@ export function ExceptionFormModal({ mode, riskId, exception, onClose, onSuccess
     <Modal label={heading} onClose={onClose} busy={busy}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.heading}>{heading}</h2>
+          <h2 className={styles.heading}>
+            {heading}
+            {mode === 'create' && <> <HelpDot k="exception_form.create" placement="bottom" /></>}
+            {mode === 'renew' && <> <HelpDot k="exception_form.renew" placement="bottom" /></>}
+            {mode === 'revoke' && <> <HelpDot k="exception_form.revoke" placement="bottom" /></>}
+          </h2>
           <button className={styles.closeBtn} onClick={onClose} disabled={busy} aria-label="Close">✕</button>
         </div>
 

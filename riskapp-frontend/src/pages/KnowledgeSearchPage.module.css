@@ -39,7 +39,7 @@
   display: flex; align-items: flex-start; gap: 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius, 8px);
+  border-radius: var(--radius-md);
   padding: 20px;
 }
 .noMatchIcon { font-size: 28px; color: var(--text-muted); line-height: 1; }
@@ -64,7 +64,7 @@
 
 /* ── Architecture entity results ────────────────────────────────────────── */
 
-.entityList { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius, 8px); overflow: hidden; }
+.entityList { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
 
 .entityRow {
   display: grid;
@@ -78,7 +78,7 @@
   transition: background 0.1s;
 }
 .entityRow:last-child { border-bottom: none; }
-.entityRow:hover { background: var(--bg-hover, var(--bg-elevated)); }
+.entityRow:hover { background: var(--bg-hover); }
 
 .entityType {
   font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -105,9 +105,9 @@
   line-height: 1; cursor: pointer; white-space: nowrap;
 }
 .graphBtn:hover {
-  background: var(--bg-hover, var(--bg-elevated));
-  color: var(--accent, #4f7cff);
-  border-color: var(--accent, #4f7cff);
+  background: var(--bg-hover);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 .graphIcon { width: 15px; height: 15px; flex-shrink: 0; }
 .entityDesc {
@@ -125,7 +125,7 @@
 .hostCard {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   background: var(--bg-surface); border: 1px solid var(--border);
-  border-radius: var(--radius-sm, 6px); padding: 10px 14px;
+  border-radius: var(--radius-sm); padding: 10px 14px;
 }
 .hostName { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .hostFqdn { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
@@ -137,7 +137,7 @@
 }
 
 /* System table */
-.sysTable { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius, 8px); overflow: hidden; }
+.sysTable { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
 .sysRow {
   display: grid;
   grid-template-columns: 2fr 1.2fr 1.2fr 1.6fr auto;
@@ -163,10 +163,10 @@
 .sysActions { display: flex; gap: 6px; }
 .linkBtn {
   background: none; border: 1px solid var(--border);
-  color: var(--accent, #4f7cff); font-size: 11px; font-family: var(--font-mono);
+  color: var(--accent); font-size: 11px; font-family: var(--font-mono);
   border-radius: 4px; padding: 3px 8px; cursor: pointer; white-space: nowrap;
 }
-.linkBtn:hover { background: var(--bg-hover, var(--bg-elevated)); }
+.linkBtn:hover { background: var(--bg-hover); }
 
 /* ── Chips of interest ───────────────────────────────────────────────────────
    A triage summary on each search row: one impact figure, one risk figure, and
@@ -203,8 +203,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.25);
-  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
+  color: var(--red-light);
   text-transform: uppercase;
   cursor: help;
 }
@@ -220,8 +220,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
   text-transform: uppercase;
   cursor: help;
 }

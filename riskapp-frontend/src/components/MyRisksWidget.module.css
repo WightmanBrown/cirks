@@ -85,9 +85,9 @@
 }
 
 /* Count colour states — applied directly to the count span */
-.trendNew     { color: var(--accent, #6366f1); }
-.trendWorse   { color: var(--red, #e05252); }
-.trendBetter  { color: var(--green, #4caf50); }
+.trendNew     { color: var(--accent); }
+.trendWorse   { color: var(--red); }
+.trendBetter  { color: var(--green); }
 .trendNeutral { color: var(--text-muted); }
 
 /* ── Department display filter ───────────────────────────────────────────── */
@@ -121,13 +121,13 @@
 
 .scopeToggle:hover,
 .scopeToggle:focus-visible {
-  color: var(--text);
+  color: var(--text-primary);
   border-color: var(--text-muted);
 }
 
 .scopeToggle[aria-pressed='true'] {
-  color: var(--accent, #6366f1);
-  border-color: var(--accent, #6366f1);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .emptyScope {
@@ -141,7 +141,7 @@
   border: none;
   padding: 0;
   font: inherit;
-  color: var(--accent, #6366f1);
+  color: var(--accent);
   cursor: pointer;
   text-decoration: underline;
 }

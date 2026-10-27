@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getSupplierRelationships } from '../api';
@@ -24,7 +25,7 @@ export function SuppliersPanel({ systemId = null, componentId = null, isExpert =
   if (!canRead || rows === null) return null;
   return (
     <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>Suppliers <span className={styles.count}>{rows.length}</span></h2>
+      <h2 className={styles.sectionTitle}>Suppliers <HelpDot k="suppliers_panel.title" placement="bottom" /> <span className={styles.count}>{rows.length}</span></h2>
       {rows.length === 0 ? (
         <p className={styles.muted}>
           No supplier relationship touches this {systemId ? 'system' : 'component'}.{' '}

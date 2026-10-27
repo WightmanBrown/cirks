@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMeetingPack, listAttachments, uploadAttachment, downloadAttachment, deleteAttachment } from '../api/index';
 import styles from './PackView.module.css';
+import { HelpDot } from './HelpDot';
 
 const CATEGORY_LABELS = {
   opening:          'Opening',
@@ -11,6 +12,7 @@ const CATEGORY_LABELS = {
   change_briefing:  'Change Briefings',
   cycle_overview:   'Cycle Overview',
   isms_objectives:  'ISMS Objectives & Interested Parties',
+  threat_identification: 'Identified Exposures Awaiting Assessment',
   new_risks:        'New Risks and Incidents Requiring Action',
   action_progress:  'Action Progress',
   sap_health:       'SAP Health',
@@ -196,7 +198,7 @@ function PackItem({ item, meetingId, canUpload, isMeetingClosed }) {
 
 // ── PackSection ───────────────────────────────────────────────────────────────
 
-function PackSection({ title, description, items, meetingId, canUploadFor, isMeetingClosed, collapsible }) {
+function PackSection({ title, description, items, meetingId, canUploadFor, isMeetingClosed, collapsible, helpKey, helpPlacement = 'bottom' }) {
   const [open, setOpen] = useState(!collapsible);
   if (items.length === 0) return null;
 
@@ -206,7 +208,7 @@ function PackSection({ title, description, items, meetingId, canUploadFor, isMee
         style={collapsible ? { cursor: 'pointer' } : {}}>
         <div className={styles.sectionTitleRow}>
           {collapsible && <span className={styles.chevron}>{open ? '▾' : '▸'}</span>}
-          <h2 className={styles.sectionTitle}>{title}</h2>
+          <h2 className={styles.sectionTitle}>{title}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</h2>
           <span className={styles.sectionCount}>{items.length} item{items.length !== 1 ? 's' : ''}</span>
         </div>
         {description && <p className={styles.sectionDesc}>{description}</p>}
@@ -266,6 +268,7 @@ export function PackView({ meetingId }) {
 
       <PackSection
         title="Your prep"
+        helpKey="pack.your_prep"
         description="Items you are presenting — please prepare materials in advance."
         items={your_prep}
         meetingId={meetingId}
@@ -276,6 +279,7 @@ export function PackView({ meetingId }) {
 
       <PackSection
         title="Read in advance"
+        helpKey="pack.read_in_advance"
         description="Items relevant to your role — review before the meeting."
         items={read_in_advance}
         meetingId={meetingId}
@@ -286,6 +290,7 @@ export function PackView({ meetingId }) {
 
       <PackSection
         title="Full agenda"
+        helpKey="pack.full_agenda"
         description={null}
         items={full_agenda}
         meetingId={meetingId}

@@ -303,7 +303,7 @@ export function ControlDetailPage() {
                 <ApplicabilityBadge isBaseline={control.is_baseline} />
               )}
             </div>
-            <h1 className={styles.title}>{control.title}<EntityKind kind="control objective" /></h1>
+            <h1 className={styles.title}>{control.title}<EntityKind kind="control objective" /><HelpDot k="control_detail.title" placement="bottom" /></h1>
           </div>
         </div>
 
@@ -311,7 +311,7 @@ export function ControlDetailPage() {
         <div className={styles.grid}>
 
           <div className={styles.col}>
-            <Section title="What it asks">
+            <Section title="What it asks" helpKey="control_detail.what_it_asks">
               {wordsEditing ? (
                 <div className={styles.wordsForm}>
                   <label className={styles.wordsField}>
@@ -355,7 +355,7 @@ export function ControlDetailPage() {
               </dl>
             </Section>
 
-            <Section title="Standard requirements it meets">
+            <Section title="Standard requirements it meets" helpKey="control_detail.standard_requirements">
               {(control.standard_refs || []).length === 0 ? (
                 <p className={styles.empty}>
                   None — this is a custom objective, mapped to no standard.
@@ -386,12 +386,12 @@ export function ControlDetailPage() {
         {/* The valid ways this objective is delivered, and how each system is (v145). */}
         <div className={styles.cols}>
           <div className={styles.col}>
-            <Section title="Security solutions">
+            <Section title="Security solutions" helpKey="control_detail.security_solutions">
               <DeliveryPatternsSection controlId={id} patterns={deliveryPatterns} cirks={cirks}
                 canEdit={canWrite} onChanged={(p) => { setDeliveryPatterns(p); setReloadKey(k => k + 1); }} />
               {/* One list per system: how it is delivered there, and why it is
                   there. Was two panels over the same systems (owner, 2026-10-06). */}
-              <h3 className={styles.subHeading}>On each system: how it is delivered, and why it is there</h3>
+              <h3 className={styles.subHeading}>On each system: how it is delivered, and why it is there <HelpDot k="control_detail.on_each_system" placement="bottom" /></h3>
               {deployments.length === 0
                 ? <p className={styles.readoutNote}>Not recorded on any system.</p>
                 : <ControlDeployments deployments={deployments} deliveryBySystem={deliveryBySystem} />}
@@ -411,7 +411,7 @@ export function ControlDetailPage() {
         {/* The decision — the SoA's own subject, edited here (2026-09-22). The SoA
             page reports it and can decide several at once, but this is where one
             objective's decision is made and explained. */}
-        <Section title="Decision — Statement of Applicability" anchorRef={decisionRef}>
+        <Section title="Decision — Statement of Applicability" helpKey="control_detail.decision" anchorRef={decisionRef}>
           {editingDecision ? (
             <DecisionForm
               controlId={id}
@@ -453,7 +453,7 @@ export function ControlDetailPage() {
 
         {/* 3 · Our control — the thing that meets the objective */}
         <div className={styles.controlHeader}>
-          <h2 className={styles.controlTitle}>Our control</h2>
+          <h2 className={styles.controlTitle}>Our control <HelpDot k="control_detail.our_control" placement="bottom" /></h2>
           {adopted && canWrite && (
             <button
               type="button"
@@ -486,7 +486,7 @@ export function ControlDetailPage() {
           <>
             {/* How the control meets the objective: status, the one-line "how" the
                 SoA shows, and maturity. Edited with the rest of the control. */}
-            <Section title="Implementation">
+            <Section title="Implementation" helpKey="control_detail.implementation">
               {editingControl ? (
                 <ImplementationForm
                   controlId={id} soa={soa} control={control}
@@ -513,7 +513,7 @@ export function ControlDetailPage() {
               />
             )}
 
-            <Section title={`Threats it counters${threats.length ? ` (${threats.length})` : ''}`}>
+            <Section title={`Threats it counters${threats.length ? ` (${threats.length})` : ''}`} helpKey="control_detail.threats">
               {editingControl && !showLinkForm && (
                 <div className={styles.threatHeader}>
                   <span />
@@ -566,10 +566,10 @@ export function ControlDetailPage() {
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <Th>Threat</Th>
-                        <Th>Category</Th>
-                        <Th>Source</Th>
-                        <Th>Notes</Th>
+                        <Th helpKey="col.threat">Threat</Th>
+                        <Th helpKey="control_detail.col.threat_category">Category</Th>
+                        <Th helpKey="control_detail.col.threat_source">Source</Th>
+                        <Th helpKey="control_detail.col.link_notes">Notes</Th>
                         {editingControl && <Th />}
                       </tr>
                     </thead>
@@ -770,7 +770,7 @@ function MaturityCeilingSection({ control, users, canWrite, onSaved }) {
   }
 
   return (
-    <Section title="Responsible owner">
+    <Section title="Responsible owner" helpKey="control_detail.responsible_owner">
       {editing ? (
         <div className={styles.ceilingForm}>
           <label className={styles.ceilingField}>
@@ -781,7 +781,7 @@ function MaturityCeilingSection({ control, users, canWrite, onSaved }) {
                 <option key={u.id} value={u.id}>{personLabel(u)}</option>
               ))}
             </select>
-            <span className={styles.ceilingHint}>Unassigned controls are the CISO&apos;s responsibility by default; delegate to an asset owner/manager (e.g. staff training → HR). The owner sets the control&apos;s organisation-wide maturity.</span>
+            <span className={styles.ceilingHint}>Unassigned controls are the CISO&apos;s responsibility by default; delegate to an asset owner/manager (e.g. staff training → HR). The owner answers for the objective across the organisation; its open work shows under their name on the remediation roll-up.</span>
           </label>
           {err && <span className={styles.ratingFormError}>{err}</span>}
           <div className={styles.ratingFormActions}>
@@ -822,9 +822,12 @@ function Section({ title, children, helpKey, helpPlacement = 'bottom', anchorRef
   );
 }
 
-function Th({ children, center }) {
+function Th({ children, center, helpKey, helpPlacement = 'bottom' }) {
   return (
-    <th className={`${styles.th} ${center ? styles.thCenter : ''}`}>{children}</th>
+    <th className={`${styles.th} ${center ? styles.thCenter : ''}`}>
+      {children}
+      {helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}
+    </th>
   );
 }
 

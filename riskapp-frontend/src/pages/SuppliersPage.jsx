@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getSuppliers, createSupplier } from '../api';
@@ -75,7 +76,7 @@ export function SuppliersPage() {
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Suppliers</h1>
+            <h1 className={styles.title}>Suppliers <HelpDot k="suppliers.title" placement="bottom" /></h1>
             <p className={styles.desc}>
               The organisations we rely on, and what each relationship touches: contractors working inside
               the business, companies operating our systems, providers hosting a system for us, and the
@@ -124,7 +125,13 @@ export function SuppliersPage() {
           </div>
           <table className={styles.table}>
             <thead>
-              <tr><th>Supplier</th><th>Relationships</th><th>Contracted by</th><th>Criticality</th><th>Assurance</th></tr>
+              <tr>
+                <th>Supplier <HelpDot k="col.supplier" placement="bottom" /></th>
+                <th>Relationships <HelpDot k="suppliers.col.relationships" placement="bottom" /></th>
+                <th>Contracted by <HelpDot k="suppliers.col.contracted_by" placement="bottom" /></th>
+                <th>Criticality <HelpDot k="suppliers.col.criticality" placement="bottom" /></th>
+                <th>Assurance <HelpDot k="suppliers.col.assurance" placement="bottom" /></th>
+              </tr>
             </thead>
             <tbody>
               {shown.map(s => (

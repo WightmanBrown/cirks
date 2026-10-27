@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth }               from '../context/AuthContext';
@@ -65,7 +66,7 @@ function EditModal({ component, onClose, onSaved }) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h2 className={styles.modalTitle}>Edit component</h2>
+        <h2 className={styles.modalTitle}>Edit component <HelpDot k="component_detail.edit_modal" placement="bottom" /></h2>
         <form onSubmit={handleSubmit}>
           <label className={styles.fieldLabel}>
             Name
@@ -298,7 +299,7 @@ export function ComponentDetailPage() {
             {maxRisk != null && <RiskBand score={maxRisk} />}
           </div>
           <div className={styles.headerRow}>
-            <h1 className={styles.title}>{component.name}<EntityKind kind="component" /></h1>
+            <h1 className={styles.title}>{component.name}<EntityKind kind="component" /> <HelpDot k="component_detail.title" placement="bottom" /></h1>
             {canEdit && (
               <button className={styles.btnSecondary} onClick={() => setEditing(true)}>
                 Edit
@@ -319,7 +320,7 @@ export function ComponentDetailPage() {
         {/* Network identity (hosts only) */}
         {component.is_host && (
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Network identity</h2>
+            <h2 className={styles.sectionTitle}>Network identity <HelpDot k="component_detail.network_identity" placement="bottom" /></h2>
             {component.hostname && (
               <p className={styles.hostnameLine}>
                 <span className={styles.hostnameLabel}>Hostname</span>
@@ -348,7 +349,7 @@ export function ComponentDetailPage() {
         {vulnerableOn.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>
-              Named as a vulnerability
+              Named as a vulnerability <HelpDot k="component_detail.vulnerable_on" placement="bottom" />
               <span className={styles.sectionCount}>{vulnerableOn.length}</span>
             </h2>
             <p className={styles.sectionNote}>
@@ -380,7 +381,7 @@ export function ComponentDetailPage() {
         {/* Systems */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>
-            Systems using this component
+            Systems using this component <HelpDot k="component_detail.systems" placement="bottom" />
             {systems.length > 0 && <span className={styles.sectionCount}>{systems.length}</span>}
           </h2>
 

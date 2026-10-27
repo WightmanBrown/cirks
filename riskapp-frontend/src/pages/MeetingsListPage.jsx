@@ -7,6 +7,7 @@ import { getMeetings } from '../api/index';
 import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import styles from './MeetingsListPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 const STATE_LABELS = {
   draft:          { label: 'Draft',          cls: 'draft' },
@@ -46,7 +47,7 @@ export function MeetingsListPage() {
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <BackButton />
-        <h1 className={styles.pageTitle}>SWG Meetings</h1>
+        <h1 className={styles.pageTitle}>SWG Meetings <HelpDot k="meetings.title" placement="bottom" /></h1>
         {isSecretary && (
           <button
             className={styles.btnPlanMeeting}
@@ -75,13 +76,13 @@ export function MeetingsListPage() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Date</th>
-              <th>State</th>
-              <th>Cycle</th>
-              <th>Chair</th>
-              <th>Secretary</th>
-              <th>Attendees</th>
-              <th>Agenda items</th>
+              <th>Date <HelpDot k="meetings.col.date" placement="bottom" /></th>
+              <th>State <HelpDot k="meetings.col.state" placement="bottom" /></th>
+              <th>Cycle <HelpDot k="meetings.col.cycle" placement="bottom" /></th>
+              <th>Chair <HelpDot k="meetings.col.chair" placement="bottom" /></th>
+              <th>Secretary <HelpDot k="meetings.col.secretary" placement="bottom" /></th>
+              <th>Attendees <HelpDot k="meetings.col.attendees" placement="bottom" /></th>
+              <th>Agenda items <HelpDot k="meetings.col.agenda_items" placement="bottom" /></th>
             </tr>
           </thead>
           <tbody>

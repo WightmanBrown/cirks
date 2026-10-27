@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { Link } from 'react-router-dom';
 import { RatingChip } from './RatingChip';
 import { SupplierAssurance } from './SupplierAssurance';
@@ -22,6 +23,7 @@ export function SupplierRelationshipCard({ relationship: r, isExpert, canEdit, o
               {r.system_id && <Link to={`/systems/${r.system_id}`}>{r.system_name}</Link>}
               {r.system_id && r.component_id && ' · '}
               {r.component_id && <Link to={`/components/${r.component_id}`}>{r.component_name}</Link>}
+              {' '}<HelpDot k="supplier_rel.card" placement="bottom" />
             </h3>
           </div>
           {canEdit && (

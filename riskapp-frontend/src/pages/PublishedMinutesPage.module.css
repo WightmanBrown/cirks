@@ -60,8 +60,8 @@
   letter-spacing: 0.03em;
   padding: 2px 8px;
   border-radius: 3px;
-  background: rgba(129,199,132,0.15);
-  color: #81c784;
+  background: color-mix(in srgb, var(--green) 15%, transparent);
+  color: var(--green-light);
 }
 
 .body {

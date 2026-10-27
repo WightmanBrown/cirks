@@ -147,7 +147,7 @@
 
 .openBtn {
   background: var(--amber);
-  color: #000;
+  color: var(--text-on-fill);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 12px;
@@ -203,9 +203,9 @@
   gap: 8px;
   padding: 8px 12px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 167, 38, 0.08);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
   border: 1px solid var(--amber);
-  color: var(--amber);
+  color: var(--amber-light);
   font-size: 12px;
 }
 
@@ -479,7 +479,7 @@
   cursor: pointer;
 }
 .riskTreeCellLink:hover {
-  background: var(--bg-hover, rgba(255,255,255,0.04));
+  background: var(--bg-hover);
 }
 
 /* Highest-risk line */
@@ -528,8 +528,8 @@
   background: none; border: 0; cursor: pointer;
   font: inherit; color: inherit; text-align: left;
 }
-.riskFoldHeader:hover { background: var(--surface-2, rgba(127, 127, 127, 0.08)); }
-.riskFoldHeader:focus-visible { outline: 2px solid var(--accent, #3f7ea6); outline-offset: -2px; }
+.riskFoldHeader:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.riskFoldHeader:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 .riskFoldChevron,
 .riskFoldChevronOpen {
@@ -553,7 +553,7 @@
   padding: 0.4rem 0.7rem 0.4rem 2rem;
   font-size: 0.88rem;
 }
-.riskFoldRow + .riskFoldRow { border-top: 1px solid var(--border-subtle, var(--border)); }
+.riskFoldRow + .riskFoldRow { border-top: 1px solid var(--border); }
 .riskFoldThreat { flex: 1 1 auto; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -562,4 +562,4 @@
 
 /* Links inside a card body read as the text they name, not browser blue. */
 .bodyValue a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dotted var(--border); }
-.bodyValue a:hover { color: var(--accent, #64b5f6); border-bottom-color: currentColor; }
+.bodyValue a:hover { color: var(--accent); border-bottom-color: currentColor; }

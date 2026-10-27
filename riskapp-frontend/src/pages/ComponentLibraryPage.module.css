@@ -82,7 +82,7 @@
 
 .td {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--border-subtle, var(--border));
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
@@ -122,10 +122,10 @@
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
-.status_operational     { background: var(--green-dim); color: var(--green, #4caf50); }
-.status_degraded        { background: var(--amber-faint); color: var(--amber, #f0a500); }
-.status_non_operational { background: var(--red-dim); color: var(--red,   #e53935); }
-.status_unknown         { background: var(--bg-base, transparent); color: var(--text-muted); border: 1px solid var(--border); }
+.status_operational     { background: var(--green-dim); color: var(--green-light); }
+.status_degraded        { background: var(--amber-faint); color: var(--amber-light); }
+.status_non_operational { background: var(--red-dim); color: var(--red-light); }
+.status_unknown         { background: var(--bg-base); color: var(--text-muted); border: 1px solid var(--border); }
 
 /* ── Risk chips ─────────────────────────────────────────────────────────── */
 
@@ -139,11 +139,11 @@
   border-radius: 3px;
   white-space: nowrap;
 }
-.risk_low         { background: var(--green-dim);   color: var(--green); }
-.risk_medium      { background: var(--amber-faint); color: var(--amber); }
-.risk_high        { background: rgba(239,68,68,0.12); color: #ef4444; }
-.risk_critical    { background: rgba(220,38,38,0.15); color: #dc2626; }
-.risk_catastrophic{ background: rgba(149,40,3,0.18); color: #ff8036; }
+.risk_low         { background: var(--green-dim);   color: var(--green-light); }
+.risk_medium      { background: var(--amber-faint); color: var(--amber-light); }
+.risk_high        { background: color-mix(in srgb, var(--red) 12%, transparent); color: var(--red-light); }
+.risk_critical    { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red-light); }
+.risk_catastrophic{ background: color-mix(in srgb, var(--band-catastrophic-bg) 18%, transparent); color: var(--band-catastrophic-edge); }
 .noRisk           { font-size: 11px; color: var(--text-muted); }
 
 /* ── Unfold summary row ─────────────────────────────────────────────────── */
@@ -209,9 +209,9 @@
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.05em;
-  color: var(--accent, #4f7cff);
-  background: rgba(79, 124, 255, 0.12);
-  border: 1px solid var(--accent, #4f7cff);
+  color: var(--blue-light);
+  background: color-mix(in srgb, var(--blue) 12%, transparent);
+  border: 1px solid var(--accent);
   padding: 1px 6px;
   border-radius: 3px;
 }
@@ -311,10 +311,10 @@
 
 .hostSection {
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm, 6px);
+  border-radius: var(--radius-sm);
   padding: 14px;
   margin-bottom: 14px;
-  background: var(--bg-base, rgba(255, 255, 255, 0.02));
+  background: var(--bg-base);
 }
 
 .hostToggle {
@@ -344,7 +344,7 @@
   border-radius: 4px;
   padding: 5px 8px;
 }
-.ipAddr  { font-family: var(--font-mono, monospace); font-size: 12px; color: var(--text-primary); }
+.ipAddr  { font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); }
 .ipLabel { font-size: 11px; color: var(--text-muted); }
 .ipRemove {
   margin-left: auto;
@@ -378,8 +378,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.25);
-  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
+  color: var(--red-light);
   text-transform: uppercase;
   white-space: nowrap;
   cursor: help;
@@ -402,8 +402,8 @@
   padding: 3px 8px;
   border-radius: var(--radius-sm);
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.25);
-  color: var(--text-primary, inherit);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
+  color: var(--text-primary);
   cursor: pointer;
 }
 .vulnRiskPill:hover { border-color: var(--red); }
@@ -414,9 +414,9 @@
 /* Policies & documents: the objectives a component helps deliver. */
 .intro { color: var(--text-muted); font-size: 13px; line-height: 1.55; margin: 4px 0 12px; max-width: 820px; }
 .supports { display: inline-flex; flex-wrap: wrap; gap: 6px; font-family: var(--font-mono); font-size: 11px; }
-.supports a { color: var(--accent, #64b5f6); text-decoration: none; }
+.supports a { color: var(--accent); text-decoration: none; }
 .supports a:hover { text-decoration: underline; }
-.overdueDate { color: var(--amber, #f59e0b); font-weight: 600; }
+.overdueDate { color: var(--amber); font-weight: 600; }
 
 /* New policy or document: its lifecycle, entered as it is created (v139/v141). */
 .docFields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }

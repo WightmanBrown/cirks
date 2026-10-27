@@ -17,6 +17,7 @@ import { COMPONENT_TYPE_LABEL } from '../utils/componentTypes';
 import { partWhere, deliveryLabel } from '../utils/deliveryPatterns';
 import shared from './ScopesPage.module.css';
 import parts from '../components/DeliveryPatternsSection.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 // One security solution (v147): the objectives it delivers, its parts, and the
 // systems it is in place on. Everything changed here changes the solution for
@@ -108,7 +109,7 @@ export function SecuritySolutionDetailPage() {
           ))}
 
           <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Control objectives it delivers <span className={shared.count}>{n}</span></h2>
+            <h2 className={shared.sectionTitle}>Control objectives it delivers <span className={shared.count}>{n}</span> <HelpDot k="security_solution.objectives" placement="bottom" /></h2>
             {n === 0 ? <p className={shared.muted}>None yet — it delivers nothing until an objective is added.</p> : (
               <table className={shared.table}>
                 <tbody>
@@ -140,7 +141,7 @@ export function SecuritySolutionDetailPage() {
 
           {s.kind === 'parts' && (
             <section className={shared.section}>
-              <h2 className={shared.sectionTitle}>Component parts <span className={shared.count}>{s.parts.length}</span></h2>
+              <h2 className={shared.sectionTitle}>Component parts <span className={shared.count}>{s.parts.length}</span> <HelpDot k="security_solution.parts" placement="bottom" /></h2>
               <p className={shared.note}>
                 A system has this solution when every part is in place: parts on the system are recorded on each system,
                 parts on a security system are read from that system, and parts once for the organisation are in their own
@@ -171,15 +172,16 @@ export function SecuritySolutionDetailPage() {
           )}
 
           <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Where it is in place <span className={shared.count}>{s.systems.length}</span></h2>
+            <h2 className={shared.sectionTitle}>Where it is in place <span className={shared.count}>{s.systems.length}</span> <HelpDot k="security_solution.in_place" placement="bottom" /></h2>
             <p className={shared.note}>
               Systems that record its parts on the system itself. A solution with no part on the system leaves no
               trace there, so it counts only where a component recorded on the system implies it (a security pattern
-              trigger) or it was chosen for the system. It reports; it does not change any status or risk score.
+              trigger) or it was chosen for the system. Where it is the solution in use, the status of each objective it
+              delivers there follows the state of its parts, and the system&rsquo;s risk scores follow that status.
             </p>
             {s.systems.length === 0 ? <p className={shared.muted}>Not in place on any system.</p> : (
               <table className={shared.table}>
-                <thead><tr><th>System</th><th>Department</th><th>State</th><th>What is wrong</th></tr></thead>
+                <thead><tr><th>System <HelpDot k="col.system" placement="bottom" /></th><th>Department <HelpDot k="col.department" placement="bottom" /></th><th>State <HelpDot k="security_solution.col.state" placement="bottom" /></th><th>What is wrong <HelpDot k="security_solution.col.what_is_wrong" placement="bottom" /></th></tr></thead>
                 <tbody>
                   {s.systems.map(x => (
                     <tr key={x.system_id}>

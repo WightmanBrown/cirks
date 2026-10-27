@@ -82,9 +82,9 @@
 }
 .chip:hover { color: var(--text-primary); }
 .chipActive {
-  background: var(--amber, #ffa726);
-  color: #000;
-  border-color: var(--amber, #ffa726);
+  background: var(--amber);
+  color: var(--text-on-fill);
+  border-color: var(--amber);
   font-weight: 700;
 }
 
@@ -92,13 +92,13 @@
 
 .loadingBar {
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--amber, #ffa726), transparent);
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;
 }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-.errorMsg { color: var(--red, #e53935); font-size: 13px; }
+.errorMsg { color: var(--red); font-size: 13px; }
 .muted    { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
 
 .empty { composes: emptyState from '../components/form.module.css'; padding: 24px 0; }
@@ -179,8 +179,8 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.cat_deliberate    { background: var(--red-dim);     color: var(--red);   border: 1px solid rgba(232,93,74,0.25); }
-.cat_accidental    { background: var(--amber-faint); color: var(--amber); border: 1px solid rgba(245,166,35,0.25); }
+.cat_deliberate    { background: var(--red-dim);     color: var(--red-light);   border: 1px solid color-mix(in srgb, var(--red) 25%, transparent); }
+.cat_accidental    { background: var(--amber-faint); color: var(--amber-light); border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent); }
 .cat_environmental { background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border); }
 
 .sourceChip {
@@ -275,7 +275,7 @@
 
 .fieldLabel { composes: fieldLabel from '../components/form.module.css'; }
 
-.req { color: var(--red, #e53935); }
+.req { color: var(--red); }
 
 .fieldHint {
   color: var(--text-muted);
@@ -348,7 +348,7 @@
 }
 
 .error {
-  color: var(--red, #e53935);
+  color: var(--red);
   font-size: 12px;
   margin: 0;
 }
@@ -370,8 +370,8 @@
 
 .btnArchive {
   background: transparent;
-  border: 1px solid var(--red, #e53935);
-  color: var(--red, #e53935);
+  border: 1px solid var(--red);
+  color: var(--red);
 }
 /* ── 1d / 3d probability mode toggle ────────────────────────────────────── */
 
@@ -398,8 +398,8 @@
 }
 .probModeBtn + .probModeBtn { border-left: 1px solid var(--border); }
 .probModeBtnActive {
-  background: rgba(255,167,38,0.12);
-  color: var(--amber, #ffa726);
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--amber-light);
 }
 
 /* Legend row: title + toggle side by side */

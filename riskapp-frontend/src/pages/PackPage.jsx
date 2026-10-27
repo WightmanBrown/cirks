@@ -18,6 +18,7 @@ import { BackButton }     from '../components/BackButton';
 import { PackView }       from '../components/PackView';
 import { useAuth }        from '../context/AuthContext';
 import styles             from './PackPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 export function PackPage() {
   const { id }        = useParams();
@@ -28,7 +29,7 @@ export function PackPage() {
       <div className={styles.page}>
         <BackButton fallback="/meetings" />
         <div className={styles.header}>
-          <h1 className={styles.title}>Meeting Pack</h1>
+          <h1 className={styles.title}>Meeting Pack <HelpDot k="pack.title" placement="bottom" /></h1>
           <p className={styles.subtitle}>
             Your personalised view for this Security Working Group meeting.
           </p>

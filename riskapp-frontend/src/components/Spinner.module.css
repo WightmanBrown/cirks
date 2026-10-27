@@ -33,7 +33,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--text-muted, #64748b);
+  background: var(--text-muted);
   animation: bounce 1.2s ease-in-out infinite;
 }
 .muted span:nth-child(2) { animation-delay: 0.2s; }

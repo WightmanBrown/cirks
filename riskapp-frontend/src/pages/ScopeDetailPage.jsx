@@ -9,6 +9,7 @@ import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { EntityKind } from '../components/EntityKind';
 import styles from './ScopesPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 // One scope: the systems in it and the objectives narrowed to it. Changing the
 // systems changes where every one of those objectives is expected to be deployed,
@@ -66,7 +67,7 @@ export function ScopeDetailPage() {
               </div>
             ) : (
               <>
-                <h1 className={styles.title}>{scope.name}<EntityKind kind="scope" /></h1>
+                <h1 className={styles.title}>{scope.name}<EntityKind kind="scope" /><HelpDot k="scope_detail.title" placement="bottom" /></h1>
                 {scope.description && <p className={styles.desc}>{scope.description}</p>}
               </>
             )}
@@ -83,7 +84,7 @@ export function ScopeDetailPage() {
         {error && <div className={styles.error} role="alert">{error}</div>}
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Systems in this scope <span className={styles.count}>{data.systems.length}</span></h2>
+          <h2 className={styles.sectionTitle}>Systems in this scope <span className={styles.count}>{data.systems.length}</span> <HelpDot k="scope_detail.systems" placement="bottom" /></h2>
           {canManage && (
             <div className={styles.create}>
               <select className={styles.input} value={pick} onChange={e => setPick(e.target.value)} aria-label="System to add">
@@ -98,7 +99,7 @@ export function ScopeDetailPage() {
             <p className={styles.muted}>No systems yet. An objective narrowed to an empty scope is expected nowhere.</p>
           ) : (
             <table className={styles.table}>
-              <thead><tr><th>System</th><th>Department</th>{canManage && <th />}</tr></thead>
+              <thead><tr><th>System <HelpDot k="col.system" placement="bottom" /></th><th>Department <HelpDot k="col.department" placement="bottom" /></th>{canManage && <th />}</tr></thead>
               <tbody>
                 {data.systems.map(s => (
                   <tr key={s.id}>
@@ -118,7 +119,7 @@ export function ScopeDetailPage() {
         </section>
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Objectives that apply only here <span className={styles.count}>{data.objectives.length}</span></h2>
+          <h2 className={styles.sectionTitle}>Objectives that apply only here <span className={styles.count}>{data.objectives.length}</span> <HelpDot k="scope_detail.objectives" placement="bottom" /></h2>
           {data.objectives.length === 0 ? (
             <p className={styles.muted}>None yet. Narrow an objective to this scope from its page, or from the SoA&apos;s bulk decision.</p>
           ) : (

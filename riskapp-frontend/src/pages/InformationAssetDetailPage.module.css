@@ -74,7 +74,7 @@
   background: var(--red-dim);
   border: 1px solid var(--red);
   border-radius: var(--radius-sm);
-  color: var(--red);
+  color: var(--red-light);
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 600;
@@ -117,9 +117,9 @@
   white-space: nowrap;
 }
 
-.ciaGreen  { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
-.ciaAmber  { background: var(--amber-faint); color: var(--amber);  border: 1px solid var(--amber-dim); }
-.ciaRed    { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
+.ciaGreen  { background: var(--green-dim);   color: var(--green-light);  border: 1px solid var(--green); }
+.ciaAmber  { background: var(--amber-faint); color: var(--amber-light);  border: 1px solid var(--amber-dim); }
+.ciaRed    { background: var(--red-dim);     color: var(--red-light);    border: 1px solid var(--red); }
 .ciaUnset  { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
 
 /* ── Tabs ───────────────────────────────────────────────────────────────── */
@@ -224,8 +224,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
   text-transform: uppercase;
 }
 
@@ -302,21 +302,21 @@
   background: var(--green-dim) !important;
   border-color: var(--green) !important;
   color: var(--green) !important;
-  box-shadow: 0 0 0 2px rgba(76, 175, 125, 0.15);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 15%, transparent);
 }
 
 .activeAmber {
   background: var(--amber-faint) !important;
   border-color: var(--amber-dim) !important;
   color: var(--amber) !important;
-  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.12);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 12%, transparent);
 }
 
 .activeRed {
   background: var(--red-dim) !important;
   border-color: var(--red) !important;
-  color: var(--red) !important;
-  box-shadow: 0 0 0 2px rgba(232, 93, 74, 0.15);
+  color: var(--red-light) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 15%, transparent);
 }
 
 /* ── Form footer ────────────────────────────────────────────────────────── */
@@ -500,7 +500,7 @@
 }
 
 .viewToggleBtn    { color: var(--text-muted); }
-.viewToggleActive { background: var(--amber); color: #000; }
+.viewToggleActive { background: var(--amber); color: var(--text-on-fill); }
 
 .ciaMaxRow {
   display: flex;
@@ -536,11 +536,11 @@
   padding: 3px 10px;
 }
 
-.bil1 { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
-.bil2 { background: var(--green-dim);   color: var(--green);  border: 1px solid var(--green); }
-.bil3 { background: var(--amber-faint); color: var(--amber);  border: 1px solid var(--amber-dim); }
-.bil4 { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
-.bil5 { background: var(--red-dim);     color: var(--red);    border: 1px solid var(--red); }
+.bil1 { background: var(--green-dim);   color: var(--green-light);  border: 1px solid var(--green); }
+.bil2 { background: var(--green-dim);   color: var(--green-light);  border: 1px solid var(--green); }
+.bil3 { background: var(--amber-faint); color: var(--amber-light);  border: 1px solid var(--amber-dim); }
+.bil4 { background: var(--red-dim);     color: var(--red-light);    border: 1px solid var(--red); }
+.bil5 { background: var(--red-dim);     color: var(--red-light);    border: 1px solid var(--red); }
 
 .unset { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
 
@@ -608,7 +608,7 @@
   border-color: var(--green) !important;
   background: var(--green-dim) !important;
   color: var(--green) !important;
-  box-shadow: 0 0 0 2px rgba(76,175,125,0.15);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 15%, transparent);
 }
 
 .bilBtnHLevel {
@@ -632,8 +632,8 @@
 
 .bilBtnHEmpty { font-size: 12px; color: var(--text-muted); }
 
-.scopeChipOrg  { background: var(--green-dim);   border: 1px solid var(--green);     color: var(--green);  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; letter-spacing: 0.05em; }
-.scopeChipDept { background: var(--amber-faint); border: 1px solid var(--amber-dim); color: var(--amber);  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; letter-spacing: 0.05em; }
+.scopeChipOrg  { background: var(--green-dim);   border: 1px solid var(--green);     color: var(--green-light);  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; letter-spacing: 0.05em; }
+.scopeChipDept { background: var(--amber-faint); border: 1px solid var(--amber-dim); color: var(--amber-light);  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; letter-spacing: 0.05em; }
 
 .ciaRatingSection { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); padding-top: 12px; }
 
@@ -649,7 +649,7 @@
   background: var(--amber-faint);
   border: 1px solid var(--amber-dim);
   border-radius: var(--radius-sm);
-  color: var(--amber);
+  color: var(--amber-light);
   font-family: var(--font-mono);
   font-size: 11px;
   padding: 8px 12px;
@@ -757,15 +757,15 @@
    from any other in these lists, so skipping one was invisible rather than a
    choice — and a missing one can only understate the asset's impact. */
 .itGroupRequired {
-  border: 1px solid var(--amber, #f59e0b);
-  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid var(--amber);
+  background: color-mix(in srgb, var(--amber) 6%, transparent);
   border-radius: var(--radius-sm);
   padding: 8px 10px;
 }
 .itRequiredChip {
   display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
   text-transform: uppercase; white-space: nowrap;
-  color: #7a4a00; background: var(--amber, #f59e0b);
+  color: var(--text-on-fill); background: var(--amber);
   padding: 1px 6px; border-radius: var(--radius-sm);
 }
 .itRequiredNote {

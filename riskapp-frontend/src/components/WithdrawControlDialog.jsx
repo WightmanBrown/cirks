@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { Modal } from './Modal';
+import { HelpDot } from './HelpDot';
 import { previewControlWithdrawal, withdrawControlFromUse } from '../api';
 import styles from './WithdrawControlDialog.module.css';
 
@@ -46,7 +47,7 @@ export default function WithdrawControlDialog({ controlId, title, onClose, onDon
   return (
     <Modal label={`Withdraw ${title} from use`} onClose={busy ? () => {} : onClose} busy={busy}>
       <div className={styles.modal}>
-        <h2 className={styles.title}>Withdraw from use</h2>
+        <h2 className={styles.title}>Withdraw from use <HelpDot k="withdraw_control.title" placement="bottom" /></h2>
         <p className={styles.lede}>{title}</p>
 
         {error && !preview && <p className={styles.error} role="alert">{error}</p>}
@@ -79,14 +80,14 @@ export default function WithdrawControlDialog({ controlId, title, onClose, onDon
             {risks.length > 0 ? (
               <div className={styles.risks}>
                 <h3 className={styles.risksTitle}>
-                  {risks.length} risk{risks.length === 1 ? '' : 's'} rise{risks.length === 1 ? 's' : ''} when it goes
+                  {risks.length} risk{risks.length === 1 ? '' : 's'} rise{risks.length === 1 ? 's' : ''} when it goes <HelpDot k="withdraw_control.risks_rise" placement="bottom" />
                 </h3>
                 <p className={styles.risksNote}>
                   This control is holding {risks.length === 1 ? 'it' : 'them'} down. The new figures are what the
                   register will say.
                 </p>
                 <table className={styles.table}>
-                  <thead><tr><th>System</th><th>Threat</th><th>Now</th><th>After</th></tr></thead>
+                  <thead><tr><th>System <HelpDot k="col.system" placement="bottom" /></th><th>Threat <HelpDot k="col.threat" placement="bottom" /></th><th>Now <HelpDot k="withdraw_control.col.now" placement="bottom" /></th><th>After <HelpDot k="withdraw_control.col.after" placement="bottom" /></th></tr></thead>
                   <tbody>
                     {risks.map(x => (
                       <tr key={x.risk_id}>

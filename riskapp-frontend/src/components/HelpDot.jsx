@@ -4,10 +4,10 @@
  * components/HelpDot.jsx
  *
  * A small ⓘ affordance that reveals author-written help for a UI element, keyed by
- * a stable string (e.g. "risk.detail.residual_probability"). Instrumenting an
+ * a stable string (e.g. "col.probability"). Instrumenting an
  * element is one line:
  *
- *   <label>Residual probability <HelpDot k="risk.detail.residual_probability" /></label>
+ *   <th>Probability <HelpDot k="col.probability" /></th>
  *
  * Read mode: the dot renders only when help text exists for the key. It opens on
  * hover, focus, or click; closes on Escape or blur. Wired with aria-describedby so
@@ -19,18 +19,54 @@
  * Positioning is anchored to this element — `placement` (top|bottom|left|right) picks
  * the side; there are no free coordinates, so help can't drift onto the wrong thing.
  */
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useHelp } from '../context/HelpContext';
+import { HELP_DEFAULTS } from '../help/defaults';
 import styles from './HelpDot.module.css';
 
 const PLACEMENTS = ['top', 'bottom', 'left', 'right'];
+const GAP = 6;     // between the dot and the popover
+const MARGIN = 8;  // kept clear of the window edge
 
-export function HelpDot({ k, placement: placementProp = 'top', label, fallback = null, className = '' }) {
-  const { help, editMode, canEditHelp, saveHelp, ensureKey } = useHelp();
+// Where the popover goes: on the chosen side of the dot, flipped to the opposite
+// side when there is no room, then slid along to stay inside the window. Fixed to
+// the window (and rendered into <body>) so a scrolling table or a card with
+// overflow hidden cannot cut it off.
+export function placePopover(anchor, pop, side, view) {
+  const room = {
+    top: anchor.top - GAP - MARGIN >= pop.height,
+    bottom: view.height - anchor.bottom - GAP - MARGIN >= pop.height,
+    left: anchor.left - GAP - MARGIN >= pop.width,
+    right: view.width - anchor.right - GAP - MARGIN >= pop.width,
+  };
+  const opposite = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
+  const s = room[side] || !room[opposite[side]] ? side : opposite[side];
+  const cx = anchor.left + anchor.width / 2 - pop.width / 2;
+  const cy = anchor.top + anchor.height / 2 - pop.height / 2;
+  let left, top;
+  if (s === 'top')    { left = cx; top = anchor.top - GAP - pop.height; }
+  if (s === 'bottom') { left = cx; top = anchor.bottom + GAP; }
+  if (s === 'left')   { left = anchor.left - GAP - pop.width; top = cy; }
+  if (s === 'right')  { left = anchor.right + GAP; top = cy; }
+  const clamp = (v, max) => Math.max(MARGIN, Math.min(v, max - MARGIN));
+  return {
+    left: clamp(left, view.width - pop.width),
+    top: clamp(top, view.height - pop.height),
+  };
+}
+
+export function HelpDot({ k, placement: placementProp = 'top', label, fallback: fallbackProp = null, className = '' }) {
+  const { help, editMode, canEditHelp, saveHelp, ensureKey, drafts } = useHelp();
+  // The draft text shipped in help/defaults stands in until an admin writes their own.
+  const fallback = fallbackProp || (drafts && k ? HELP_DEFAULTS[k] : null) || null;
   const dbEntry = help(k);
   const [open, setOpen]       = useState(false);
   const [editing, setEditing] = useState(false);
   const wrapRef = useRef(null);
+  const popRef  = useRef(null);
+  const placementRef = useRef('top');
+  const [pos, setPos] = useState(null);
   const popId   = useId();
 
   // In edit mode, register the key so the coverage view can list it even unwritten.
@@ -42,11 +78,34 @@ export function HelpDot({ k, placement: placementProp = 'top', label, fallback =
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => { if (e.key === 'Escape') { setOpen(false); setEditing(false); } };
-    const onClick = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) { setOpen(false); setEditing(false); } };
+    const onClick = (e) => {
+      const inside = wrapRef.current?.contains(e.target) || popRef.current?.contains(e.target);
+      if (!inside) { setOpen(false); setEditing(false); }
+    };
     document.addEventListener('keydown', onKey);
     document.addEventListener('mousedown', onClick);
     return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('mousedown', onClick); };
   }, [open]);
+
+  // Measure and place the popover once it is in the page, and keep it with the
+  // dot while the page scrolls or resizes.
+  useLayoutEffect(() => {
+    if (!open) { setPos(null); return; }
+    const place = () => {
+      const btn = wrapRef.current?.querySelector('button');
+      if (!btn || !popRef.current) return;
+      setPos(placePopover(
+        btn.getBoundingClientRect(),
+        popRef.current.getBoundingClientRect(),
+        placementRef.current,
+        { width: window.innerWidth, height: window.innerHeight },
+      ));
+    };
+    place();
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
+    return () => { window.removeEventListener('scroll', place, true); window.removeEventListener('resize', place); };
+  }, [open, editing]);
 
   // What we actually show: a DB entry overrides the code-level fallback (e.g. an
   // InfoTip glossary definition). The dot is editable only when there's a key and
@@ -58,12 +117,26 @@ export function HelpDot({ k, placement: placementProp = 'top', label, fallback =
   if (!display && !editable) return null;
 
   const placement = dbEntry?.placement || placementProp || 'top';
-  const aria = label || display?.title || `Help: ${k || ''}`;
+  placementRef.current = PLACEMENTS.includes(placement) ? placement : 'top';
+  // "About …" so the dot is not announced with the same name as the heading or
+  // sort button it sits beside.
+  const aria = label || (display?.title ? `About ${display.title}` : `Help: ${k || ''}`);
   // "Empty" = no customised DB text yet (a bare fallback still reads as uncustomised).
   const uncustomised = !dbEntry;
 
   return (
-    <span className={`${styles.wrap} ${className}`} ref={wrapRef}>
+    <span
+      // Marks a header cell that carries help, so globals.css can keep it on one
+      // line: a browser may always break before a button, which left the dot on
+      // a line of its own in narrow column headers.
+      data-help-dot=""
+      className={`${styles.wrap} ${className}`}
+      ref={wrapRef}
+      // A dot often sits inside something clickable (a sortable column header, a
+      // collapsible card's title): opening help must not also sort or collapse it.
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
+    >
       <button
         type="button"
         className={`${styles.dot} ${editable ? styles.dotEdit : ''} ${editable && uncustomised ? styles.dotEmpty : ''}`}
@@ -82,11 +155,14 @@ export function HelpDot({ k, placement: placementProp = 'top', label, fallback =
         i
       </button>
 
-      {open && (
+      {open && createPortal(
         <span
           id={popId}
+          ref={popRef}
           role={editing ? undefined : 'tooltip'}
-          className={`${styles.pop} ${styles[`pop_${placement}`]}`}
+          className={styles.pop}
+          // Hidden for the first frame, until it has been measured and placed.
+          style={pos ? { left: pos.left, top: pos.top } : { left: 0, top: 0, visibility: 'hidden' }}
         >
           {editing
             ? <HelpEditor k={k} entry={dbEntry} fallback={fallback} placement={placement} onSave={saveHelp} onClose={() => { setEditing(false); setOpen(false); }} />
@@ -97,7 +173,8 @@ export function HelpDot({ k, placement: placementProp = 'top', label, fallback =
                 {dbEntry?.is_fallback && <span className={styles.fallback}>shown in default language</span>}
               </>
             )}
-        </span>
+        </span>,
+        document.body,
       )}
     </span>
   );

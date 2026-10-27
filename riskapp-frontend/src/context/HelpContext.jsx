@@ -67,7 +67,7 @@ export function HelpProvider({ children }) {
   }, [canEditHelp, knownKeys]);
 
   const value = useMemo(() => ({
-    help, knownKeys, editMode, setEditMode, canEditHelp, saveHelp, ensureKey, locale: LOCALE,
+    help, knownKeys, editMode, setEditMode, canEditHelp, saveHelp, ensureKey, locale: LOCALE, drafts: true,
   }), [help, knownKeys, editMode, canEditHelp, saveHelp, ensureKey]);
 
   return <HelpContext.Provider value={value}>{children}</HelpContext.Provider>;
@@ -76,6 +76,8 @@ export function HelpProvider({ children }) {
 // Safe defaults so a <HelpDot> rendered outside a provider (e.g. an isolated
 // component test, or a widget mounted standalone) degrades to "no help" rather
 // than throwing. In the running app the provider is always present (App.jsx).
+// `drafts: false` keeps the shipped draft text out too, so a component test sees
+// exactly the markup it renders.
 const NO_HELP = {
   help: () => null,
   knownKeys: new Set(),
@@ -85,6 +87,7 @@ const NO_HELP = {
   saveHelp: async () => {},
   ensureKey: () => {},
   locale: 'en',
+  drafts: false,
 };
 
 export function useHelp() {

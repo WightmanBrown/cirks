@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { levelClass, scoreLevel } from '../utils/riskColors';
@@ -53,10 +54,10 @@ function ServiceTree({ paths, navigate, isExpert = false }) {
   return (
     <div className={styles.riskTree} style={{ gridTemplateColumns: 'minmax(140px, 1fr) minmax(140px, 1fr) minmax(180px, 1.5fr) auto' }}>
       <div className={styles.riskTreeHeader}>
-        <span>Information asset</span>
-        <span>System</span>
-        <span>Threat</span>
-        <span>Risk</span>
+        <span>Information asset <HelpDot k="risk_tree.col.information_asset" placement="bottom" /></span>
+        <span>System <HelpDot k="col.system" placement="bottom" /></span>
+        <span>Threat <HelpDot k="col.threat" placement="bottom" /></span>
+        <span>Risk <HelpDot k="risk_tree.col.risk" placement="bottom" /></span>
       </div>
       {assets.flatMap(asset =>
         asset.systemList.flatMap((sys, sIdx) =>
@@ -186,9 +187,9 @@ function SystemGrid({ systems, navigate, isExpert }) {
   return (
     <div className={styles.riskTree} style={{ gridTemplateColumns: 'minmax(160px, 1fr) minmax(180px, 1.5fr) auto' }}>
       <div className={styles.riskTreeHeader}>
-        <span>System</span>
-        <span>Threat</span>
-        <span>Risk</span>
+        <span>System <HelpDot k="col.system" placement="bottom" /></span>
+        <span>Threat <HelpDot k="col.threat" placement="bottom" /></span>
+        <span>Risk <HelpDot k="risk_tree.col.risk" placement="bottom" /></span>
       </div>
       {systems.flatMap(sys =>
         sys.risks.map((r, rIdx) => (
@@ -231,8 +232,8 @@ function FlatTree({ paths, navigate, isExpert = false }) {
   return (
     <div className={styles.riskTree} style={{ gridTemplateColumns: 'minmax(220px, 1fr) auto' }}>
       <div className={styles.riskTreeHeader}>
-        <span>Threat</span>
-        <span>Risk</span>
+        <span>Threat <HelpDot k="col.threat" placement="bottom" /></span>
+        <span>Risk <HelpDot k="risk_tree.col.risk" placement="bottom" /></span>
       </div>
       {sorted.map(r => {
         const cellProps = r.risk_id ? {
@@ -265,7 +266,8 @@ function FlatTree({ paths, navigate, isExpert = false }) {
 // groupBy: 'auto' (default) picks ServiceTree when paths carry an asset, else a
 // flat Threat|Risk list. 'system' forces the System|Threat|Risk grouping (used
 // by the information-asset detail page, whose risks span multiple systems).
-export function RiskPathTree({ paths, title = 'Risk paths', groupBy = 'auto', collapsed = false, isExpert = false }) {
+// `helpKey` is the ⓘ on the section title; each page passes its own.
+export function RiskPathTree({ paths, title = 'Risk paths', groupBy = 'auto', collapsed = false, isExpert = false, helpKey = null, helpPlacement = 'bottom' }) {
   const navigate = useNavigate();
   if (!paths || paths.length === 0) return null;
   // EVERY, not SOME: one asset-bearing path among many asset-less ones used
@@ -278,7 +280,7 @@ export function RiskPathTree({ paths, title = 'Risk paths', groupBy = 'auto', co
   else                        tree = <FlatTree    paths={paths} navigate={navigate} isExpert={isExpert} />;
   return (
     <section>
-      <h3 className={styles.riskTreeSectionTitle}>{title}</h3>
+      <h3 className={styles.riskTreeSectionTitle}>{title}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</h3>
       {tree}
     </section>
   );

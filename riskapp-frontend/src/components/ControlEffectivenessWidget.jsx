@@ -7,6 +7,7 @@ export function ControlEffectivenessWidget() {
   return (
     <CountWidget
       title="Control Effectiveness"
+      helpKey="widget.control_effectiveness"
       badge="ANALYST"
       fetchCount={async () => (await getControls()).summary.needs_rating}
       errorText="Could not load control data."

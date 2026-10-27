@@ -98,7 +98,7 @@ function TrendSection({ trends }) {
   return (
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
-        Since last SWG{last_swg_date ? ` · ${last_swg_date}` : ''}
+        Since last SWG{last_swg_date ? ` · ${last_swg_date}` : ''}<HelpDot k="widget.my_risks.since_last_swg" placement="bottom" />
       </div>
       <div className={styles.trendList}>
         {items.map(({ label, count, cls }) => (
@@ -131,7 +131,7 @@ function Top5Risks({ risks }) {
 
   return (
     <div className={styles.section}>
-      <div className={styles.sectionHeader}>Top risks</div>
+      <div className={styles.sectionHeader}>Top risks<HelpDot k="widget.my_risks.top_risks" placement="bottom" /></div>
       <div className={listStyles.list}>
         {top5.map(r => (
           <div
@@ -243,7 +243,7 @@ export function MyRisksWidget() {
             <div className={grid.dual}>
               <div className={grid.panel}>
                 <span className={grid.panelTitle}>
-                  CURRENT
+                  CURRENT<HelpDot k="widget.heatmap_current" placement="bottom" />
                   <span className={grid.panelCount}>{scopedCurrent.length}</span>
                 </span>
                 <MiniGrid
@@ -257,7 +257,7 @@ export function MyRisksWidget() {
 
               <div className={grid.panel}>
                 <span className={grid.panelTitle}>
-                  FUTURE
+                  FUTURE<HelpDot k="widget.heatmap_future" placement="bottom" />
                   <span className={grid.panelCount}>{scopedFuture.length}</span>
                 </span>
                 <MiniGrid

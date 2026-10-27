@@ -173,13 +173,13 @@ export function SecurityExceptionsPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th className={styles.th}>Level</th>
-                    <th className={styles.th}>Threat</th>
-                    <th className={styles.th}>System</th>
-                    <th className={styles.th}>Department</th>
-                    <th className={styles.th}>Accepted by</th>
-                    <th className={styles.th}>Expired</th>
-                    <th className={`${styles.th} ${styles.thDays}`}>Overdue</th>
+                    <th className={styles.th}>Level <HelpDot k="exceptions.col.level" placement="bottom" /></th>
+                    <th className={styles.th}>Threat <HelpDot k="col.threat" placement="bottom" /></th>
+                    <th className={styles.th}>System <HelpDot k="col.system" placement="bottom" /></th>
+                    <th className={styles.th}>Department <HelpDot k="col.department" placement="bottom" /></th>
+                    <th className={styles.th}>Accepted by <HelpDot k="exceptions.col.accepted_by" placement="bottom" /></th>
+                    <th className={styles.th}>Expired <HelpDot k="exceptions.col.expired" placement="bottom" /></th>
+                    <th className={`${styles.th} ${styles.thDays}`}>Overdue <HelpDot k="exceptions.col.overdue" placement="bottom" /></th>
                     {canWrite && <th className={styles.th} />}
                   </tr>
                 </thead>
@@ -269,14 +269,14 @@ export function SecurityExceptionsPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Level</th>
-                  <th className={styles.th}>Threat</th>
-                  <th className={styles.th}>System</th>
-                  <th className={styles.th}>Department</th>
-                  <th className={styles.th}>Accepted by</th>
-                  <th className={styles.th}>Cadence</th>
+                  <th className={styles.th}>Level <HelpDot k="exceptions.col.level" placement="bottom" /></th>
+                  <th className={styles.th}>Threat <HelpDot k="col.threat" placement="bottom" /></th>
+                  <th className={styles.th}>System <HelpDot k="col.system" placement="bottom" /></th>
+                  <th className={styles.th}>Department <HelpDot k="col.department" placement="bottom" /></th>
+                  <th className={styles.th}>Accepted by <HelpDot k="exceptions.col.accepted_by" placement="bottom" /></th>
+                  <th className={styles.th}>Cadence <HelpDot k="exceptions.col.cadence" placement="bottom" /></th>
                   <th className={styles.th}>Expires<HelpDot k="exceptions.expiry" placement="top" label="About exception expiry" /></th>
-                  <th className={`${styles.th} ${styles.thDays}`}>Days</th>
+                  <th className={`${styles.th} ${styles.thDays}`}>Days <HelpDot k="exceptions.col.days" placement="bottom" /></th>
                   {canWrite && <th className={styles.th} />}
                 </tr>
               </thead>

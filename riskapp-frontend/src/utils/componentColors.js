@@ -1,20 +1,26 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-// Canonical PPITF component colour palette.
-// Used by: RiskGraph (Cytoscape nodes), ComponentPill, ComponentFormModal.
-// These match the graph node colours exactly — list views use the same values.
+// Canonical PPITF component colour palette, as CSS colour names (styles/globals.css).
+// Used by: RiskGraph and the walkable graph (resolved through utils/themeColours),
+// ComponentPill, and the component pages. A DOM style can use these directly.
+
+const ppitf = (type, text) => ({
+  bg:     `var(--ppitf-${type})`,
+  border: `var(--ppitf-${type}-edge)`,
+  text:   `var(--ppitf-text-${text})`,
+});
 
 export const COMPONENT_COLORS = {
-  people:      { bg: '#38bdf8', border: '#0ea5e9', text: '#0c1117' },
-  process:     { bg: '#f59e0b', border: '#d97706', text: '#0c1117' },
-  information: { bg: '#a78bfa', border: '#7c3aed', text: '#ffffff' },
-  technology:  { bg: '#34d399', border: '#059669', text: '#0c1117' },
-  facility:    { bg: '#94a3b8', border: '#64748b', text: '#0c1117' },
-  control:     { bg: '#4f7cff', border: '#2a5ae8', text: '#ffffff' },
-  system:      { bg: '#1e293b', border: '#334155', text: '#94a3b8' },
+  people:      ppitf('people', 'dark'),
+  process:     ppitf('process', 'dark'),
+  information: ppitf('information', 'dark'),
+  technology:  ppitf('technology', 'dark'),
+  facility:    ppitf('facility', 'dark'),
+  control:     ppitf('control', 'dark'),
+  system:      { bg: 'var(--ppitf-system)', border: 'var(--ppitf-system-edge)', text: 'var(--graph-quiet-text)' },
 };
 
-export const COMPONENT_COLORS_FALLBACK = { bg: '#334155', border: '#475569', text: '#f1f5f9' };
+export const COMPONENT_COLORS_FALLBACK = { bg: 'var(--graph-node)', border: 'var(--graph-node-edge)', text: 'var(--graph-node-text)' };
 
 export function getComponentColor(type) {
   return COMPONENT_COLORS[type] ?? COMPONENT_COLORS_FALLBACK;

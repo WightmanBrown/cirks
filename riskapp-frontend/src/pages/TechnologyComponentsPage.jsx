@@ -3,5 +3,5 @@
 import ComponentLibraryPage from './ComponentLibraryPage';
 
 export function TechnologyComponentsPage() {
-  return <ComponentLibraryPage componentType="technology" title="Technology Components" singular="Technology Component" />;
+  return <ComponentLibraryPage componentType="technology" title="Technology Components" singular="Technology Component" helpKey="technology.title" />;
 }

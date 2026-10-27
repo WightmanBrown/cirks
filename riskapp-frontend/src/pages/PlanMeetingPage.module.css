@@ -107,8 +107,8 @@
 
 .attendeeRoleBadge {
   padding: 1px 7px;
-  background: rgba(100,181,246,0.12);
-  color: var(--accent, #64b5f6);
+  background: color-mix(in srgb, var(--blue) 12%, transparent);
+  color: var(--blue-light);
   border-radius: 3px;
   font-size: 0.75rem;
   text-transform: capitalize;
@@ -142,8 +142,8 @@
 }
 
 .modeActive {
-  background: var(--accent, #64b5f6);
-  color: #000;
+  background: var(--accent);
+  color: var(--text-on-fill);
   font-weight: 600;
 }
 

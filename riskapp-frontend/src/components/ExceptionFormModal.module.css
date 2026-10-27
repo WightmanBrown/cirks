@@ -93,8 +93,8 @@
 .confirmText {
   margin: 0;
   padding: 12px 14px;
-  background: rgba(220, 53, 69, 0.08);
-  border: 1px solid rgba(220, 53, 69, 0.25);
+  background: color-mix(in srgb, var(--red) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: 13px;

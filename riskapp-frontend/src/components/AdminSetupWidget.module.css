@@ -54,7 +54,7 @@
 .allDone {
   font-family: var(--font-body);
   font-size: 12px;
-  color: var(--green, #4caf50);
+  color: var(--green);
   margin: 0;
 }
 
@@ -97,7 +97,7 @@
   text-align: center;
 }
 
-.itemOk .icon    { color: var(--green, #4caf50); }
+.itemOk .icon    { color: var(--green); }
 .itemPending .icon { color: var(--text-muted); }
 
 .itemBody {
@@ -167,7 +167,7 @@
 .error {
   font-family: var(--font-body);
   font-size: 12px;
-  color: var(--red, #e05252);
+  color: var(--red);
   margin: 0;
 }
 
@@ -187,5 +187,5 @@
 .progressDone {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--green, #4caf50);
+  color: var(--green);
 }

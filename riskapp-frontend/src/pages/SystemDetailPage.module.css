@@ -56,7 +56,7 @@
   padding: 2px 7px;
   border-radius: 3px;
   background: var(--red-dim);
-  color: var(--red, #e53935);
+  color: var(--red-light);
 }
 
 /* ── Impact summary strip ───────────────────────────────────────────────── */
@@ -93,9 +93,9 @@
   padding: 2px 6px;
   border-radius: 3px;
 }
-.bil1, .bil2 { background: var(--green-dim); color: var(--green, #4caf50); }
-.bil3        { background: var(--amber-faint); color: var(--amber, #f0a500); }
-.bil4, .bil5 { background: var(--red-dim); color: var(--red,   #e53935); }
+.bil1, .bil2 { background: var(--green-dim); color: var(--green-light); }
+.bil3        { background: var(--amber-faint); color: var(--amber-light); }
+.bil4, .bil5 { background: var(--red-dim); color: var(--red-light); }
 .unset       { color: var(--text-muted); font-size: 12px; }
 
 .changeWarnBanner {
@@ -103,11 +103,11 @@
   align-items: center;
   gap: 8px;
   background: var(--amber-faint);
-  border: 1px solid var(--amber, #f0a500);
+  border: 1px solid var(--amber);
   border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 12px;
-  color: var(--amber, #f0a500);
+  color: var(--amber-light);
   font-weight: 600;
 }
 
@@ -195,7 +195,7 @@
   margin-top: 20px;
 }
 
-.savedMsg { font-size: 12px; color: var(--green, #4caf50); }
+.savedMsg { font-size: 12px; color: var(--green); }
 .errorMsg { color: var(--red); font-size: 13px; }
 .muted    { color: var(--text-muted); font-size: 13px; }
 
@@ -252,7 +252,7 @@
   font-size: 10px;
   padding: 1px 5px;
   border-radius: 3px;
-  background: var(--bg-base, #1a1a2e);
+  background: var(--bg-base);
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -290,7 +290,7 @@
 
 .pickerInput {
   flex: 1;
-  background: var(--bg-base, var(--bg-surface));
+  background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -301,7 +301,7 @@
 .pickerInput:focus { border-color: var(--accent); }
 
 .typeSelect {
-  background: var(--bg-base, var(--bg-surface));
+  background: var(--bg-base);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -326,7 +326,7 @@
   padding: 6px 8px;
   border-radius: 3px;
   font-size: 12px;
-  background: var(--bg-base, #1a1a2e);
+  background: var(--bg-base);
 }
 
 .pickerOptionName { font-weight: 600; flex: 1; }
@@ -382,9 +382,9 @@
   padding: 2px 5px;
   border-radius: 3px;
 }
-.ciaGreen { background: var(--green-dim); color: var(--green, #4caf50); }
-.ciaAmber { background: var(--amber-faint); color: var(--amber, #f0a500); }
-.ciaRed   { background: var(--red-dim); color: var(--red,   #e53935); }
+.ciaGreen { background: var(--green-dim); color: var(--green-light); }
+.ciaAmber { background: var(--amber-faint); color: var(--amber-light); }
+.ciaRed   { background: var(--red-dim); color: var(--red-light); }
 .ciaUnset { color: var(--text-muted); font-size: 12px; }
 
 /* "Shared" is amber everywhere it appears — the systems and services lists, the
@@ -399,13 +399,13 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
   text-transform: uppercase;
 }
 
 .assetCardChanged {
-  border-left: 3px solid var(--amber, #f0a500);
+  border-left: 3px solid var(--amber);
 }
 
 .changedTag {
@@ -413,9 +413,9 @@
   font-size: 9px;
   padding: 1px 5px;
   border-radius: 3px;
-  background: var(--amber-faint, rgba(240,165,0,0.12));
-  border: 1px solid var(--amber, #f0a500);
-  color: var(--amber, #f0a500);
+  background: var(--amber-faint);
+  border: 1px solid var(--amber);
+  color: var(--amber-light);
   text-transform: uppercase;
   margin-left: 4px;
 }
@@ -439,10 +439,10 @@
 .expectedBlock {
   margin-bottom: 20px;
   padding: 12px 14px;
-  border: 1px solid var(--amber, #d69e2e);
+  border: 1px solid var(--amber);
   border-left-width: 3px;
   border-radius: 4px;
-  background: rgba(214, 158, 46, 0.07);
+  background: color-mix(in srgb, var(--amber) 7%, transparent);
 }
 
 .expectedTitle {
@@ -484,7 +484,7 @@
   border-radius: 3px;
   border: 1px solid var(--border);
   background: transparent;
-  color: var(--text-secondary, var(--text-muted));
+  color: var(--text-secondary);
   cursor: pointer;
 }
 .btnGhostSm:hover { border-color: var(--text-muted); color: var(--text-primary); }
@@ -506,12 +506,12 @@
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 3px;
-  border: 1px solid var(--accent, #3b82f6);
+  border: 1px solid var(--accent);
   background: transparent;
-  color: var(--accent, #3b82f6);
+  color: var(--accent);
   cursor: pointer;
 }
-.componentAdd:hover { background: rgba(59, 130, 246, 0.1); }
+.componentAdd:hover { background: color-mix(in srgb, var(--blue) 10%, transparent); }
 
 /* Unrecorded-but-expected count on the Components tab. A question mark, not a
    number: it is what the record is missing, not what the system has. */
@@ -521,8 +521,8 @@
   font-weight: 700;
   padding: 1px 4px;
   border-radius: 3px;
-  background: rgba(214, 158, 46, 0.18);
-  color: #b7791f;
+  background: color-mix(in srgb, var(--amber) 18%, transparent);
+  color: var(--amber-light);
 }
 
 /* Components tab: its two sections (architecture, security) */
@@ -538,5 +538,5 @@
 .undecided a { color: var(--accent); text-decoration: none; }
 .undecided a:hover, .undecided a:focus-visible { text-decoration: underline; }
 .undecidedTag { align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase;
-                color: var(--amber); border: 1px solid var(--amber-dim); background: var(--amber-faint); border-radius: 4px; padding: 2px 6px; }
+                color: var(--amber-light); border: 1px solid var(--amber-dim); background: var(--amber-faint); border-radius: 4px; padding: 2px 6px; }
 .undecidedChoose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }

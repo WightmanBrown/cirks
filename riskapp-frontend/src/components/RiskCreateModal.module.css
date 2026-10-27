@@ -56,7 +56,7 @@
 
 .fieldLabel { composes: fieldLabel from './form.module.css'; }
 
-.req { color: var(--red, #e53935); }
+.req { color: var(--red); }
 
 .select, .inputDate {
   background: var(--bg-inset);
@@ -83,7 +83,7 @@
 .derivedOwner {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary, inherit);
+  color: var(--text-primary);
   margin: 0 0 2px;
 }
 
@@ -109,7 +109,7 @@
 }
 
 .probSlider {
-  accent-color: var(--amber, #ffa726);
+  accent-color: var(--amber);
   cursor: pointer;
 }
 
@@ -138,10 +138,10 @@
 }
 .maxScore span { font-weight: 700; }
 
-.scoreLow      { color: var(--green, #4caf50); background: rgba(76,175,80,0.1); }
-.scoreMedium   { color: var(--amber, #ffa726); background: rgba(255,167,38,0.1); }
-.scoreHigh     { color: var(--red, #e53935);   background: rgba(229,57,53,0.12); }
-.scoreCritical { color: var(--red, #e53935);   background: rgba(229,57,53,0.2);  font-weight: 800; }
+.scoreLow      { color: var(--green-light); background: color-mix(in srgb, var(--green) 10%, transparent); }
+.scoreMedium   { color: var(--amber-light); background: color-mix(in srgb, var(--amber) 10%, transparent); }
+.scoreHigh     { color: var(--red-light);   background: color-mix(in srgb, var(--red) 12%, transparent); }
+.scoreCritical { color: var(--red-light);   background: color-mix(in srgb, var(--red) 20%, transparent);  font-weight: 800; }
 
 .textarea { composes: textarea from './form.module.css'; }
 
@@ -153,14 +153,14 @@
 
 .error {
   font-size: 12px;
-  color: var(--red, #e53935);
+  color: var(--red);
   font-family: var(--font-mono);
   margin: 0;
 }
 
 .compRequiredHint {
   font-size: 11px;
-  color: var(--amber, #f59e0b);
+  color: var(--amber);
   font-family: var(--font-mono);
   margin: 4px 0 0;
 }
@@ -185,7 +185,7 @@
 }
 
 .required {
-  color: var(--red, #e53935);
+  color: var(--red);
   font-weight: 600;
   margin-left: 2px;
 }
@@ -231,11 +231,11 @@
   cursor: pointer;
   transition: background 0.1s;
 }
-.componentRow:hover { background: rgba(255,255,255,0.03); }
-.componentRowSel { background: rgba(255,167,38,0.08); }
+.componentRow:hover { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.componentRowSel { background: color-mix(in srgb, var(--amber) 8%, transparent); }
 
 .componentCheck {
-  accent-color: var(--amber, #ffa726);
+  accent-color: var(--amber);
   cursor: pointer;
 }
 
@@ -294,7 +294,7 @@
   padding: 1px 7px;
   line-height: 1;
 }
-.removeBtn:hover { border-color: var(--red, #e53935); color: var(--red, #e53935); }
+.removeBtn:hover { border-color: var(--red); color: var(--red); }
 
 .compSystems {
   display: flex;
@@ -304,7 +304,7 @@
   font-size: 10px;
 }
 
-.attachOk { color: var(--green, #4caf50); }
+.attachOk { color: var(--green); }
 
 .systemsList {
   color: var(--text-secondary);
@@ -319,7 +319,7 @@
 .attachWarn {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--amber, #ffa726);
+  color: var(--amber);
   flex-shrink: 0;
 }
 
@@ -334,17 +334,17 @@
 }
 
 .attachBtn {
-  background: rgba(76,175,80,0.15);
-  border: 1px solid rgba(76,175,80,0.4);
+  background: color-mix(in srgb, var(--green) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 40%, transparent);
   border-radius: 3px;
-  color: var(--green, #4caf50);
+  color: var(--green-light);
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   padding: 3px 9px;
 }
-.attachBtn:hover:not(:disabled) { background: rgba(76,175,80,0.25); }
+.attachBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--green) 25%, transparent); }
 .attachBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Picker row & search */
@@ -379,7 +379,7 @@
   padding: 6px 10px;
   white-space: nowrap;
 }
-.newCompBtn:hover { border-color: var(--amber, #ffa726); color: var(--amber, #ffa726); }
+.newCompBtn:hover { border-color: var(--amber); color: var(--amber); }
 
 .componentResults {
   display: flex;
@@ -413,8 +413,8 @@
 .componentTypeChip {
   font-family: var(--font-mono);
   font-size: 9px;
-  color: var(--text-muted);
-  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
   padding: 2px 6px;
   border-radius: 3px;
   text-transform: uppercase;
@@ -424,15 +424,15 @@
 .componentSystemHint {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--green, #4caf50);
+  color: var(--green);
   flex-shrink: 0;
 }
 
 .componentAdd {
-  background: var(--amber, #ffa726);
-  border: 1px solid var(--amber, #ffa726);
+  background: var(--amber);
+  border: 1px solid var(--amber);
   border-radius: 3px;
-  color: #000;
+  color: var(--text-on-fill);
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -445,7 +445,7 @@
 .inlineLink {
   background: none;
   border: none;
-  color: var(--amber, #ffa726);
+  color: var(--amber);
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -543,7 +543,7 @@
 
 .bulkSystemRow:hover { background: var(--bg-elevated); }
 
-.bulkSystemRowChecked { background: rgba(255, 167, 38, 0.08); }
+.bulkSystemRowChecked { background: color-mix(in srgb, var(--amber) 8%, transparent); }
 
 .bulkSystemRow input { cursor: pointer; }
 
@@ -584,22 +584,22 @@
   background: var(--bg-surface); color: var(--text-muted);
   border: 1.5px solid var(--border);
 }
-.stepDotActive { border-color: var(--accent, #3b82f6); color: var(--accent, #3b82f6); }
-.stepDotDone { background: var(--accent, #3b82f6); border-color: var(--accent, #3b82f6); color: #fff; }
+.stepDotActive { border-color: var(--accent); color: var(--accent); }
+.stepDotDone { background: var(--accent); border-color: var(--accent); color: var(--text-on-fill); }
 .stepLabel { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
 .stepLabelActive { color: var(--text-primary); font-weight: 600; }
 .stepLine { width: 24px; height: 1.5px; background: var(--border); margin: 0 2px; }
-.stepLineDone { background: var(--accent, #3b82f6); }
+.stepLineDone { background: var(--accent); }
 
 /* ── Wizard body + probability rows ─────────────────────────────────────────── */
 .body { padding: 18px 20px; min-height: 240px; }
 .probRow { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
 .probRow .probDim { min-width: 120px; font-size: 13px; color: var(--text-secondary); }
 
-.chipOk { color: var(--green, #16a34a); font-size: 12px; font-weight: 600; }
+.chipOk { color: var(--green); font-size: 12px; font-weight: 600; }
 .chipWarn {
   display: inline-block; font-size: 11px; font-weight: 700; text-transform: capitalize;
-  color: #7a4a00; background: var(--amber, #f59e0b); padding: 1px 7px; border-radius: var(--radius-sm);
+  color: var(--text-on-fill); background: var(--amber); padding: 1px 7px; border-radius: var(--radius-sm);
 }
 
 /* ── Replicate step ─────────────────────────────────────────────────────────── */
@@ -614,7 +614,7 @@
 .replicaHead { display: flex; align-items: center; gap: 10px; }
 .replicaName { font-weight: 600; font-size: 13px; color: var(--text-primary); flex: 1; }
 .replicaRemove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 0 4px; }
-.replicaRemove:hover { color: var(--red, #e53935); }
+.replicaRemove:hover { color: var(--red); }
 
 /* ── Correcting the system's record from the gap step ─────────────────────── */
 
@@ -626,10 +626,10 @@
 .dupBlock {
   margin-top: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--amber, #d69e2e);
+  border: 1px solid var(--amber);
   border-left-width: 3px;
   border-radius: 4px;
-  background: rgba(214, 158, 46, 0.08);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
 }
 
 .dupTitle {
@@ -643,5 +643,5 @@
   margin: 0 0 10px;
   font-size: 12px;
   line-height: 1.5;
-  color: var(--text-secondary, var(--text-muted));
+  color: var(--text-secondary);
 }

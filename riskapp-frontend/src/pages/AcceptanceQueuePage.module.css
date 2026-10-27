@@ -32,7 +32,7 @@
 
 .acceptErr {
   font-size: 11px;
-  color: var(--red, #e53935);
+  color: var(--red);
   margin: 0;
   text-align: right;
 }
@@ -49,15 +49,15 @@
   align-items: flex-end;
   gap: 8px;
   padding: 10px 12px;
-  background: rgba(255,167,38,0.07);
-  border: 1px solid rgba(255,167,38,0.25);
+  background: color-mix(in srgb, var(--amber) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent);
   border-radius: var(--radius-sm);
 }
 
 .confirmText {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--amber, #ffa726);
+  color: var(--amber);
   text-align: right;
   line-height: 1.5;
   max-width: 240px;

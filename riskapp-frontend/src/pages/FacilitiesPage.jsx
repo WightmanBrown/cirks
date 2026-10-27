@@ -3,5 +3,5 @@
 import ComponentLibraryPage from './ComponentLibraryPage';
 
 export function FacilitiesPage() {
-  return <ComponentLibraryPage componentType="facility" title="Facilities" singular="Facility" />;
+  return <ComponentLibraryPage componentType="facility" title="Facilities" singular="Facility" helpKey="facilities.title" />;
 }

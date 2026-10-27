@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDepartments, createDepartment, getUsers } from '../api';
@@ -52,7 +53,7 @@ function NewDepartmentModal({ onClose, onCreated, users }) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h2 className={styles.modalTitle}>New Department</h2>
+        <h2 className={styles.modalTitle}>New Department <HelpDot k="departments.new_modal" placement="bottom" /></h2>
         <form onSubmit={handleSubmit}>
           <label className={styles.fieldLabel}>
             Name
@@ -122,7 +123,7 @@ export function DepartmentsPage() {
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Organisation</h1>
+            <h1 className={styles.title}>Organisation <HelpDot k="departments.title" placement="bottom" /></h1>
             {!loading && (
               <span className={styles.subtitle}>
                 {sorted.length} department{sorted.length !== 1 ? 's' : ''}
@@ -156,14 +157,14 @@ export function DepartmentsPage() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <SortableTh column="name" {...sortProps}>Name</SortableTh>
-                      <SortableTh column="iao" className={styles.colOptional} {...sortProps}>Owner (IAO)</SortableTh>
-                      <SortableTh column="iam" className={styles.colOptional} {...sortProps}>Manager (IAM)</SortableTh>
-                      <SortableTh column="assets" className={styles.colNum} {...sortProps}>Assets</SortableTh>
-                      <SortableTh column="systems" className={styles.colNum} {...sortProps}>Systems</SortableTh>
-                      <SortableTh column="services" className={styles.colNum} {...sortProps}>Services</SortableTh>
-                      <SortableTh column="tables" className={styles.colNum} {...sortProps}>Impact tables</SortableTh>
-                      <SortableTh column="risks" className={styles.colNum} {...sortProps}>Active risks</SortableTh>
+                      <SortableTh column="name" {...sortProps} helpKey="col.name">Name</SortableTh>
+                      <SortableTh column="iao" className={styles.colOptional} {...sortProps} helpKey="departments.col.iao">Owner (IAO)</SortableTh>
+                      <SortableTh column="iam" className={styles.colOptional} {...sortProps} helpKey="departments.col.iam">Manager (IAM)</SortableTh>
+                      <SortableTh column="assets" className={styles.colNum} {...sortProps} helpKey="departments.col.assets">Assets</SortableTh>
+                      <SortableTh column="systems" className={styles.colNum} {...sortProps} helpKey="departments.col.systems">Systems</SortableTh>
+                      <SortableTh column="services" className={styles.colNum} {...sortProps} helpKey="departments.col.services">Services</SortableTh>
+                      <SortableTh column="tables" className={styles.colNum} {...sortProps} helpKey="departments.col.impact_tables">Impact tables</SortableTh>
+                      <SortableTh column="risks" className={styles.colNum} {...sortProps} helpKey="departments.col.active_risks">Active risks</SortableTh>
                     </tr>
                   </thead>
                   <tbody>

@@ -8,6 +8,7 @@ import styles              from './ActionsPage.module.css';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
 import { Th } from '../components/Th';
+import { HelpDot } from '../components/HelpDot';
 
 export function SiroCyclesPage() {
   const [cycles,  setCycles]  = useState([]);
@@ -36,7 +37,7 @@ export function SiroCyclesPage() {
         <BackButton />
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>Cycle Approval</h1>
+            <h1 className={styles.pageTitle}>Cycle Approval <HelpDot k="siro_cycles.title" placement="bottom" /></h1>
             <p className={styles.pageDesc}>
               Review cycles frozen by the CISO and awaiting SIRO sign-off. Click a row to review and approve.
             </p>
@@ -69,12 +70,12 @@ export function SiroCyclesPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th>Cycle</Th>
-                    <Th>Period</Th>
-                    <Th>Meeting Date</Th>
-                    <Th>Frozen At</Th>
-                    <Th>Frozen By</Th>
-                    <Th>Changes</Th>
+                    <Th helpKey="siro_cycles.col.cycle">Cycle</Th>
+                    <Th helpKey="siro_cycles.col.period">Period</Th>
+                    <Th helpKey="siro_cycles.col.meeting_date">Meeting Date</Th>
+                    <Th helpKey="siro_cycles.col.frozen_at">Frozen At</Th>
+                    <Th helpKey="siro_cycles.col.frozen_by">Frozen By</Th>
+                    <Th helpKey="siro_cycles.col.changes">Changes</Th>
                   </tr>
                 </thead>
                 <tbody>

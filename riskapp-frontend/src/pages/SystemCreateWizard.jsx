@@ -13,6 +13,7 @@ import { BackButton } from '../components/BackButton';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { PersonSelect } from '../components/PersonSelect';
 import { PatternChip } from '../components/PatternChip';
+import { HelpDot } from '../components/HelpDot';
 import { ComponentModal } from '../components/ComponentModal';
 import { componentTypeShort } from '../utils/componentTypes';
 import { CROSS_DEPT_ROLES } from '../utils/departmentScope';
@@ -25,6 +26,14 @@ import styles from './SystemCreateWizard.module.css';
 // record will imply before anything is created.
 
 const STEPS = ['What it is', 'What it is built like', 'Its answers', 'Anything special', 'Review'];
+// The ⓘ beside each step's label, in the same order as STEPS.
+const STEP_HELP = [
+  { helpKey: 'system_wizard.step.what' },
+  { helpKey: 'system_wizard.step.built_like' },
+  { helpKey: 'system_wizard.step.answers' },
+  { helpKey: 'system_wizard.step.special' },
+  { helpKey: 'system_wizard.step.review' },
+];
 const HAND = 'hand';
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
@@ -170,11 +179,11 @@ export function SystemCreateWizard() {
     <Shell>
       <div className={styles.page}>
         <BackButton fallback="/systems" />
-        <h1 className={styles.title}>New system</h1>
+        <h1 className={styles.title}>New system <HelpDot k="system_wizard.title" placement="bottom" /></h1>
         <ol className={styles.steps}>
           {STEPS.map((label, i) => (
             <li key={label} className={i === step ? styles.stepOn : i < step ? styles.stepDone : styles.step}
-              aria-current={i === step ? 'step' : undefined}>{i + 1}. {label}</li>
+              aria-current={i === step ? 'step' : undefined}>{i + 1}. {label} <HelpDot k={STEP_HELP[i].helpKey} placement="bottom" /></li>
           ))}
         </ol>
 
@@ -234,7 +243,7 @@ export function SystemCreateWizard() {
                 </button>
               ))}
             </div>
-            <h2 className={styles.sub}>Nothing fits?</h2>
+            <h2 className={styles.sub}>Nothing fits? <HelpDot k="system_wizard.nothing_fits" placement="bottom" /></h2>
             <div className={styles.options}>
               <div className={styles.note}>
                 <b>There will be more like this: make a pattern first.</b>{' '}
@@ -348,7 +357,7 @@ export function SystemCreateWizard() {
                   );
                 })}
               </div>
-              <h2 className={styles.sub}>What this record implies</h2>
+              <h2 className={styles.sub}>What this record implies <HelpDot k="system_wizard.implies" placement="bottom" /></h2>
               {implied.length === 0
                 ? <p className={styles.muted}>No security solution is implied: none of these components triggers one.</p>
                 : (

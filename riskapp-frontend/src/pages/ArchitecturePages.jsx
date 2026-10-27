@@ -14,6 +14,7 @@ import { PatternChip } from '../components/PatternChip';
 import { COMPONENT_TYPES, componentTypeLabel, componentTypeShort } from '../utils/componentTypes';
 import shared from './ScopesPage.module.css';
 import styles from './ArchitecturePages.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 // The security architecture (v148, docs/system-security-view.md §4.2–§4.4), as
 // three pages (owner, 2026-10-02):
@@ -21,7 +22,9 @@ import styles from './ArchitecturePages.module.css';
 //   Security pattern triggers      — the security solutions a component on a system calls for (rules);
 //   System architecture patterns   — components that live together, applied as a copy (builds).
 // Written by the security team (controls.write); everyone who reads the control
-// catalogue can see them. Report only: nothing here changes a status or a risk score.
+// catalogue can see them. Template gaps are reported (system page, findings); a
+// trigger implies a solution, and an implied objective's status follows its
+// solution (v152), so triggers and applied patterns can change risk scores.
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
@@ -117,7 +120,7 @@ function useArchitecture(cap = 'controls.write') {
            confirmRemove: (what, effect) => window.confirm(`Remove ${what}? ${effect}`) };
 }
 
-function Frame({ title, comment, children, a, needsDocs }) {
+function Frame({ title, comment, children, a, needsDocs, helpKey, helpPlacement = 'bottom' }) {
   const here = PAGES.find(p => p.label === title);
   return (
     <Shell>
@@ -125,14 +128,15 @@ function Frame({ title, comment, children, a, needsDocs }) {
         <BackButton fallback="/controls" />
         <div className={shared.header}>
           <div>
-            <h1 className={shared.title}>{title}</h1>
+            <h1 className={shared.title}>{title}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</h1>
             {comment && <p className={shared.desc}><b>{comment}</b></p>}
             <p className={shared.note}>
               Part of the security architecture, with{' '}
               {PAGES.filter(p => p !== here).map((p, i) => (
                 <span key={p.path}>{i > 0 && ' and '}<Link to={p.path}>{p.label}</Link></span>
-              ))}. Gaps appear on each system and in the <Link to="/findings">findings</Link>; nothing here changes a
-              control&rsquo;s status or a risk score.
+              ))}. Gaps appear on each system and in the <Link to="/findings">findings</Link>. What a system records
+              decides which security solutions it implies, and an implied objective&rsquo;s status on the system
+              follows its solution &mdash; so this can change risk scores.
             </p>
           </div>
           {!a.canEdit && <ReadOnlyBadge reason={`Editing this needs the ${a.cap} capability (CISO, risk analyst, admin).`} />}
@@ -155,10 +159,10 @@ export function ArchitectureTemplatePage() {
   const { canEdit, lib, components, run, docs, noDocs, confirmRemove } = a;
   const [draftGroup, setDraftGroup] = useState({ name: '', standard_id: '' });
   return (
-    <Frame title="Systems architecture template" comment="What every system must record." a={a} needsDocs>
+    <Frame title="Systems architecture template" comment="What every system must record." a={a} needsDocs helpKey="security_architecture.template">
       {lib && (<>
           <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Groups <span className={shared.count}>{lib.groups.length}</span></h2>
+            <h2 className={shared.sectionTitle}>Groups <span className={shared.count}>{lib.groups.length}</span> <HelpDot k="security_architecture.groups" placement="bottom" /></h2>
             <p className={shared.note}>
               Each system should include one component from each group — its network zone, where it is hosted,
               its operating system and so on. A system that includes none has a gap, because without it the rules
@@ -173,7 +177,7 @@ export function ArchitectureTemplatePage() {
                 <article key={g.id} className={styles.card}>
                   <header className={styles.cardHead}>
                     <div>
-                      <div className={styles.titleRow}><h3 className={styles.cardTitle}>{g.name}</h3><PatternChip kind="template" /></div>
+                      <div className={styles.titleRow}><h3 className={styles.cardTitle}>{g.name} <HelpDot k="security_architecture.group_card" placement="bottom" /></h3><PatternChip kind="template" /></div>
                       <span className={shared.note}>
                         From {g.standard_name} ·{' '}
                         {g.triggers.length ? 'applies to systems recording a trigger below' : `applies to all ${plural(lib.active_systems, 'system')}`}
@@ -235,10 +239,10 @@ export function SecurityPatternTriggersPage() {
   const { canEdit, lib, solutions, components, run, docs, noDocs, confirmRemove } = a;
   const [draftRule, setDraftRule]   = useState({ pattern_id: '', standard_id: '' });
   return (
-    <Frame title="Security pattern triggers" a={a} needsDocs>
+    <Frame title="Security pattern triggers" a={a} needsDocs helpKey="security_architecture.triggers">
       {lib && (<>
           <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Triggers <span className={shared.count}>{lib.rules.length}</span></h2>
+            <h2 className={shared.sectionTitle}>Triggers <span className={shared.count}>{lib.rules.length}</span> <HelpDot k="security_architecture.rules" placement="bottom" /></h2>
             <p className={shared.note}>
               Each rule below names a security solution and the components that trigger it. A system that has <b>any one</b> of
               those components must have the solution. List alternatives on one rule (for example <i>Windows Server 2016</i> and{' '}
@@ -252,7 +256,7 @@ export function SecurityPatternTriggersPage() {
                 <article key={r.id} className={styles.card}>
                   <header className={styles.cardHead}>
                     <div>
-                      <div className={styles.titleRow}><h3 className={styles.cardTitle}><Link to={`/security-solutions/${r.pattern_id}`}>{r.pattern_name}</Link></h3><PatternChip kind="solution" /></div>
+                      <div className={styles.titleRow}><h3 className={styles.cardTitle}><Link to={`/security-solutions/${r.pattern_id}`}>{r.pattern_name}</Link> <HelpDot k="security_architecture.rule_card" placement="bottom" /></h3><PatternChip kind="solution" /></div>
                       <span className={shared.note}>
                         Required by {r.standard_name} · applies to {plural(r.systems, 'system')} today
                         {r.notes && <> · {r.notes}</>}
@@ -303,10 +307,10 @@ export function ArchitecturePatternsPage() {
   const [draftBuild, setDraftBuild] = useState('');
   const [renaming, setRenaming] = useState(null);   // { id, name } while a pattern's name is being edited
   return (
-    <Frame title="System architecture patterns" a={a}>
+    <Frame title="System architecture patterns" a={a} helpKey="security_architecture.patterns">
       {lib && (<>
           <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Patterns <span className={shared.count}>{lib.builds.length}</span></h2>
+            <h2 className={shared.sectionTitle}>Patterns <span className={shared.count}>{lib.builds.length}</span> <HelpDot k="security_architecture.builds" placement="bottom" /></h2>
             <p className={shared.note}>
               A system architecture pattern is a named set of components that are normally installed together. For example,
               a standard Windows server is its operating system, its endpoint protection agent and its logging agent. Define
@@ -344,7 +348,7 @@ export function ArchitecturePatternsPage() {
                       </form>
                     ) : (
                       <div>
-                        <div className={styles.titleRow}><h3 className={styles.cardTitle}>{b.name}</h3><PatternChip kind="pattern" /></div>
+                        <div className={styles.titleRow}><h3 className={styles.cardTitle}>{b.name} <HelpDot k="security_architecture.build_card" placement="bottom" /></h3><PatternChip kind="pattern" /></div>
                         {b.notes && <span className={shared.note}>{b.notes}</span>}
                       </div>
                     )}

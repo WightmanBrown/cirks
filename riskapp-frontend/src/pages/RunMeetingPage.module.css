@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--bg-base, #0f0f0f);
+  background: var(--bg-base);
   overflow: hidden;
 }
 
@@ -25,7 +25,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 10px 20px;
-  background: var(--bg-surface, #1a1a1a);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -51,10 +51,10 @@
   padding: 2px 8px;
   border-radius: var(--radius-sm);
 }
-.state_planned        { background: rgba(100,181,246,0.12); color: #64b5f6; }
-.state_closed         { background: rgba(255,183,77,0.12);  color: #ffb74d; }
-.state_minutes_issued { background: rgba(129,199,132,0.12); color: #81c784; }
-.state_draft          { background: rgba(150,150,150,0.1);  color: #888; }
+.state_planned        { background: color-mix(in srgb, var(--blue) 12%, transparent); color: var(--blue-light); }
+.state_closed         { background: color-mix(in srgb, var(--amber) 12%, transparent);  color: var(--amber-light); }
+.state_minutes_issued { background: color-mix(in srgb, var(--green) 12%, transparent); color: var(--green-light); }
+.state_draft          { background: color-mix(in srgb, var(--ink) 6%, transparent);  color: var(--text-secondary); }
 
 .headerRight {
   display: flex;
@@ -72,7 +72,7 @@
 
 .progressFill {
   height: 100%;
-  background: var(--accent, #1976d2);
+  background: var(--accent);
   border-radius: 2px;
   transition: width 0.3s;
 }
@@ -102,7 +102,7 @@
   overflow-y: auto;
   border-right: 1px solid var(--border);
   padding: 8px 0;
-  background: var(--bg-surface, #1a1a1a);
+  background: var(--bg-surface);
 }
 
 .sidebarItem {
@@ -117,11 +117,11 @@
   cursor: pointer;
   border-left: 3px solid transparent;
 }
-.sidebarItem:hover { background: var(--bg-hover, rgba(255,255,255,0.04)); }
+.sidebarItem:hover { background: var(--bg-hover); }
 
 .sidebarActive {
-  background: rgba(25,118,210,0.08) !important;
-  border-left-color: var(--accent, #1976d2);
+  background: color-mix(in srgb, var(--blue) 8%, transparent) !important;
+  border-left-color: var(--accent);
 }
 
 .sidebarIndex {
@@ -147,9 +147,9 @@
   font-size: 11px;
   flex-shrink: 0;
 }
-.icon_decided   { color: var(--green, #4caf50); }
-.icon_discussed { color: var(--green, #4caf50); }
-.icon_pending   { color: var(--text-muted, rgba(255,255,255,0.3)); }
+.icon_decided   { color: var(--green); }
+.icon_discussed { color: var(--green); }
+.icon_pending   { color: var(--text-muted); }
 
 /* ── Main panel ──────────────────────────────────────────────────────────── */
 
@@ -230,9 +230,9 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--amber, #ffa726);
-  border: 1px solid rgba(255,167,38,0.4);
-  background: rgba(255,167,38,0.08);
+  color: var(--amber-light);
+  border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
   margin-bottom: 16px;
@@ -283,16 +283,16 @@
   font-size: 11px;
   font-weight: 600;
 }
-.vs_pending  { background: rgba(255,167,38,0.1);  color: #ffcc80; }
-.vs_returned { background: rgba(229,57,53,0.1);   color: #ef9a9a; }
-.vs_active   { background: rgba(76,175,80,0.1);   color: #a5d6a7; }
+.vs_pending  { background: color-mix(in srgb, var(--amber) 10%, transparent);  color: var(--amber-light); }
+.vs_returned { background: color-mix(in srgb, var(--red) 10%, transparent);   color: var(--red-light); }
+.vs_active   { background: color-mix(in srgb, var(--green) 10%, transparent);   color: var(--green-light); }
 
-.sa_proposed   { background: rgba(100,181,246,0.1); color: #90caf9; }
-.sa_planned    { background: rgba(100,181,246,0.1); color: #90caf9; }
-.sa_in_progress{ background: rgba(255,183,77,0.1);  color: #ffe082; }
-.sa_completed  { background: rgba(129,199,132,0.1); color: #c8e6c9; }
-.sa_verified   { background: rgba(76,175,80,0.1);   color: #a5d6a7; }
-.sa_rejected   { background: rgba(229,57,53,0.1);   color: #ef9a9a; }
+.sa_proposed   { background: color-mix(in srgb, var(--blue) 10%, transparent); color: var(--blue-light); }
+.sa_planned    { background: color-mix(in srgb, var(--blue) 10%, transparent); color: var(--blue-light); }
+.sa_in_progress{ background: color-mix(in srgb, var(--amber) 10%, transparent);  color: var(--amber-light); }
+.sa_completed  { background: color-mix(in srgb, var(--green) 10%, transparent); color: var(--green-light); }
+.sa_verified   { background: color-mix(in srgb, var(--green) 10%, transparent);   color: var(--green-light); }
+.sa_rejected   { background: color-mix(in srgb, var(--red) 10%, transparent);   color: var(--red-light); }
 
 .itemNotes {
   font-size: 13px;
@@ -303,8 +303,8 @@
 
 .decisionRecorded {
   padding: 12px 14px;
-  background: rgba(76,175,80,0.06);
-  border: 1px solid rgba(76,175,80,0.3);
+  background: color-mix(in srgb, var(--green) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
   border-radius: var(--radius-sm);
 }
 
@@ -314,7 +314,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--green, #4caf50);
+  color: var(--green);
   margin-bottom: 6px;
 }
 
@@ -364,20 +364,20 @@
 .actionBtn:disabled { opacity: 0.5; cursor: default; }
 
 .actionBtn_approve {
-  background: rgba(76,175,80,0.1);
-  border-color: rgba(76,175,80,0.5);
-  color: #a5d6a7;
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+  border-color: color-mix(in srgb, var(--green) 50%, transparent);
+  color: var(--green-light);
 }
-.actionBtn_approve:hover { background: rgba(76,175,80,0.2); }
-.actionBtn_approve.actionBtnSelected { background: rgba(76,175,80,0.25); border-color: #4caf50; }
+.actionBtn_approve:hover { background: color-mix(in srgb, var(--green) 20%, transparent); }
+.actionBtn_approve.actionBtnSelected { background: color-mix(in srgb, var(--green) 25%, transparent); border-color: var(--green); }
 
 .actionBtn_reject {
-  background: rgba(229,57,53,0.08);
-  border-color: rgba(229,57,53,0.4);
-  color: #ef9a9a;
+  background: color-mix(in srgb, var(--red) 8%, transparent);
+  border-color: color-mix(in srgb, var(--red) 40%, transparent);
+  color: var(--red-light);
 }
-.actionBtn_reject:hover { background: rgba(229,57,53,0.16); }
-.actionBtn_reject.actionBtnSelected { background: rgba(229,57,53,0.2); border-color: #e53935; }
+.actionBtn_reject:hover { background: color-mix(in srgb, var(--red) 16%, transparent); }
+.actionBtn_reject.actionBtnSelected { background: color-mix(in srgb, var(--red) 20%, transparent); border-color: var(--danger); }
 
 .formButtons {
   display: flex;
@@ -389,18 +389,18 @@
 .btnRecord { composes: btnSecondary from '../components/buttons.module.css'; }
 .btnConfirmAction { composes: btnSecondary from '../components/buttons.module.css'; }
 .btnConfirmAction_approve {
-  background: rgba(76,175,80,0.15);
-  border-color: #4caf50;
-  color: #a5d6a7;
+  background: color-mix(in srgb, var(--green) 15%, transparent);
+  border-color: var(--green);
+  color: var(--green-light);
 }
-.btnConfirmAction_approve:hover { background: rgba(76,175,80,0.28); }
+.btnConfirmAction_approve:hover { background: color-mix(in srgb, var(--green) 28%, transparent); }
 
 .btnConfirmAction_reject {
-  background: rgba(229,57,53,0.12);
-  border-color: #e53935;
-  color: #ef9a9a;
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+  border-color: var(--danger);
+  color: var(--red-light);
 }
-.btnConfirmAction_reject:hover { background: rgba(229,57,53,0.25); }
+.btnConfirmAction_reject:hover { background: color-mix(in srgb, var(--red) 25%, transparent); }
 
 .roleHint {
   margin: 0;
@@ -408,28 +408,28 @@
   color: var(--text-secondary);
   font-style: italic;
   padding: 8px 12px;
-  background: rgba(255,255,255,0.03);
-  border-left: 3px solid var(--border-accent, rgba(255,255,255,0.15));
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  border-left: 3px solid var(--border-accent);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .pendingAction {
   font-size: 12px;
   padding: 7px 12px;
-  background: rgba(100,181,246,0.07);
-  border: 1px solid rgba(100,181,246,0.25);
+  background: color-mix(in srgb, var(--blue) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue) 25%, transparent);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
 }
 
 .pendingActionLabel {
   font-weight: 700;
-  color: #90caf9;
+  color: var(--blue-light);
 }
 
 .readonlyHint {
   font-size: 12px;
-  color: var(--text-muted, rgba(255,255,255,0.3));
+  color: var(--text-muted);
   margin: 0;
   font-style: italic;
 }
@@ -448,7 +448,7 @@
   justify-content: space-between;
   padding: 10px 24px;
   border-top: 1px solid var(--border);
-  background: var(--bg-surface, #1a1a1a);
+  background: var(--bg-surface);
   flex-shrink: 0;
 }
 
@@ -470,11 +470,11 @@
   flex-shrink: 0;
   transition: background 0.15s;
 }
-.navDotActive       { background: var(--accent, #1976d2); }
-.navDot_decided     { background: rgba(76,175,80,0.6); }
-.navDot_discussed   { background: rgba(76,175,80,0.6); }
-.navDotActive.navDot_decided   { background: #4caf50; }
-.navDotActive.navDot_discussed { background: #4caf50; }
+.navDotActive       { background: var(--accent); }
+.navDot_decided     { background: color-mix(in srgb, var(--green) 60%, transparent); }
+.navDot_discussed   { background: color-mix(in srgb, var(--green) 60%, transparent); }
+.navDotActive.navDot_decided   { background: var(--green); }
+.navDotActive.navDot_discussed { background: var(--green); }
 
 /* ── Finish meeting ──────────────────────────────────────────────────────── */
 

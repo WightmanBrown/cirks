@@ -113,7 +113,7 @@
 
 .filterActive {
   border-color: var(--amber-dim);
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
 }
 
@@ -123,9 +123,9 @@
   align-items: center;
   gap: 12px;
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.2);
+  border: 1px solid color-mix(in srgb, var(--red) 20%, transparent);
   border-radius: var(--radius-md);
-  color: var(--red);
+  color: var(--red-light);
   font-size: 13px;
   padding: 12px 16px;
 }
@@ -228,14 +228,14 @@
 
 .statusPending {
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
 }
 
 .statusReturned {
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.2);
-  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 20%, transparent);
+  color: var(--red-light);
 }
 
 /* Empty / loading state */
@@ -268,11 +268,11 @@
 .toast_success {
   background: var(--green-dim);
   border: 1px solid var(--green);
-  color: var(--green);
+  color: var(--green-light);
 }
 
 .toast_info {
   background: var(--red-dim);
   border: 1px solid var(--red);
-  color: var(--red);
+  color: var(--red-light);
 }

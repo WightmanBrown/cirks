@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './CountWidget.module.css';
+import { HelpDot } from './HelpDot';
 
 /**
  * Shared "big-count headline" dashboard widget (Pattern B). Canonical style is
@@ -11,6 +12,7 @@ import styles from './CountWidget.module.css';
  *
  * Props:
  *  - title, badge          header text + role chip
+ *  - helpKey, helpPlacement optional ⓘ help key shown after the title
  *  - fetchCount            async () => number
  *  - errorText             message shown if fetchCount throws
  *  - singular / plural     count label (chosen by count === 1)
@@ -32,6 +34,8 @@ export function CountWidget({
   linkLabel,
   clickable = false,
   zeroText,
+  helpKey,
+  helpPlacement = 'bottom',
 }) {
   const [count,   setCount]   = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +73,7 @@ export function CountWidget({
   return (
     <div className={`${styles.widget} ${accentWidget}`} {...widgetProps}>
       <div className={styles.header}>
-        <span className={styles.title}>{title}</span>
+        <span className={styles.title}>{title}{helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}</span>
         <span className={styles.badge}>{badge}</span>
       </div>
 

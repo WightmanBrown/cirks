@@ -362,7 +362,13 @@ export function StatementOfApplicabilityPage({ framework: frameworkProp }) {
           <div>
             <h1 className={styles.title}>
               {framework !== 'all' ? `Statement of Applicability — ${viewLabel || framework}` : 'Statement of Applicability'}
-              <HelpDot k={isIso ? 'soa.iso27001' : 'soa.all_controls'} placement="bottom" label="About the Statement of Applicability" />
+              {isIso
+                ? <HelpDot k="soa.iso27001" placement="bottom" label="About the Statement of Applicability" />
+                : isStandard
+                ? <HelpDot k="soa.standard" placement="bottom" label="About the Statement of Applicability" />
+                : isCustom
+                ? <HelpDot k="soa.custom" placement="bottom" label="About the Statement of Applicability" />
+                : <HelpDot k="soa.all_controls" placement="bottom" label="About the Statement of Applicability" />}
             </h1>
             <p className={styles.desc}>
               {isStandard
@@ -488,6 +494,7 @@ export function StatementOfApplicabilityPage({ framework: frameworkProp }) {
                   ⚠ {untreatedRisks.length} risk{untreatedRisks.length === 1 ? '' : 's'} above appetite
                   {coverage?.appetite_score ? ` (score ≥ ${coverage.appetite_score})` : ''} with no control treating
                   {untreatedRisks.length === 1 ? ' it' : ' them'}
+                  <HelpDot k="soa.untreated_risks" placement="bottom" />
                 </h2>
                 <p className={styles.untreatedDesc}>
                   No control is deployed on the risk&apos;s system that addresses its threat. Either deploy a mitigating
@@ -541,7 +548,7 @@ export function StatementOfApplicabilityPage({ framework: frameworkProp }) {
             {isWholeRecord && (
             <section className={styles.versions}>
               <div className={styles.versionsHead}>
-                <h2 className={styles.versionsTitle}>Approved versions</h2>
+                <h2 className={styles.versionsTitle}>Approved versions <HelpDot k="soa.versions" placement="bottom" /></h2>
                 {canEdit && (
                   <div className={styles.approveRow}>
                     <input
@@ -662,6 +669,7 @@ export function StatementOfApplicabilityPage({ framework: frameworkProp }) {
                       </label>
                     )}
                     {label} <span className={styles.themeCount}>{rows.length}</span>
+                    <HelpDot k="soa.group" placement="bottom" />
                   </h2>
                   <div className={styles.rows}>
                     {rows.map(c => (isStandard ? (

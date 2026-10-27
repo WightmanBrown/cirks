@@ -68,7 +68,7 @@
 }
 
 .row { cursor: pointer; }
-.row:hover td { background: var(--bg-hover, var(--bg-surface)); }
+.row:hover td { background: var(--bg-hover); }
 
 .nameCell { font-weight: 600; color: var(--text-primary); }
 .countCell { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); text-align: left; }
@@ -98,7 +98,7 @@
    created for it will have no owner until someone is assigned, so the gap is
    named rather than shown as a dash among dashes. */
 .roleMissing {
-  color: var(--danger, #b3261e);
+  color: var(--danger);
   font-size: 0.8rem;
   font-weight: 500;
 }

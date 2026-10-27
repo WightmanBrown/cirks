@@ -8,6 +8,7 @@ import { BackButton } from '../components/BackButton';
 import { chipClass, scoreColorClass } from '../utils/riskColors';
 import { Spinner } from '../components/Spinner';
 import { Th } from '../components/Th';
+import { HelpDot } from '../components/HelpDot';
 import { StatusPill } from '../components/StatusPill';
 import styles from './ActionsPage.module.css';
 
@@ -120,7 +121,7 @@ export function ActionsPage() {
         <BackButton />
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>Security Actions</h1>
+            <h1 className={styles.pageTitle}>Security Actions <HelpDot k="actions.title" placement="bottom" /></h1>
             <p className={styles.pageDesc}>
               Security actions and their progress. Click a row to preview; open it to act
               on the ones you're responsible for.
@@ -190,12 +191,12 @@ export function ActionsPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th>Status</Th>
-                    <Th>Title</Th>
-                    <Th>Items</Th>
-                    <Th>Owner</Th>
-                    <Th>Plan</Th>
-                    <Th>Target Date</Th>
+                    <Th helpKey="actions.col.status">Status</Th>
+                    <Th helpKey="actions.col.title">Title</Th>
+                    <Th helpKey="actions.col.items">Items</Th>
+                    <Th helpKey="actions.col.owner">Owner</Th>
+                    <Th helpKey="actions.col.plan">Plan</Th>
+                    <Th helpKey="actions.col.target_date">Target Date</Th>
                   </tr>
                 </thead>
                 <tbody>

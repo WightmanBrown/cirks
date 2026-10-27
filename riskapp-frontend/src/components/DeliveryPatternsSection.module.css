@@ -3,7 +3,7 @@
 .wrap { display: flex; flex-direction: column; gap: 10px; }
 .explain { margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; }
 .muted { margin: 0; font-size: 12.5px; color: var(--text-muted); font-style: italic; }
-.error { background: rgba(229,83,75,0.12); border: 1px solid rgba(229,83,75,0.4); color: var(--red, #e5534b); border-radius: 6px; padding: 8px 12px; font-size: 13px; }
+.error { background: color-mix(in srgb, var(--red) 12%, transparent); border: 1px solid color-mix(in srgb, var(--red) 40%, transparent); color: var(--red-light); border-radius: 6px; padding: 8px 12px; font-size: 13px; }
 .card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; background: var(--bg-surface); }
 .cardHead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .patternName { font-weight: 700; font-size: 13.5px; color: var(--text-primary); }
@@ -11,18 +11,18 @@
 .parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 .parts li { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
 .parts a { color: var(--text-primary); text-decoration: none; }
-.parts a:hover { color: var(--accent, #64b5f6); text-decoration: underline; }
+.parts a:hover { color: var(--accent); text-decoration: underline; }
 .type { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); min-width: 90px; }
 .where { font-size: 12px; color: var(--text-secondary); }
-.linkBtn { background: none; border: none; padding: 0; color: var(--accent, #64b5f6); cursor: pointer; font-size: 12px; margin-left: auto; }
+.linkBtn { background: none; border: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 12px; margin-left: auto; }
 .partForm, .addForm { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
 .partForm select, .addForm input, .addForm select, .partForm input {
-  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  background: var(--bg-inset); border: 1px solid var(--border); color: var(--text-primary);
   border-radius: 5px; padding: 5px 8px; font-size: 12.5px; max-width: 360px;
 }
 .field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-muted); }
 .buttons { display: flex; gap: 8px; }
-.primary { background: var(--accent, #64b5f6); color: #0b1220; border: none; border-radius: 5px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.primary { background: var(--accent); color: var(--text-on-fill); border: none; border-radius: 5px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .secondary { align-self: flex-start; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); border-radius: 5px; padding: 5px 12px; font-size: 12.5px; cursor: pointer; }
 .h3 { font-size: 0.85rem; margin: 8px 0 0; color: var(--text-primary); }
@@ -30,11 +30,11 @@
 .table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .table td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text-primary); }
 .table a { color: var(--text-primary); text-decoration: none; }
-.table a:hover { color: var(--accent, #64b5f6); text-decoration: underline; }
-.good { color: var(--green, #3fb950); font-weight: 600; }
-.warn { color: var(--amber, #d29922); }
+.table a:hover { color: var(--accent); text-decoration: underline; }
+.good { color: var(--green); font-weight: 600; }
+.warn { color: var(--amber); }
 .shared { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
 .shared a { color: var(--text-primary); text-decoration: none; }
-.shared a:hover { color: var(--accent, #64b5f6); text-decoration: underline; }
-.shared b { color: var(--amber, #d29922); font-weight: 600; }
+.shared a:hover { color: var(--accent); text-decoration: underline; }
+.shared b { color: var(--amber); font-weight: 600; }
 .scopeAsk { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--text-primary); }

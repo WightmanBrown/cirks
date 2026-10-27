@@ -5,6 +5,7 @@ import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { WalkableGraph } from '../components/WalkableGraph';
 import { EntityKind } from '../components/EntityKind';
+import { HelpDot } from '../components/HelpDot';
 
 export function GraphExplorerPage() {
   const { type, id } = useParams();
@@ -15,7 +16,7 @@ export function GraphExplorerPage() {
         <div>
           <BackButton />
           <h1 style={{ margin: '0.25rem 0 0' }}>
-            Graph explorer<EntityKind kind="knowledge" />
+            Graph explorer<EntityKind kind="knowledge" /> <HelpDot k="graph_explorer.title" placement="bottom" />
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '13px', margin: '4px 0 0' }}>
             Click a node to see its details and walk one hop further. Dashed nodes can still be expanded.

@@ -4,38 +4,112 @@
  */
 /* ── Design Tokens ──────────────────────────────────────────────────────────── */
 :root {
-  /* Palette — dark slate + amber */
+  /* ── Colour ──────────────────────────────────────────────────────────────────
+     Every colour in CIRKS comes from here. Components never write a colour
+     value: they name one of these, or mix one with transparency
+       color-mix(in srgb, var(--red) 15%, transparent)
+     so that a second theme (day mode) is one more block of values. A test
+     (src/styles/colours.test.js) fails on a colour written anywhere else. */
+
+  /* Surfaces, darkest to lightest */
   --bg-base:        #0d0f13;
+  --bg-inset:       #0f1218;            /* recessed wells / input backgrounds */
   --bg-surface:     #13161d;
   --bg-elevated:    #1a1e28;
   --bg-overlay:     rgba(13, 15, 19, 0.85);
-  --bg-inset:       #0f1218;            /* recessed wells / input backgrounds */
   --bg-hover:       rgba(255,255,255,0.04); /* subtle row/button hover */
+
+  /* Translucent overlays mix one of these with transparency: --ink lightens
+     (white on a dark theme), --shade darkens (shadows, scrims). */
+  --ink:            #ffffff;
+  --shade:          #000000;
 
   --border:         #252a38;
   --border-accent:  #2e3547;
 
+  /* Text. Muted text passes WCAG AA (4.5:1) on every surface above; it was
+     #4e5668 (2.3:1) until 2026-10-26, which made labels hard to read. */
+  --text-primary:   #e8ecf4;
+  --text-secondary: #aab2c4;
+  --text-muted:     #7f889d;
+  --text-amber:     #f5a623;
+  --text-on-fill:   #0d0f13;            /* text on a solid coloured fill (button, chip) */
+
+  /* Hues. The plain name is for marks, borders and fills; -light is for text
+     sitting on a tint of the same hue. */
   --amber:          #f5a623;
+  --amber-light:    #ffb74d;
   --amber-dim:      #c47e0c;
   --amber-glow:     rgba(245, 166, 35, 0.12);
   --amber-faint:    rgba(245, 166, 35, 0.06);
 
   --red:            #e85d4a;
+  --red-light:      #f19a8f;
   --red-dim:        rgba(232, 93, 74, 0.15);
   --green:          #4caf7d;
+  --green-light:    #95d5b2;
   --green-dim:      rgba(76, 175, 125, 0.12);
   --blue:           #5b8dee;
+  --blue-light:     #98b9f5;
   --violet:         #a58bf0;             /* system architecture patterns (PatternChip) */
+  --teal:           #4fc3c7;
+
   /* Secondary accent — blue, distinct from the amber brand accent. Used for
      focus rings, interactive highlights, selected states. */
   --accent:         var(--blue);
   --accent-hover:   #4778d6;             /* darker blue for accent :hover */
   --accent-faint:   rgba(91, 141, 238, 0.12);
 
-  --text-primary:   #e8ecf4;
-  --text-secondary: #8b93a8;
-  --text-muted:     #4e5668;
-  --text-amber:     #f5a623;
+  /* What a colour means, for use where the meaning is the point */
+  --danger:         var(--red);
+  --success:        var(--green);
+  --warning:        var(--amber);
+  --info:           var(--blue);
+
+  /* Risk bands (utils/riskColors): a dark fill with light text */
+  --band-low-bg:            #1a3a2a;  --band-low-fg:          #5af09a;
+  --band-medium-bg:         #3a3010;  --band-medium-fg:       #f0c85a;
+  --band-high-bg:           #3a1e0a;  --band-high-fg:         #f0905a;
+  --band-critical-bg:       #3a0a0a;  --band-critical-fg:     #f05a5a;
+  --band-catastrophic-bg:   #952803;  --band-catastrophic-fg: #ffb380;
+  --band-catastrophic-edge: #ff8036;
+
+  /* Control maturity (COBIT 1–5): the risk bands with red and blue swapped */
+  --maturity-1-bg: #0a0a3a;  --maturity-1-fg: #7a7af5;
+  --maturity-2-bg: #0a1e3a;  --maturity-2-fg: #5a90f0;
+  --maturity-3-bg: #10303a;  --maturity-3-fg: #5ac8f0;
+  --maturity-4-bg: #103840;  --maturity-4-fg: #5ae0f0;
+  --maturity-5-bg: #032895;  --maturity-5-fg: #80b3ff;  --maturity-5-edge: #3680ff;
+
+  /* Component types (PPITF), as fill / edge / text — the graph reads these too */
+  --ppitf-people:      #38bdf8;  --ppitf-people-edge:      #0ea5e9;
+  --ppitf-process:     #f59e0b;  --ppitf-process-edge:     #d97706;
+  --ppitf-information: #a78bfa;  --ppitf-information-edge: #7c3aed;
+  --ppitf-technology:  #34d399;  --ppitf-technology-edge:  #059669;
+  --ppitf-facility:    #94a3b8;  --ppitf-facility-edge:    #64748b;
+  --ppitf-control:     #4f7cff;  --ppitf-control-edge:     #2a5ae8;
+  --ppitf-system:      #1e293b;  --ppitf-system-edge:      #334155;
+  --ppitf-text-dark:   #0c1117;            /* dark text on every type: white failed AA on information and control */
+
+  /* A component's state, as a small dot (ComponentPill) */
+  --state-operational:    #34d399;
+  --state-degraded:       #f59e0b;
+  --state-planned:        #94a3b8;
+  --state-decommissioned: #ef4444;
+  --state-unknown:        #475569;
+
+  /* Graphs (Cytoscape cannot read CSS, so utils/themeColours.js resolves
+     these when a graph is drawn) */
+  --graph-service: #c084fc;  --graph-service-edge: #9333ea;
+  --graph-asset:   #2dd4bf;  --graph-asset-edge:   #0d9488;
+  --graph-risk:    #f59e0b;  --graph-risk-edge:    #d97706;
+  --graph-threat:  #ef4444;  --graph-threat-edge:  #b91c1c;
+  --graph-action:  #60a5fa;  --graph-action-edge:  #2563eb;
+  --graph-system:  #1e293b;  --graph-system-text:  #cbd5e1;
+  --graph-node:    #334155;  --graph-node-edge:    #475569;  --graph-node-text: #f1f5f9;
+  --graph-quiet-text: #94a3b8;
+  --graph-line:    #334155;  --graph-arrow:        #475569;
+  --graph-label-bg:#0c1117;  --graph-selected:     #f8fafc;
 
   /* Typography */
   --font-display:  'Syne', sans-serif;
@@ -70,8 +144,8 @@
   --radius-lg:  12px;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-modal: 0 8px 48px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-card: 0 1px 3px color-mix(in srgb, var(--shade) 40%, transparent), 0 4px 16px color-mix(in srgb, var(--shade) 30%, transparent);
+  --shadow-modal: 0 8px 48px color-mix(in srgb, var(--shade) 60%, transparent), 0 2px 8px color-mix(in srgb, var(--shade) 40%, transparent);
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────────────── */
@@ -147,7 +221,14 @@ textarea:disabled {
   :root {
     --border:        #4e5668;
     --border-accent: #6b7590;
-    --text-muted:    #8b93a8;
+    --text-muted:    #9aa2b5;
     --text-secondary:#c4cad8;
   }
+}
+
+/* A column header with a help dot stays on one line. A browser may always break
+   before a button, so a narrow header otherwise left its dot on a line of its
+   own, under the label it explains. (The shared Th header is nowrap already.) */
+th:has([data-help-dot]) {
+  white-space: nowrap;
 }

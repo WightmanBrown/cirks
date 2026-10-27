@@ -6,6 +6,7 @@ import { classifyControl, componentGaps, OPERATIONAL, EXCLUDED } from '../utils/
 import { ChipSelector } from './CiaTable';
 import { RatingChip } from './RatingChip';
 import { Modal } from './Modal';
+import { HelpDot } from './HelpDot';
 import styles from './RiskCreateModal.module.css';
 import { DateField } from './DateField';
 
@@ -24,7 +25,11 @@ import { DateField } from './DateField';
 // land and the panel shows its effect on the score. The wizard now ends by
 // taking the analyst straight there.
 const STEP_SYSTEM = 1, STEP_THREAT = 2, STEP_REPLICATE = 3;
-const STEP_TITLES = ['System', 'Threat, probability & rationale', 'Replicate'];
+const STEP_TITLES = [
+  { label: 'System', helpKey: 'risk_create.step_system' },
+  { label: 'Threat, probability & rationale', helpKey: 'risk_create.step_threat' },
+  { label: 'Replicate', helpKey: 'risk_create.step_replicate' },
+];
 
 // A stable signature of the actionable gap. Two systems have an "identical gap"
 // for the threat when their signatures match → the rationale can be replicated.
@@ -61,7 +66,7 @@ export function gapSignature(g) {
 function StepIndicator({ step }) {
   return (
     <div className={styles.stepper}>
-      {STEP_TITLES.map((label, i) => {
+      {STEP_TITLES.map(({ label, helpKey }, i) => {
         const n = i + 1;
         const done = step > n, active = step === n;
         return (
@@ -70,6 +75,7 @@ function StepIndicator({ step }) {
               {done ? '✓' : n}
             </span>
             <span className={`${styles.stepLabel} ${active ? styles.stepLabelActive : ''}`}>{label}</span>
+            <HelpDot k={helpKey} placement="bottom" />
             {n < STEP_TITLES.length && <span className={`${styles.stepLine} ${done ? styles.stepLineDone : ''}`} />}
           </div>
         );
@@ -284,7 +290,7 @@ export function RiskCreateModal({ onClose, onCreated, initialSystemId = '', init
     <Modal label="Register risk" onClose={onClose} busy={saving}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <span className={styles.headerLabel}>REGISTER RISK</span>
+          <span className={styles.headerLabel}>REGISTER RISK <HelpDot k="risk_create.title" placement="bottom" /></span>
           <button className={styles.closeBtn} onClick={onClose} disabled={saving}>✕</button>
         </div>
 
@@ -426,7 +432,7 @@ export function RiskCreateModal({ onClose, onCreated, initialSystemId = '', init
               offer the one move that helps. */}
           {existingRiskId && (
             <div className={styles.dupBlock}>
-              <p className={styles.dupTitle}>This risk has already been assessed</p>
+              <p className={styles.dupTitle}>This risk has already been assessed <HelpDot k="risk_create.duplicate" placement="bottom" /></p>
               <p className={styles.dupBody}>
                 A risk for this threat on this system already exists, and a system
                 and threat can only carry one. Work on the existing risk instead —

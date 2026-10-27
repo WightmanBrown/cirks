@@ -11,6 +11,51 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.0.5
+
+Help on every page, text that is easier to read, a security update, and fixes
+to screens that had stopped telling the truth.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. There is no
+migration in this release.
+
+- **Help on every page.** Every page title, panel and table column now has an
+  ⓘ that explains it: where its numbers come from and what to do with them,
+  about 560 explanations in all. They are drafts. An administrator can rewrite
+  any of them in place (**✎ Edit help** in the top bar) or from *Admin → Help
+  Content*. Your wording replaces the draft, and clearing it brings the draft
+  back.
+- **Text that is easier to read.** The grey used for labels, hints and column
+  headers was too faint against the dark background. It now meets the WCAG AA
+  standard for contrast, as does coloured text on tinted badges and text on
+  coloured buttons. Bold text is now real bold: the bold weights were not being
+  loaded, so browsers imitated them.
+- **One place for colours and fonts.** Every colour is now defined once, so a
+  day theme can follow. *Admin → Colours & Fonts* shows them all on one page:
+  every font in every weight, every colour, and how readable each text colour
+  is on each background.
+- **Security.** `body-parser` 1.20.9 and `multer` 2.5.0 fix two high-severity
+  denial-of-service advisories published on 26 October 2026 (GHSA-27r3-jxmh-p828
+  and GHSA-q7qp-rjg7-q26m).
+
+- **Fixed: screens that said something no longer true.** Several explanations
+  still said that security solutions change no status or risk score; since
+  v1.0.0 an objective's status on a system follows its security solution, and
+  the system's risk scores follow that status. The supplier control sets, the
+  department wizard, the asset page's suggested impact tables, the control owner
+  hint and the API keys page are corrected too.
+- **Fixed: the CISO's Impact Tables widget showed NaN.** It now counts the
+  organisation's impact tables not yet published.
+- **Fixed: SWG agendas left out *Identified exposures awaiting assessment*.**
+  The item was generated but never shown, in the agenda, the pack or the
+  meeting kiosk.
+- **Fixed: transferring a business service blanked the page** after the
+  transfer had succeeded.
+- **Fixed: an ⓘ could sit far from the title it explains**, or wrap under it,
+  on the risk page's cards, a supplier's assurance and narrow table columns.
+- **The README** describes what CIRKS does differently, with an example from
+  the training data.
+
 ## v1.0.4
 
 Supplier assurance that asks each supplier only for what a supplier can give,

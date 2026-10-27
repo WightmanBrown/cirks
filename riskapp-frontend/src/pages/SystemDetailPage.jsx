@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { PatternChip } from '../components/PatternChip';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -205,7 +206,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
     <div className={styles.ppitfSection}>
       {linkError && <p className={styles.linkError}>{linkError}</p>}
 
-      <h3 className={styles.tabSectionTitle}>Architecture components</h3>
+      <h3 className={styles.tabSectionTitle}>Architecture components <HelpDot k="system_detail.architecture_components" placement="bottom" /></h3>
       <p className={styles.muted}>
         What this system is made of. Add components freely; where one belongs to a system architecture pattern,
         the whole pattern is offered.
@@ -215,6 +216,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
         <div className={styles.tabSubTitle}>
           <PatternChip kind="template" />
           <span>Each system should include one component from each group.</span>
+          <HelpDot k="system_detail.template" placement="bottom" />
         </div>
         <TemplateStrip memberships={security.memberships} canEdit={canEdit} onAnswer={handleAnswer} />
       </>)}
@@ -289,7 +291,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
           onAddOnly={(c) => handleLink(c.id)} onAdopted={handleAdopted} onClose={() => setAdopt(null)} />
       )}
 
-      <div className={styles.tabSubTitle}><span>Recorded on this system</span></div>
+      <div className={styles.tabSubTitle}><span>Recorded on this system</span> <HelpDot k="system_detail.recorded_components" placement="bottom" /></div>
 
       <div className={styles.scopeRow} role="group" aria-label="Which components to list">
         {[
@@ -344,7 +346,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
         </div>
       ))}
 
-      <h3 className={styles.tabSectionTitle}>Security</h3>
+      <h3 className={styles.tabSectionTitle}>Security <HelpDot k="system_detail.security" placement="bottom" /></h3>
       <p className={styles.muted}>
         Some components trigger a security solution. Each is drawn as its ideal, with what this system has laid
         over it; what is left uncovered is a gap.
@@ -369,15 +371,16 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
       {expected.length > 0 && (
         <section className={styles.expectedBlock}>
           <h3 className={styles.expectedTitle}>
-            {expected.length} component{expected.length === 1 ? '' : 's'} expected here but not recorded
+            {expected.length} component{expected.length === 1 ? '' : 's'} expected here but not recorded{' '}
+            <HelpDot k="system_detail.expected_components" placement="bottom" />
           </h3>
           <p className={styles.expectedBody}>
             A control deployed on this system needs {expected.length === 1 ? 'this part' : 'these parts'}, and the
             system&rsquo;s record does not mention {expected.length === 1 ? 'it' : 'them'}. Where the control has
             security solutions, only the parts of the solution in use here are listed. Until each is recorded, the
-            coverage panel on this system&rsquo;s risks shows the control as needing improvement. Risk scores are not
-            affected: they follow the status set on each control. Record what is genuinely here, and leave the rest to
-            show as the gap it is.
+            coverage panel on this system&rsquo;s risks shows the control as needing improvement, and the solution is not
+            complete here &mdash; so an objective delivered on each system reads missing, and its risks score as if it
+            were absent. Record what is genuinely here, and leave the rest to show as the gap it is.
           </p>
           {expected.map(c => (
             <div key={c.id} className={styles.expectedRow}>
@@ -609,7 +612,8 @@ function ControlsTab({ system, canEdit, onRefresh }) {
       {wantedUnrecorded.length > 0 && (
         <section className={styles.expectedBlock}>
           <h3 className={styles.expectedTitle}>
-            {wantedUnrecorded.length} control objective{wantedUnrecorded.length === 1 ? ' is' : 's are'} implied by this system&rsquo;s security solutions but not recorded on it
+            {wantedUnrecorded.length} control objective{wantedUnrecorded.length === 1 ? ' is' : 's are'} implied by this system&rsquo;s security solutions but not recorded on it{' '}
+            <HelpDot k="system_detail.implied_objectives" placement="bottom" />
           </h3>
           <p className={styles.expectedBody}>
             Components recorded on this system trigger security solutions, and those solutions deliver {wantedUnrecorded.length === 1 ? 'this objective' : 'these objectives'}.
@@ -986,7 +990,7 @@ export function SystemDetailPage() {
         <ComponentRecordFindingBanner system={system} onChanged={load} />
 
         {system.risk_paths && system.risk_paths.length > 0 && (
-          <RiskPathTree paths={system.risk_paths} title="Risks on this system" isExpert={isExpert} />
+          <RiskPathTree paths={system.risk_paths} title="Risks on this system" helpKey="system_detail.risks" isExpert={isExpert} />
         )}
 
         <div className={styles.tabs}>

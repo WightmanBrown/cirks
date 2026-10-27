@@ -3,5 +3,5 @@
 import ComponentLibraryPage from './ComponentLibraryPage';
 
 export function PeopleGroupsPage() {
-  return <ComponentLibraryPage componentType="people" title="People Groups" singular="People Group" />;
+  return <ComponentLibraryPage componentType="people" title="People Groups" singular="People Group" helpKey="people_groups.title" />;
 }

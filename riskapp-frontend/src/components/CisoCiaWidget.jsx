@@ -18,10 +18,11 @@ export function CisoCiaWidget() {
       try {
         const tables = await getImpactTables();
         if (cancelled) return;
+        // Impact tables no longer have rows to analyse (the old row_count /
+        // rows_with_any_analysis fields are gone, which made this NaN). What the
+        // CISO still has to do here is publish the organisation's tables.
         const orgTables = tables.filter(t => t.scope === 'organisation');
-        const total = orgTables.reduce((s, t) => s + parseInt(t.row_count, 10), 0);
-        const done  = orgTables.reduce((s, t) => s + parseInt(t.rows_with_any_analysis, 10), 0);
-        setPending(total - done);
+        setPending({ drafts: orgTables.filter(t => !t.published_at).length, total: orgTables.length });
       } catch (err) {
         if (!cancelled) {
           const status = err.response?.status;
@@ -62,15 +63,21 @@ export function CisoCiaWidget() {
           <p className={styles.error}>Could not load — {error}</p>
         )}
 
-        {!loading && !error && pending === 0 && (
-          <span className={styles.countLabel}>All org table rows analysed.</span>
+        {!loading && !error && pending?.total === 0 && (
+          <span className={styles.countLabel}>No organisation impact tables yet.</span>
         )}
 
-        {!loading && !error && pending > 0 && (
+        {!loading && !error && pending?.total > 0 && pending.drafts === 0 && (
+          <span className={styles.countLabel}>
+            {pending.total === 1 ? 'The organisation impact table is published.' : `All ${pending.total} organisation impact tables are published.`}
+          </span>
+        )}
+
+        {!loading && !error && pending?.drafts > 0 && (
           <>
-            <span className={styles.count}>{pending}</span>
+            <span className={styles.count}>{pending.drafts}</span>
             <span className={styles.countLabel}>
-              {pending === 1 ? 'org table row awaiting CIA analysis' : 'org table rows awaiting CIA analysis'}
+              {pending.drafts === 1 ? 'organisation impact table not yet published' : 'organisation impact tables not yet published'}
             </span>
           </>
         )}

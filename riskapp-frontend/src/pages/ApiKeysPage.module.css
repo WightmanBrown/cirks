@@ -71,8 +71,8 @@
   font-family: var(--font-mono); font-size: var(--text-xs);
   padding: 2px 8px; border-radius: 999px; border: 1px solid transparent;
 }
-.active  { background: rgba(46,160,67,0.15);  color: var(--green); border-color: var(--green); }
-.expired { background: rgba(210,153,34,0.15); color: var(--amber); border-color: var(--amber); }
+.active  { background: color-mix(in srgb, var(--green) 15%, transparent);  color: var(--green-light); border-color: var(--green); }
+.expired { background: color-mix(in srgb, var(--amber) 15%, transparent); color: var(--amber-light); border-color: var(--amber); }
 .revoked { background: var(--bg-inset);       color: var(--text-muted); border-color: var(--border); }
 
 .revokeBtn {

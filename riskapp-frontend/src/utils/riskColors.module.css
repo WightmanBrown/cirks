@@ -5,13 +5,14 @@
 /* Shared severity palette — matches the original Risk Heatmap (future view)
  * scheme. Imported via riskColors.js so any component can apply consistent
  * colouring to risk, impact, and probability values without duplicating
- * thresholds or hex codes.
+ * thresholds. The colours themselves are the --band-* and --maturity-*
+ * tokens in styles/globals.css.
  */
 
-.critical { background: #3a0a0a; color: #f05a5a; }
-.high     { background: #3a1e0a; color: #f0905a; }
-.medium   { background: #3a3010; color: #f0c85a; }
-.low      { background: #1a3a2a; color: #5af09a; }
+.critical { background: var(--band-critical-bg); color: var(--band-critical-fg); }
+.high     { background: var(--band-high-bg); color: var(--band-high-fg); }
+.medium   { background: var(--band-medium-bg); color: var(--band-medium-fg); }
+.low      { background: var(--band-low-bg); color: var(--band-low-fg); }
 .none     { color: var(--text-muted); }
 
 .chip {
@@ -32,9 +33,9 @@
    Deliberately alarming: black on bright red with a white border. Placed after
    .chip so the border-color override wins. */
 .catastrophic {
-  background: #952803;       /* rgb(149, 40, 3) */
-  color: #ffb380;            /* light orange — readable on the dark bg */
-  border-color: #ff8036;     /* rgb(255, 128, 54) */
+  background: var(--band-catastrophic-bg);
+  color: var(--band-catastrophic-fg);            /* light orange — readable on the dark bg */
+  border-color: var(--band-catastrophic-edge);
 }
 
 /* Word-chip modifier — placed after .chip so its overrides win. Used when the
@@ -53,12 +54,12 @@
  * 1 = Initial (needs work, dark navy) → 5 = Optimising (best practice, bright blue).
  * m5 mirrors the "catastrophic" treatment (visible border) to signal top achievement.
  */
-.maturity1 { background: #0a0a3a; color: #5a5af0; }   /* Initial    — deep indigo (← critical swap) */
-.maturity2 { background: #0a1e3a; color: #5a90f0; }   /* Repeatable — navy blue   (← high swap)     */
-.maturity3 { background: #10303a; color: #5ac8f0; }   /* Defined    — steel teal  (← medium swap)   */
-.maturity4 { background: #103840; color: #5ae0f0; }   /* Managed    — light teal  (interpolated)     */
+.maturity1 { background: var(--maturity-1-bg); color: var(--maturity-1-fg); }   /* Initial    — deep indigo (← critical swap) */
+.maturity2 { background: var(--maturity-2-bg); color: var(--maturity-2-fg); }   /* Repeatable — navy blue   (← high swap)     */
+.maturity3 { background: var(--maturity-3-bg); color: var(--maturity-3-fg); }   /* Defined    — steel teal  (← medium swap)   */
+.maturity4 { background: var(--maturity-4-bg); color: var(--maturity-4-fg); }   /* Managed    — light teal  (interpolated)     */
 .maturity5 {                                           /* Optimising — bright blue (← catastrophic swap) */
-  background: #032895;     /* rgb(3, 40, 149) */
-  color:      #80b3ff;     /* light blue — readable on saturated bg */
-  border-color: #3680ff;   /* rgb(54, 128, 255) */
+  background: var(--maturity-5-bg);
+  color:      var(--maturity-5-fg);     /* light blue — readable on saturated bg */
+  border-color: var(--maturity-5-edge);
 }

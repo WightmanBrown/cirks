@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { getScopes, createScope } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
+import { HelpDot } from '../components/HelpDot';
 import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import styles from './ScopesPage.module.css';
@@ -48,7 +49,7 @@ export function ScopesPage() {
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Scopes</h1>
+            <h1 className={styles.title}>Scopes <HelpDot k="scopes.title" placement="bottom" /></h1>
             <p className={styles.desc}>
               Where a control objective applies. By default an adopted objective applies to the
               <b> whole organisation</b> — every active system. A scope narrows it to a named set of
@@ -73,7 +74,7 @@ export function ScopesPage() {
         {data && (
           <table className={styles.table}>
             <thead>
-              <tr><th>Scope</th><th>Systems</th><th>Objectives narrowed to it</th></tr>
+              <tr><th>Scope <HelpDot k="scopes.col.scope" placement="bottom" /></th><th>Systems <HelpDot k="scopes.col.systems" placement="bottom" /></th><th>Objectives narrowed to it <HelpDot k="scopes.col.objectives" placement="bottom" /></th></tr>
             </thead>
             <tbody>
               <tr className={styles.orgRow}>

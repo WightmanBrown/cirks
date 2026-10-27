@@ -68,6 +68,7 @@ import { AccountManagementPage }       from './pages/AccountManagementPage';
 import { DataExportPage }              from './pages/DataExportPage';
 import { AuditLogPage }                from './pages/AuditLogPage';
 import { HelpContentPage }             from './pages/HelpContentPage';
+import { StyleSheetPage }              from './pages/StyleSheetPage';
 import { ApiKeysPage }                 from './pages/ApiKeysPage';
 import { MetricsPage }                 from './pages/MetricsPage';
 
@@ -202,6 +203,7 @@ export default function App() {
             <Route path="/admin/audit"  element={<AuditLogPage />} />
             <Route path="/admin/api-keys" element={<ApiKeysPage />} />
             <Route path="/admin/help"   element={<HelpContentPage />} />
+            <Route path="/admin/colours" element={<StyleSheetPage />} />
           </Route>
 
           <Route path="/" element={<RoleHomeRedirect />} />

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrgInProgressActions } from '../api/index';
 import styles from './SecretaryActionProgressWidget.module.css';
+import { HelpDot } from './HelpDot';
 
 function formatDate(iso) {
   if (!iso) return null;
@@ -36,7 +37,7 @@ export function SecretaryActionProgressWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <span className={styles.title}>Action Progress</span>
+          <span className={styles.title}>Action Progress<HelpDot k="widget.action_progress" placement="bottom" /></span>
         </div>
         <p className={styles.muted}>Loading…</p>
       </div>
@@ -53,7 +54,7 @@ export function SecretaryActionProgressWidget() {
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
-        <span className={styles.title}>Action Progress</span>
+        <span className={styles.title}>Action Progress<HelpDot k="widget.action_progress" placement="bottom" /></span>
         {needsUpdate.length > 0 && (
           <span className={styles.alertBadge}>{needsUpdate.length} need update</span>
         )}

@@ -15,6 +15,7 @@ import { PatternChip } from '../components/PatternChip';
 import { ComponentModal } from '../components/ComponentModal';
 import { componentTypeShort } from '../utils/componentTypes';
 import styles from './SystemCreateWizard.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 // Creating a security solution (owner, 2026-10-09). Most of the library's
 // solutions are really SYSTEMS — a console, a service, a monitoring team's
@@ -164,7 +165,7 @@ export function SecuritySolutionWizard() {
     <Shell>
       <div className={styles.page}>
         <BackButton fallback="/security-solutions" />
-        <h1 className={styles.title}>New security solution</h1>
+        <h1 className={styles.title}>New security solution <HelpDot k="solution_wizard.title" placement="bottom" /></h1>
         <ol className={styles.steps}>
           {steps.map((label, i) => (
             <li key={label} className={i === step ? styles.stepOn : i < step ? styles.stepDone : styles.step}
@@ -287,9 +288,9 @@ export function SecuritySolutionWizard() {
             )}
             <div className={styles.review}>
               <div><PatternChip kind="solution" /> <b>{name.trim() || 'Unnamed'}</b></div>
-              <h2 className={styles.sub}>On each protected system</h2>
+              <h2 className={styles.sub}>On each protected system <HelpDot k="solution_wizard.on_each_protected" placement="bottom" /></h2>
               <ul className={styles.list}><li>{agent ? agent.name : <span className={styles.muted}>nothing</span>}</li></ul>
-              <h2 className={styles.sub}>On {system?.name}</h2>
+              <h2 className={styles.sub}>On {system?.name} <HelpDot k="solution_wizard.on_security_system" placement="bottom" /></h2>
               <ul className={styles.list}>{picked.map(c => <li key={c.id}>{c.name}</li>)}</ul>
             </div>
             {error && <p className={styles.error} role="alert">{error}{createdId && <> <Link to={`/security-solutions/${createdId}`}>Open the security solution</Link></>}</p>}

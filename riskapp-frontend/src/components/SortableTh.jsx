@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import styles from './SortableTh.module.css';
 
 // A sortable table-header cell. Pair with the useTableSort hook:
@@ -7,7 +8,9 @@ import styles from './SortableTh.module.css';
 //   <SortableTh column="name" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort}>Name</SortableTh>
 // Clicking cycles ascending → descending → default order. Renders a real <th>,
 // so it inherits the table's existing header styling; className is merged through.
-export function SortableTh({ column, sortKey, sortDir, onSort, children, className = '', ...rest }) {
+// `helpKey` adds an ⓘ after the label — outside the sort button, so opening help
+// does not sort.
+export function SortableTh({ column, sortKey, sortDir, onSort, children, className = '', helpKey, helpPlacement = 'bottom', ...rest }) {
   const active = sortKey === column;
   return (
     <th
@@ -21,6 +24,7 @@ export function SortableTh({ column, sortKey, sortDir, onSort, children, classNa
           {active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
         </span>
       </button>
+      {helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}
     </th>
   );
 }

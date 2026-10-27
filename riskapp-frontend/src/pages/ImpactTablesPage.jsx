@@ -165,7 +165,7 @@ export function TableDetail({ tableId, canEdit, canOrg, onChanged, onDeleted }) 
 
       <div className={styles.detailHeader}>
         <div className={styles.detailTitleBlock}>
-          <h2 className={styles.detailTitle}>{detail.name}</h2>
+          <h2 className={styles.detailTitle}>{detail.name} <HelpDot k="impact_tables.detail" placement="bottom" /></h2>
           <div className={styles.detailMeta}>
             <span className={styles.scopeChip}>
               {isOrgTable ? 'Cross organisation' : (detail.department_name || 'Department')}
@@ -285,7 +285,7 @@ export function TableDetail({ tableId, canEdit, canOrg, onChanged, onDeleted }) 
           {/* 3dBIL CIA grid — expert view only */}
           {showExpert && (
             <div className={styles.viewSection}>
-              <div className={styles.viewSectionLabel}>3dBIL — CIA implications per level</div>
+              <div className={styles.viewSectionLabel}>3dBIL — CIA implications per level<HelpDot k="impact_tables.cia" placement="top" /></div>
               {hasCia ? (
                 <div className={styles.ciaTable}>
                   <div className={styles.ciaTableHead}>
@@ -515,11 +515,11 @@ export function ImpactTablesPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Name</th>
-                  <th className={styles.th}>Scope</th>
-                  <th className={styles.th}>Department</th>
-                  <th className={styles.th}>Status</th>
-                  <th className={styles.th}>Attributes</th>
+                  <th className={styles.th}>Name <HelpDot k="col.name" placement="bottom" /></th>
+                  <th className={styles.th}>Scope <HelpDot k="impact_tables.col.scope" placement="bottom" /></th>
+                  <th className={styles.th}>Department <HelpDot k="impact_tables.col.department" placement="bottom" /></th>
+                  <th className={styles.th}>Status <HelpDot k="impact_tables.col.status" placement="bottom" /></th>
+                  <th className={styles.th}>Attributes <HelpDot k="impact_tables.col.attributes" placement="bottom" /></th>
                 </tr>
               </thead>
               <tbody>

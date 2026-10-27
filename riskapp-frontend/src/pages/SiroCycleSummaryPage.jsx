@@ -10,6 +10,7 @@ import { Th }                                    from '../components/Th';
 import { StatusPill }                            from '../components/StatusPill';
 import { scoreLevel }                            from '../utils/riskColors';
 import styles                                   from './SiroCycleSummary.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 export function SiroCycleSummaryPage() {
   const { id }    = useParams();
@@ -71,12 +72,12 @@ export function SiroCycleSummaryPage() {
             <CycleHeader cycle={data.cycle} />
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Risks Reviewed ({data.risks.length})</h2>
+              <h2 className={styles.sectionTitle}>Risks Reviewed ({data.risks.length}) <HelpDot k="siro_cycle_summary.risks" placement="bottom" /></h2>
               <RisksTable risks={data.risks} />
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Security Actions ({data.actions.length})</h2>
+              <h2 className={styles.sectionTitle}>Security Actions ({data.actions.length}) <HelpDot k="siro_cycle_summary.actions" placement="bottom" /></h2>
               <ActionsTable actions={data.actions} />
             </section>
 
@@ -100,7 +101,7 @@ function CycleHeader({ cycle }) {
   return (
     <div className={styles.headerCard}>
       <div className={styles.headerTop}>
-        <span className={styles.cycleName}>{cycle.name}</span>
+        <span className={styles.cycleName}>{cycle.name} <HelpDot k="siro_cycle_summary.title" placement="bottom" /></span>
         <span className={styles.statusBadge}>awaiting approval</span>
       </div>
       <div className={styles.metaGrid}>
@@ -135,13 +136,13 @@ function RisksTable({ risks }) {
       <table className={styles.table}>
         <thead>
           <tr>
-            <Th>Asset</Th>
-            <Th>Threat</Th>
-            <Th>System</Th>
-            <Th>Score</Th>
-            <Th>Level</Th>
-            <Th>Decision</Th>
-            <Th>Finalised Notes</Th>
+            <Th helpKey="siro_cycle_summary.col.asset">Asset</Th>
+            <Th helpKey="col.threat">Threat</Th>
+            <Th helpKey="col.system">System</Th>
+            <Th helpKey="siro_cycle_summary.col.score">Score</Th>
+            <Th helpKey="siro_cycle_summary.col.level">Level</Th>
+            <Th helpKey="siro_cycle_summary.col.decision">Decision</Th>
+            <Th helpKey="siro_cycle_summary.col.finalised_notes">Finalised Notes</Th>
           </tr>
         </thead>
         <tbody>
@@ -186,12 +187,12 @@ function ActionsTable({ actions }) {
       <table className={styles.table}>
         <thead>
           <tr>
-            <Th>Status</Th>
-            <Th>Title</Th>
-            <Th>Type</Th>
-            <Th>Owner</Th>
-            <Th>Target Date</Th>
-            <Th>SIRO</Th>
+            <Th helpKey="col.status">Status</Th>
+            <Th helpKey="siro_cycle_summary.col.title">Title</Th>
+            <Th helpKey="siro_cycle_summary.col.type">Type</Th>
+            <Th helpKey="siro_cycle_summary.col.owner">Owner</Th>
+            <Th helpKey="siro_cycle_summary.col.target_date">Target Date</Th>
+            <Th helpKey="siro_cycle_summary.col.siro">SIRO</Th>
           </tr>
         </thead>
         <tbody>
@@ -239,7 +240,7 @@ function ApproveFooter({ canApprove, unfinalisedCount, approved, approving, appr
   return (
     <div className={styles.approveFooter}>
       <div className={styles.approveInfo}>
-        <span className={styles.approveTitle}>SIRO Approval</span>
+        <span className={styles.approveTitle}>SIRO Approval <HelpDot k="siro_cycle_summary.approval" placement="bottom" /></span>
         {canApprove ? (
           <span className={styles.approveDesc}>All items are finalised. You may approve this cycle.</span>
         ) : (

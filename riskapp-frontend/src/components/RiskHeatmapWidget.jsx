@@ -113,7 +113,7 @@ export function RiskHeatmapWidget() {
               {/* ── current panel ── */}
               <div className={styles.panel}>
                 <span className={styles.panelTitle}>
-                  CURRENT
+                  CURRENT<HelpDot k="widget.heatmap_current" placement="bottom" />
                   <span className={styles.panelCount}>{currentRisks.length}</span>
                 </span>
                 <MiniGrid
@@ -128,7 +128,7 @@ export function RiskHeatmapWidget() {
               {/* ── future panel ── */}
               <div className={styles.panel}>
                 <span className={styles.panelTitle}>
-                  FUTURE
+                  FUTURE<HelpDot k="widget.heatmap_future" placement="bottom" />
                   <span className={styles.panelCount}>{futureRisks.length}</span>
                 </span>
                 <MiniGrid

@@ -256,10 +256,10 @@
   border-color: transparent;
 }
 
-.cellLow      { background: #1a3a2a; }
-.cellMedium   { background: #3a3010; }
-.cellHigh     { background: #3a1e0a; }
-.cellCritical { background: #3a0a0a; }
+.cellLow      { background: var(--band-low-bg); }
+.cellMedium   { background: var(--band-medium-bg); }
+.cellHigh     { background: var(--band-high-bg); }
+.cellCritical { background: var(--band-critical-bg); }
 
 .cellCount {
   pointer-events: none;
@@ -352,7 +352,7 @@
 
 .viewToggleActive {
   background: var(--amber-faint);
-  color: var(--amber);
+  color: var(--amber-light);
   font-weight: 600;
 }
 
@@ -389,7 +389,7 @@
 }
 .sortBtnActive {
   border-color: var(--amber);
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
 }
 
@@ -454,7 +454,7 @@
 }
 
 .thGroupTgt {
-  color: var(--blue, #64b5f6);
+  color: var(--blue);
 }
 
 .thScore {
@@ -466,7 +466,7 @@
 .thScoreActive { color: var(--amber); }
 
 .thScoreTgt { color: var(--text-muted); }
-.thScoreTgt:hover { color: var(--blue, #64b5f6); }
+.thScoreTgt:hover { color: var(--blue); }
 
 .tdTgt { opacity: 0.75; }
 
@@ -481,8 +481,8 @@
   transition: background 0.1s;
 }
 .riskTr:last-child { border-bottom: 0; }
-.riskTr:hover td { background: var(--bg-hover, var(--bg-surface)); }
-.riskTrSelected td { background: var(--bg-hover, var(--bg-surface)); }
+.riskTr:hover td { background: var(--bg-hover); }
+.riskTrSelected td { background: var(--bg-hover); }
 
 .summaryRow td { padding: 0; border-bottom: 1px solid var(--border); }
 
@@ -688,7 +688,7 @@
 
 .statusReturned {
   background: var(--amber-faint);
-  color: var(--amber);
+  color: var(--amber-light);
   border-color: var(--amber);
   cursor: help;
 }
@@ -736,10 +736,10 @@
   white-space: nowrap;
 }
 
-.scoreLow      { background: #1a3a2a; color: #5af09a; }
-.scoreMedium   { background: #3a3010; color: #f0c85a; }
-.scoreHigh     { background: #3a1e0a; color: #f0905a; }
-.scoreCritical { background: #3a0a0a; color: #f05a5a; }
+.scoreLow      { background: var(--band-low-bg); color: var(--band-low-fg); }
+.scoreMedium   { background: var(--band-medium-bg); color: var(--band-medium-fg); }
+.scoreHigh     { background: var(--band-high-bg); color: var(--band-high-fg); }
+.scoreCritical { background: var(--band-critical-bg); color: var(--band-critical-fg); }
 
 /* ── mitigation column ────────────────────────────────────────────────────── */
 
@@ -774,16 +774,16 @@
   white-space: nowrap;
 }
 
-.mitigationActive   { background: #1a3a2a; color: #5af09a; }
+.mitigationActive   { background: var(--band-low-bg); color: var(--band-low-fg); }
 .mitigationProposed { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border); }
-.mitigationStalled  { background: #3a3010; color: #f0c85a; }
+.mitigationStalled  { background: var(--band-medium-bg); color: var(--band-medium-fg); }
 .mitigationNone     { background: var(--bg-elevated); color: var(--red); border: 1px solid var(--border); }
 
 .registerBtn {
-  background: var(--amber, #ffa726);
-  border: 1px solid var(--amber, #ffa726);
+  background: var(--amber);
+  border: 1px solid var(--amber);
   border-radius: var(--radius-sm);
-  color: #000;
+  color: var(--text-on-fill);
   cursor: pointer;
   font-family: var(--font-mono);
   font-size: 11px;

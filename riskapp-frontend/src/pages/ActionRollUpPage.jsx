@@ -6,6 +6,7 @@ import { getActionRollUp } from '../api';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
+import { HelpDot } from '../components/HelpDot';
 import styles from './ActionRollUpPage.module.css';
 import { componentTypeShort } from '../utils/componentTypes';
 
@@ -39,7 +40,7 @@ export function ActionRollUpPage() {
     <Shell>
       <BackButton />
       <div className={styles.header}>
-        <h1 className={styles.title}>Remediation roll-up</h1>
+        <h1 className={styles.title}>Remediation roll-up <HelpDot k="action_rollup.title" placement="bottom" /></h1>
         <label className={styles.mineToggle}>
           <input type="checkbox" checked={mine} onChange={e => setMine(e.target.checked)} />
           Only mine
@@ -53,19 +54,19 @@ export function ActionRollUpPage() {
         : empty ? <p className={styles.empty}>No open remediation items{mine ? ' assigned to you' : ''}.</p>
         : data && (
           <>
-            <Section title="Controls" rows={data.controls} kind="control" />
-            <Section title="Components" rows={data.components} kind="component" />
+            <Section title="Controls" rows={data.controls} kind="control" helpKey="action_rollup.controls" />
+            <Section title="Components" rows={data.components} kind="component" helpKey="action_rollup.components" />
           </>
         )}
     </Shell>
   );
 }
 
-function Section({ title, rows, kind }) {
+function Section({ title, rows, kind, helpKey, helpPlacement = 'bottom' }) {
   if (!rows.length) return null;
   return (
     <section className={styles.section}>
-      <h2 className={styles.h2}>{title} <span className={styles.count}>{rows.length}</span></h2>
+      <h2 className={styles.h2}>{title} <span className={styles.count}>{rows.length}</span>{helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}</h2>
       {rows.map(r => (
         <ElementCard key={kind === 'control' ? r.control_id : r.component_id} row={r} kind={kind} />
       ))}

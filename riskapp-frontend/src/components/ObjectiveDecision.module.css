@@ -6,7 +6,7 @@
 .field { display: flex; flex-direction: column; gap: 6px; }
 .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
 .input, .select {
-  background: var(--bg-input, var(--bg-hover)); border: 1px solid var(--border); color: var(--text-primary);
+  background: var(--bg-inset); border: 1px solid var(--border); color: var(--text-primary);
   border-radius: 5px; padding: 6px 8px; font-size: 13px; font-family: inherit;
 }
 .input { resize: vertical; }
@@ -16,18 +16,18 @@
   background: transparent; border: 1px solid var(--border); color: var(--text-muted);
   border-radius: 12px; padding: 2px 10px; font-size: 12px; cursor: pointer; text-transform: capitalize;
 }
-.chipOn { background: rgba(100,181,246,0.15); border-color: var(--accent, #64b5f6); color: var(--accent, #64b5f6); font-weight: 600; }
+.chipOn { background: color-mix(in srgb, var(--blue) 15%, transparent); border-color: var(--accent); color: var(--blue-light); font-weight: 600; }
 .pick { background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 1px; cursor: pointer; opacity: 0.55; }
-.pickOn { opacity: 1; border-color: var(--accent, #64b5f6); }
+.pickOn { opacity: 1; border-color: var(--accent); }
 .linkBtn {
   align-self: flex-start; background: transparent; border: none; padding: 0; cursor: pointer;
-  color: var(--accent, #64b5f6); font-size: 12.5px; text-align: left;
+  color: var(--accent); font-size: 12.5px; text-align: left;
 }
-.error { color: var(--red, #e5534b); font-size: 13px; margin: 0; }
-.done { color: var(--green, #4caf7d); font-size: 13px; }
+.error { color: var(--red); font-size: 13px; margin: 0; }
+.done { color: var(--green); font-size: 13px; }
 .actions { display: flex; gap: 10px; align-items: center; }
 .save {
-  background: var(--accent, #64b5f6); color: #0b1220; border: none; border-radius: 5px;
+  background: var(--accent); color: var(--text-on-fill); border: none; border-radius: 5px;
   padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
 }
 .save:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { useState } from 'react';
 import styles from './SupplierRelationshipForm.module.css';
 import { DateField } from './DateField';
@@ -53,7 +54,7 @@ export function SupplierEvidenceForm({ objectives, evidence = [], editingId = nu
 
   return (
     <form className={styles.form} onSubmit={submit}>
-      <p className={styles.step}>1. What is the evidence?</p>
+      <p className={styles.step}>1. What is the evidence? <HelpDot k="supplier_evidence.step_what" placement="bottom" /></p>
       <div className={styles.grid}>
         <label className={styles.field}>
           <span>Evidence type</span>
@@ -86,7 +87,7 @@ export function SupplierEvidenceForm({ objectives, evidence = [], editingId = nu
         </label>
       </div>
 
-      <p className={styles.step}>2. Which control objectives does this {noun} cover?</p>
+      <p className={styles.step}>2. Which control objectives does this {noun} cover? <HelpDot k="supplier_evidence.step_covers" placement="bottom" /></p>
       <p className={styles.hint}>
         Tick each control objective that this {noun} gives evidence for. It does not have to cover all of them — you
         can record other reports or contract terms for the rest. Any control objective that no current evidence

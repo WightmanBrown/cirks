@@ -5,12 +5,14 @@ import { useState } from 'react';
 import { downloadAdminExport } from '../api';
 import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
+import { HelpDot } from '../components/HelpDot';
 import styles from './DataExportPage.module.css';
 
 // Datasets grouped as they appear on the page. `key` is the export endpoint slug.
 export const GROUPS = [
   {
     title: 'Account management',
+    helpKey: 'data_export.group.accounts',
     datasets: [
       { key: 'users',        label: 'Users',        desc: 'Accounts with primary role, department, active flag and 2FA status.' },
       { key: 'user-roles',   label: 'User roles',   desc: 'Additional (secondary) role grants, by user email.' },
@@ -19,6 +21,7 @@ export const GROUPS = [
   },
   {
     title: 'Threats & controls',
+    helpKey: 'data_export.group.threats_controls',
     datasets: [
       { key: 'threats',               label: 'Threats',                    desc: 'Threat catalogue with category, source, per-dimension probability and baseline.' },
       { key: 'controls',              label: 'Controls',                   desc: 'Control objectives: type, reference, how each is delivered (organisation, group or per system), baseline flag, maturity rating and owner. Status is derived, so not exported.' },
@@ -35,6 +38,7 @@ export const GROUPS = [
   },
   {
     title: 'PPITF components',
+    helpKey: 'data_export.group.components',
     datasets: [
       { key: 'components',              label: 'Component library',          desc: 'All PPITF components: name, type, status, scope (once for the organisation or per system), host name, and a policy or document\u2019s kind, version, owner, approval and review dates.' },
       { key: 'component-ip-addresses',  label: 'Component IP addresses',     desc: 'IP addresses recorded against host components, used by SOC enrichment.' },
@@ -42,6 +46,7 @@ export const GROUPS = [
   },
   {
     title: 'Information assets',
+    helpKey: 'data_export.group.assets',
     datasets: [
       { key: 'information-assets',   label: 'Information assets',  desc: 'Asset metadata: name, department, owner, manager (IAM), shared and active flags.' },
       { key: 'asset-impact-ratings', label: 'Asset impact ratings', desc: 'Per-table CIA ratings (1dBIL level + per-dimension overrides). This is the primary CIA source data.' },
@@ -49,6 +54,7 @@ export const GROUPS = [
   },
   {
     title: 'Systems',
+    helpKey: 'data_export.group.systems',
     datasets: [
       { key: 'systems',           label: 'Systems',                  desc: 'System metadata: name, department, owner and active status.' },
       { key: 'system-assets',     label: 'System — asset links',     desc: 'Which information assets are linked to each system.' },
@@ -59,6 +65,7 @@ export const GROUPS = [
   },
   {
     title: 'Business services',
+    helpKey: 'data_export.group.services',
     datasets: [
       { key: 'business-services',       label: 'Business services',       desc: 'Service metadata: name, department, owner department, shared flag and active status.' },
       { key: 'business-service-systems', label: 'Service — system links',  desc: 'Which systems compose each service. A service\u2019s information assets are derived from these (v104), not linked directly.' },
@@ -66,6 +73,7 @@ export const GROUPS = [
   },
   {
     title: 'Impact tables',
+    helpKey: 'data_export.group.impact_tables',
     datasets: [
       { key: 'impact-tables',          label: 'Impact tables',          desc: 'Table metadata: name, scope, department, mandatory and published flags.' },
       { key: 'impact-table-bil-levels', label: '1dBIL level statements', desc: 'Business impact level descriptions (BIL 1–5) for each table. All rows exported, including blanks.' },
@@ -74,6 +82,7 @@ export const GROUPS = [
   },
   {
     title: 'Statement of Applicability',
+    helpKey: 'data_export.group.soa',
     datasets: [
       { key: 'soa-entries',      label: 'SoA decisions',        desc: 'For each control objective: applicable or not, why (drivers and justification), how it is implemented, and its owner.' },
       { key: 'scopes',           label: 'Scopes',               desc: 'Named sets of systems an objective can be narrowed to (e.g. the cardholder data environment).' },
@@ -83,6 +92,7 @@ export const GROUPS = [
   },
   {
     title: 'Suppliers',
+    helpKey: 'data_export.group.suppliers',
     datasets: [
       { key: 'suppliers',                label: 'Suppliers',               desc: 'Supplier names and notes.' },
       { key: 'supplier-relationships',   label: 'Supplier relationships',  desc: 'Each relationship: supplier type, contracting department, what it touches, contract and status.' },
@@ -92,6 +102,7 @@ export const GROUPS = [
   },
   {
     title: 'Access control',
+    helpKey: 'data_export.group.access_control',
     datasets: [
       { key: 'role-permissions', label: 'Role permissions', desc: 'The capability matrix: role → capability → scope.' },
       { key: 'sod-rules',        label: 'Separation-of-duties rules', desc: 'Each SoD rule and whether it is enabled.' },
@@ -130,7 +141,7 @@ export function DataExportPage() {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <BackButton />
-          <h1 className={styles.heading}>Data Export</h1>
+          <h1 className={styles.heading}>Data Export <HelpDot k="data_export.title" placement="bottom" /></h1>
         </div>
         <p className={styles.intro}>
           Export access-control and account-management data as spreadsheets. Files use
@@ -171,7 +182,7 @@ export function DataExportPage() {
 
         {GROUPS.map((group) => (
           <section key={group.title} className={styles.card}>
-            <h2 className={styles.cardTitle}>{group.title}</h2>
+            <h2 className={styles.cardTitle}>{group.title} <HelpDot k={group.helpKey} placement="bottom" /></h2>
             <table className={styles.table}>
               <tbody>
                 {group.datasets.map((d) => (

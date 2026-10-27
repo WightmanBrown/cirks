@@ -4,11 +4,11 @@ import { getComponentColor } from '../utils/componentColors';
 import styles from './ComponentPill.module.css';
 
 const STATUS_COLOR = {
-  operational:    '#34d399',
-  degraded:       '#f59e0b',
-  planned:        '#94a3b8',
-  decommissioned: '#ef4444',
-  unknown:        '#475569',
+  operational:    'var(--state-operational)',
+  degraded:       'var(--state-degraded)',
+  planned:        'var(--state-planned)',
+  decommissioned: 'var(--state-decommissioned)',
+  unknown:        'var(--state-unknown)',
 };
 
 /**
@@ -47,7 +47,7 @@ export function ComponentPill({
       {showStatus && (
         <span
           className={styles.statusDot}
-          style={{ background: STATUS_COLOR[component.status] ?? '#475569' }}
+          style={{ background: STATUS_COLOR[component.status] ?? 'var(--state-unknown)' }}
           title={component.status}
         />
       )}

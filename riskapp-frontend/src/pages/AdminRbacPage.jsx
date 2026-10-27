@@ -9,6 +9,7 @@ import {
 import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { useAuth }    from '../context/AuthContext';
+import { HelpDot } from '../components/HelpDot';
 import styles from './AdminRbacPage.module.css';
 
 // Machine identities: never assignable to a person, never a row in the role
@@ -145,7 +146,7 @@ export function AdminRbacPage() {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <BackButton />
-          <h1 className={styles.heading}>Access Control</h1>
+          <h1 className={styles.heading}>Access Control <HelpDot k="rbac.title" placement="bottom" /></h1>
         </div>
         <p className={styles.intro}>
           Configure which roles can perform which actions, separation-of-duties rules,
@@ -159,11 +160,15 @@ export function AdminRbacPage() {
           <>
             {/* Users & roles */}
             <section className={styles.card}>
-              <h2 className={styles.cardTitle}>Users &amp; roles</h2>
+              <h2 className={styles.cardTitle}>Users &amp; roles <HelpDot k="rbac.users_roles" placement="bottom" /></h2>
               {usersErr && <p className={styles.errorMsg}>{usersErr}</p>}
               <table className={styles.userTable}>
                 <thead>
-                  <tr><th>User</th><th>Primary role</th><th>Additional roles</th></tr>
+                  <tr>
+                    <th>User <HelpDot k="rbac.col.user" placement="bottom" /></th>
+                    <th>Primary role <HelpDot k="rbac.col.primary_role" placement="bottom" /></th>
+                    <th>Additional roles <HelpDot k="rbac.col.additional_roles" placement="bottom" /></th>
+                  </tr>
                 </thead>
                 <tbody>
                   {users.map((u) => {
@@ -220,7 +225,7 @@ export function AdminRbacPage() {
 
             {/* Department isolation */}
             <section className={styles.card}>
-              <h2 className={styles.cardTitle}>Department isolation</h2>
+              <h2 className={styles.cardTitle}>Department isolation <HelpDot k="rbac.department_isolation" placement="bottom" /></h2>
               <label className={styles.switchRow}>
                 <input
                   type="checkbox"
@@ -237,7 +242,7 @@ export function AdminRbacPage() {
 
             {/* Separation of duties */}
             <section className={styles.card}>
-              <h2 className={styles.cardTitle}>Separation of duties</h2>
+              <h2 className={styles.cardTitle}>Separation of duties <HelpDot k="rbac.sod" placement="bottom" /></h2>
               <ul className={styles.sodList}>
                 {data.sod_rules.map((s) => (
                   <li key={s.key} className={styles.sodItem}>
@@ -257,7 +262,7 @@ export function AdminRbacPage() {
             {/* Role permissions matrix (per role) */}
             <section className={styles.card}>
               <div className={styles.roleEditorHead}>
-                <h2 className={styles.cardTitle}>Role permissions</h2>
+                <h2 className={styles.cardTitle}>Role permissions <HelpDot k="rbac.role_permissions" placement="bottom" /></h2>
                 <label className={styles.roleSelect}>
                   Role:&nbsp;
                   <select value={role || ''} onChange={(e) => selectRole(e.target.value)}>
@@ -275,7 +280,7 @@ export function AdminRbacPage() {
 
               {capGroups.map(([resource, caps]) => (
                 <div key={resource} className={styles.resourceGroup}>
-                  <h3 className={styles.resourceLabel}>{resource}</h3>
+                  <h3 className={styles.resourceLabel}>{resource} <HelpDot k="rbac.resource" placement="bottom" /></h3>
                   {caps.map((c) => {
                     const granted = c.key in grants;
                     return (

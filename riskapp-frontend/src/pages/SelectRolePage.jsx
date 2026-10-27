@@ -6,6 +6,7 @@ import { useState }    from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth }     from '../context/AuthContext';
 import { getRoleHome } from '../utils/getRoleHome';
+import { HelpDot }     from '../components/HelpDot';
 import styles          from './SelectRolePage.module.css';
 
 const ROLE_LABELS = {
@@ -46,7 +47,7 @@ export function SelectRolePage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <span className={styles.appName}>CIRKS</span>
-          <h1 className={styles.title}>Select your role</h1>
+          <h1 className={styles.title}>Select your role <HelpDot k="select_role.title" placement="bottom" /></h1>
           <p className={styles.subtitle}>
             Welcome back, {user?.full_name ?? user?.email}.
             Choose the role you want to work in for this session.

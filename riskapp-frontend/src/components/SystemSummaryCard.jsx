@@ -35,6 +35,7 @@ export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskP
     <EntitySummaryCard
       name={system.name}
       kind="system"
+      helpKey="system_card.title"
       openHref={openHref}
       rightSlot={<RiskPill level={(() => { const sc = system.max_risk_score ?? system.top_risk?.risk_score; return sc != null ? scoreLevel(sc) : null; })()} />}
       meta={
@@ -70,6 +71,7 @@ export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskP
         <RiskPath
           paths={Array.isArray(system.risk_paths) ? system.risk_paths : null}
           emptyMessage="No active risks on this system."
+          helpKey="system_card.risk_path"
         />
       )}
 

@@ -3,5 +3,5 @@
 import ComponentLibraryPage from './ComponentLibraryPage';
 
 export function ProcessesPage() {
-  return <ComponentLibraryPage componentType="process" title="Processes" singular="Process" />;
+  return <ComponentLibraryPage componentType="process" title="Processes" singular="Process" helpKey="processes.title" />;
 }

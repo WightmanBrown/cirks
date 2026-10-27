@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -118,7 +119,7 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
 
       <div className={styles.tableAssignSection}>
         <div className={styles.tableAssignTitleRow}>
-          <h3 className={styles.tableAssignTitle}>Systems delivering this service</h3>
+          <h3 className={styles.tableAssignTitle}>Systems delivering this service <HelpDot k="service_detail.systems" placement="bottom" /></h3>
         </div>
 
         {linked.length === 0
@@ -131,10 +132,10 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
               <table className={styles.iaTable}>
                 <thead>
                   <tr>
-                    <th>System</th>
-                    <th>Department</th>
-                    <th>Your stake</th>
-                    <th>Worst risk</th>
+                    <th>System <HelpDot k="col.system" placement="bottom" /></th>
+                    <th>Department <HelpDot k="col.department" placement="bottom" /></th>
+                    <th>Your stake <HelpDot k="service_detail.col.stake" placement="bottom" /></th>
+                    <th>Worst risk <HelpDot k="service_detail.col.worst_risk" placement="bottom" /></th>
                     {canEdit && <th />}
                   </tr>
                 </thead>
@@ -179,7 +180,7 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
         {canEdit && (
           <div style={{ marginTop: 20 }}>
             <div className={styles.tableAssignTitleRow} style={{ marginBottom: 10 }}>
-              <h4 className={styles.tableAssignTitle}>Link a system</h4>
+              <h4 className={styles.tableAssignTitle}>Link a system <HelpDot k="service_detail.link_system" placement="bottom" /></h4>
             </div>
             <div className={styles.pickerFilterBar}>
               <input
@@ -213,10 +214,10 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
                 <table className={styles.iaTable}>
                   <thead>
                     <tr>
-                      <th>System</th>
-                      <th>Department</th>
-                      <th>Your stake</th>
-                      <th>Worst risk</th>
+                      <th>System <HelpDot k="col.system" placement="bottom" /></th>
+                      <th>Department <HelpDot k="col.department" placement="bottom" /></th>
+                      <th>Your stake <HelpDot k="service_detail.col.stake" placement="bottom" /></th>
+                      <th>Worst risk <HelpDot k="service_detail.col.worst_risk" placement="bottom" /></th>
                       <th />
                     </tr>
                   </thead>
@@ -249,7 +250,7 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
           its systems rather than curated. */}
       <div className={styles.tableAssignSection} style={{ marginTop: 24 }}>
         <div className={styles.tableAssignTitleRow}>
-          <h3 className={styles.tableAssignTitle}>Information this service touches</h3>
+          <h3 className={styles.tableAssignTitle}>Information this service touches <HelpDot k="service_detail.information" placement="bottom" /></h3>
         </div>
         <p className={styles.emptyHint} style={{ marginTop: 0 }}>
           Derived from the systems above — your department&apos;s information in them.
@@ -262,9 +263,11 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
               <table className={styles.iaTable}>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Department</th>
-                    {isExpert ? (<><th>C</th><th>I</th><th>A</th></>) : (<th>Max impact</th>)}
+                    <th>Name <HelpDot k="col.name" placement="bottom" /></th>
+                    <th>Department <HelpDot k="col.department" placement="bottom" /></th>
+                    {isExpert
+                      ? (<><th>C <HelpDot k="col.confidentiality" placement="bottom" /></th><th>I <HelpDot k="col.integrity" placement="bottom" /></th><th>A <HelpDot k="col.availability" placement="bottom" /></th></>)
+                      : (<th>Max impact <HelpDot k="service_detail.col.max_impact" placement="bottom" /></th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -331,7 +334,7 @@ export function ServiceTreatmentTab({ service, isExpert }) {
       </div>
 
       <section className={styles.treatSection}>
-        <h3 className={styles.treatHeading}>Risks with nothing planned</h3>
+        <h3 className={styles.treatHeading}>Risks with nothing planned <HelpDot k="service_detail.untreated" placement="bottom" /></h3>
         {untreated.length === 0 ? (
           <p className={styles.treatEmpty}>
             Every risk on this service&rsquo;s systems has an action against it.
@@ -344,7 +347,7 @@ export function ServiceTreatmentTab({ service, isExpert }) {
             </p>
             <table className={styles.treatTable}>
               <thead>
-                <tr><th>Threat</th><th>System</th><th className={styles.numCol}>Risk</th></tr>
+                <tr><th>Threat <HelpDot k="col.threat" placement="bottom" /></th><th>System <HelpDot k="col.system" placement="bottom" /></th><th className={styles.numCol}>Risk <HelpDot k="service_detail.col.untreated_risk" placement="bottom" /></th></tr>
               </thead>
               <tbody>
                 {untreated.map(u => (
@@ -366,13 +369,19 @@ export function ServiceTreatmentTab({ service, isExpert }) {
       </section>
 
       <section className={styles.treatSection}>
-        <h3 className={styles.treatHeading}>Security actions</h3>
+        <h3 className={styles.treatHeading}>Security actions <HelpDot k="service_detail.actions" placement="bottom" /></h3>
         {actions.length === 0 ? (
           <p className={styles.treatEmpty}>No security actions touch this service&rsquo;s systems.</p>
         ) : (
           <table className={styles.treatTable}>
             <thead>
-              <tr><th>Action</th><th>Owner</th><th>Status</th><th>Progress</th><th>Target</th></tr>
+              <tr>
+                <th>Action <HelpDot k="service_detail.col.action" placement="bottom" /></th>
+                <th>Owner <HelpDot k="service_detail.col.action_owner" placement="bottom" /></th>
+                <th>Status <HelpDot k="service_detail.col.action_status" placement="bottom" /></th>
+                <th>Progress <HelpDot k="service_detail.col.progress" placement="bottom" /></th>
+                <th>Target <HelpDot k="service_detail.col.target_date" placement="bottom" /></th>
+              </tr>
             </thead>
             <tbody>
               {actions.map(a => {
@@ -577,7 +586,7 @@ export function BusinessServiceDetailPage() {
             grouping was a leftover from the model where the path ran through
             assets — and a dependency system has no asset of yours to group by. */}
         {service.risk_paths && service.risk_paths.length > 0 && (
-          <RiskPathTree paths={service.risk_paths} title="Risks to this service" groupBy="system" collapsed isExpert={isExpert} />
+          <RiskPathTree paths={service.risk_paths} title="Risks to this service" helpKey="service_detail.risks" groupBy="system" collapsed isExpert={isExpert} />
         )}
 
         {deleteError && <p className={styles.error}>{deleteError}</p>}
@@ -649,29 +658,15 @@ export function BusinessServiceDetailPage() {
 
         {transferring && (
           <div className={styles.transferPanel}>
-            <h3 className={styles.transferTitle}>Transfer to another department</h3>
+            <h3 className={styles.transferTitle}>Transfer to another department <HelpDot k="service_detail.transfer" placement="bottom" /></h3>
             {transferResult ? (
               <div className={styles.transferSuccess}>
                 <p className={styles.transferSuccessMsg}>
                   Transferred from <strong>{transferResult.from_department.name}</strong> to <strong>{transferResult.to_department.name}</strong>.
                 </p>
-                {transferResult.removed_tables.length > 0 && (
-                  <div className={styles.transferImpact}>
-                    <span className={styles.transferImpactLabel}>Impact table links removed:</span>
-                    <ul className={styles.transferList}>
-                      {transferResult.removed_tables.map(t => <li key={t.id}>{t.name}</li>)}
-                    </ul>
-                  </div>
-                )}
-                {transferResult.kept_tables.length > 0 && (
-                  <div className={styles.transferImpact}>
-                    <span className={styles.transferImpactLabel}>Kept (org-wide):</span>
-                    <ul className={styles.transferList}>
-                      {transferResult.kept_tables.map(t => <li key={t.id}>{t.name}</li>)}
-                    </ul>
-                  </div>
-                )}
-                {transferResult.adoptions_affected.length > 0 && (
+                {/* Impact-table links no longer move on a transfer (v99): a service's
+                    tables follow its assets, so the API reports only adoptions. */}
+                {transferResult.adoptions_affected?.length > 0 && (
                   <div className={styles.transferImpact}>
                     <span className={styles.transferImpactLabel}>Adoption records retained:</span>
                     <ul className={styles.transferList}>
@@ -782,11 +777,11 @@ export function BusinessServiceDetailPage() {
             <table className={styles.factTable}>
               <tbody>
                 <tr>
-                  <th scope="row">Owner department</th>
+                  <th scope="row">Owner department <HelpDot k="service_detail.owner_department" placement="bottom" /></th>
                   <td>{service.owner_department_name || service.department_name || <span className={styles.unset}>—</span>}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Impact tables</th>
+                  <th scope="row">Impact tables <HelpDot k="service_detail.impact_tables_count" placement="bottom" /></th>
                   <td>
                     {hasLinked
                       ? <>
@@ -799,7 +794,7 @@ export function BusinessServiceDetailPage() {
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">Impact source</th>
+                  <th scope="row">Impact source <HelpDot k="service_detail.impact_source" placement="bottom" /></th>
                   <td>
                     {service.cia_source === 'assets'
                       ? 'Derived from the information assets in this service\u2019s systems'
@@ -844,7 +839,7 @@ export function BusinessServiceDetailPage() {
           <div className={styles.impactTableTab}>
             <div className={styles.tableAssignSection}>
               <div className={styles.tableAssignTitleRow}>
-                <h3 className={styles.tableAssignTitle}>Impact Tables</h3>
+                <h3 className={styles.tableAssignTitle}>Impact Tables <HelpDot k="service_detail.impact_tables" placement="bottom" /></h3>
                 <Link to="/impact-tables" className={styles.impactTablesLink}>
                   Edit table definitions →
                 </Link>
@@ -871,11 +866,11 @@ export function BusinessServiceDetailPage() {
                   <table className={styles.itTable}>
                     <thead>
                       <tr>
-                        <th>Name</th>
-                        <th>Scope</th>
-                        <th>Department</th>
-                        <th>BIL levels</th>
-                        <th>Brought in by</th>
+                        <th>Name <HelpDot k="col.name" placement="bottom" /></th>
+                        <th>Scope <HelpDot k="service_detail.col.table_scope" placement="bottom" /></th>
+                        <th>Department <HelpDot k="service_detail.col.table_department" placement="bottom" /></th>
+                        <th>BIL levels <HelpDot k="service_detail.col.bil_levels" placement="bottom" /></th>
+                        <th>Brought in by <HelpDot k="service_detail.col.brought_in_by" placement="bottom" /></th>
                       </tr>
                     </thead>
                     <tbody>

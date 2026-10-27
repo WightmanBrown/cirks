@@ -59,7 +59,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
 .detailed .pipLabel {

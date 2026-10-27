@@ -15,6 +15,7 @@ import { getComponentColor } from '../utils/componentColors';
 import styles               from './ComponentLibraryPage.module.css';
 import { componentStatusLabel } from '../utils/componentTypes';
 import { ComponentModal } from '../components/ComponentModal';
+import { HelpDot } from '../components/HelpDot';
 
 
 // Status is a health ladder, not a word list, so it sorts by how much attention
@@ -206,7 +207,8 @@ function ComponentSummaryCard({ component, detail, openHref, onEdit, canEdit }) 
 // the component helps deliver — the useful fact for a policy or document, which
 // belongs to the objectives it supports rather than to any system. `intro` is a
 // short explanation under the heading.
-export default function ComponentLibraryPage({ componentType, title, singular, supportsControls = false, intro = null }) {
+// `helpKey` is the ⓘ on the page title — each wrapper passes its own literal key.
+export default function ComponentLibraryPage({ componentType, title, singular, supportsControls = false, intro = null, helpKey = null }) {
   // The capability, not a list of role names: the Security Architect holds
   // components.write and was missing from the list this used to be.
   const { hasCapability } = useAuth();
@@ -272,7 +274,7 @@ export default function ComponentLibraryPage({ componentType, title, singular, s
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>{title}</h1>
+            <h1 className={styles.title}>{title}{helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>}</h1>
             {!loading && (
               <span className={styles.subtitle}>
                 {filtered.length} item{filtered.length !== 1 ? 's' : ''}
@@ -307,17 +309,17 @@ export default function ComponentLibraryPage({ componentType, title, singular, s
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <SortableTh column="name"       className={styles.th} {...sortProps}>Name</SortableTh>
-                    <SortableTh column="status"     className={styles.th} {...sortProps}>Status</SortableTh>
+                    <SortableTh column="name"       className={styles.th} {...sortProps} helpKey="col.name">Name</SortableTh>
+                    <SortableTh column="status"     className={styles.th} {...sortProps} helpKey="components.col.status">Status</SortableTh>
                     {supportsControls
-                      ? <SortableTh column="supports" className={styles.th} {...sortProps}>Supports</SortableTh>
-                      : <SortableTh column="systems"  className={styles.th} {...sortProps}>Linked systems</SortableTh>}
+                      ? <SortableTh column="supports" className={styles.th} {...sortProps} helpKey="policies.col.supports">Supports</SortableTh>
+                      : <SortableTh column="systems"  className={styles.th} {...sortProps} helpKey="components.col.linked_systems">Linked systems</SortableTh>}
                     {supportsControls ? (<>
-                      <SortableTh column="kind"   className={styles.th} {...sortProps}>Kind</SortableTh>
-                      <SortableTh column="review" className={styles.th} {...sortProps}>Next review</SortableTh>
+                      <SortableTh column="kind"   className={styles.th} {...sortProps} helpKey="policies.col.kind">Kind</SortableTh>
+                      <SortableTh column="review" className={styles.th} {...sortProps} helpKey="policies.col.next_review">Next review</SortableTh>
                     </>) : (<>
-                      <SortableTh column="vulnerable" className={styles.th} {...sortProps}>Vulnerable</SortableTh>
-                      <SortableTh column="risk"       className={styles.th} {...sortProps}>Risk score</SortableTh>
+                      <SortableTh column="vulnerable" className={styles.th} {...sortProps} helpKey="components.col.vulnerable">Vulnerable</SortableTh>
+                      <SortableTh column="risk"       className={styles.th} {...sortProps} helpKey="components.col.risk_score">Risk score</SortableTh>
                     </>)}
                   </tr>
                 </thead>

@@ -40,10 +40,10 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-.state_draft   { background: rgba(150,150,150,0.15); color: #aaa; }
-.state_planned { background: rgba(100,181,246,0.15); color: #64b5f6; }
-.state_closed  { background: rgba(255,183,77,0.15);  color: #ffb74d; }
-.state_minutes_issued { background: rgba(129,199,132,0.15); color: #81c784; }
+.state_draft   { background: color-mix(in srgb, var(--ink) 9%, transparent); color: var(--text-secondary); }
+.state_planned { background: color-mix(in srgb, var(--blue) 15%, transparent); color: var(--blue-light); }
+.state_closed  { background: color-mix(in srgb, var(--amber) 15%, transparent);  color: var(--amber-light); }
+.state_minutes_issued { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green-light); }
 
 /* Metadata card */
 .metaCard {
@@ -87,7 +87,7 @@
 .durationInput {
   width: 64px;
   padding: 3px 6px;
-  background: var(--bg-input, var(--bg-hover));
+  background: var(--bg-inset);
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text-primary);
@@ -155,8 +155,8 @@
   display: inline-block;
   margin-left: 8px;
   padding: 1px 6px;
-  background: rgba(100,181,246,0.08);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--blue) 8%, transparent);
+  color: var(--text-secondary);
   border-radius: 3px;
   font-size: 0.7rem;
   font-weight: 400;
@@ -167,8 +167,8 @@
   display: inline-block;
   margin-left: 8px;
   padding: 1px 6px;
-  background: rgba(255,183,77,0.12);
-  color: #ffb74d;
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--amber-light);
   border-radius: 3px;
   font-size: 0.7rem;
   font-weight: 500;
@@ -178,8 +178,8 @@
 .roleBadge {
   display: inline-block;
   padding: 1px 7px;
-  background: rgba(100,181,246,0.1);
-  color: var(--accent, #64b5f6);
+  background: color-mix(in srgb, var(--blue) 10%, transparent);
+  color: var(--blue-light);
   border-radius: 3px;
   font-size: 0.75rem;
   text-transform: capitalize;
@@ -215,8 +215,8 @@
   font-family: inherit;
 }
 .modeActive {
-  background: var(--accent, #64b5f6);
-  color: #000;
+  background: var(--accent);
+  color: var(--text-on-fill);
   font-weight: 600;
 }
 
@@ -320,8 +320,8 @@
 .attachItemBadge {
   font-size: 0.7rem;
   padding: 1px 5px;
-  background: rgba(100,181,246,0.1);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--blue) 10%, transparent);
+  color: var(--text-secondary);
   border-radius: 3px;
   flex-shrink: 0;
 }
@@ -339,7 +339,7 @@
   display: inline-flex;
   align-items: center;
   font-size: 0.82rem;
-  color: var(--accent, #64b5f6);
+  color: var(--accent);
   cursor: pointer;
   padding: 4px 0;
 }
@@ -370,8 +370,8 @@
   display: inline-block;
   margin-left: 10px;
   padding: 1px 7px;
-  background: rgba(129,199,132,0.12);
-  color: #81c784;
+  background: color-mix(in srgb, var(--green) 12%, transparent);
+  color: var(--green-light);
   border-radius: 3px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -383,8 +383,8 @@
   display: inline-block;
   margin-left: 10px;
   padding: 1px 7px;
-  background: rgba(255,183,77,0.12);
-  color: #ffb74d;
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--amber-light);
   border-radius: 3px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -402,7 +402,7 @@
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: color-mix(in srgb, var(--shade) 55%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -454,7 +454,7 @@
   font-family: inherit;
   box-sizing: border-box;
 }
-.modalTextarea:focus { outline: none; border-color: var(--accent, #64b5f6); }
+.modalTextarea:focus { outline: none; border-color: var(--accent); }
 
 .modalError {
   font-size: 0.82rem;
@@ -499,7 +499,7 @@
   line-height: 1.6;
   box-sizing: border-box;
 }
-.minutesTextarea:focus { outline: none; border-color: var(--accent, #64b5f6); }
+.minutesTextarea:focus { outline: none; border-color: var(--accent); }
 
 .minutesActions {
   display: flex;

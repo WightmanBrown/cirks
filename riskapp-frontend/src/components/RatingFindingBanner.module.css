@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 .banner {
   display: flex; gap: 16px; align-items: flex-start; justify-content: space-between;
-  border: 1px solid var(--amber, #f59e0b);
-  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid var(--amber);
+  background: color-mix(in srgb, var(--amber) 6%, transparent);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   margin: 12px 0;
@@ -27,4 +27,4 @@
 /* Links inside the finding (the objectives a reason names). Without this they
    took the browser's default blue, unreadable on the dark theme. */
 .title a, .detail a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dotted var(--border); }
-.title a:hover, .detail a:hover { color: var(--accent, #64b5f6); border-bottom-color: currentColor; }
+.title a:hover, .detail a:hover { color: var(--accent); border-bottom-color: currentColor; }

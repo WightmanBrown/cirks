@@ -108,7 +108,7 @@
 .error {
   font-family: var(--font-body);
   font-size: 12px;
-  color: var(--red, #e05252);
+  color: var(--red);
   margin: 0;
 }
 

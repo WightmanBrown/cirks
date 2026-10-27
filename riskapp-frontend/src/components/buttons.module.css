@@ -58,7 +58,7 @@
 }
 .btnSuccess:hover:not(:disabled) {
   background: var(--green);
-  color: #fff;
+  color: var(--text-on-fill);
 }
 
 /* Outline — secondary action */
@@ -80,7 +80,7 @@
 }
 .btnDanger:hover:not(:disabled) {
   background: var(--red);
-  color: #fff;
+  color: var(--text-on-fill);
 }
 
 /* Inline text link */
@@ -95,7 +95,7 @@
   text-decoration: underline;
 }
 .btnLink:hover:not(:disabled) {
-  color: var(--accent-hover);
+  color: var(--blue-light);
 }
 
 /* Minimal / icon-style — no fill or border */
@@ -132,7 +132,7 @@
   font-weight: 600;
   line-height: 1;
   background: var(--amber-faint);
-  color: var(--amber);
+  color: var(--amber-light);
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
@@ -159,12 +159,12 @@
   font-weight: 600;
   line-height: 1;
   background: var(--accent-faint);
-  color: var(--accent);
+  color: var(--blue-light);
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
 .btnAccent:hover:not(:disabled) {
-  background: rgba(91, 141, 238, 0.2);
+  background: color-mix(in srgb, var(--blue) 20%, transparent);
 }
 .btnAccent:disabled {
   opacity: 0.5;

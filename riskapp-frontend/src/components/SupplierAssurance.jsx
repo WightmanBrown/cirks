@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createSupplierEvidence, updateSupplierEvidence, deleteSupplierEvidence } from '../api';
@@ -86,7 +87,7 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
   if (!all.length) {
     return (
       <section className={styles.body}>
-        <h3 className={styles.h3}>Assurance</h3>
+        <h3 className={styles.h3}>Assurance <HelpDot k="supplier_assurance.title" placement="bottom" /></h3>
         <p className={styles.explain}>
           No control objectives are expected of this supplier type yet — see <Link to="/suppliers/control-sets">supplier control sets</Link>.
         </p>
@@ -97,9 +98,15 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
   const expanded = open_ || Boolean(adding || editing);
   return (
     <section ref={sectionRef} className={`${styles.body} ${open.length ? styles.gap : styles.ok}`}>
-      <button type="button" className={styles.foldHead} aria-expanded={expanded} onClick={() => setOpen(v => !v)}>
-        <span className={styles.chevron} aria-hidden="true">{expanded ? '▾' : '▸'}</span>
-        <span className={styles.h3}>Assurance</span>
+      {/* The help dot cannot sit inside the fold button, and after a full-width
+          button it fell to the next line; so the title is its own toggle, the
+          dot follows it, and "Show details" toggles too. */}
+      <div className={styles.foldHead}>
+        <button type="button" className={styles.foldToggle} aria-expanded={expanded} onClick={() => setOpen(v => !v)}>
+          <span className={styles.chevron} aria-hidden="true">{expanded ? '▾' : '▸'}</span>
+          <span className={styles.h3}>Assurance</span>
+        </button>
+        <HelpDot k="supplier_assurance.title" placement="bottom" />
         <span className={styles.foldSummary}>
           <b>{covered.length} of {objectives.length}</b> supplier control objectives met
           {open.length === 0
@@ -110,8 +117,10 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
           {f?.action_id && <span> · action open</span>}
           {f?.accepted_until && <span> · gap accepted until {fmtDay(f.accepted_until)}</span>}
         </span>
-        <span className={styles.foldHint}>{expanded ? 'Hide details' : 'Show details'}</span>
-      </button>
+        <button type="button" className={styles.foldHint} onClick={() => setOpen(v => !v)}>
+          {expanded ? 'Hide details' : 'Show details'}
+        </button>
+      </div>
 
       {expanded && (<>
       <p className={styles.explain}>
@@ -140,9 +149,9 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
         </p>
       ) : null}
 
-      <h4 className={styles.h4}>Control objectives</h4>
+      <h4 className={styles.h4}>Control objectives <HelpDot k="supplier_assurance.objectives" placement="bottom" /></h4>
       <table className={styles.objTable}>
-        <thead><tr><th>Control objective</th><th>Met?</th><th>Met by</th>{canEdit && <th />}</tr></thead>
+        <thead><tr><th>Control objective <HelpDot k="col.control" placement="bottom" /></th><th>Met? <HelpDot k="supplier_assurance.col.met" placement="bottom" /></th><th>Met by <HelpDot k="supplier_assurance.col.met_by" placement="bottom" /></th>{canEdit && <th />}</tr></thead>
         <tbody>
           {rows.map(o => {
             const c = coverageOf(o, evidence);
@@ -179,7 +188,7 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
       )}
 
       {ours.length > 0 && (<>
-        <h4 className={styles.h4}>Ours: met by our own control ({oursMet} of {ours.length} in place)</h4>
+        <h4 className={styles.h4}>Ours: met by our own control ({oursMet} of {ours.length} in place) <HelpDot k="supplier_assurance.ours" placement="bottom" /></h4>
         <p className={styles.explain}>
           These control objectives are delivered once for the whole organisation, so no report or contract from this
           supplier can meet them. Each is met when the <Link to="/soa">Statement of Applicability</Link> says our own
@@ -187,7 +196,7 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
           is ours to close in the SoA.
         </p>
         <table className={styles.objTable}>
-          <thead><tr><th>Control objective</th><th>In place?</th><th>Delivered by</th></tr></thead>
+          <thead><tr><th>Control objective <HelpDot k="col.control" placement="bottom" /></th><th>In place? <HelpDot k="supplier_assurance.col.in_place" placement="bottom" /></th><th>Delivered by <HelpDot k="supplier_assurance.col.delivered_by" placement="bottom" /></th></tr></thead>
           <tbody>
             {ours.map(o => (
               <tr key={o.control_id}>
@@ -203,13 +212,13 @@ export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus =
         </table>
       </>)}
 
-      <h4 className={styles.h4}>Evidence recorded ({evidence.length})</h4>
+      <h4 className={styles.h4}>Evidence recorded ({evidence.length}) <HelpDot k="supplier_assurance.evidence" placement="bottom" /></h4>
       {error && <div className={styles.error} role="alert">{error}</div>}
       {evidence.length === 0 ? (
         <p className={styles.explain}>No assurance reports or contract terms have been recorded for this relationship.</p>
       ) : (
         <table className={styles.objTable}>
-          <thead><tr><th>Evidence</th><th>Evidence type</th><th>Valid until</th><th>Covers</th>{canEdit && <th />}</tr></thead>
+          <thead><tr><th>Evidence <HelpDot k="supplier_assurance.col.evidence" placement="bottom" /></th><th>Evidence type <HelpDot k="supplier_assurance.col.evidence_type" placement="bottom" /></th><th>Valid until <HelpDot k="supplier_assurance.col.valid_until" placement="bottom" /></th><th>Covers <HelpDot k="supplier_assurance.col.covers" placement="bottom" /></th>{canEdit && <th />}</tr></thead>
           <tbody>
             {evidence.map(e => (
               <tr key={e.id}>

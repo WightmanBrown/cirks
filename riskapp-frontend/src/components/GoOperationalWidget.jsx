@@ -13,6 +13,7 @@
 import { useEffect, useState } from 'react';
 import { getOrgPhase, goOperational } from '../api';
 import styles from './GoOperationalWidget.module.css';
+import { HelpDot } from './HelpDot';
 
 function fmtDate(d) {
   if (!d) return '—';
@@ -57,7 +58,7 @@ export function GoOperationalWidget() {
   return (
     <div className={`${styles.widget} ${isSetup ? styles.setup : styles.operational}`}>
       <div className={styles.header}>
-        <span className={styles.title}>Onboarding Handover</span>
+        <span className={styles.title}>Onboarding Handover<HelpDot k="widget.onboarding_handover" placement="bottom" /></span>
         <span className={`${styles.badge} ${isSetup ? styles.badgeSetup : styles.badgeOp}`}>
           {loading ? '…' : isSetup ? 'SETUP' : 'OPERATIONAL'}
         </span>

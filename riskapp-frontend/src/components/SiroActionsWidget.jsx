@@ -7,6 +7,7 @@ export function SiroActionsWidget() {
   return (
     <CountWidget
       title="Security Actions"
+      helpKey="widget.siro_actions"
       badge="SIRO"
       fetchCount={async () => (await getSiroActionPending()).count}
       errorText="Could not load pending actions."

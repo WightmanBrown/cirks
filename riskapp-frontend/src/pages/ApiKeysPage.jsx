@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { getApiKeys, createApiKey, revokeApiKey } from '../api';
 import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
+import { HelpDot } from '../components/HelpDot';
 import styles from './ApiKeysPage.module.css';
 import { DateField } from '../components/DateField';
 
@@ -68,12 +69,12 @@ export function ApiKeysPage() {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <BackButton />
-          <h1 className={styles.heading}>API Keys</h1>
+          <h1 className={styles.heading}>API Keys <HelpDot k="api_keys.title" placement="bottom" /></h1>
         </div>
         <p className={styles.intro}>
           Machine credentials for SOC integrations (e.g. Wazuh) that call the knowledge
           enrichment API. A key authenticates via the <code>X-API-Key</code> header and
-          assumes the <strong>soc_analyst</strong> role (read-only host/IP → system lookup).
+          assumes the <strong>soc_integration</strong> role, which answers enrichment questions (host/IP → system) and nothing else.
           Keys are shown once on creation — copy and store it securely.
         </p>
 
@@ -97,7 +98,7 @@ export function ApiKeysPage() {
         )}
 
         <form className={styles.createCard} onSubmit={handleCreate}>
-          <h2 className={styles.cardTitle}>Create a key</h2>
+          <h2 className={styles.cardTitle}>Create a key <HelpDot k="api_keys.create" placement="bottom" /></h2>
           <div className={styles.formRow}>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>Label (integration name)</span>
@@ -124,7 +125,7 @@ export function ApiKeysPage() {
         </form>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Existing keys</h2>
+          <h2 className={styles.cardTitle}>Existing keys <HelpDot k="api_keys.existing" placement="bottom" /></h2>
           {keys === null ? (
             <p className={styles.muted}>Loading…</p>
           ) : keys.length === 0 ? (
@@ -133,8 +134,14 @@ export function ApiKeysPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Label</th><th>Prefix</th><th>Role</th><th>Status</th>
-                  <th>Last used</th><th>Expires</th><th>Created</th><th></th>
+                  <th>Label <HelpDot k="api_keys.col.label" placement="bottom" /></th>
+                  <th>Prefix <HelpDot k="api_keys.col.prefix" placement="bottom" /></th>
+                  <th>Role <HelpDot k="api_keys.col.role" placement="bottom" /></th>
+                  <th>Status <HelpDot k="api_keys.col.status" placement="bottom" /></th>
+                  <th>Last used <HelpDot k="api_keys.col.last_used" placement="bottom" /></th>
+                  <th>Expires <HelpDot k="api_keys.col.expires" placement="bottom" /></th>
+                  <th>Created <HelpDot k="col.created" placement="bottom" /></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>

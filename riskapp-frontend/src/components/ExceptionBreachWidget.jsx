@@ -18,6 +18,7 @@ import { Link, useNavigate }   from 'react-router-dom';
 import { getEscalatedExceptions } from '../api';
 import { scoreLevel } from '../utils/riskColors';
 import styles from './ExceptionBreachWidget.module.css';
+import { HelpDot } from './HelpDot';
 
 const LEVEL_CLASS = {
   low:           styles.levelLow,
@@ -59,7 +60,12 @@ export function ExceptionBreachWidget({ role = 'ciso' }) {
   return (
     <div className={`${styles.widget} ${isAlert ? styles.alert : ''}`}>
       <div className={styles.header}>
-        <span className={styles.title}>{title}</span>
+        <span className={styles.title}>
+          {title}
+          {isSiro
+            ? <HelpDot k="widget.exceptions_contravention" placement="bottom" />
+            : <HelpDot k="widget.exceptions_breach" placement="bottom" />}
+        </span>
         <span className={styles.badge}>{badge}</span>
       </div>
 

@@ -172,10 +172,10 @@
 }
 
 .cellEmpty    { background: var(--bg-elevated); opacity: 0.4; }
-.cellLow      { background: #1a3a2a; }
-.cellMedium   { background: #3a3010; }
-.cellHigh     { background: #3a1e0a; }
-.cellCritical { background: #3a0a0a; }
+.cellLow      { background: var(--band-low-bg); }
+.cellMedium   { background: var(--band-medium-bg); }
+.cellHigh     { background: var(--band-high-bg); }
+.cellCritical { background: var(--band-critical-bg); }
 
 .cellCount {
   pointer-events: none;

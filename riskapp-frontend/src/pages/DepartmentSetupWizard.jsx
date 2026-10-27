@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDepartments, createDepartment, updateDepartment, deleteDepartment, getBusinessServices, getSharedServices, createBusinessService, updateBusinessService, deleteBusinessService, adoptService } from '../api';
@@ -399,7 +400,7 @@ export function DepartmentSetupWizard() {
           <BackButton />
           <div className={styles.pageHeader}>
             <div>
-              <h1 className={styles.title}>Department Setup</h1>
+              <h1 className={styles.title}>Department Setup <HelpDot k="dept_wizard.title" placement="bottom" /></h1>
               {!deptLoading && (
                 <span className={styles.subtitle}>
                   {departments.length} department{departments.length !== 1 ? 's' : ''}
@@ -452,11 +453,11 @@ export function DepartmentSetupWizard() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th className={styles.th}>Department</th>
-                    <th className={styles.th}>Information Asset Owner</th>
-                    <th className={styles.th}>Information Asset Manager</th>
-                    <th className={`${styles.th} ${styles.thNum}`}>Impact tables</th>
-                    <th className={`${styles.th} ${styles.thNum}`}>Information assets</th>
+                    <th className={styles.th}>Department <HelpDot k="dept_wizard.col.department" placement="bottom" /></th>
+                    <th className={styles.th}>Information Asset Owner <HelpDot k="departments.col.iao" placement="bottom" /></th>
+                    <th className={styles.th}>Information Asset Manager <HelpDot k="departments.col.iam" placement="bottom" /></th>
+                    <th className={`${styles.th} ${styles.thNum}`}>Impact tables <HelpDot k="departments.col.impact_tables" placement="bottom" /></th>
+                    <th className={`${styles.th} ${styles.thNum}`}>Information assets <HelpDot k="departments.col.assets" placement="bottom" /></th>
                     <th className={styles.th} />
                   </tr>
                 </thead>
@@ -547,7 +548,7 @@ export function DepartmentSetupWizard() {
           <StepIndicator step={1} />
           <div className={styles.stepContent}>
             <div className={styles.stepHeading}>
-              <h1>Would you like to use a service template?</h1>
+              <h1>Would you like to use a service template? <HelpDot k="dept_wizard.template" placement="bottom" /></h1>
               <p>
                 Select a template to see example services for <em>{deptName}</em> as inspiration.
                 This is optional — skip straight through if you'd prefer to add your own services from scratch.
@@ -607,7 +608,7 @@ export function DepartmentSetupWizard() {
             {/* Left: examples panel */}
             <aside className={styles.examplesPanel}>
               <div className={styles.examplesPanelHeader}>
-                <span className={styles.examplesPanelTitle}>Examples</span>
+                <span className={styles.examplesPanelTitle}>Examples <HelpDot k="dept_wizard.examples" placement="bottom" /></span>
                 <span className={styles.examplesPanelSub}>
                   {selectedArchetypes.map(a => a.label).join(', ')}
                 </span>
@@ -616,7 +617,7 @@ export function DepartmentSetupWizard() {
 
                 {sharedFromOthers.length > 0 && (
                   <>
-                    <div className={styles.examplesSectionLabel}>From your organisation</div>
+                    <div className={styles.examplesSectionLabel}>From your organisation <HelpDot k="dept_wizard.from_org" placement="bottom" /></div>
                     {sharedFromOthers.map(svc => {
                       const adopted  = addedNames.has(svc.name);
                       const loading  = adoptingId === svc.id;
@@ -640,7 +641,7 @@ export function DepartmentSetupWizard() {
 
                 {selectedArchetypes.map(archetype => (
                   <div key={archetype.id}>
-                    <div className={styles.examplesSectionLabel}>Examples — {archetype.label}</div>
+                    <div className={styles.examplesSectionLabel}>Examples — {archetype.label} <HelpDot k="dept_wizard.template_examples" placement="bottom" /></div>
                     {archetype.examples.map(ex => {
                       const added   = addedNames.has(ex.name);
                       const loading = addingName === ex.name;
@@ -668,7 +669,7 @@ export function DepartmentSetupWizard() {
             <div className={styles.servicesMain}>
               <div className={styles.servicesMainHeader}>
                 <div>
-                  <h1 className={styles.servicesTitle}>{deptName}</h1>
+                  <h1 className={styles.servicesTitle}>{deptName} <HelpDot k="dept_wizard.services" placement="bottom" /></h1>
                   <p className={styles.servicesSubtitle}>
                     {services.length === 0
                       ? 'No services yet — add from the examples or create your own.'
@@ -822,7 +823,7 @@ export function DepartmentSetupWizard() {
       <div className={styles.page}>
         <div className={styles.doneScreen}>
           <div className={styles.doneCheck}>✓</div>
-          <h1 className={styles.doneTitle}>{deptName} set up</h1>
+          <h1 className={styles.doneTitle}>{deptName} set up <HelpDot k="dept_wizard.done" placement="bottom" /></h1>
           <p className={styles.doneSub}>
             {services.length} service{services.length !== 1 ? 's' : ''} catalogued
           </p>
@@ -837,10 +838,10 @@ export function DepartmentSetupWizard() {
           </ul>
 
           <div className={styles.doneNext}>
-            <p className={styles.doneNextLabel}>What's next?</p>
+            <p className={styles.doneNextLabel}>What's next? <HelpDot k="dept_wizard.whats_next" placement="bottom" /></p>
             <p className={styles.doneNextHint}>
-              Each service needs a BIL impact table before it can be rated.
-              Set one up from the service detail page, or run the impact table wizard when it's available.
+              A service is not rated directly. Link each service to the systems that deliver it, and rate the
+              information assets those systems hold against the impact tables &mdash; the service&rsquo;s impact follows.
             </p>
           </div>
 

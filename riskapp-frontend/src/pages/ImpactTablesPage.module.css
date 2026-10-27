@@ -75,7 +75,7 @@
 }
 
 .muted    { color: var(--text-muted); font-size: 13px; }
-.errorMsg { color: var(--red, #e53935); font-size: 13px; }
+.errorMsg { color: var(--red); font-size: 13px; }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
 
@@ -150,9 +150,9 @@
 /* Status + attribute badges */
 .badgePublished {
   background: var(--green-dim);
-  border: 1px solid rgba(76,175,125,0.25);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
   border-radius: var(--radius-sm);
-  color: var(--green, #4caf50);
+  color: var(--green-light);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -178,7 +178,7 @@
   background: var(--amber-faint);
   border: 1px solid var(--amber-dim);
   border-radius: var(--radius-sm);
-  color: var(--amber);
+  color: var(--amber-light);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -239,7 +239,7 @@
 
 .createError {
   font-size: 11px;
-  color: #ef4444;
+  color: var(--red);
   margin: 0;
 }
 
@@ -273,7 +273,7 @@
 .detailError {
   padding: 16px;
   font-size: 13px;
-  color: #ef4444;
+  color: var(--red);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -281,8 +281,8 @@
 
 .retryBtn {
   background: none;
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #ef4444;
+  border: 1px solid color-mix(in srgb, var(--red) 40%, transparent);
+  color: var(--red);
   font-size: 12px;
   padding: 3px 10px;
   border-radius: var(--radius-sm);
@@ -331,9 +331,9 @@
 .publishedChip {
   font-size: 10px;
   font-family: var(--font-mono);
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+  color: var(--green-light);
+  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
   border-radius: 4px;
   padding: 2px 7px;
 }
@@ -351,9 +351,9 @@
 .mandatoryChip {
   font-size: 10px;
   font-family: var(--font-mono);
-  background: rgba(251, 191, 36, 0.15);
-  color: var(--amber);
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: color-mix(in srgb, var(--amber) 15%, transparent);
+  color: var(--amber-light);
+  border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent);
   border-radius: 4px;
   padding: 2px 7px;
 }
@@ -423,7 +423,7 @@
 
 .viewToggleActive {
   background: var(--amber-faint);
-  color: var(--amber);
+  color: var(--amber-light);
   font-weight: 600;
 }
 
@@ -437,23 +437,23 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: color-mix(in srgb, var(--red) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
   border-radius: var(--radius-sm);
   padding: 4px 10px;
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #ef4444;
+  color: var(--red-light);
   white-space: nowrap;
 }
 
 .btnDelConfirm { composes: btnDanger from '../components/buttons.module.css'; }
 .btnDelCancel { composes: btnGhost from '../components/buttons.module.css'; }
 .actionError {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: color-mix(in srgb, var(--red) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
   border-radius: var(--radius-sm);
-  color: #ef4444;
+  color: var(--red-light);
   font-size: 12px;
   padding: 8px 12px;
   display: flex;
@@ -465,7 +465,7 @@
 .dismissBtn {
   background: none;
   border: none;
-  color: #ef4444;
+  color: var(--red);
   cursor: pointer;
   font-size: 16px;
   line-height: 1;
@@ -578,9 +578,9 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  color: #22c55e;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--green-light);
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
   border-radius: 3px;
   padding: 1px 5px;
 }
@@ -602,16 +602,16 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  color: var(--amber);
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: var(--amber-light);
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);
   border-radius: 3px;
   padding: 1px 5px;
 }
 
 .ciaStale {
   font-size: 11px;
-  color: #f97316;
+  color: var(--amber);
   cursor: default;
 }
 
@@ -717,7 +717,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  color: #22c55e;
+  color: var(--green);
   flex-shrink: 0;
 }
 
@@ -867,7 +867,7 @@
 }
 
 .ciaEmpty {
-  color: var(--border-accent);
+  color: var(--text-muted);
   font-size: 13px;
 }
 
@@ -887,5 +887,5 @@
 /* Every impact table has an owning department (v102), so a blank here is a
    fault, not a legitimate state — make it look like one rather than a dash. */
 .deptMissing {
-  color: var(--red, #e05252);
+  color: var(--red);
 }

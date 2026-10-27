@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getDepartment, updateDepartment } from '../api';
@@ -48,7 +49,7 @@ function EditModal({ dept, onClose, onSaved }) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h2 className={styles.modalTitle}>Edit Department</h2>
+        <h2 className={styles.modalTitle}>Edit Department <HelpDot k="department_detail.edit_modal" placement="bottom" /></h2>
         <form onSubmit={handleSubmit}>
           <label className={styles.fieldLabel}>
             Name
@@ -120,7 +121,7 @@ export function DepartmentDetailPage() {
         </div>
 
         <div className={styles.header}>
-          <h1 className={styles.title}>{dept.name}<EntityKind kind="department" /></h1>
+          <h1 className={styles.title}>{dept.name}<EntityKind kind="department" /> <HelpDot k="department_detail.title" placement="bottom" /></h1>
           {canManage && (
             <button className={styles.btnSecondary} onClick={() => setEditing(true)}>Edit</button>
           )}
@@ -149,12 +150,12 @@ export function DepartmentDetailPage() {
 
         {/* ── Staff ── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>People</h2>
+          <h2 className={styles.sectionTitle}>People <HelpDot k="department_detail.people" placement="bottom" /></h2>
           {dept.staff.length === 0
             ? <p className={styles.muted}>No users in this department.</p>
             : (
               <table className={styles.table}>
-                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+                <thead><tr><th>Name <HelpDot k="department_detail.col.person" placement="bottom" /></th><th>Email <HelpDot k="col.email" placement="bottom" /></th><th>Role <HelpDot k="col.role" placement="bottom" /></th><th>Status <HelpDot k="department_detail.col.status" placement="bottom" /></th></tr></thead>
                 <tbody>
                   {dept.staff.map(u => (
                     <tr key={u.id}>
@@ -173,7 +174,7 @@ export function DepartmentDetailPage() {
 
         {/* ── Systems ── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Systems <span className={styles.count}>{dept.systems.length}</span></h2>
+          <h2 className={styles.sectionTitle}>Systems <HelpDot k="department_detail.systems" placement="bottom" /> <span className={styles.count}>{dept.systems.length}</span></h2>
           {dept.systems.length === 0
             ? <p className={styles.muted}>No systems.</p>
             : (
@@ -194,7 +195,7 @@ export function DepartmentDetailPage() {
 
         {/* ── Information assets ── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Information assets <span className={styles.count}>{dept.assets.length}</span></h2>
+          <h2 className={styles.sectionTitle}>Information assets <HelpDot k="department_detail.assets" placement="bottom" /> <span className={styles.count}>{dept.assets.length}</span></h2>
           {dept.assets.length === 0
             ? <p className={styles.muted}>No information assets.</p>
             : (
@@ -211,7 +212,7 @@ export function DepartmentDetailPage() {
 
         {/* ── Business services ── */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Business services <span className={styles.count}>{dept.services.length}</span></h2>
+          <h2 className={styles.sectionTitle}>Business services <HelpDot k="department_detail.services" placement="bottom" /> <span className={styles.count}>{dept.services.length}</span></h2>
           {dept.services.length === 0
             ? <p className={styles.muted}>No business services.</p>
             : (

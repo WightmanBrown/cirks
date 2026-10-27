@@ -4,8 +4,7 @@
  * pages/PendingRisksPage.jsx
  *
  * Lists all pending/returned risks awaiting CISO validation.
- * Clicking a row opens the ValidateModal.
- * After validate/return, removes or refreshes the row optimistically.
+ * Clicking a row opens the risk, where the CISO validates or returns it.
  */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +13,7 @@ import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
 import { Th } from '../components/Th';
+import { HelpDot } from '../components/HelpDot';
 import styles from './PendingRisksPage.module.css';
 
 export function PendingRisksPage() {
@@ -48,7 +48,7 @@ export function PendingRisksPage() {
         {/* Page header */}
         <div className={styles.pageHeader}>
           <div>
-            <h1 className={styles.pageTitle}>Pending Validation</h1>
+            <h1 className={styles.pageTitle}>Pending Validation <HelpDot k="pending_risks.title" placement="bottom" /></h1>
             <p className={styles.pageDesc}>
               Risks awaiting CISO review. Click a row to open the risk detail and validate.
             </p>
@@ -103,12 +103,12 @@ export function PendingRisksPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th>Status</Th>
-                    <Th>Threat</Th>
-                    <Th>Category</Th>
-                    <Th>Asset</Th>
-                    <Th>Department</Th>
-                    <Th>Identified</Th>
+                    <Th helpKey="pending_risks.col.status">Status</Th>
+                    <Th helpKey="col.threat">Threat</Th>
+                    <Th helpKey="pending_risks.col.category">Category</Th>
+                    <Th helpKey="pending_risks.col.asset">Asset</Th>
+                    <Th helpKey="col.department">Department</Th>
+                    <Th helpKey="pending_risks.col.identified">Identified</Th>
                   </tr>
                 </thead>
                 <tbody>

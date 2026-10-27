@@ -102,7 +102,7 @@
 .activePill {
   font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
   padding: 2px 6px; border-radius: var(--radius-sm); text-transform: uppercase;
-  background: var(--green-dim); color: var(--green, #4caf50);
+  background: var(--green-dim); color: var(--green-light);
 }
 .inactivePill {
   font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
@@ -125,22 +125,22 @@
   cursor: pointer;
   transition: border-color 0.15s;
 }
-.entChip:hover { border-color: var(--border-accent, var(--accent)); }
+.entChip:hover { border-color: var(--border-accent); }
 
 .sharedTag {
   font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
   padding: 1px 5px; border-radius: var(--radius-sm); text-transform: uppercase;
-  background: var(--amber-faint); color: var(--amber);
+  background: var(--amber-faint); color: var(--amber-light);
 }
 .riskTag {
   font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
   padding: 1px 6px; border-radius: var(--radius-sm); text-transform: uppercase;
 }
-.risk_critical { background: rgba(180,30,30,0.15); border: 1px solid rgba(180,30,30,0.3); color: #e05252; }
-.risk_high     { background: var(--red-dim);        border: 1px solid rgba(232,93,74,0.25); color: var(--red); }
-.risk_medium   { background: var(--amber-faint);    border: 1px solid rgba(245,166,35,0.25); color: var(--amber); }
-.risk_low      { background: var(--green-dim);      border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
-.risk_catastrophic { background: #952803; border: 1px solid #ff8036; color: #ffb37a; }
+.risk_critical { background: color-mix(in srgb, var(--red) 15%, transparent); border: 1px solid color-mix(in srgb, var(--red) 30%, transparent); color: var(--red-light); }
+.risk_high     { background: var(--red-dim);        border: 1px solid color-mix(in srgb, var(--red) 25%, transparent); color: var(--red-light); }
+.risk_medium   { background: var(--amber-faint);    border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent); color: var(--amber-light); }
+.risk_low      { background: var(--green-dim);      border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); color: var(--green-light); }
+.risk_catastrophic { background: var(--band-catastrophic-bg); border: 1px solid var(--band-catastrophic-edge); color: var(--band-catastrophic-fg); }
 
 .muted { color: var(--text-muted); font-size: 13px; }
 .errorMsg { color: var(--red); font-size: 13px; }

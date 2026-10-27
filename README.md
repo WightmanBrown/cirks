@@ -20,12 +20,68 @@ behind it.**
 **[Download](https://github.com/WightmanBrown/cirks/releases)** ·
 **[Support](SUPPORT.md)** · **[Services](#support-and-services)**
 
-CIRKS is an open-source information risk management platform, aligned with
-ISO/IEC 27001, for CISOs, risk analysts and the boards they report to. It
-replaces the risk spreadsheet with a model of your organisation: its
-information, systems, threats and controls. Risk is **derived** from that model,
-so it is consistent, explainable, and changes when the evidence changes. It is
-never typed in as opinion.
+Most risk registers are spreadsheets of opinions. Two assessors score the same
+risk differently, the scores go stale as soon as something changes, and nobody
+can say afterwards why a risk is a 12 and not an 8. These spreadsheets take time
+and effort and often end up as shelf-ware.
+
+CIRKS takes a different approach. It uses the same governance data to create
+information risk knowledge held as a model of your organisation i.e. its
+information, its systems, the threats you face and the controls actually in
+place, then works the risk scores out from that model. When a
+control fails, a system changes, or an information asset is re-rated, every
+affected risk moves with it, and every score can show exactly where it came
+from.
+
+> **An example from the training data.** Misty Isles Government's VPN has no
+> MFA for contractors, so the VPN is recorded as degraded. Every system that
+> relies on remote access shows the higher risk at once, without anyone
+> re-scoring it. Fix the VPN, and they all come down together.
+
+| If you are | CIRKS gives you |
+|---|---|
+| **On the board** | One clear and consistent picture of information risk, where any rating can be traced to the facts behind it, and spending proposals that show the risk reduction they buy. Less uncertainty |
+| **The CISO** | A register that stays consistent whoever assesses it, shows the common causes behind many risks, turns gaps into a worklist, and keeps actions, exceptions and Security Working Group decisions in one audited place. |
+| **An information or system owner** | Plain questions about what you own i.e. how much does this information matter, is this control working, instead of being asked to score risks. |
+| **An auditor** | A Statement of Applicability, frozen quarterly reviews, minutes that cannot change once issued, and an audit trail enforced by the database itself. |
+
+CIRKS is open source (Apache 2.0) and runs on any Linux machine within Docker.
+The [install guide](docs/INSTALL.md) builds a training instance, loaded with a
+fictional organisation and a year of risk management already done, in well under
+an hour.
+
+**What CIRKS is not.** It is not a compliance checklist tool, and it does not put
+risk in pounds. It ranks risks consistently, explains every one, and shows what
+fixing something would change.
+
+### For boards
+
+CIRKS gives the board a single, consistent view of information risk in which every rating can be traced to its cause, and every investment shows the risk it removes. Accepted risks do not quietly disappear; each one records who accepted it and why, and it expires on a set date, so it comes back to be decided again. Boards ask specific questions about information risk, and CIRKS is built to answer them with evidence rather than reassurance. Therefore, as a board member you can ask:
+
+- "Why is this red?" Every rating in CIRKS can be opened up to show where it came from. The impact comes from the information the system holds, rated by the person who owns that information. The likelihood comes from the controls actually working on that system. Therefore, a director who challenges a number gets the facts behind it, not a debate about whether someone scored it fairly.
+
+- "Are we getting safer?" Each quarter's review is frozen once it closes, so this quarter can be compared with last quarter on the same basis. Because scores are worked out the same way every time, a change in the picture means something changed in the organisation, not that a different person did the scoring.
+
+- "What will this money buy?" A proposed security action lists exactly what it will put in place, and CIRKS works out the risk it will leave behind. Investment decisions can be made on the risk reduction each option delivers, before the money is spent.
+
+### For CISOs
+
+CIRKS changes what you spend your time arguing about. A score cannot be negotiated directly, because it is worked out from facts. The conversation moves from "is this a 12 or an 8?" to "is MFA actually working on this system?", which is a question with an answer. Therefore, as the CISO:
+
+- You stop being the scorer and become the keeper of the model. Business owners rate their own information, system owners record what is deployed, and risk owners validate their risks or send them back. The scores follow. Responsibility sits with the people who own the facts, which is where ISO 27001 puts it.
+- You can see common causes. One weak shared service shows up on every system that depends on it, so the fixes with the most leverage stand out instead of hiding behind dozens of separate entries.
+- Gaps become a worklist. CIRKS raises findings by itself, such as a control objective that applies but has nothing to deliver it, and each one needs a response, i.e. either act or accept until a date. Exceptions expire on schedule, and separation of duties can stop risk owners accepting their own.
+- Your evidence holds up. Validation, ownership changes and the audit trail are enforced in the database, not only in the application, so the record stands even if someone works around the interface. And minutes cannot be edited once issued.
+- Your SOC gets business context. An analyst can look up an IP address or hostname from an alert and see the systems behind it, with their impact and current risk.
+- You can be clear about the cost. The numbers mean something only once assets are rated and controls recorded system by system, and they stay current only if people keep control statuses honest. As a suggestion, start with one department and use the Misty Isles training instance to learn the model before loading your own.
+
+### For department heads
+Department heads i.e. information asset owners, system owners and risk owners, are usually handed a risk spreadsheet once a quarter and asked to rate information risks using unfamiliar language. CIRKS asks them something easier and more useful, to say what the impact is in business terms. Therefore, as a business owner:
+- You answer questions about what you own, in plain language. How much harm would it do if this information leaked, was altered or became unavailable? Is this control working on your system? Those are questions you can answer better than anyone, and expert detail is one click away if you want it.
+- Your answers count everywhere they apply. Rate an information asset once, and every system that holds it and every risk on those systems takes its impact from your rating. You do not have to keep dozens of scores in step by hand.
+- You see the effect of your decisions. When a fix is completed on your system, the risk it addressed comes down, and you can see by how much. When you accept a risk, the record shows it was your call, and it comes back for review on a set date.
+- You can disagree, formally. If a risk on your system looks wrong, you can return it with your reasons rather than signing it off.
+- You see what is yours. Access follows your department, so you work on your own information and systems without wading through everyone else's.
 
 ![The CISO's dashboard in CIRKS, showing tasks, security actions, exceptions and the risk heat map](docs/images/dashboard.png)
 
@@ -67,19 +123,6 @@ docker compose exec app node riskapp/db/import.js /import --password '<starting 
 The workbook for B is [docs/templates/CIRKS-organisation-capture.xlsx](docs/templates/CIRKS-organisation-capture.xlsx).
 Running CIRKS day to day — upgrades, backups, TLS options, air-gapped installs —
 is in [docs/deployment.md](docs/deployment.md).
-
-## Why CIRKS
-
-- **For the board:** one consistent picture of information risk, where every
-  rating can be traced back to the facts it came from. Less doubt, fewer
-  surprises.
-- **For the CISO:** a register that stays current as systems, controls and
-  information change, with validation, security actions, exceptions and
-  Security Working Group meetings in one place, and an audit trail.
-- **For risk analysts and asset owners:** clear questions to answer, in plain
-  language, with expert detail one click away.
-- **For auditors:** a Statement of Applicability, approved and frozen versions,
-  and minutes that cannot be changed once issued.
 
 ## What it does
 

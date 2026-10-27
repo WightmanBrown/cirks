@@ -70,7 +70,7 @@
 .packLink {
   background: none;
   border: none;
-  color: var(--accent, #64b5f6);
+  color: var(--accent);
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0;
@@ -93,17 +93,17 @@
   gap: 8px;
   width: 100%;
   text-align: left;
-  background: rgba(255,183,77,0.10);
-  border: 1px solid rgba(255,183,77,0.35);
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent);
   border-radius: 6px;
   padding: 8px 10px;
   cursor: pointer;
   color: var(--text-primary);
   font: inherit;
 }
-.updateAlert:hover { background: rgba(255,183,77,0.18); }
+.updateAlert:hover { background: color-mix(in srgb, var(--amber) 18%, transparent); }
 
-.updateIcon { color: #ffb74d; font-size: 0.95rem; line-height: 1; }
+.updateIcon { color: var(--amber-light); font-size: 0.95rem; line-height: 1; }
 
 .updateText {
   flex: 1;
@@ -111,7 +111,7 @@
   font-weight: 600;
 }
 
-.updateArrow { color: #ffb74d; font-weight: 700; }
+.updateArrow { color: var(--amber-light); font-weight: 700; }
 
 /* ── Loading skeleton ── */
 @keyframes shimmer {
@@ -126,7 +126,7 @@
 .skeletonLabel {
   width: 80px;
   height: 10px;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm);
   background: var(--border);
   animation: shimmer 1.4s ease-in-out infinite;
 }
@@ -134,7 +134,7 @@
 .skeletonValue {
   width: 160px;
   height: 20px;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm);
   background: var(--border);
   animation: shimmer 1.4s ease-in-out infinite 0.2s;
 }

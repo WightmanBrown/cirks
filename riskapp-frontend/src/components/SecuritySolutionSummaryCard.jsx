@@ -19,6 +19,7 @@ export function SecuritySolutionSummaryCard({ solution: s, openHref }) {
     <EntitySummaryCard
       name={s.name}
       kind="security solution"
+      helpKey="security_solution.card"
       openHref={openHref}
       meta={<>
         <PatternChip kind="solution" />

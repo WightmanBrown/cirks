@@ -14,7 +14,7 @@
   transition: border-color 0.15s;
 }
 .widget:hover { border-color: var(--border-accent); }
-.widget.alert { border-color: var(--red, #e05252); }
+.widget.alert { border-color: var(--red); }
 
 .header {
   display: flex;
@@ -63,8 +63,8 @@
   color: var(--text-primary);
   line-height: 1;
 }
-.count.countZero    { color: var(--green, #4caf50); }
-.count.countNonZero { color: var(--red, #e05252); }
+.count.countZero    { color: var(--green); }
+.count.countNonZero { color: var(--red); }
 
 .statsAux {
   display: flex;
@@ -88,14 +88,14 @@
   width: max-content;
 }
 .pillOverdue {
-  background: rgba(244, 67, 54, 0.12);
-  color: var(--red, #e05252);
-  border: 1px solid rgba(244, 67, 54, 0.35);
+  background: color-mix(in srgb, var(--red) 12%, transparent);
+  color: var(--red-light);
+  border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
 }
 .pillDueSoon {
-  background: rgba(255, 193, 7, 0.10);
-  color: var(--amber);
-  border: 1px solid rgba(255, 193, 7, 0.30);
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+  color: var(--amber-light);
+  border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);
 }
 
 /* ── Since-last-SWG meta row ─────────────────────────────────────────────── */
@@ -118,10 +118,10 @@
   text-transform: uppercase;
 }
 
-.metaNew        { color: var(--accent, #6366f1); }
+.metaNew        { color: var(--accent); }
 .metaNeutral    { color: var(--text-muted); }
 .metaAge        { color: var(--text-secondary); }
-.metaEscalated  { color: var(--red, #e05252); font-weight: 600; }
+.metaEscalated  { color: var(--red); font-weight: 600; }
 
 .metaDivider {
   display: inline-block;
@@ -163,9 +163,9 @@
 }
 .listItem:hover { border-color: var(--border-accent); background: var(--bg-surface); }
 
-.status_overdue  { border-left: 3px solid var(--red, #e05252); }
+.status_overdue  { border-left: 3px solid var(--red); }
 .status_due_soon { border-left: 3px solid var(--amber); }
-.status_ok       { border-left: 3px solid var(--green, #4caf50); }
+.status_ok       { border-left: 3px solid var(--green); }
 
 .levelPill {
   font-family: var(--font-mono);
@@ -176,10 +176,10 @@
   border-radius: var(--radius-sm);
   white-space: nowrap;
 }
-.levelLow      { background: rgba(76, 175, 80, 0.15); color: var(--green); }
-.levelMedium   { background: rgba(255, 193, 7, 0.15); color: var(--amber); }
-.levelHigh     { background: rgba(255, 152, 0, 0.20); color: #ff9800; }
-.levelCritical { background: rgba(244, 67, 54, 0.20); color: var(--red, #e05252); }
+.levelLow      { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green-light); }
+.levelMedium   { background: color-mix(in srgb, var(--amber) 15%, transparent); color: var(--amber-light); }
+.levelHigh     { background: color-mix(in srgb, var(--amber) 20%, transparent); color: var(--amber-light); }
+.levelCritical { background: color-mix(in srgb, var(--red) 20%, transparent); color: var(--red-light); }
 
 .itemMain {
   display: flex;
@@ -211,7 +211,7 @@
   font-size: 11px;
   white-space: nowrap;
 }
-.expiry_overdue  { color: var(--red, #e05252); }
+.expiry_overdue  { color: var(--red); }
 .expiry_due_soon { color: var(--amber); }
 .expiry_ok       { color: var(--text-secondary); }
 
@@ -225,7 +225,7 @@
 .skeletonCount { width: 64px; height: 40px; background: var(--border); border-radius: var(--radius-sm); animation: shimmer 1.4s ease-in-out infinite; }
 .skeletonLabel { width: 160px; height: 12px; background: var(--border); border-radius: var(--radius-sm); animation: shimmer 1.4s ease-in-out infinite 0.2s; }
 
-.error { margin: 0; font-size: 12px; color: var(--red, #e05252); }
+.error { margin: 0; font-size: 12px; color: var(--red); }
 
 .footer { border-top: 1px solid var(--border); padding-top: 10px; }
 .link {

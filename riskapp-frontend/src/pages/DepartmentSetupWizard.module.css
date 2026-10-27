@@ -168,7 +168,7 @@
 .rowActionBtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .rowActionBtnDanger:hover:not(:disabled) {
-  border-color: rgba(232, 93, 74, 0.4);
+  border-color: color-mix(in srgb, var(--red) 40%, transparent);
   color: var(--red);
 }
 
@@ -232,13 +232,13 @@
 .stepDotActive {
   background: var(--amber);
   border: 1px solid var(--amber);
-  color: #0d0f13;
+  color: var(--text-on-fill);
 }
 
 .stepDotDone {
   background: var(--green-dim);
-  border: 1px solid rgba(76, 175, 125, 0.4);
-  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 40%, transparent);
+  color: var(--green-light);
   font-size: 12px;
 }
 
@@ -319,7 +319,7 @@
 .deptCardActive {
   border-color: var(--amber) !important;
   background: var(--amber-faint) !important;
-  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.2) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 20%, transparent) !important;
 }
 
 .deptCardName {
@@ -400,7 +400,7 @@
 .deptEditSave {
   padding: 4px 10px;
   background: var(--amber);
-  color: #000;
+  color: var(--text-on-fill);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 13px;
@@ -453,7 +453,7 @@
 .newDeptBtn {
   padding: 7px 14px;
   background: var(--amber);
-  color: #000;
+  color: var(--text-on-fill);
   border: none;
   border-radius: var(--radius-sm);
   font-size: 13px;
@@ -500,7 +500,7 @@
 .archetypeCardActive {
   border-color: var(--amber) !important;
   background: var(--amber-faint) !important;
-  box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.2) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber) 20%, transparent) !important;
 }
 
 .archetypeName {
@@ -586,7 +586,7 @@
 
 .exampleCard:last-child { border-bottom: none; }
 
-.exampleCard:hover { background: rgba(255,255,255,0.02); }
+.exampleCard:hover { background: color-mix(in srgb, var(--ink) 2%, transparent); }
 
 .exampleCardAdded { opacity: 0.5; }
 
@@ -647,13 +647,13 @@
 .addExampleBtnDone {
   display: inline-block;
   background: var(--green-dim);
-  border: 1px solid rgba(76, 175, 125, 0.25);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
   border-radius: var(--radius-sm);
   padding: 3px 10px;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  color: var(--green);
+  color: var(--green-light);
   cursor: default;
 }
 
@@ -750,7 +750,7 @@
 
 .removeBtn {
   background: none;
-  border: 1px solid rgba(232, 93, 74, 0.25);
+  border: 1px solid color-mix(in srgb, var(--red) 25%, transparent);
   border-radius: var(--radius-sm);
   padding: 2px 8px;
   font-family: var(--font-mono);
@@ -763,7 +763,7 @@
 
 .removeBtn:hover:not(:disabled) {
   background: var(--red-dim);
-  border-color: rgba(232, 93, 74, 0.4);
+  border-color: color-mix(in srgb, var(--red) 40%, transparent);
 }
 
 .removeBtn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -824,7 +824,7 @@
   background: none;
   border: 1px dashed var(--border-accent);
   border-radius: var(--radius-md);
-  color: #ffffff;
+  color: var(--text-primary);
   font-family: var(--font-mono);
   font-size: 16.8px;
   cursor: pointer;
@@ -835,7 +835,7 @@
 
 .addCustomBtn:hover {
   border-color: var(--amber-dim);
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
 }
 
@@ -903,8 +903,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--green-dim);
-  border: 1px solid rgba(76, 175, 125, 0.25);
-  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
+  color: var(--green-light);
   text-transform: uppercase;
   white-space: nowrap;
   flex-shrink: 0;
@@ -925,8 +925,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
   text-transform: uppercase;
   white-space: nowrap;
   flex-shrink: 0;
@@ -961,8 +961,8 @@
   height: 56px;
   border-radius: 50%;
   background: var(--green-dim);
-  border: 2px solid rgba(76, 175, 125, 0.4);
-  color: var(--green);
+  border: 2px solid color-mix(in srgb, var(--green) 40%, transparent);
+  color: var(--green-light);
   font-size: 24px;
   display: flex;
   align-items: center;
@@ -1014,8 +1014,8 @@
 }
 
 .doneNext {
-  background: rgba(245, 166, 35, 0.06);
-  border: 1px solid rgba(245, 166, 35, 0.15);
+  background: color-mix(in srgb, var(--amber) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--amber) 15%, transparent);
   border-radius: var(--radius-md);
   padding: 16px 18px;
   text-align: left;
@@ -1076,9 +1076,9 @@
 
 .error {
   background: var(--red-dim);
-  border: 1px solid rgba(232, 93, 74, 0.2);
+  border: 1px solid color-mix(in srgb, var(--red) 20%, transparent);
   border-radius: var(--radius-md);
-  color: var(--red);
+  color: var(--red-light);
   font-size: 13px;
   padding: 10px 14px;
 }

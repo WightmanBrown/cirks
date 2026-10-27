@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { RatingChip } from './RatingChip';
 import { criticalityNarrative } from '../utils/supplierCriticality';
 import styles from './SupplierRelationshipCard.module.css';
@@ -12,7 +13,7 @@ export function SupplierCriticality({ supplierName, relationships, isExpert }) {
   return (
     <section className={styles.critBox} aria-label="Criticality">
       <div className={styles.critHead}>
-        <span className={styles.h3}>Criticality</span>
+        <span className={styles.h3}>Criticality <HelpDot k="supplier.criticality" placement="bottom" /></span>
         <RatingChip value={level} scale="impact" variant={isExpert ? 'number' : 'word'} />
       </div>
       {level == null ? (

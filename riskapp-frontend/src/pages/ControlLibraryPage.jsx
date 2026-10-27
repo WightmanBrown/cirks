@@ -241,12 +241,12 @@ export function ControlLibraryPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th>Ref</Th>
-                    <Th>Title</Th>
-                    <Th>Type</Th>
-                    <Th>Status</Th>
-                    <Th>Effectiveness<HelpDot k="controls.effectiveness" placement="top" label="About control effectiveness" /></Th>
-                    <Th>Applicability</Th>
+                    <Th helpKey="col.reference">Ref</Th>
+                    <Th helpKey="controls.col.title">Title</Th>
+                    <Th helpKey="controls.col.type">Type</Th>
+                    <Th helpKey="controls.col.status">Status</Th>
+                    <Th helpKey="controls.effectiveness">Effectiveness</Th>
+                    <Th helpKey="controls.col.applicability">Applicability</Th>
                   </tr>
                 </thead>
                 <tbody>

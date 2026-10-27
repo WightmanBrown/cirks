@@ -10,6 +10,7 @@ import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { ControlStatusPill } from '../components/ControlStatusPill';
 import { SUPPLIER_TYPES } from '../utils/supplierTypes';
 import styles from './ScopesPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 const SETS = [
   { key: 'all', label: 'Every supplier', hint: 'The supplier programme itself — expected of every relationship, whatever its supplier type.' },
@@ -55,11 +56,12 @@ export function SupplierControlSetsPage() {
         <BackButton fallback="/suppliers" />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Supplier control sets</h1>
+            <h1 className={styles.title}>Supplier control sets <HelpDot k="supplier_sets.title" placement="bottom" /></h1>
             <p className={styles.desc}>
               What each supplier type is expected to meet. Every relationship is held to the <b>every supplier</b>
-              set plus the set for its supplier type. An objective counts as met only when a current assurance report
-              or contract terms cover it. Changing a set here changes it for every relationship of that supplier type.
+              set plus the set for its supplier type. An objective counts as met when a current assurance report or
+              contract terms cover it &mdash; or, for an objective we deliver once for the whole organisation, when our
+              own control is implemented. Changing a set here changes it for every relationship of that supplier type.
             </p>
           </div>
           {!canEdit && <ReadOnlyBadge reason="Editing the sets needs the controls.write capability (CISO, risk analyst, admin)." />}
@@ -72,13 +74,13 @@ export function SupplierControlSetsPage() {
           const inSet = new Set(rows.map(r => r.control_id));
           return (
             <section key={set.key} className={styles.section}>
-              <h2 className={styles.sectionTitle}>{set.label} <span className={styles.count}>{rows.length}</span></h2>
+              <h2 className={styles.sectionTitle}>{set.label} <span className={styles.count}>{rows.length}</span> <HelpDot k="supplier_sets.set" placement="bottom" /></h2>
               <p className={styles.note}>{set.hint}</p>
               {rows.length === 0 ? (
                 <p className={styles.muted}>No objectives in this set.</p>
               ) : (
                 <table className={styles.table}>
-                  <thead><tr><th>Objective</th><th>In the SoA</th>{canEdit && <th />}</tr></thead>
+                  <thead><tr><th>Objective <HelpDot k="col.control" placement="bottom" /></th><th>In the SoA <HelpDot k="supplier_sets.col.in_soa" placement="bottom" /></th>{canEdit && <th />}</tr></thead>
                   <tbody>
                     {rows.map(o => (
                       <tr key={o.control_id}>

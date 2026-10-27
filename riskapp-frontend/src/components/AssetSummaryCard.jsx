@@ -21,6 +21,7 @@ export function AssetSummaryCard({ asset, openHref, isExpert = true }) {
     <EntitySummaryCard
       name={asset.name}
       kind="information asset"
+      helpKey="asset_card.title"
       openHref={openHref}
       rightSlot={
         isExpert ? (

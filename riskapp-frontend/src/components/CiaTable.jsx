@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { chipClass, rawColorClass } from '../utils/riskColors';
 import { RatingChip } from './RatingChip';
 import { RatingScaleRow } from './RatingScaleRow';
@@ -78,14 +79,14 @@ export function CiaTableHeader({ label, simpleMode = false, className = '' }) {
         ? <>
             <span className={styles.ciaLineCell} />
             <span className={styles.ciaLineCell}>
-              <span className={styles.ciaColumnHeader}>Max CIA</span>
+              <span className={styles.ciaColumnHeader}>Max CIA <HelpDot k="cia_table.col.max" placement="bottom" /></span>
             </span>
             <span className={styles.ciaLineCell} />
           </>
         : <>
-            <CiaValueCell value="Confidentiality" isHeader />
-            <CiaValueCell value="Integrity"       isHeader />
-            <CiaValueCell value="Availability"    isHeader />
+            <CiaValueCell value={<>Confidentiality <HelpDot k="cia_table.col.c" placement="bottom" /></>} isHeader />
+            <CiaValueCell value={<>Integrity <HelpDot k="cia_table.col.i" placement="bottom" /></>} isHeader />
+            <CiaValueCell value={<>Availability <HelpDot k="cia_table.col.a" placement="bottom" /></>} isHeader />
           </>
       }
     </div>

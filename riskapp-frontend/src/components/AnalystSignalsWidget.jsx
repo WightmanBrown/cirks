@@ -7,6 +7,7 @@ export function AnalystSignalsWidget() {
   return (
     <CountWidget
       title="Open Probability Signals"
+      helpKey="widget.probability_signals"
       badge="ANALYST"
       fetchCount={async () => (await getProbabilitySignals()).count}
       errorText="Could not load probability signals."

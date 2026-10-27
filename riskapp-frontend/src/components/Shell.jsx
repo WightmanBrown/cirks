@@ -94,6 +94,7 @@ const NAV_GROUPS = [
       { label: 'Audit Log',          path: '/admin/audit',  cap: 'admin.manage' },
       { label: 'API Keys',           path: '/admin/api-keys', cap: 'admin.manage' },
       { label: 'Help Content',       path: '/admin/help',   cap: 'admin.manage' },
+      { label: 'Colours & Fonts',    path: '/admin/colours', cap: 'admin.manage' },
     ],
   },
 

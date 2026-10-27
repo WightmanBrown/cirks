@@ -15,10 +15,10 @@
   border: 1px solid var(--border); border-radius: 12px; padding: 2px 4px 2px 10px; background: var(--bg-hover);
 }
 .chip a { color: var(--text-primary); text-decoration: none; }
-.chip a:hover { color: var(--accent, #64b5f6); text-decoration: underline; }
+.chip a:hover { color: var(--accent); text-decoration: underline; }
 .kind { font-size: 11px; color: var(--text-muted); }
 .x { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 4px; }
-.x:hover { color: var(--red, #e5534b); }
+.x:hover { color: var(--red); }
 .more summary { cursor: pointer; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 6px; }
 .more { display: flex; flex-direction: column; gap: 6px; }
 @media (max-width: 640px) { .label { min-width: 0; } }

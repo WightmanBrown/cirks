@@ -35,6 +35,7 @@ export function ServiceSummaryCard({ service, openHref, isExpert = true, showRis
     <EntitySummaryCard
       name={service.name}
       kind="business service"
+      helpKey="service_card.title"
       openHref={openHref}
       meta={
         <>
@@ -53,7 +54,7 @@ export function ServiceSummaryCard({ service, openHref, isExpert = true, showRis
         </>
       }
     >
-      {showRiskPath && <RiskPath paths={service.risk_paths ?? null} />}
+      {showRiskPath && <RiskPath paths={service.risk_paths ?? null} helpKey="service_card.risk_path" />}
 
       <CiaContributionTable
         c={service.effective_c}

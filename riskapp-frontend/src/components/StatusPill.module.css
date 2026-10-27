@@ -13,9 +13,9 @@
   white-space: nowrap;
 }
 
-.statusPlanned    { background: rgba(100,100,180,0.12); border: 1px solid rgba(100,100,180,0.25); color: #9fa8da; }
-.statusInProgress { background: rgba(245,166,35,0.12);  border: 1px solid rgba(245,166,35,0.3);  color: var(--amber); }
-.statusCompleted  { background: rgba(76,175,125,0.12);  border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
-.statusDeferred   { background: rgba(120,120,120,0.12); border: 1px solid rgba(120,120,120,0.25); color: var(--text-muted); }
-.statusCancelled  { background: rgba(120,120,120,0.08); border: 1px solid rgba(120,120,120,0.2);  color: var(--text-muted); }
-.statusOverdue    { background: rgba(224,82,82,0.12);   border: 1px solid rgba(224,82,82,0.3);   color: var(--red); }
+.statusPlanned    { background: color-mix(in srgb, var(--violet) 12%, transparent); border: 1px solid color-mix(in srgb, var(--violet) 25%, transparent); color: var(--violet); }
+.statusInProgress { background: color-mix(in srgb, var(--amber) 12%, transparent);  border: 1px solid color-mix(in srgb, var(--amber) 30%, transparent);  color: var(--amber-light); }
+.statusCompleted  { background: color-mix(in srgb, var(--green) 12%, transparent);  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); color: var(--green-light); }
+.statusDeferred   { background: color-mix(in srgb, var(--ink) 6%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); color: var(--text-secondary); }
+.statusCancelled  { background: color-mix(in srgb, var(--ink) 4%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);  color: var(--text-secondary); }
+.statusOverdue    { background: color-mix(in srgb, var(--red) 12%, transparent);   border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);   color: var(--red-light); }

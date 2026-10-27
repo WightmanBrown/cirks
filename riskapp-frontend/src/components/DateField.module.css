@@ -11,4 +11,4 @@
 /* Present for showPicker(), never seen. */
 .hiddenPicker { position: absolute; right: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; border: 0; padding: 0; }
 .read { font-size: 11.5px; color: var(--text-muted); }
-.problem { font-size: 11.5px; color: var(--red, #e5534b); }
+.problem { font-size: 11.5px; color: var(--red); }

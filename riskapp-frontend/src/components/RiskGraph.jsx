@@ -5,26 +5,27 @@ import cytoscape from 'cytoscape';
 import { getRiskGraph } from '../api';
 import { COMPONENT_COLORS } from '../utils/componentColors';
 import { scoreLevel } from '../utils/riskColors';
+import { resolveColour, resolveSheet } from '../utils/themeColours';
 import { Spinner } from './Spinner';
 import styles from './RiskGraph.module.css';
 
 // Node colour palette — extends PPITF component colours
 const NODE_COLORS = {
   ...COMPONENT_COLORS,
-  risk:           { bg: '#f59e0b', border: '#d97706', text: '#0c1117' },
-  threat:         { bg: '#ef4444', border: '#b91c1c', text: '#ffffff' },
-  asset:          { bg: '#2dd4bf', border: '#0d9488', text: '#0c1117' },
-  asset_overflow: { bg: '#334155', border: '#475569', text: '#94a3b8' },
+  risk:           { bg: 'var(--graph-risk)',   border: 'var(--graph-risk-edge)',   text: 'var(--ppitf-text-dark)' },
+  threat:         { bg: 'var(--graph-threat)', border: 'var(--graph-threat-edge)', text: 'var(--ppitf-text-dark)' },
+  asset:          { bg: 'var(--graph-asset)',  border: 'var(--graph-asset-edge)',  text: 'var(--ppitf-text-dark)' },
+  asset_overflow: { bg: 'var(--graph-node)',   border: 'var(--graph-node-edge)',   text: 'var(--graph-quiet-text)' },
   control:        COMPONENT_COLORS.control,
 };
 
 // Risk score → border accent (matches score band colours)
 const SCORE_BORDER = {
-  low:          '#22c55e',
-  medium:       '#f59e0b',
-  high:         '#f97316',
-  critical:     '#ef4444',
-  catastrophic: '#ff8036',
+  low:          'var(--band-low-fg)',
+  medium:       'var(--band-medium-fg)',
+  high:         'var(--band-high-fg)',
+  critical:     'var(--band-critical-fg)',
+  catastrophic: 'var(--band-catastrophic-edge)',
 };
 
 function buildStylesheet() {
@@ -37,7 +38,7 @@ function buildStylesheet() {
     },
   }));
 
-  return [
+  return resolveSheet([
     {
       selector: 'node',
       style: {
@@ -121,14 +122,14 @@ function buildStylesheet() {
         'label':                   'data(label)',
         'font-size':               9,
         'font-family':             'var(--font-mono, monospace)',
-        'color':                   '#64748b',
-        'text-background-color':   '#0c1117',
+        'color':                   'var(--graph-quiet-text)',
+        'text-background-color':   'var(--graph-label-bg)',
         'text-background-opacity': 0.8,
         'text-background-padding': 2,
         'curve-style':             'bezier',
         'target-arrow-shape':      'triangle',
-        'target-arrow-color':      '#475569',
-        'line-color':              '#334155',
+        'target-arrow-color':      'var(--graph-arrow)',
+        'line-color':              'var(--graph-line)',
         'width':                   1.5,
         'arrow-scale':             0.9,
       },
@@ -138,8 +139,8 @@ function buildStylesheet() {
     {
       selector: 'edge[type="asset_of"]',
       style: {
-        'line-color':         '#2dd4bf',
-        'target-arrow-color': '#2dd4bf',
+        'line-color':         'var(--graph-asset)',
+        'target-arrow-color': 'var(--graph-asset)',
         'width':              1.5,
       },
     },
@@ -148,8 +149,8 @@ function buildStylesheet() {
     {
       selector: 'edge[type="mitigates"]',
       style: {
-        'line-color':         '#4f7cff',
-        'target-arrow-color': '#4f7cff',
+        'line-color':         'var(--ppitf-control)',
+        'target-arrow-color': 'var(--ppitf-control)',
         'line-style':         'dashed',
         'line-dash-pattern':  [5, 3],
         'width':              2,
@@ -160,8 +161,8 @@ function buildStylesheet() {
     {
       selector: 'edge[type="has_risk"]',
       style: {
-        'line-color':         '#f59e0b',
-        'target-arrow-color': '#f59e0b',
+        'line-color':         'var(--graph-risk)',
+        'target-arrow-color': 'var(--graph-risk)',
         'width':              2,
       },
     },
@@ -170,8 +171,8 @@ function buildStylesheet() {
     {
       selector: 'edge[type="from_threat"]',
       style: {
-        'line-color':         '#ef4444',
-        'target-arrow-color': '#ef4444',
+        'line-color':         'var(--graph-threat)',
+        'target-arrow-color': 'var(--graph-threat)',
         'width':              1.5,
       },
     },
@@ -180,10 +181,10 @@ function buildStylesheet() {
       selector: 'node:selected',
       style: {
         'border-width': 3,
-        'border-color': '#f8fafc',
+        'border-color': 'var(--graph-selected)',
       },
     },
-  ];
+  ]);
 }
 
 export function RiskGraph({ riskId, riskScore, refreshKey }) {
@@ -256,7 +257,7 @@ export function RiskGraph({ riskId, riskScore, refreshKey }) {
           // Score-based border on risk node
           if (riskScore != null) {
             const level = scoreLevel(riskScore);
-            const border = SCORE_BORDER[level];
+            const border = resolveColour(SCORE_BORDER[level]);
             if (border) {
               cy.$('node[type="risk"]').style({ 'border-color': border, 'border-width': 4 });
             }

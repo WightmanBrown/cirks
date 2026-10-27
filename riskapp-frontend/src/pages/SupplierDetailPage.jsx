@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
@@ -73,7 +74,7 @@ export function SupplierDetailPage() {
               </div>
             ) : (
               <>
-                <h1 className={styles.title}>{data.name}<EntityKind kind="supplier" /></h1>
+                <h1 className={styles.title}>{data.name}<EntityKind kind="supplier" /> <HelpDot k="supplier_detail.title" placement="bottom" /></h1>
                 {data.notes && <p className={styles.desc}>{data.notes}</p>}
               </>
             )}
@@ -98,7 +99,7 @@ export function SupplierDetailPage() {
         <SupplierCriticality supplierName={data.name} relationships={data.relationships} isExpert={viewMode.isExpert} />
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Relationships <span className={styles.count}>{data.relationships.length}</span></h2>
+          <h2 className={styles.sectionTitle}>Relationships <HelpDot k="supplier_detail.relationships" placement="bottom" /> <span className={styles.count}>{data.relationships.length}</span></h2>
           <p className={styles.note}>
             Each relationship is one thing we have with this supplier. Its assurance — the control objectives it must
             meet, and the evidence that shows it — is shown with it.

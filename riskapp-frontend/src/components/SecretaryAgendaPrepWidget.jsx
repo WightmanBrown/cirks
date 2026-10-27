@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMeetings, getMeeting, getAgenda } from '../api/index';
 import styles from './SecretaryAgendaPrepWidget.module.css';
+import { HelpDot } from './HelpDot';
 
 function formatDate(iso) {
   if (!iso) return '—';
@@ -51,7 +52,7 @@ export function SecretaryAgendaPrepWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <span className={styles.title}>Agenda Prep</span>
+          <span className={styles.title}>Agenda Prep<HelpDot k="widget.agenda_prep" placement="bottom" /></span>
         </div>
         <p className={styles.muted}>Loading…</p>
       </div>
@@ -62,7 +63,7 @@ export function SecretaryAgendaPrepWidget() {
     return (
       <div className={styles.widget}>
         <div className={styles.header}>
-          <span className={styles.title}>Agenda Prep</span>
+          <span className={styles.title}>Agenda Prep<HelpDot k="widget.agenda_prep" placement="bottom" /></span>
         </div>
         <p className={styles.muted}>No active meeting.</p>
         <button className={styles.btnAction} onClick={() => navigate('/meetings/plan')}>
@@ -87,7 +88,7 @@ export function SecretaryAgendaPrepWidget() {
   return (
     <div className={styles.widget}>
       <div className={styles.header}>
-        <span className={styles.title}>Agenda Prep</span>
+        <span className={styles.title}>Agenda Prep<HelpDot k="widget.agenda_prep" placement="bottom" /></span>
         <button className={styles.btnLink} onClick={() => navigate(`/meetings/${meeting.id}`)}>
           Open →
         </button>

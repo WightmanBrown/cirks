@@ -16,6 +16,7 @@ import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { Shell }         from '../components/Shell';
 import styles from './MeetingDetailPage.module.css';
 import { personLabel } from '../utils/roles';
+import { HelpDot } from '../components/HelpDot';
 
 const STATE_LABELS = {
   draft:          'Draft',
@@ -102,13 +103,16 @@ function MeetingAttachmentsPanel({ meetingId, minutesIssued }) {
 
   return (
     <section className={styles.section}>
-      <button className={styles.attachSectionToggle} onClick={() => setOpen(o => !o)}>
-        <span>{open ? '▾' : '▸'}</span>
-        <h2 className={styles.sectionTitle} style={{ display: 'inline' }}>Meeting Attachments</h2>
-        {attachments.length > 0 && (
-          <span className={styles.attachBadge}>{attachments.length}</span>
-        )}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+        <button className={styles.attachSectionToggle} style={{ marginBottom: 0 }} onClick={() => setOpen(o => !o)}>
+          <span>{open ? '▾' : '▸'}</span>
+          <h2 className={styles.sectionTitle} style={{ display: 'inline' }}>Meeting Attachments</h2>
+          {attachments.length > 0 && (
+            <span className={styles.attachBadge}>{attachments.length}</span>
+          )}
+        </button>
+        <HelpDot k="meeting_detail.attachments" placement="bottom" />
+      </div>
 
       {open && (
         <div className={styles.attachBody}>
@@ -172,7 +176,7 @@ function CloseMeetingModal({ meetingId, onClosed, onCancel }) {
   return (
     <div className={styles.modalBackdrop}>
       <div className={styles.modal}>
-        <h3 className={styles.modalTitle}>Close Meeting</h3>
+        <h3 className={styles.modalTitle}>Close Meeting <HelpDot k="meeting_detail.close_modal" placement="bottom" /></h3>
         <p className={styles.modalDesc}>
           Closing the meeting freezes the agenda, attendee list, and attachments.
           You will still be able to edit decision text and write the minutes.
@@ -266,7 +270,7 @@ function MinutesEditor({ meetingId, initialBody, agendaItems, onIssued }) {
   return (
     <section className={styles.section}>
       <div className={styles.minutesHeader}>
-        <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Minutes</h2>
+        <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Minutes <HelpDot k="meeting_detail.minutes" placement="bottom" /></h2>
         <button
           className={styles.btnDraftGenerate}
           onClick={() => setBody(buildDraft())}
@@ -433,7 +437,7 @@ export function MeetingDetailPage() {
       <div className={styles.pageHeader}>
         <BackButton fallback="/meetings" />
         <div className={styles.headerInfo}>
-          <h1 className={styles.title}>SWG Meeting — {formatDate(meeting.meeting_date)}</h1>
+          <h1 className={styles.title}>SWG Meeting — {formatDate(meeting.meeting_date)} <HelpDot k="meeting_detail.title" placement="bottom" /></h1>
           <span className={`${styles.stateBadge} ${styles[`state_${state}`]}`}>
             {STATE_LABELS[state] ?? state}
           </span>
@@ -522,7 +526,7 @@ export function MeetingDetailPage() {
       {isSecretary ? (
         <>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Attendees</h2>
+            <h2 className={styles.sectionTitle}>Attendees <HelpDot k="meeting_detail.attendees" placement="bottom" /></h2>
 
             {attendees.length === 0 ? (
               <p className={styles.empty}>No attendees added yet.</p>
@@ -530,13 +534,13 @@ export function MeetingDetailPage() {
               <table className={styles.attendeeTable}>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Email</th>
-                    <th>Meeting role</th>
-                    <th>Presenting item</th>
-                    <th>Pack viewed</th>
-                    <th>Present</th>
+                    <th>Name <HelpDot k="meeting_detail.col.name" placement="bottom" /></th>
+                    <th>Department <HelpDot k="meeting_detail.col.department" placement="bottom" /></th>
+                    <th>Email <HelpDot k="col.email" placement="bottom" /></th>
+                    <th>Meeting role <HelpDot k="meeting_detail.col.meeting_role" placement="bottom" /></th>
+                    <th>Presenting item <HelpDot k="meeting_detail.col.presenting" placement="bottom" /></th>
+                    <th>Pack viewed <HelpDot k="meeting_detail.col.pack_viewed" placement="bottom" /></th>
+                    <th>Present <HelpDot k="meeting_detail.col.present" placement="bottom" /></th>
                     {!isClosed && <th></th>}
                   </tr>
                 </thead>
@@ -646,7 +650,7 @@ export function MeetingDetailPage() {
 
           {minutesIssued && meeting.minutes_body && (
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Minutes (issued)</h2>
+              <h2 className={styles.sectionTitle}>Minutes (issued) <HelpDot k="meeting_detail.minutes_issued" placement="bottom" /></h2>
               <pre className={styles.minutesReadonly}>{meeting.minutes_body}</pre>
             </section>
           )}
@@ -655,18 +659,18 @@ export function MeetingDetailPage() {
         /* Non-secretary: personalised pack view */
         <>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Attendees</h2>
+            <h2 className={styles.sectionTitle}>Attendees <HelpDot k="meeting_detail.attendees" placement="bottom" /></h2>
             {attendees.length === 0 ? (
               <p className={styles.empty}>No attendees added yet.</p>
             ) : (
               <table className={styles.attendeeTable}>
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Department</th>
-                    <th>Email</th>
-                    <th>Meeting role</th>
-                    <th>Present</th>
+                    <th>Name <HelpDot k="meeting_detail.col.name" placement="bottom" /></th>
+                    <th>Department <HelpDot k="meeting_detail.col.department" placement="bottom" /></th>
+                    <th>Email <HelpDot k="col.email" placement="bottom" /></th>
+                    <th>Meeting role <HelpDot k="meeting_detail.col.meeting_role" placement="bottom" /></th>
+                    <th>Present <HelpDot k="meeting_detail.col.present" placement="bottom" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -691,13 +695,13 @@ export function MeetingDetailPage() {
           </section>
 
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Meeting Pack</h2>
+            <h2 className={styles.sectionTitle}>Meeting Pack <HelpDot k="meeting_detail.pack" placement="bottom" /></h2>
             <PackView meetingId={id} userRole={user?.role} />
           </section>
 
           {minutesIssued && meeting.minutes_body && (
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Minutes</h2>
+              <h2 className={styles.sectionTitle}>Minutes <HelpDot k="meeting_detail.minutes_issued" placement="bottom" /></h2>
               <pre className={styles.minutesReadonly}>{meeting.minutes_body}</pre>
             </section>
           )}

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { RatingScaleRow } from './RatingScaleRow';
 import { RatingChip } from './RatingChip';
 import { EntityKind } from './EntityKind';
+import { HelpDot } from './HelpDot';
 import styles from './EntitySummaryCard.module.css';
 
 const CATEGORY_LABEL = {
@@ -24,7 +25,7 @@ export function ThreatSummaryCard({ threat, openHref, isExpert = false }) {
       <div className={styles.top}>
         <div className={styles.left}>
           <h2 className={styles.title}>
-            {threat.name}<EntityKind kind="threat" />
+            {threat.name}<EntityKind kind="threat" /> <HelpDot k="threat_card.title" placement="bottom" />
           </h2>
           <div className={styles.meta}>
             {threat.threat_category && (

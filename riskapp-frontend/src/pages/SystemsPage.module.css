@@ -74,7 +74,7 @@
 
 .filterActive {
   border-color: var(--amber-dim);
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -129,7 +129,7 @@
 }
 
 .row { cursor: pointer; }
-.row:hover td { background: var(--bg-hover, var(--bg-surface)); }
+.row:hover td { background: var(--bg-hover); }
 
 .rowSelected td {
   background: var(--bg-elevated);
@@ -161,9 +161,9 @@
   padding: 2px 6px;
   border-radius: 3px;
 }
-.ciaGreen { background: var(--green-dim); color: var(--green, #4caf50); }
-.ciaAmber { background: var(--amber-faint); color: var(--amber, #f0a500); }
-.ciaRed   { background: var(--red-dim); color: var(--red,   #e53935); }
+.ciaGreen { background: var(--green-dim); color: var(--green-light); }
+.ciaAmber { background: var(--amber-faint); color: var(--amber-light); }
+.ciaRed   { background: var(--red-dim); color: var(--red-light); }
 .ciaUnset { color: var(--text-muted); font-size: 12px; }
 
 /* ── Shared badge ────────────────────────────────────────────────────────── */
@@ -176,8 +176,8 @@
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   background: var(--amber-faint);
-  border: 1px solid rgba(245, 166, 35, 0.2);
-  color: var(--amber);
+  border: 1px solid color-mix(in srgb, var(--amber) 20%, transparent);
+  color: var(--amber-light);
   text-transform: uppercase;
   margin-left: 6px;
 }
@@ -192,7 +192,7 @@
   padding: 2px 6px;
   border-radius: 3px;
   background: var(--amber-faint);
-  color: var(--amber, #f0a500);
+  color: var(--amber-light);
   margin-left: 6px;
 }
 
@@ -261,8 +261,8 @@
 
 /* Risk level pill */
 .riskPill     { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: var(--radius-sm); white-space: nowrap; }
-.riskCritical { background: rgba(180,30,30,0.15);  border: 1px solid rgba(180,30,30,0.3);  color: #e05252; }
-.riskHigh     { background: var(--red-dim);         border: 1px solid rgba(232,93,74,0.25); color: var(--red); }
-.riskMedium   { background: var(--amber-faint);     border: 1px solid rgba(245,166,35,0.25); color: var(--amber); }
-.riskLow      { background: var(--green-dim);       border: 1px solid rgba(76,175,125,0.25); color: var(--green); }
+.riskCritical { background: color-mix(in srgb, var(--red) 15%, transparent);  border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);  color: var(--red-light); }
+.riskHigh     { background: var(--red-dim);         border: 1px solid color-mix(in srgb, var(--red) 25%, transparent); color: var(--red-light); }
+.riskMedium   { background: var(--amber-faint);     border: 1px solid color-mix(in srgb, var(--amber) 25%, transparent); color: var(--amber-light); }
+.riskLow      { background: var(--green-dim);       border: 1px solid color-mix(in srgb, var(--green) 25%, transparent); color: var(--green-light); }
 .riskNone     { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }

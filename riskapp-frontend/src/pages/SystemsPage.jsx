@@ -10,6 +10,7 @@ import { BackButton } from '../components/BackButton';
 import { CiaBadge } from '../components/CiaBadge';
 import { RatingChip } from '../components/RatingChip';
 import { SortableTh } from '../components/SortableTh';
+import { HelpDot } from '../components/HelpDot';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { SystemSummaryCard } from '../components/SystemSummaryCard';
 import { byMaxRiskDescThenName } from '../utils/systemSort';
@@ -110,7 +111,7 @@ export function SystemsPage() {
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Systems</h1>
+            <h1 className={styles.title}>Systems <HelpDot k="systems.title" placement="bottom" /></h1>
             {!loading && (
               <span className={styles.subtitle}>
                 {sorted.length} system{sorted.length !== 1 ? 's' : ''}
@@ -150,18 +151,18 @@ export function SystemsPage() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <SortableTh column="name" {...sortProps}>Name</SortableTh>
-                      <SortableTh column="dept" {...sortProps}>Department</SortableTh>
-                      <SortableTh column="iao" className={styles.colOptional} {...sortProps}>Owner (IAO)</SortableTh>
-                      <SortableTh column="iam" className={styles.colOptional} {...sortProps}>Manager (IAM)</SortableTh>
+                      <SortableTh column="name" {...sortProps} helpKey="col.name">Name</SortableTh>
+                      <SortableTh column="dept" {...sortProps} helpKey="col.department">Department</SortableTh>
+                      <SortableTh column="iao" className={styles.colOptional} {...sortProps} helpKey="architecture.col.owner_iao">Owner (IAO)</SortableTh>
+                      <SortableTh column="iam" className={styles.colOptional} {...sortProps} helpKey="architecture.col.manager_iam">Manager (IAM)</SortableTh>
                       {isExpert
                         ? <>
-                            <SortableTh column="c" {...sortProps}>C</SortableTh>
-                            <SortableTh column="i" {...sortProps}>I</SortableTh>
-                            <SortableTh column="a" {...sortProps}>A</SortableTh>
+                            <SortableTh column="c" {...sortProps} helpKey="col.confidentiality">C</SortableTh>
+                            <SortableTh column="i" {...sortProps} helpKey="col.integrity">I</SortableTh>
+                            <SortableTh column="a" {...sortProps} helpKey="col.availability">A</SortableTh>
                           </>
-                        : <SortableTh column="impact" {...sortProps}>Impact</SortableTh>}
-                      <SortableTh column="risk" {...sortProps}>Risk</SortableTh>
+                        : <SortableTh column="impact" {...sortProps} helpKey="col.impact">Impact</SortableTh>}
+                      <SortableTh column="risk" {...sortProps} helpKey="systems.col.risk">Risk</SortableTh>
                     </tr>
                   </thead>
                   <tbody>

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { EntityKind } from './EntityKind';
 import styles from './EntitySummaryCard.module.css';
 import cardStyles from './ImpactTableSummaryCard.module.css';
+import { HelpDot } from './HelpDot';
 
 // Compact read-only summary for the unfold row on ImpactTablesPage.
 export function ImpactTableSummaryCard({ table, openHref }) {
@@ -17,7 +18,7 @@ export function ImpactTableSummaryCard({ table, openHref }) {
       <div className={styles.top}>
         <div className={styles.left}>
           <h2 className={styles.title}>
-            {table.name}<EntityKind kind="impact table" />
+            {table.name}<EntityKind kind="impact table" /><HelpDot k="impact_tables.card" placement="bottom" />
           </h2>
           <div className={styles.meta}>
             <span className={styles.metaChip}>

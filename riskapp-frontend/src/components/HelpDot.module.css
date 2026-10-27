@@ -44,7 +44,7 @@
   border-color: var(--amber-dim);
 }
 .dotEdit:hover {
-  color: var(--amber);
+  color: var(--amber-light);
   border-color: var(--amber);
   background: var(--amber-faint);
 }
@@ -54,8 +54,8 @@
 
 /* Popover */
 .pop {
-  position: absolute;
-  z-index: 60;
+  position: fixed;
+  z-index: 10000; /* above modals: a dot can sit in a modal title */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -80,10 +80,6 @@
   cursor: default;
 }
 
-.pop_top    { bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); }
-.pop_bottom { top: calc(100% + 6px);    left: 50%; transform: translateX(-50%); }
-.pop_left   { right: calc(100% + 6px);  top: 50%;  transform: translateY(-50%); }
-.pop_right  { left: calc(100% + 6px);   top: 50%;  transform: translateY(-50%); }
 
 .popTitle {
   font-weight: 600;
@@ -169,7 +165,7 @@
 .editorSave {
   border-color: var(--accent);
   background: var(--accent-faint);
-  color: var(--accent);
+  color: var(--blue-light);
   font-weight: 600;
 }
 .editorSave:disabled {

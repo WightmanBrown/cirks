@@ -60,8 +60,10 @@ export function DeliveryPatternsSection({ controlId, patterns, canEdit, onChange
         complete solution</b>. Alternatives are separate solutions, so parts from different solutions never combine.
         Each part says where it must be: on the system itself, on a named security service, or once for the
         organisation. One solution can deliver <b>several objectives</b> — CrowdStrike EDR monitors, logs and
-        eradicates — so its parts are written once and shared. Solutions only <b>report</b> how each system is
-        delivered; they do not change the status set on any system, or any risk score.
+        eradicates — so its parts are written once and shared. Where the objective is delivered on each system, its
+        status there <b>follows the solution in use</b>: operational when every part is working, degraded when a part
+        is degraded, otherwise missing — and missing when no solution delivers it. The system&rsquo;s risk scores
+        follow that status.
       </p>
       {cirks && !cirks.chosen && (
         <div className={styles.card} role="note" aria-label="CIRKS can deliver this objective">

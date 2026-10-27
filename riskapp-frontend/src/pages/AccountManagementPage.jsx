@@ -130,7 +130,7 @@ export function AccountManagementPage() {
           <>
             {/* New account */}
             <section className={styles.card}>
-              <h2 className={styles.cardTitle}>New account</h2>
+              <h2 className={styles.cardTitle}>New account <HelpDot k="admin.accounts.new" placement="bottom" /></h2>
               <form className={styles.createForm} onSubmit={handleCreate}>
                 <input className={styles.input} type="email" placeholder="email" required
                   value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
@@ -157,10 +157,17 @@ export function AccountManagementPage() {
 
             {/* Accounts */}
             <section className={styles.card}>
-              <h2 className={styles.cardTitle}>Accounts ({users.length})</h2>
+              <h2 className={styles.cardTitle}>Accounts ({users.length}) <HelpDot k="admin.accounts.list" placement="bottom" /></h2>
               <table className={styles.table}>
                 <thead>
-                  <tr><th>Name</th><th>Email</th><th>Role</th><th>Department</th><th>Active</th><th>Credentials</th></tr>
+                  <tr>
+                    <th>Name <HelpDot k="admin.accounts.col.name" placement="bottom" /></th>
+                    <th>Email <HelpDot k="col.email" placement="bottom" /></th>
+                    <th>Role <HelpDot k="admin.accounts.col.role" placement="bottom" /></th>
+                    <th>Department <HelpDot k="admin.accounts.col.department" placement="bottom" /></th>
+                    <th>Active <HelpDot k="admin.accounts.col.active" placement="bottom" /></th>
+                    <th>Credentials <HelpDot k="admin.accounts.col.credentials" placement="bottom" /></th>
+                  </tr>
                 </thead>
                 <tbody>
                   {users.map((u) => {

@@ -6,26 +6,32 @@
  *
  * Authoring overview for contextual help. Lists every help key the server knows
  * (registered as admins browse in edit mode, or already written) merged with the
- * code-level glossary terms, shows which have text / translations, and lets an
+ * code-level glossary terms and the draft text shipped in help/defaults, shows which have text / translations, and lets an
  * admin write or clear any of them in one place — the manageable counterpart to
  * editing dots in situ.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getHelpCoverage, getHelp, saveHelp } from '../api';
 import { GLOSSARY } from '../utils/glossary';
+import { HELP_DEFAULTS } from '../help/defaults';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
+import { HelpDot } from '../components/HelpDot';
 import styles from './HelpContentPage.module.css';
 
 const DEFAULT_LOCALE = 'en';
 const PLACEMENTS = ['top', 'bottom', 'left', 'right', 'auto'];
 
-// Glossary terms always appear (they have a code default even with no DB row).
-const GLOSSARY_ROWS = Object.entries(GLOSSARY).map(([term, g]) => ({
-  help_key: `glossary.${term}`,
-  fallback: { title: g.term, body: g.definition },
-}));
+// Glossary terms and the shipped drafts always appear (they have a code default
+// even with no DB row), so this list covers every dot in the app.
+const GLOSSARY_ROWS = [
+  ...Object.entries(GLOSSARY).map(([term, g]) => ({
+    help_key: `glossary.${term}`,
+    fallback: { title: g.term, body: g.definition },
+  })),
+  ...Object.entries(HELP_DEFAULTS).map(([key, d]) => ({ help_key: key, fallback: d })),
+];
 
 export function HelpContentPage() {
   const [coverage, setCoverage] = useState([]);   // [{help_key, placement, page_hint, locales[]}]
@@ -101,7 +107,7 @@ export function HelpContentPage() {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <BackButton />
-          <h1 className={styles.heading}>Help Content</h1>
+          <h1 className={styles.heading}>Help Content <HelpDot k="help_content.title" placement="bottom" /></h1>
         </div>
         <p className={styles.intro}>
           Every contextual-help anchor the system knows about. Keys appear here once they
@@ -127,10 +133,10 @@ export function HelpContentPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Key</th>
-                  <th className={styles.th}>English</th>
-                  <th className={styles.th}>Other languages</th>
-                  <th className={styles.th}>Source</th>
+                  <th className={styles.th}>Key <HelpDot k="help_content.col.key" placement="bottom" /></th>
+                  <th className={styles.th}>English <HelpDot k="help_content.col.english" placement="bottom" /></th>
+                  <th className={styles.th}>Other languages <HelpDot k="help_content.col.other_languages" placement="bottom" /></th>
+                  <th className={styles.th}>Source <HelpDot k="help_content.col.source" placement="bottom" /></th>
                   <th className={styles.th}></th>
                 </tr>
               </thead>

@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shell } from './Shell';
 import { BackButton } from './BackButton';
+import { HelpDot } from './HelpDot';
 import { chipClass, scoreColorClass, scoreLevel } from '../utils/riskColors';
 import styles from './ReviewQueue.module.css';
 
@@ -69,6 +70,8 @@ const SUBJECT_LABEL = {
 
 export function ReviewQueue({
   title,
+  helpKey,
+  helpPlacement = 'bottom',
   countLabel,
   emptyBody,
   intro,
@@ -141,7 +144,7 @@ export function ReviewQueue({
         <div className={styles.pageHeader}>
           <BackButton fallback="/dashboard" />
           <div className={styles.headingGroup}>
-            <h1 className={styles.heading}>{title}</h1>
+            <h1 className={styles.heading}>{title}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</h1>
             {!loading && <span className={styles.headingCount}>{countLabel(actions.length)}</span>}
           </div>
         </div>

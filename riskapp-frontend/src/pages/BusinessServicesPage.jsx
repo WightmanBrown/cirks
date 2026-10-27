@@ -73,7 +73,7 @@ function AddServiceModal({ onClose, onCreated }) {
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h2>New Business Service</h2>
+        <h2>New Business Service <HelpDot k="services.new_modal" placement="bottom" /></h2>
         <form onSubmit={handleSubmit}>
           <label>
             Name
@@ -320,18 +320,18 @@ export function BusinessServicesPage() {
                     />
                   </th>
                 )}
-                <SortableTh column="name" {...sortProps}>Service</SortableTh>
-                <SortableTh column="dept" {...sortProps}>Department</SortableTh>
-                <SortableTh column="iao" {...sortProps}>Owner (IAO)</SortableTh>
-                <SortableTh column="iam" {...sortProps}>Manager (IAM)</SortableTh>
+                <SortableTh column="name" {...sortProps} helpKey="col.name">Service</SortableTh>
+                <SortableTh column="dept" {...sortProps} helpKey="col.department">Department</SortableTh>
+                <SortableTh column="iao" {...sortProps} helpKey="architecture.col.owner_iao">Owner (IAO)</SortableTh>
+                <SortableTh column="iam" {...sortProps} helpKey="architecture.col.manager_iam">Manager (IAM)</SortableTh>
                 {isExpert
                   ? <>
-                      <SortableTh column="c" {...sortProps}>C</SortableTh>
-                      <SortableTh column="i" {...sortProps}>I</SortableTh>
-                      <SortableTh column="a" {...sortProps}>A</SortableTh>
+                      <SortableTh column="c" {...sortProps} helpKey="col.confidentiality">C</SortableTh>
+                      <SortableTh column="i" {...sortProps} helpKey="col.integrity">I</SortableTh>
+                      <SortableTh column="a" {...sortProps} helpKey="col.availability">A</SortableTh>
                     </>
-                  : <SortableTh column="impact" {...sortProps}>Impact</SortableTh>}
-                <SortableTh column="risk" {...sortProps}>Risk</SortableTh>
+                  : <SortableTh column="impact" {...sortProps} helpKey="col.impact">Impact</SortableTh>}
+                <SortableTh column="risk" {...sortProps} helpKey="services.col.risk">Risk</SortableTh>
               </tr>
             </thead>
             <tbody>

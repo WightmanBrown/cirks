@@ -34,6 +34,7 @@ import { BackButton } from '../components/BackButton';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { RatingChip } from '../components/RatingChip';
 import { InfoTip } from '../components/InfoTip';
+import { HelpDot } from '../components/HelpDot';
 import { useViewMode } from '../hooks/useViewMode';
 import { DepartmentScopeFilter, useDepartmentScope } from '../components/DepartmentScopeFilter';
 import { applyDepartmentScope, CROSS_DEPT_ROLES }    from '../utils/departmentScope';
@@ -41,10 +42,10 @@ import styles from './RiskSummaryPage.module.css';
 
 // ── mini grid (interactive — cells are individually clickable) ────────────────
 
-function MiniGrid({ label, matrix, selectedP, selectedI, onCellClick }) {
+function MiniGrid({ label, helpKey, helpPlacement = 'bottom', matrix, selectedP, selectedI, onCellClick }) {
   return (
     <div className={styles.gridCard}>
-      <span className={styles.gridLabel}>{label}</span>
+      <span className={styles.gridLabel}>{label}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</span>
       <div className={styles.gridWrapper}>
         <span className={styles.axisLabelY}>PROB →</span>
         <div className={styles.gridArea}>
@@ -264,12 +265,12 @@ function RiskTableRow({ risk, expertView, showStatus, isSelected, onToggle, summ
 // expert breaks the risk down per dimension, business shows the single figure
 // the table's "Current risk" column reports.
 const EXPERT_GRID_DEFS = [
-  { key: 'conf',  label: 'CONFIDENTIALITY' },
-  { key: 'int',   label: 'INTEGRITY' },
-  { key: 'avail', label: 'AVAILABILITY' },
+  { key: 'conf',  label: 'CONFIDENTIALITY', helpKey: 'risk_summary.grid_c' },
+  { key: 'int',   label: 'INTEGRITY',       helpKey: 'risk_summary.grid_i' },
+  { key: 'avail', label: 'AVAILABILITY',    helpKey: 'risk_summary.grid_a' },
 ];
 const BUSINESS_GRID_DEFS = [
-  { key: 'current', label: 'CURRENT RISK' },
+  { key: 'current', label: 'CURRENT RISK', helpKey: 'risk_summary.grid_current' },
 ];
 
 // Accessor pairs — must mirror heatmapUtils builders so filterByCell and the
@@ -477,6 +478,9 @@ export function RiskSummaryPage({ view }) {
           <div className={styles.headingGroup}>
             <h1 className={styles.heading}>
               {isCurrent ? 'Current Risk Summary' : 'New Risk Summary'}
+              {isCurrent
+                ? <> <HelpDot k="risk_summary.title_current" placement="bottom" /></>
+                : <> <HelpDot k="risk_summary.title_new" placement="bottom" /></>}
             </h1>
             <span className={styles.headingTag}>
               {isCurrent ? 'VALIDATED' : 'PENDING VALIDATION'}
@@ -528,10 +532,11 @@ export function RiskSummaryPage({ view }) {
           <>
             {/* ── grids: three C/I/A in expert, one current-risk in business ── */}
             <div className={expertView ? styles.gridRow : styles.gridRowSingle}>
-              {gridDefs.map(({ key, label }) => (
+              {gridDefs.map(({ key, label, helpKey }) => (
                 <MiniGrid
                   key={key}
                   label={label}
+                  helpKey={helpKey}
                   matrix={matrices[key]}
                   selectedP={activeFilter?.gridKey === key ? activeFilter.p : null}
                   selectedI={activeFilter?.gridKey === key ? activeFilter.i : null}
@@ -577,14 +582,14 @@ export function RiskSummaryPage({ view }) {
                         className={`${styles.th} ${styles.thName}`}
                         onClick={() => handleSort('name')}
                       >
-                        Risk {sortArrow('name')}
+                        Risk {sortArrow('name')} <HelpDot k="risk_summary.col.risk" placement="bottom" />
                       </th>
                       <th
                         rowSpan={2}
                         className={`${styles.th} ${styles.thOwner}`}
                         onClick={() => handleSort('dept')}
                       >
-                        Department {sortArrow('dept')}
+                        Department {sortArrow('dept')} <HelpDot k="risk_summary.col.department" placement="bottom" />
                       </th>
                       <th colSpan={expertView ? 4 : 1} className={`${styles.th} ${styles.thGroup} ${styles.thGroupInh}`}>
                         Inherent impact<InfoTip term="inherentImpact" />
@@ -604,6 +609,10 @@ export function RiskSummaryPage({ view }) {
                           onClick={() => handleSort(`inh_${dim}`)}
                         >
                           {dim.toUpperCase()} {sortArrow(`inh_${dim}`)}
+                          {dim === 'c' && <HelpDot k="col.confidentiality" placement="bottom" />}
+                          {dim === 'i' && <HelpDot k="col.integrity" placement="bottom" />}
+                          {dim === 'a' && <HelpDot k="col.availability" placement="bottom" />}
+                          {dim === 'max' && <HelpDot k="risk_summary.col.inh_max" placement="bottom" />}
                         </th>
                       ))}
                       {(expertView ? ['c','i','a','max'] : ['max']).map(dim => (
@@ -613,6 +622,10 @@ export function RiskSummaryPage({ view }) {
                           onClick={() => handleSort(`res_${dim}`)}
                         >
                           {dim.toUpperCase()} {sortArrow(`res_${dim}`)}
+                          {dim === 'c' && <HelpDot k="risk_summary.col.res_c" placement="bottom" />}
+                          {dim === 'i' && <HelpDot k="risk_summary.col.res_i" placement="bottom" />}
+                          {dim === 'a' && <HelpDot k="risk_summary.col.res_a" placement="bottom" />}
+                          {dim === 'max' && <HelpDot k="risk_summary.col.res_max" placement="bottom" />}
                         </th>
                       ))}
                       {(expertView ? ['c','i','a','max'] : ['max']).map(dim => (
@@ -622,6 +635,10 @@ export function RiskSummaryPage({ view }) {
                           onClick={() => handleSort(`tgt_${dim}`)}
                         >
                           {dim.toUpperCase()} {sortArrow(`tgt_${dim}`)}
+                          {dim === 'c' && <HelpDot k="risk_summary.col.tgt_c" placement="bottom" />}
+                          {dim === 'i' && <HelpDot k="risk_summary.col.tgt_i" placement="bottom" />}
+                          {dim === 'a' && <HelpDot k="risk_summary.col.tgt_a" placement="bottom" />}
+                          {dim === 'max' && <HelpDot k="risk_summary.col.tgt_max" placement="bottom" />}
                         </th>
                       ))}
                     </tr>

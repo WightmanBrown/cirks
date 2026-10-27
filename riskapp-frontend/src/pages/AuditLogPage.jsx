@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, Fragment } from 'react';
 import { getAuditLog } from '../api';
 import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
+import { HelpDot } from '../components/HelpDot';
 import styles from './AuditLogPage.module.css';
 import { DateField } from '../components/DateField';
 
@@ -76,7 +77,7 @@ export function AuditLogPage() {
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Audit Log</h1>
+            <h1 className={styles.title}>Audit Log <HelpDot k="audit_log.title" placement="bottom" /></h1>
             <p className={styles.subtitle}>
               Append-only record of governance actions — who did what, to which entity, and when.
             </p>
@@ -132,11 +133,11 @@ export function AuditLogPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>When</th>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Entity</th>
-                    <th>Narrative</th>
+                    <th>When <HelpDot k="audit_log.col.when" placement="bottom" /></th>
+                    <th>User <HelpDot k="audit_log.col.user" placement="bottom" /></th>
+                    <th>Action <HelpDot k="audit_log.col.action" placement="bottom" /></th>
+                    <th>Entity <HelpDot k="audit_log.col.entity" placement="bottom" /></th>
+                    <th>Narrative <HelpDot k="audit_log.col.narrative" placement="bottom" /></th>
                   </tr>
                 </thead>
                 <tbody>

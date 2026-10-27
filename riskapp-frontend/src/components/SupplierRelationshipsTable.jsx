@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from './HelpDot';
 import { Link } from 'react-router-dom';
 import { RatingChip } from './RatingChip';
 import { supplierTypeLabel, supplierStatusLabel } from '../utils/supplierTypes';
@@ -21,8 +22,14 @@ export function SupplierRelationshipsTable({ rows, show = 'supplier', isExpert =
     <table className={styles.table}>
       <thead>
         <tr>
-          <th>{show === 'supplier' ? 'Supplier' : 'Touches'}</th>
-          <th>Supplier type</th><th>Status</th><th>Contract</th><th>Accountable</th><th>Criticality</th>
+          <th>{show === 'supplier'
+            ? <>Supplier <HelpDot k="col.supplier" placement="bottom" /></>
+            : <>Touches <HelpDot k="supplier_rel.col.touches" placement="bottom" /></>}</th>
+          <th>Supplier type <HelpDot k="supplier_rel.col.type" placement="bottom" /></th>
+          <th>Status <HelpDot k="supplier_rel.col.status" placement="bottom" /></th>
+          <th>Contract <HelpDot k="supplier_rel.col.contract" placement="bottom" /></th>
+          <th>Accountable <HelpDot k="supplier_rel.col.accountable" placement="bottom" /></th>
+          <th>Criticality <HelpDot k="supplier_rel.col.criticality" placement="bottom" /></th>
           {renderActions && <th />}
         </tr>
       </thead>

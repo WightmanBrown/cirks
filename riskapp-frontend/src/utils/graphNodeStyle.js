@@ -6,17 +6,18 @@
 // here as on the component pages.
 
 import { COMPONENT_COLORS } from './componentColors';
+import { resolveSheet } from './themeColours';
 
 // Per logical node-type colour (component subtypes handled separately below).
 export const TYPE_COLORS = {
-  service:  { bg: '#c084fc', border: '#9333ea', text: '#0c1117' },
-  asset:    { bg: '#2dd4bf', border: '#0d9488', text: '#0c1117' },
-  system:   { bg: '#1e293b', border: '#475569', text: '#cbd5e1' },
-  risk:     { bg: '#f59e0b', border: '#d97706', text: '#0c1117' },
-  threat:   { bg: '#ef4444', border: '#b91c1c', text: '#ffffff' },
-  action:   { bg: '#60a5fa', border: '#2563eb', text: '#0c1117' },
-  control:  { bg: '#4f7cff', border: '#2a5ae8', text: '#ffffff' },
-  overflow: { bg: '#334155', border: '#475569', text: '#94a3b8' },
+  service:  { bg: 'var(--graph-service)', border: 'var(--graph-service-edge)', text: 'var(--ppitf-text-dark)' },
+  asset:    { bg: 'var(--graph-asset)',   border: 'var(--graph-asset-edge)',   text: 'var(--ppitf-text-dark)' },
+  system:   { bg: 'var(--graph-system)',  border: 'var(--graph-node-edge)',    text: 'var(--graph-system-text)' },
+  risk:     { bg: 'var(--graph-risk)',    border: 'var(--graph-risk-edge)',    text: 'var(--ppitf-text-dark)' },
+  threat:   { bg: 'var(--graph-threat)',  border: 'var(--graph-threat-edge)',  text: 'var(--ppitf-text-dark)' },
+  action:   { bg: 'var(--graph-action)',  border: 'var(--graph-action-edge)',  text: 'var(--ppitf-text-dark)' },
+  control:  COMPONENT_COLORS.control,
+  overflow: { bg: 'var(--graph-node)',    border: 'var(--graph-node-edge)',    text: 'var(--graph-quiet-text)' },
 };
 
 // type → detail page path (null = no detail page; component → component detail).
@@ -66,7 +67,7 @@ export function buildStylesheet() {
     style: { 'background-color': c.bg, 'border-color': c.border, color: c.text },
   }));
 
-  return [
+  return resolveSheet([
     {
       selector: 'node',
       style: {
@@ -82,9 +83,9 @@ export function buildStylesheet() {
         'text-wrap': 'wrap',
         'text-max-width': 110,
         padding: 8,
-        'background-color': '#334155',
-        'border-color': '#475569',
-        color: '#f1f5f9',
+        'background-color': 'var(--graph-node)',
+        'border-color': 'var(--graph-node-edge)',
+        color: 'var(--graph-node-text)',
       },
     },
     ...typeStyles,
@@ -102,18 +103,18 @@ export function buildStylesheet() {
         label: 'data(label)',
         'font-size': 9,
         'font-family': 'var(--font-mono, monospace)',
-        color: '#94a3b8',
-        'text-background-color': '#0c1117',
+        color: 'var(--graph-quiet-text)',
+        'text-background-color': 'var(--graph-label-bg)',
         'text-background-opacity': 0.8,
         'text-background-padding': 2,
         'curve-style': 'bezier',
         'target-arrow-shape': 'triangle',
-        'target-arrow-color': '#475569',
-        'line-color': '#334155',
+        'target-arrow-color': 'var(--graph-arrow)',
+        'line-color': 'var(--graph-line)',
         width: 1.5,
         'arrow-scale': 0.9,
       },
     },
-    { selector: 'node:selected', style: { 'border-width': 4, 'border-color': '#f8fafc' } },
-  ];
+    { selector: 'node:selected', style: { 'border-width': 4, 'border-color': 'var(--graph-selected)' } },
+  ]);
 }

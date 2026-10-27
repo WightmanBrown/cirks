@@ -30,7 +30,7 @@
 /* Visibly a field — it used to be borderless until hovered, so it read as plain
    text and nobody could find how to change a name. */
 .nameInput { background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius-sm); width: 100%; min-width: 12rem; }
-.nameInput:hover, .nameInput:focus { border-color: var(--accent, var(--text-secondary)); }
+.nameInput:hover, .nameInput:focus { border-color: var(--accent); }
 .nameInput:disabled { color: var(--text-muted); cursor: default; }
 .select:disabled { opacity: 0.45; cursor: default; }
 

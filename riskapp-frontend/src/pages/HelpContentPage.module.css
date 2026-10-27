@@ -63,9 +63,9 @@
   font-size: var(--text-xs);
   border: 1px solid var(--border-accent);
 }
-.srcCustom    { color: var(--green); border-color: var(--green-dim); background: var(--green-dim); }
+.srcCustom    { color: var(--green-light); border-color: var(--green-dim); background: var(--green-dim); }
 .srcDefault   { color: var(--text-secondary); }
-.srcUnwritten { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-faint); }
+.srcUnwritten { color: var(--amber-light); border-color: var(--amber-dim); background: var(--amber-faint); }
 
 .editBtn {
   padding: 4px 12px;
@@ -106,6 +106,6 @@
   font-size: var(--text-hint);
   cursor: pointer;
 }
-.saveBtn { border-color: var(--accent); background: var(--accent-faint); color: var(--accent); font-weight: 600; }
+.saveBtn { border-color: var(--accent); background: var(--accent-faint); color: var(--blue-light); font-weight: 600; }
 .saveBtn:disabled { opacity: 0.45; cursor: not-allowed; }
 .clearBtn { border-color: var(--red-dim); color: var(--red); }

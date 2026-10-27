@@ -76,10 +76,10 @@
   letter-spacing: 0.03em;
 }
 
-.state_draft   { background: rgba(150,150,150,0.15); color: #aaa; }
-.state_planned { background: rgba(100,181,246,0.15); color: #64b5f6; }
-.state_closed  { background: rgba(255,183,77,0.15);  color: #ffb74d; }
-.state_issued  { background: rgba(129,199,132,0.15); color: #81c784; }
+.state_draft   { background: color-mix(in srgb, var(--ink) 9%, transparent); color: var(--text-secondary); }
+.state_planned { background: color-mix(in srgb, var(--blue) 15%, transparent); color: var(--blue-light); }
+.state_closed  { background: color-mix(in srgb, var(--amber) 15%, transparent);  color: var(--amber-light); }
+.state_issued  { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green-light); }
 
 /* Closed-but-unissued meetings need the secretary to issue minutes — flag them. */
 .stateCell {
@@ -95,8 +95,8 @@
   border-radius: 3px;
   font-size: 0.72rem;
   font-weight: 600;
-  background: rgba(255,183,77,0.18);
-  color: #ffb74d;
+  background: color-mix(in srgb, var(--amber) 18%, transparent);
+  color: var(--amber-light);
   white-space: nowrap;
 }
 

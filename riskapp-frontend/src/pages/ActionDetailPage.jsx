@@ -10,6 +10,7 @@ import { useAuth }        from '../context/AuthContext';
 import { Shell }          from '../components/Shell';
 import { BackButton }     from '../components/BackButton';
 import { ReadOnlyBadge }  from '../components/ReadOnlyBadge';
+import { HelpDot }        from '../components/HelpDot';
 import { StatusPill }      from '../components/StatusPill';
 import { ChipSelector }    from '../components/CiaTable';
 import { scoreLevel }      from '../utils/riskColors';
@@ -69,7 +70,7 @@ function ActionNarrative({ action }) {
 
   return (
     <div className={styles.card}>
-      <h2 className={styles.sectionTitle}>Record of this action</h2>
+      <h2 className={styles.sectionTitle}>Record of this action <HelpDot k="action_detail.record" placement="bottom" /></h2>
       <p className={styles.narrIntro}>
         A plain-language record of what was decided and what has happened since,
         for review and for audit.
@@ -94,7 +95,7 @@ function ActionNarrative({ action }) {
 
       {n.risks.length > 0 && (
         <>
-          <h3 className={styles.narrHead}>Why it exists</h3>
+          <h3 className={styles.narrHead}>Why it exists <HelpDot k="action_detail.record_why" placement="bottom" /></h3>
           <ul className={styles.narrList}>
             {n.risks.map(r => (
               <li key={r.id}>
@@ -109,7 +110,7 @@ function ActionNarrative({ action }) {
       )}
 
       {isSubject ? null : <>
-      <h3 className={styles.narrHead}>What it changes</h3>
+      <h3 className={styles.narrHead}>What it changes <HelpDot k="action_detail.record_changes" placement="bottom" /></h3>
       {n.items.length === 0 ? (
         <p className={styles.narrPara}>No items are recorded against this action.</p>
       ) : (
@@ -156,7 +157,7 @@ function ActionNarrative({ action }) {
 
       {n.notes.length > 0 && (
         <>
-          <h3 className={styles.narrHead}>Progress recorded against the action</h3>
+          <h3 className={styles.narrHead}>Progress recorded against the action <HelpDot k="action_detail.record_progress" placement="bottom" /></h3>
           <ul className={styles.narrNotes}>
             {n.notes.map(x => (
               <li key={x.id}>
@@ -169,7 +170,7 @@ function ActionNarrative({ action }) {
 
       {n.gaps.length > 0 && (
         <>
-          <h3 className={styles.narrHead}>What this record does not say</h3>
+          <h3 className={styles.narrHead}>What this record does not say <HelpDot k="action_detail.record_gaps" placement="bottom" /></h3>
           <ul className={styles.narrGaps}>
             {n.gaps.map(g => <li key={g}>{g}</li>)}
           </ul>
@@ -473,7 +474,7 @@ export function ActionDetailPage() {
             {/* ── Header ── */}
             <div className={styles.header}>
               <div className={styles.headerMain}>
-                <h1 className={styles.title}>{action.title}</h1>
+                <h1 className={styles.title}>{action.title} <HelpDot k="action_detail.title" placement="bottom" /></h1>
                 <div className={styles.headerMeta}>
                   <StatusPill status={action.status} isOverdue={action.is_overdue} />
                   {items.length > 0 && (
@@ -575,7 +576,7 @@ export function ActionDetailPage() {
 
               {action.description && (
                 <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Description</h2>
+                  <h2 className={styles.sectionTitle}>Description <HelpDot k="action_detail.description" placement="bottom" /></h2>
                   <p className={styles.body}>{action.description}</p>
                 </div>
               )}
@@ -583,7 +584,7 @@ export function ActionDetailPage() {
               {(action.progress_notes || canLogProgress) && (
                 <div className={styles.section}>
                   <div className={styles.sectionHead}>
-                    <h2 className={styles.sectionTitle}>Progress &amp; completion notes</h2>
+                    <h2 className={styles.sectionTitle}>Progress &amp; completion notes <HelpDot k="action_detail.progress_notes" placement="bottom" /></h2>
                     {canLogProgress && !progressEditing && (
                       <button className={styles.linkBtn} onClick={openProgressEditor}>
                         {action.progress_notes ? 'Update' : 'Add a note'}
@@ -622,7 +623,7 @@ export function ActionDetailPage() {
             {/* ── What it is about, when that is not a risk ── */}
             {isSubject && (
               <div className={styles.card}>
-                <h2 className={styles.sectionTitle}>About</h2>
+                <h2 className={styles.sectionTitle}>About <HelpDot k="action_detail.about" placement="bottom" /></h2>
                 <p className={styles.narrPara}>
                   <strong>{SUBJECT_LABEL[action.subject_type] || action.subject_type}:</strong>{' '}
                   {action.subject_type === 'supplier_relationship' && action.subject_parent_id ? (
@@ -644,14 +645,14 @@ export function ActionDetailPage() {
             {/* ── Linked risks ── */}
             {action.risks && action.risks.length > 0 && (
               <div className={styles.card}>
-                <h2 className={styles.sectionTitle}>Linked risks</h2>
+                <h2 className={styles.sectionTitle}>Linked risks <HelpDot k="action_detail.linked_risks" placement="bottom" /></h2>
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th className={styles.th}>Risk</th>
-                      <th className={styles.th}>System</th>
-                      <th className={styles.th}>Department</th>
-                      <th className={styles.th}>Level</th>
+                      <th className={styles.th}>Risk <HelpDot k="action_detail.col.risk" placement="bottom" /></th>
+                      <th className={styles.th}>System <HelpDot k="col.system" placement="bottom" /></th>
+                      <th className={styles.th}>Department <HelpDot k="col.department" placement="bottom" /></th>
+                      <th className={styles.th}>Level <HelpDot k="action_detail.col.level" placement="bottom" /></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -683,18 +684,18 @@ export function ActionDetailPage() {
             {items.length > 0 && (
               <div className={styles.card}>
                 <h2 className={styles.sectionTitle}>
-                  Remediation items ({itemsDone}/{items.length} complete)
+                  Remediation items ({itemsDone}/{items.length} complete) <HelpDot k="action_detail.items" placement="bottom" />
                 </h2>
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th className={styles.th}>Ref</th>
-                      <th className={styles.th}>Element</th>
-                      <th className={styles.th}>Change</th>
-                      <th className={styles.th}>System</th>
-                      <th className={styles.th}>Responsible</th>
-                      <th className={styles.th}>Target</th>
-                      <th className={styles.th}>Status</th>
+                      <th className={styles.th}>Ref <HelpDot k="action_detail.col.ref" placement="bottom" /></th>
+                      <th className={styles.th}>Element <HelpDot k="action_detail.col.element" placement="bottom" /></th>
+                      <th className={styles.th}>Change <HelpDot k="action_detail.col.change" placement="bottom" /></th>
+                      <th className={styles.th}>System <HelpDot k="action_detail.col.system" placement="bottom" /></th>
+                      <th className={styles.th}>Responsible <HelpDot k="action_detail.col.responsible" placement="bottom" /></th>
+                      <th className={styles.th}>Target <HelpDot k="action_detail.col.target" placement="bottom" /></th>
+                      <th className={styles.th}>Status <HelpDot k="action_detail.col.status" placement="bottom" /></th>
                       <th className={styles.th}></th>
                     </tr>
                   </thead>

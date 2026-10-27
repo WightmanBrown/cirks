@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
@@ -183,7 +184,8 @@ function RatingPanel({ asset, canEdit, onSaved, isExpert = false }) {
             {table.description && <p className={styles.ratingTableDesc}>{table.description}</p>}
 
             <div className={styles.bilSectionLabel}>
-              {showExpert ? '1dBIL — Overall business impact' : '1dBIL — Select impact level'}
+              {showExpert ? '1dBIL — Overall business impact' : '1dBIL — Select impact level'}{' '}
+              <HelpDot k="asset_detail.bil_1d" placement="bottom" />
             </div>
             <div className={styles.bilPickerH}>
               {[1,2,3,4,5].map(lvl => (
@@ -311,7 +313,7 @@ function ImpactTablesSection({ asset, canEdit, onChanged }) {
 
   return (
     <div className={styles.impactTablesSection}>
-      <h3 className={styles.itTitle}>Impact tables</h3>
+      <h3 className={styles.itTitle}>Impact tables <HelpDot k="asset_detail.impact_tables" placement="bottom" /></h3>
       <p className={styles.muted}>
         Information assets are rated against impact tables. Choose the tables that apply,
         then rate the asset against each one below.
@@ -320,7 +322,7 @@ function ImpactTablesSection({ asset, canEdit, onChanged }) {
       {canEdit && requiredMissing.length > 0 && (
         <div className={`${styles.itGroup} ${styles.itGroupRequired}`}>
           <div className={styles.itGroupTitle}>
-            Required — not yet applied to this asset
+            Required — not yet applied to this asset <HelpDot k="asset_detail.required_tables" placement="bottom" />
             <button className={styles.btnLink} disabled={busy}
               onClick={() => run(() => linkAssetImpactTables(asset.id, requiredMissing.map(t => t.id)))}>
               Add all
@@ -354,7 +356,7 @@ function ImpactTablesSection({ asset, canEdit, onChanged }) {
 
       {linked.length > 0 ? (
         <div className={styles.itGroup}>
-          <div className={styles.itGroupTitle}>Applied to this asset</div>
+          <div className={styles.itGroupTitle}>Applied to this asset <HelpDot k="asset_detail.applied_tables" placement="bottom" /></div>
           {unratedRequired > 0 && (
             <p className={styles.itRequiredNote}>
               {unratedRequired} required table{unratedRequired === 1 ? ' is' : 's are'} applied
@@ -384,7 +386,7 @@ function ImpactTablesSection({ asset, canEdit, onChanged }) {
       {canEdit && sugUnlinked.length > 0 && (
         <div className={styles.itGroup}>
           <div className={styles.itGroupTitle}>
-            Suggested from linked services
+            Suggested from assets on the same systems <HelpDot k="asset_detail.suggested_tables" placement="bottom" />
             <button className={styles.btnLink} disabled={busy} onClick={() => run(() => linkAssetImpactTables(asset.id, sugUnlinked.map(t => t.id)))}>
               Add all
             </button>
@@ -403,7 +405,7 @@ function ImpactTablesSection({ asset, canEdit, onChanged }) {
 
       {canEdit && availUnlinked.length > 0 && (
         <div className={styles.itGroup}>
-          <div className={styles.itGroupTitle}>Add from your department / organisation</div>
+          <div className={styles.itGroupTitle}>Add from your department / organisation <HelpDot k="asset_detail.add_tables" placement="bottom" /></div>
           <select
             className={styles.select}
             value=""
@@ -589,7 +591,7 @@ export function InformationAssetDetailPage() {
           <div className={styles.breadcrumb}>
             <BackButton fallback="/assets" />
           </div>
-          <h1 className={styles.createTitle}>New Information Asset</h1>
+          <h1 className={styles.createTitle}>New Information Asset <HelpDot k="asset_new.title" placement="bottom" /></h1>
           {(fromSystemId || fromServiceId)
             ? <p className={styles.muted}>
                 This asset will be linked to the {fromSystemId ? 'system' : 'service'} automatically
@@ -680,7 +682,7 @@ export function InformationAssetDetailPage() {
         <RatingFindingBanner asset={asset} onChanged={reload} />
 
         {asset.risk_paths && asset.risk_paths.length > 0 && (
-          <RiskPathTree paths={asset.risk_paths} title="Risks to this information asset" groupBy="system" collapsed isExpert={isExpert} />
+          <RiskPathTree paths={asset.risk_paths} title="Risks to this information asset" helpKey="asset_detail.risks" groupBy="system" collapsed isExpert={isExpert} />
         )}
 
         <div className={styles.tabs}>
@@ -852,8 +854,8 @@ export function InformationAssetDetailPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Service</th>
-                    <th>Department</th>
+                    <th>Service <HelpDot k="asset_detail.col.service" placement="bottom" /></th>
+                    <th>Department <HelpDot k="col.department" placement="bottom" /></th>
                     {canEdit && <th></th>}
                   </tr>
                 </thead>

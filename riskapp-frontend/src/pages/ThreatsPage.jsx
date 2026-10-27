@@ -10,6 +10,7 @@ import { RatingChip }                     from '../components/RatingChip';
 import { useViewMode }                    from '../hooks/useViewMode';
 import styles from './ThreatsPage.module.css';
 import { BackButton } from '../components/BackButton';
+import { HelpDot } from '../components/HelpDot';
 
 const CAN_WRITE = new Set(['ciso', 'risk_analyst', 'security_consultant', 'admin']);
 
@@ -129,7 +130,10 @@ function ThreatFormModal({ initial, onClose, onSaved, canWrite, threatId }) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <span className={styles.modalLabel}>{isEdit ? 'EDIT THREAT' : 'NEW THREAT'}</span>
+          <span className={styles.modalLabel}>
+            {isEdit ? 'EDIT THREAT' : 'NEW THREAT'}
+            {isEdit ? <> <HelpDot k="threats.form_edit" placement="bottom" /></> : <> <HelpDot k="threats.form_new" placement="bottom" /></>}
+          </span>
           <button className={styles.closeBtn} onClick={onClose} disabled={saving || archiving}>✕</button>
         </div>
 
@@ -372,7 +376,7 @@ export function ThreatsPage() {
         <BackButton />
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Threat Catalogue</h1>
+            <h1 className={styles.title}>Threat Catalogue <HelpDot k="threats.title" placement="bottom" /></h1>
             {!loading && (
               <span className={styles.subtitle}>
                 {filtered.length} threat{filtered.length !== 1 ? 's' : ''}
@@ -420,12 +424,12 @@ export function ThreatsPage() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th className={styles.th}>Name</th>
-                      <th className={styles.th}>Category</th>
-                      <th className={styles.th}>Source</th>
-                      <th className={styles.th}>Ref code</th>
-                      <th className={styles.th} title="Probability hint">Probability</th>
-                      <th className={styles.th}>Active risks</th>
+                      <th className={styles.th}>Name <HelpDot k="threats.col.name" placement="bottom" /></th>
+                      <th className={styles.th}>Category <HelpDot k="threats.col.category" placement="bottom" /></th>
+                      <th className={styles.th}>Source <HelpDot k="threats.col.source" placement="bottom" /></th>
+                      <th className={styles.th}>Ref code <HelpDot k="threats.col.ref_code" placement="bottom" /></th>
+                      <th className={styles.th} title="Probability hint">Probability <HelpDot k="threats.col.probability" placement="bottom" /></th>
+                      <th className={styles.th}>Active risks <HelpDot k="threats.col.active_risks" placement="bottom" /></th>
                     </tr>
                   </thead>
                   <tbody>

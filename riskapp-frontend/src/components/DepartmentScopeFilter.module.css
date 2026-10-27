@@ -28,7 +28,7 @@
 
 .filterActive {
   border-color: var(--amber-dim);
-  color: var(--amber);
+  color: var(--amber-light);
   background: var(--amber-faint);
   font-family: var(--font-mono);
   font-size: 11px;

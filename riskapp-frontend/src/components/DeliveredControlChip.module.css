@@ -4,12 +4,12 @@
    control's own, so it is shown, not picked. */
 .chip, .chipNotHere {
   font-size: 11px;
-  border: 1px solid var(--accent, #64b5f6);
-  color: var(--accent, #64b5f6);
+  border: 1px solid var(--accent);
+  color: var(--accent);
   border-radius: 10px;
   padding: 2px 8px;
   white-space: nowrap;
   text-decoration: none;
 }
-.chip:hover, .chipNotHere:hover { background: rgba(100, 181, 246, 0.1); }
+.chip:hover, .chipNotHere:hover { background: color-mix(in srgb, var(--blue) 10%, transparent); }
 .chipNotHere { border-style: dashed; color: var(--text-muted); border-color: var(--text-muted); }

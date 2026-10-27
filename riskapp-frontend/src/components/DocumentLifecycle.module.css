@@ -5,11 +5,11 @@
 .grid { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; font-size: 13px; }
 .grid dt { color: var(--text-muted); }
 .grid dd { margin: 0; color: var(--text-primary); overflow-wrap: anywhere; }
-.grid a { color: var(--accent, #64b5f6); }
+.grid a { color: var(--accent); }
 .hint { color: var(--text-muted); font-size: 12px; }
-.late { color: var(--amber, #f59e0b); font-weight: 600; }
+.late { color: var(--amber); font-weight: 600; }
 .overdue {
-  border: 1px solid var(--amber, #f59e0b); background: rgba(245, 158, 11, 0.08);
+  border: 1px solid var(--amber); background: color-mix(in srgb, var(--amber) 8%, transparent);
   border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; margin: 0 0 10px;
 }
 .form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 14px; }

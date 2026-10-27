@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { EntityKind } from '../components/EntityKind';
+import { HelpDot } from '../components/HelpDot';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { useViewMode } from '../hooks/useViewMode';
 import { RatingScaleRow } from '../components/RatingScaleRow';
@@ -235,7 +236,7 @@ export function ThreatDetailPage() {
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>
-              {threat.name}<EntityKind kind="threat" />
+              {threat.name}<EntityKind kind="threat" /> <HelpDot k="threat_detail.title" placement="bottom" />
             </h1>
             <div className={styles.meta}>
               <span className={styles.metaChip}>
@@ -263,7 +264,7 @@ export function ThreatDetailPage() {
 
         {/* ── Probability panel ──────────────────────────────────────────── */}
         <section className={styles.panel}>
-          <span className={styles.panelTitle}>Probability hint</span>
+          <span className={styles.panelTitle}>Probability hint <HelpDot k="threat_detail.probability" placement="bottom" /></span>
           <p className={styles.panelHint}>
             Informed guess at this threat's typical probability. Used to pre-populate
             the risk authoring form — actual probability is set per risk by the analyst.
@@ -389,7 +390,7 @@ export function ThreatDetailPage() {
         {/* ── Metadata ──────────────────────────────────────────────────── */}
         {!editing && (
           <section className={styles.panel}>
-            <span className={styles.panelTitle}>Metadata</span>
+            <span className={styles.panelTitle}>Metadata <HelpDot k="threat_detail.metadata" placement="bottom" /></span>
             <div className={styles.metaGrid}>
               <span className={styles.metaGridLabel}>Category</span>
               <span>{CATEGORY_LABEL[threat.threat_category] || threat.threat_category}</span>
@@ -412,7 +413,7 @@ export function ThreatDetailPage() {
         {/* ── Systems affected (identification) ──────────────────────────── */}
         {!editing && (
           <section className={styles.panel}>
-            <span className={styles.panelTitle}>Systems affected</span>
+            <span className={styles.panelTitle}>Systems affected <HelpDot k="threat_detail.systems" placement="bottom" /></span>
             <p className={styles.panelHint}>
               Systems this threat has been identified against. Identifying an exposure
               here does not score it — each system is assessed separately, which is what
@@ -526,7 +527,7 @@ export function ThreatDetailPage() {
         {/* ── Mitigating controls (catalogue) ───────────────────────────── */}
         {!editing && (
           <section className={styles.panel}>
-            <span className={styles.panelTitle}>Mitigating controls</span>
+            <span className={styles.panelTitle}>Mitigating controls <HelpDot k="threat_detail.controls" placement="bottom" /></span>
             <p className={styles.panelHint}>
               Controls known to address this threat. Apply them to a system from a
               risk's “Controls against this threat” panel.

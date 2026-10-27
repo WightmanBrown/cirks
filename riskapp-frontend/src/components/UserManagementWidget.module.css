@@ -107,7 +107,7 @@
   flex-shrink: 0;
 }
 
-.dotActive   { background: var(--green, #4caf50); }
+.dotActive   { background: var(--green); }
 .dotInactive { background: var(--text-muted); }
 
 /* ── User info ───────────────────────────────────────────────────────────── */
@@ -155,7 +155,7 @@
 .additionalRoles {
   font-family: var(--font-mono);
   font-size: 9px;
-  color: var(--accent, #6366f1);
+  color: var(--accent);
   letter-spacing: 0.03em;
 }
 
@@ -187,12 +187,12 @@
 }
 
 .roleSelect:hover:not(:disabled) {
-  border-color: var(--accent, #6366f1);
+  border-color: var(--accent);
 }
 
 .roleSelect:focus {
   outline: none;
-  border-color: var(--accent, #6366f1);
+  border-color: var(--accent);
 }
 
 .roleSelect:disabled {
@@ -222,12 +222,12 @@
 
 .savedMark {
   font-size: 12px;
-  color: var(--green, #4caf50);
+  color: var(--green);
 }
 
 .errorMark {
   font-size: 12px;
-  color: var(--red, #e05252);
+  color: var(--red);
   cursor: help;
 }
 
@@ -252,16 +252,16 @@
   color: var(--text-muted);
 }
 .deactivateBtn:hover:not(:disabled) {
-  border-color: var(--red, #e05252);
-  color: var(--red, #e05252);
+  border-color: var(--red);
+  color: var(--red);
 }
 
 .reactivateBtn {
   color: var(--text-muted);
 }
 .reactivateBtn:hover:not(:disabled) {
-  border-color: var(--green, #4caf50);
-  color: var(--green, #4caf50);
+  border-color: var(--green);
+  color: var(--green);
 }
 
 .deactivateBtn:disabled,
@@ -299,4 +299,4 @@
   margin: 0; }
 
 .empty { color: var(--text-muted); }
-.error { color: var(--red, #e05252); }
+.error { color: var(--red); }

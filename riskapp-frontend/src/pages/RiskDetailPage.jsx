@@ -291,7 +291,7 @@ export function RiskDetailPage() {
           <div className={styles.headingGroup}>
             <h1 className={styles.heading}>
               {risk
-                ? <>{risk.system_name} <span className={styles.headingThreat}>{risk.threat_name}</span><EntityKind kind="risk" /></>
+                ? <>{risk.system_name} <span className={styles.headingThreat}>{risk.threat_name}</span><EntityKind kind="risk" /> <HelpDot k="risk.detail.title" placement="bottom" /></>
                 : 'Risk Detail'
               }
             </h1>
@@ -355,7 +355,7 @@ export function RiskDetailPage() {
             {/* ── rationale ── */}
             <section className={`${styles.card} ${editingRationale ? styles.cardEditing : ''}`}>
               <div className={styles.cardHeaderRow}>
-                <h2 className={styles.cardTitle}>Rationale</h2>
+                <h2 className={styles.cardTitle}>Rationale <HelpDot k="risk.detail.rationale" placement="bottom" /></h2>
                 <div className={styles.cardHeaderActions}>
                   <PanelEditButtons
                     canEdit={canEdit}
@@ -383,7 +383,7 @@ export function RiskDetailPage() {
             {/* ── return notes (shown when risk has been returned by CISO) ── */}
             {risk.validation_notes && (
               <section className={`${styles.card} ${styles.cardReturned}`}>
-                <h2 className={styles.cardTitle}>Return Notes</h2>
+                <h2 className={styles.cardTitle}>Return Notes <HelpDot k="risk.detail.return_notes" placement="bottom" /></h2>
                 <p className={styles.rationaleText}>{risk.validation_notes}</p>
               </section>
             )}
@@ -391,7 +391,7 @@ export function RiskDetailPage() {
             {/* ── context card ── */}
             <section className={`${styles.card} ${editingContext ? styles.cardEditing : ''}`}>
               <div className={styles.cardHeaderRow}>
-                <h2 className={styles.cardTitle}>Context</h2>
+                <h2 className={styles.cardTitle}>Context <HelpDot k="risk.detail.context" placement="bottom" /></h2>
                 <div className={styles.cardHeaderActions}>
                   <PanelEditButtons
                     canEdit={canEdit}
@@ -520,6 +520,7 @@ export function RiskDetailPage() {
             {hasCapability('graph.read') && (
               <CollapsibleCard
                 title="Risk context"
+                helpKey="risk.detail.risk_graph"
                 description="How this risk connects: system, threat, information assets, PPITF components and mitigating controls."
               >
                 <RiskGraph riskId={risk.id} riskScore={risk.risk_score} />
@@ -671,6 +672,7 @@ function SecurityActionPanel({ risk, form, canEdit, user, onChange, onActionChan
     <CollapsibleCard
       id="risk-section-actions"
       title="Security action"
+      helpKey="risk.detail.security_action"
       description="What can we do to improve the security of the system?"
     >
       <label className={styles.checkboxRow}>
@@ -768,7 +770,7 @@ function GapActionSection({ risk, canEdit, user, onChange }) {
   return (
     <div className={styles.gapActions}>
       <div className={styles.actionListHeader}>
-        <h3 className={styles.subhead}>Security actions</h3>
+        <h3 className={styles.subhead}>Security actions <HelpDot k="risk.detail.actions" placement="bottom" /></h3>
         {canEdit && !building && (
           <button className={styles.btnAddAction} onClick={() => setBuilding(true)}>+ Build from gap</button>
         )}
@@ -897,7 +899,7 @@ function GapActionBuilder({ risk, onCancel, onCreated }) {
         working, the objectives they deliver come into place and the risk falls to what those objectives are judged
         to achieve.
       </p>
-      <p className={styles.suggestLabel}>Components <span className={styles.suggestHint}>— every component that is missing or not working on this system is included</span></p>
+      <p className={styles.suggestLabel}>Components <span className={styles.suggestHint}>— every component that is missing or not working on this system is included</span> <HelpDot k="risk.detail.builder_components" placement="bottom" /></p>
       {(cand.components || []).length === 0 && <p className={styles.cardHint}>No component on this system needs fixing for this risk.</p>}
       {(cand.components || []).map(cc => {
         const k = 'cmp:' + cc.component_id;
@@ -919,7 +921,7 @@ function GapActionBuilder({ risk, onCancel, onCreated }) {
       })}
 
       {(cand.blocked || []).length > 0 && (<>
-        <p className={styles.suggestLabel}>Not in place, and not fixable from this risk</p>
+        <p className={styles.suggestLabel}>Not in place, and not fixable from this risk <HelpDot k="risk.detail.builder_blocked" placement="bottom" /></p>
         {cand.blocked.map(b => (
           <div key={b.control_id} className={styles.gapCandRow}>
             <span className={styles.gapCandHead}>
@@ -1112,7 +1114,7 @@ function ExceptionSection({ canEdit, activeException, onOpenModal }) {
   return (
     <div className={`${styles.exceptionCard} ${expiryClass}`}>
       <div className={styles.exceptionHeader}>
-        <span className={styles.exceptionTitle}>Active acceptance exception</span>
+        <span className={styles.exceptionTitle}>Active acceptance exception <HelpDot k="risk.detail.active_exception" placement="bottom" /></span>
         <span className={styles.exceptionExpiry}>
           {days < 0
             ? `Overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'}`
@@ -1182,7 +1184,7 @@ function ControlsCounteringRow({ controls }) {
   return (
     <div className={styles.controlsContext}>
       <span className={styles.controlsContextLabel}>
-        Controls countering this threat
+        <span>Controls countering this threat <HelpDot k="risk.detail.controls_countering" placement="bottom" /></span>
         <span className={styles.ciaLineSub}>
           in place on this system — maturity is organisation-wide and informs the
           likelihood, it never computes it
@@ -1236,6 +1238,7 @@ function ResidualRiskPanel({ risk, form, simpleMode = true }) {
   return (
     <CollapsibleCard
       title="Current risk"
+      helpKey="risk.detail.current_risk"
       description="What is the current level of risk?"
       descriptionTip={<InfoTip term="currentRisk" />}
     >
@@ -1277,7 +1280,7 @@ function ResidualRiskPanel({ risk, form, simpleMode = true }) {
             />
             <p className={styles.fieldNote}>{derivedNote}</p>
             <div className={styles.residualScoreInline}>
-              <span className={styles.inhScorePanelTitle}>Risk score</span>
+              <span className={styles.inhScorePanelTitle}>Risk score <HelpDot k="risk.detail.risk_score" placement="bottom" /></span>
               <RatingScaleRow value={risk.risk_score} scale="risk" />
             </div>
           </div>
@@ -1313,7 +1316,7 @@ function ResidualRiskPanel({ risk, form, simpleMode = true }) {
           />
           <p className={styles.fieldNote}>{derivedNote}</p>
           <div className={styles.inhScorePanel}>
-            <span className={styles.inhScorePanelTitle}>Risk score</span>
+            <span className={styles.inhScorePanelTitle}>Risk score <HelpDot k="risk.detail.risk_score" placement="bottom" /></span>
             <div className={styles.inhScoreColumnsExpert}>
               {[
                 { key: 'c', label: 'Confidentiality', prob: probVals.c, impact: impactVals.c },
@@ -1368,16 +1371,20 @@ const COMPONENT_STATUSES = ['operational', 'degraded', 'missing', 'unknown'];
 const SECTIONS = [
   { key: OPERATIONAL,
     title: 'Current operational controls on this system',
+    helpKey: 'risk.detail.coverage_operational',
     blurb: 'Working here, with every delivering component in place. These are what hold the risk down today.',
     empty: 'Nothing on this system is fully operational against this threat, so the probability stays at the threat\u2019s untreated level.' },
   { key: IMPAIRED,
     title: 'Degraded controls which need improvement on this system',
+    helpKey: 'risk.detail.coverage_degraded',
     blurb: 'Present but not fully effective \u2014 either marked degraded, or missing one of the components that delivers them. A degraded control still counts, one rung worse than its score.' },
   { key: MISSING,
     title: 'Controls which are missing from this system and could reduce the risk',
+    helpKey: 'risk.detail.coverage_missing',
     blurb: 'Not in place here, so they are not lowering anything; their scores show what each would achieve. One with a security solution is put in place by recording that solution\u2019s parts on this system, which a security action can plan. One with no security solution cannot be put in place until it is given one.' },
   { key: EXCLUDED,
     title: 'Controls excluded from this system',
+    helpKey: 'risk.detail.coverage_excluded',
     blurb: 'Judged not appropriate here, with a recorded reason. Neither a gap nor a contributor to the score.' },
 ];
 
@@ -1919,6 +1926,7 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
             <span className={styles.tcHeadTitle}>
               Controls
               {risk.threat_name && <span className={styles.tcVs}> vs “{risk.threat_name}”</span>}
+              {' '}<HelpDot k="risk.detail.coverage_controls" placement="bottom" />
             </span>
             {/* Derived from the same classifier as the sections below, so the
                 header can never disagree with what the reader then counts. The
@@ -1955,7 +1963,7 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
             )}
           </p>
 
-          {SECTIONS.map(({ key, title, blurb, empty }) => {
+          {SECTIONS.map(({ key, title, helpKey, blurb, empty }) => {
             const rows = sections[key];
             // An empty section is dropped rather than shown as a reassuring
             // heading over nothing — except the operational one, whose emptiness
@@ -1966,6 +1974,7 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                 <h4 className={styles.tcSectionTitle}>
                   {title}
                   <span className={styles.tcSectionCount}>{rows.length}</span>
+                  <HelpDot k={helpKey} placement="bottom" />
                 </h4>
                 <p className={styles.tcSectionBlurb}>{rows.length ? blurb : empty}</p>
                 {rows.length > 0 && (
@@ -2238,7 +2247,7 @@ function LinkedComponentsSection({ risk, canEdit, onChange }) {
                       <span
                         className={styles.componentTypeChip}
                         style={{
-                          background: `${getComponentColor(c.component_type).bg}26`,
+                          background: `color-mix(in srgb, ${getComponentColor(c.component_type).bg} 15%, transparent)`,
                           color: getComponentColor(c.component_type).border,
                           border: `1px solid ${getComponentColor(c.component_type).border}`,
                         }}
@@ -2321,17 +2330,29 @@ function ResidualHistoryPanel({ riskId }) {
 
   return (
     <section className={`${styles.card} ${collapsed ? styles.cardCollapsed : ''}`}>
-      <button
-        type="button"
-        className={styles.cardHeader}
-        onClick={toggle}
-        aria-expanded={!collapsed}
-      >
-        <h2 className={styles.cardTitle}>Risk history</h2>
-        <span className={styles.collapseChevron} aria-hidden="true">
-          {collapsed ? '▸' : '▾'}
-        </span>
-      </button>
+      <div className={styles.cardHeaderRow}>
+        <button
+          type="button"
+          className={styles.cardHeaderToggle}
+          onClick={toggle}
+          aria-expanded={!collapsed}
+        >
+          <h2 className={styles.cardTitle}>Risk history</h2>
+        </button>
+        <HelpDot k="risk.detail.history" placement="bottom" />
+        <div className={styles.cardHeaderRight}>
+          <button
+            type="button"
+            className={styles.chevronBtn}
+            onClick={toggle}
+            aria-label={collapsed ? 'Expand' : 'Collapse'}
+          >
+            <span className={styles.collapseChevron} aria-hidden="true">
+              {collapsed ? '▸' : '▾'}
+            </span>
+          </button>
+        </div>
+      </div>
       <p className={styles.cardHint}>Audit trail of every change to this risk&apos;s probability and impact.</p>
 
       {!collapsed && (
@@ -2459,6 +2480,7 @@ function ValidationPanel({ risk, open, action, notes, error, busy, onActionChang
       <div className={styles.validationReadiness}>
         <span className={styles.validationReadinessLabel}>
           {allOk ? '✓ Ready to validate' : 'Complete before validating'}
+          {' '}<HelpDot k="risk.detail.validation_readiness" placement="bottom" />
         </span>
         <div className={styles.validationChecks}>
           {checks.map((c, i) => (

@@ -91,7 +91,7 @@
 }
 
 .cellActive {
-  border-color: rgba(255, 255, 255, 0.6) !important;
+  border-color: color-mix(in srgb, var(--ink) 60%, transparent) !important;
   transform: scale(1.08);
 }
 
@@ -100,10 +100,10 @@
   opacity: 0.35;
 }
 
-.cellLow      { background: #1a3a2a; color: #5af09a; }
-.cellMedium   { background: #3a3010; color: #f0c85a; }
-.cellHigh     { background: #3a1e0a; color: #f0905a; }
-.cellCritical { background: #3a0a0a; color: #f05a5a; }
+.cellLow      { background: var(--band-low-bg); color: var(--band-low-fg); }
+.cellMedium   { background: var(--band-medium-bg); color: var(--band-medium-fg); }
+.cellHigh     { background: var(--band-high-bg); color: var(--band-high-fg); }
+.cellCritical { background: var(--band-critical-bg); color: var(--band-critical-fg); }
 
 .cellScore {
   pointer-events: none;

@@ -34,14 +34,15 @@ import { SwgSummaryWidget }              from '../components/SwgSummaryWidget';
 import { GoOperationalWidget }           from '../components/GoOperationalWidget';
 import { DashboardGrid }                 from '../components/DashboardGrid';
 import styles from './DashboardPage.module.css';
+import { HelpDot } from '../components/HelpDot';
 
 // ── Stub widget ───────────────────────────────────────────────────────────────
 
-function StubWidget({ title, description }) {
+function StubWidget({ title, description, helpKey, helpPlacement = 'bottom' }) {
   return (
     <div className={styles.widget}>
       <div className={styles.widgetHeader}>
-        <span className={styles.widgetTitle}>{title}</span>
+        <span className={styles.widgetTitle}>{title}{helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}</span>
         <span className={styles.widgetBadge}>COMING SOON</span>
       </div>
       <p className={styles.widgetBody}>{description}</p>
@@ -107,7 +108,7 @@ const ROLE_WIDGETS = {
   security_consultant: [
     <MyActionsWidget key="my-actions" />,
     <GoOperationalWidget key="handover" />,
-    <StubWidget key="controls" title="Control Set"           description="Seed and manage the control library." />,
+    <StubWidget key="controls" title="Control Set" helpKey="widget.control_set_stub"           description="Seed and manage the control library." />,
     <SwgSummaryWidget key="swg" />,
   ],
   security_architect: [
@@ -125,7 +126,7 @@ const ROLE_WIDGETS = {
 
 function getWidgets(role) {
   return ROLE_WIDGETS[role] ?? [
-    <StubWidget key="default" title="Dashboard" description="Your widgets will appear here." />,
+    <StubWidget key="default" title="Dashboard" helpKey="widget.dashboard_stub" description="Your widgets will appear here." />,
   ];
 }
 
@@ -162,7 +163,7 @@ export function DashboardPage() {
         <div className={styles.pageHeader}>
           <div className={styles.greeting}>
             <h1 className={styles.greetingName}>
-              {user?.full_name ?? user?.email}
+              {user?.full_name ?? user?.email} <HelpDot k="dashboard.title" placement="bottom" />
             </h1>
             <span className={styles.greetingRole}>
               {roleLabel(user?.role, user)}

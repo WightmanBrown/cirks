@@ -19,7 +19,7 @@
 }
 
 .widget.pending {
-  border-color: var(--amber, #f5a623);
+  border-color: var(--amber);
 }
 
 .header {
@@ -66,7 +66,7 @@
 }
 
 .count.countPending {
-  color: var(--amber, #f5a623);
+  color: var(--amber);
 }
 
 .countLabel {
@@ -106,7 +106,7 @@
 .error {
   font-family: var(--font-body);
   font-size: 12px;
-  color: var(--red, #e05252);
+  color: var(--red);
   margin: 0;
 }
 

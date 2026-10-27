@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PatternChip } from './PatternChip';
+import { HelpDot } from './HelpDot';
 import styles from './SystemSecuritySolutions.module.css';
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -148,7 +149,11 @@ export function SystemSecuritySolutions({ solutions, canEdit, onRecord }) {
         )}
         {s.parts.length > 0 && view === 'list' && (
           <table className={styles.table}>
-            <thead><tr><th>Part of the solution</th><th>Where</th><th>State</th></tr></thead>
+            <thead><tr>
+              <th>Part of the solution <HelpDot k="system_security.col.part" placement="bottom" /></th>
+              <th>Where <HelpDot k="system_security.col.where" placement="bottom" /></th>
+              <th>State <HelpDot k="system_security.col.state" placement="bottom" /></th>
+            </tr></thead>
             <tbody>
               {s.parts.map(p => (
                 <tr key={p.component_id + p.location}>
