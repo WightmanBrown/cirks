@@ -11,6 +11,24 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.0.6
+
+A guide to the Misty Isles training dataset. Nothing in CIRKS itself changes.
+
+**To upgrade:** nothing to do unless you want the new guide in your checkout:
+`git pull`. There is no migration and no change to the application.
+
+- **A walkthrough of Misty Isles.**
+  [`docs/dataset/misty-isles-walkthrough.md`](docs/dataset/misty-isles-walkthrough.md)
+  takes a first-time user through the training dataset role by role: which
+  accounts to unlock, what each role sees, one risk followed from a failed
+  backup test to the SIRO's sign-off, exercises built on the story's deliberate
+  problems, a glossary and the rough edges to expect. The install guide links
+  to it.
+- **Install test time limit.** The automated test of the install guide now
+  allows 90 minutes rather than 60. Slow package downloads on GitHub's runners
+  had stopped a healthy run at the limit.
+
 ## v1.0.5
 
 Help on every page, text that is easier to read, a security update, and fixes

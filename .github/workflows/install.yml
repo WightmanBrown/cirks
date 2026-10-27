@@ -53,7 +53,8 @@ jobs:
     # The weekly run is for the public repository; CIRKS-dev's minutes are not free.
     if: github.event_name != 'schedule' || github.repository == 'WightmanBrown/cirks'
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
+    # x86 runners take 42-51 minutes, mostly slow apt; 60 cancelled a healthy run (2026-10-26).
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:

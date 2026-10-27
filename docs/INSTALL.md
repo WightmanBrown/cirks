@@ -327,6 +327,8 @@ deliberate problems — with a validation backlog, 5 security actions, 5
 exceptions (one lapsed), 5 meetings and 4 quarterly review cycles. Dates are
 relative to the day you run it. The story behind it is
 [`dataset/misty-isles-architecture.md`](dataset/misty-isles-architecture.md).
+To find your way around it role by role, read the walkthrough,
+[`dataset/misty-isles-walkthrough.md`](dataset/misty-isles-walkthrough.md).
 
 **To start again from nothing** (deletes the database):
 
