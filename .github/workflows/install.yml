@@ -96,12 +96,21 @@ jobs:
     name: install.sh stops on Docker installed as a snap
     if: github.event_name != 'schedule' || github.repository == 'WightmanBrown/cirks'
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - run: .github/scripts/remove-preinstalled-docker.sh
+      # The snap store is sometimes unreachable from GitHub's runners (v1.1.0:
+      # three failures in an hour, all in this download, before CIRKS runs), so
+      # try three times, five minutes each, with a pause between.
       - name: Install Docker as a snap, as Ubuntu's installer offers it
-        run: sudo snap install docker
+        run: |
+          for attempt in 1 2 3; do
+            sudo timeout 300 snap install docker && exit 0
+            echo "::warning::snap install docker failed (attempt $attempt of 3)"
+            [ "$attempt" = 3 ] || sleep $((attempt * 60))
+          done
+          exit 1
       - name: install.sh must refuse, naming the snap
         run: |
           ln -s "$GITHUB_WORKSPACE" ~/cirks

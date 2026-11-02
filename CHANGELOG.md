@@ -11,6 +11,24 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.1.1
+
+Two security updates to libraries CIRKS uses, and a sturdier install test.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. There is no
+migration in this release.
+
+- **Security:** `follow-redirects` 1.16.2 in the web front end fixes a
+  high-severity advisory published after v1.1.0 (GHSA-mrwp-f3q8-3g9p).
+- **Security:** `minimatch` 11.0.4 inside `archiver`, the library that builds
+  the *export all* ZIP, fixes a moderate denial-of-service advisory
+  (GHSA-g3hv-75wg-m249). CIRKS never uses the affected pattern matching, so it
+  was not exploitable here, but the dependency check rightly refused it.
+- **Install test:** the check that the installer refuses Docker installed as a
+  snap now tries the snap download three times. On 2026-11-02 the snap store
+  was unreachable from GitHub's machines and failed the test three times
+  before CIRKS ran at all.
+
 ## v1.1.0
 
 CIRKS now ships its own control objectives, and a standard's requirement counts
