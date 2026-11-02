@@ -15,7 +15,7 @@ side. Three things need three words:
 
 | Word | What it is | Where it lives | Example |
 |---|---|---|---|
-| **Control objective** | A job to be done. The library holds the ideal set; nothing in it is done until adopted. | Control Library (NIST CSF 2.0 ships as the default set; add your own) | "Administrative access requires multi-factor authentication" |
+| **Control objective** | A job to be done. The library holds the ideal set; nothing in it is done until adopted. | Control Library (the CIRKS control objectives ship as the set; add your own) | "Administrative access requires multi-factor authentication" |
 | **Control** | How the organisation does that job: the components that together meet the objective. It is modelled, rated, and deployed on systems. | Built once the objective is adopted | Identity provider + hardware tokens + the joiner process that issues them |
 | **Standard requirement** | A standard's own text, in its own numbering. Only exists for organisations that report against a standard. | Setup → Control Sets, mapped onto control objectives | PCI 8.4, ISO A.8.5, NIST PR.AA-03 |
 
@@ -50,11 +50,13 @@ looking for it in the Control Library.
 
 Two further sources of confusion the manual should anticipate:
 
-- **NIST CSF looks like both at once.** CIRKS ships NIST CSF 2.0 with each of its
-  106 subcategories also loaded as a control objective of the same wording, and
-  mapped one to one. On that data alone the objective and the requirement look
-  identical. They separate as soon as an organisation adds its own objectives or
-  loads a second standard.
+- **A standard is not the library.** Until v1.1 CIRKS shipped NIST CSF 2.0 with
+  each of its 106 subcategories also loaded as a control objective of the same
+  wording, so the objective and the requirement looked identical, and NIST's
+  outcome statements became what people managed. Since v1.1 CIRKS ships its own
+  control objectives (156, written for the job, e.g. *Restores are tested*), and
+  NIST CSF, ISO 27001 and CIS Controls are reporting sets mapped onto them. A
+  requirement is met only when every objective mapped to it is in place.
 - **Loading a standard is not adopting it.** A standard can be loaded purely as a
   source of good objectives, with no intention of meeting all of it. Only a
   standard adopted as an obligation should produce gaps

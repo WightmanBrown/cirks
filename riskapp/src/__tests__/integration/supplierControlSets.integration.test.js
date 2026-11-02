@@ -6,8 +6,8 @@
 // (v143, docs/supplier-model.md step 2). Pinned here: the sets are DATA edited
 // by controls.write; a relationship's set is DERIVED (every-supplier + its
 // type's), so editing a set reaches existing relationships; an objective in both
-// is listed once with both sources; the seed resolves through the NIST mapping
-// and skips what the install does not have; set edits are audited.
+// is listed once with both sources; the seed names CIRKS objectives by their
+// reference (v163) and skips what the install does not have; set edits are audited.
 
 const { app, request, tokenFor, query, USERS, IT_DEPT } = require('./helpers');
 
@@ -17,11 +17,12 @@ const api = (role, method, path) => request(app)[method](`/api/v1${path}`).set(a
 let programme, saasOnly, stdControl, nistId, sys, supplierId, relId;
 
 beforeAll(async () => {
-  const ctl = async (title) => (await query(
-    `INSERT INTO controls (title, description) VALUES ($1, 'fixture') RETURNING id`, [title])).rows[0].id;
-  programme = await ctl('STO Supplier programme established');
+  const ctl = async (title, ref = null) => (await query(
+    `INSERT INTO controls (title, description, reference_code) VALUES ($1, 'fixture', $2) RETURNING id`, [title, ref])).rows[0].id;
+  // The programme objective carries a CIRKS reference the starting sets name (v163).
+  programme = await ctl('STO Supplier programme established', 'CIRKS1.SCM-01');
   saasOnly  = await ctl('STO Backups of provider-held data');
-  // A NIST requirement mapped to the programme objective, for the seed test.
+  // A NIST requirement mapped to it: a NIST mapping no longer seeds anything.
   nistId = (await query(`SELECT id FROM standards WHERE code = 'nist_csf'`)).rows[0].id;
   stdControl = (await query(
     `INSERT INTO standard_controls (standard_id, ref_code, title) VALUES ($1, 'GV.SC-01', 'STO programme') RETURNING id`,
@@ -48,9 +49,9 @@ afterAll(async () => {
 });
 
 describe('seeding the starting sets', () => {
-  test('resolves through the NIST mapping, and skips what the install lacks', async () => {
+  test('names CIRKS objectives by reference, and skips what the install lacks', async () => {
     const { rows } = await query(`SELECT seed_supplier_type_objectives() AS n`);
-    expect(rows[0].n).toBe(1); // only GV.SC-01 exists here, and only in 'all'
+    expect(rows[0].n).toBe(1); // only CIRKS1.SCM-01 exists here, and only in 'all'
     const set = await query(`SELECT applies_to FROM supplier_type_objectives WHERE control_id = $1`, [programme]);
     expect(set.rows.map((r) => r.applies_to)).toEqual(['all']);
     // Idempotent.

@@ -1,98 +1,158 @@
 control_title,threat_name,notes
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Data exfiltration,NIST CSF 2.0 threat-informed mapping
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Privilege escalation,NIST CSF 2.0 threat-informed mapping
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Ransomware,NIST CSF 2.0 threat-informed mapping
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Security misconfiguration,NIST CSF 2.0 threat-informed mapping
-"Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties",Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
-Adequate resource capacity to ensure availability is maintained,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
-Adequate resource capacity to ensure availability is maintained,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
-"Backups of data are created, protected, maintained, and tested",Hardware or software failure,NIST CSF 2.0 threat-informed mapping
-"Backups of data are created, protected, maintained, and tested",Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
-"Backups of data are created, protected, maintained, and tested",Ransomware,NIST CSF 2.0 threat-informed mapping
-"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Malware infection,NIST CSF 2.0 threat-informed mapping
-"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Ransomware,NIST CSF 2.0 threat-informed mapping
-"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Security misconfiguration,NIST CSF 2.0 threat-informed mapping
-"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
-"Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events",Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-Configuration management practices are established and applied,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-Configuration management practices are established and applied,Privilege escalation,NIST CSF 2.0 threat-informed mapping
-Configuration management practices are established and applied,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
-Critical suppliers are assessed prior to acquisition,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
-Cyber threat intelligence is received from information sharing forums and sources,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-External service provider activities and services are monitored to find potentially adverse events,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
-"Hardware is maintained, replaced, and removed commensurate with risk",Hardware or software failure,NIST CSF 2.0 threat-informed mapping
-"Identities and credentials for authorized users, services, and hardware are managed by the organization",Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
-"Identities and credentials for authorized users, services, and hardware are managed by the organization",Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
-"Identity assertions are protected, conveyed, and verified",Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
-Incidents are contained,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
-Incidents are contained,Ransomware,NIST CSF 2.0 threat-informed mapping
-Incidents are contained,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-Incidents are eradicated,Malware infection,NIST CSF 2.0 threat-informed mapping
-Incidents are eradicated,Ransomware,NIST CSF 2.0 threat-informed mapping
-Individuals in specialized roles are provided with awareness and training so that they possess the knowledge and skills to perform relevant tasks with cybersecurity risks in mind,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-Information is correlated from multiple sources,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
-Installation and execution of unauthorized software are prevented,Malware infection,NIST CSF 2.0 threat-informed mapping
-Installation and execution of unauthorized software are prevented,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-Installation and execution of unauthorized software are prevented,Ransomware,NIST CSF 2.0 threat-informed mapping
-Inventories of hardware managed by the organization are maintained,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
-Inventories of hardware managed by the organization are maintained,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
-Inventories of services provided by suppliers are maintained,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
-"Inventories of software, services, and systems managed by the organization are maintained",Security misconfiguration,NIST CSF 2.0 threat-informed mapping
-Log records are generated and made available for continuous monitoring,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
-Log records are generated and made available for continuous monitoring,Privilege escalation,NIST CSF 2.0 threat-informed mapping
-Log records are generated and made available for continuous monitoring,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
-Mechanisms are implemented to achieve resilience requirements in normal and adverse situations,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
-Mechanisms are implemented to achieve resilience requirements in normal and adverse situations,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
-Networks and environments are protected from unauthorized logical access and usage,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
-Networks and environments are protected from unauthorized logical access and usage,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
-Networks and environments are protected from unauthorized logical access and usage,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
-Networks and environments are protected from unauthorized logical access and usage,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Data exfiltration,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Malware infection,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
-Networks and network services are monitored to find potentially adverse events,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-Personnel activity and technology usage are monitored to find potentially adverse events,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
-Personnel activity and technology usage are monitored to find potentially adverse events,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
-Personnel activity and technology usage are monitored to find potentially adverse events,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-Personnel activity and technology usage are monitored to find potentially adverse events,Privilege escalation,NIST CSF 2.0 threat-informed mapping
-Personnel activity and technology usage are monitored to find potentially adverse events,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
-Personnel are provided with awareness and training so that they possess the knowledge and skills to perform general tasks with cybersecurity risks in mind,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
-Personnel are provided with awareness and training so that they possess the knowledge and skills to perform general tasks with cybersecurity risks in mind,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-"Physical access to assets is managed, monitored, and enforced commensurate with risk",Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
-"Physical access to assets is managed, monitored, and enforced commensurate with risk",Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
-"Physical access to assets is managed, monitored, and enforced commensurate with risk",Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
-Potentially adverse events are analyzed to better understand associated activities,Data exfiltration,NIST CSF 2.0 threat-informed mapping
-"Processes for receiving, analyzing, and responding to vulnerability disclosures are established",Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-"Recovery actions are selected, scoped, prioritized, and performed",Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
-"Secure software development practices are integrated, and their performance is monitored throughout the software development life cycle",Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
-"Software is maintained, replaced, and removed commensurate with risk",Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-"Software is maintained, replaced, and removed commensurate with risk",Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
-"Software is maintained, replaced, and removed commensurate with risk",Malware infection,NIST CSF 2.0 threat-informed mapping
-"Software is maintained, replaced, and removed commensurate with risk",Privilege escalation,NIST CSF 2.0 threat-informed mapping
-"Systems, hardware, software, services, and data are managed throughout their life cycles",Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
-The authenticity and integrity of hardware and software are assessed prior to acquisition and use,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-at-rest are protected",Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-at-rest are protected",Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-at-rest are protected",Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-at-rest are protected",Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-in-transit are protected",Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-in-transit are protected",Data exfiltration,NIST CSF 2.0 threat-informed mapping
-"The confidentiality, integrity, and availability of data-in-transit are protected",Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
-The integrity of backups and other restoration assets is verified before using them for restoration,Ransomware,NIST CSF 2.0 threat-informed mapping
-The integrity of backups and other restoration assets is verified before using them for restoration,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
-The organization's technology assets are protected from environmental threats,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
-The physical environment is monitored to find potentially adverse events,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
-The recovery portion of the incident response plan is executed once initiated from the incident response process,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
-The recovery portion of the incident response plan is executed once initiated from the incident response process,Ransomware,NIST CSF 2.0 threat-informed mapping
-"Users, services, and hardware are authenticated",Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-"Users, services, and hardware are authenticated",Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
-"Vulnerabilities in assets are identified, validated, and recorded",Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-"Vulnerabilities in assets are identified, validated, and recorded",Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
-"Vulnerabilities in assets are identified, validated, and recorded",Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Least privilege,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Least privilege,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Least privilege,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Least privilege,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Least privilege,Ransomware,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Ransomware,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Ransomware,NIST CSF 2.0 threat-informed mapping
+Least privilege,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Least privilege,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Access is reviewed,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Segregation of duties,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Capacity management,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
+Capacity management,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Backup policy,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Backups are protected,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Restores are tested,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Backup policy,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Backups are protected,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Restores are tested,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Backup policy,Ransomware,NIST CSF 2.0 threat-informed mapping
+Backups are protected,Ransomware,NIST CSF 2.0 threat-informed mapping
+Restores are tested,Ransomware,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Detection of malware and viruses,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Malware infection,NIST CSF 2.0 threat-informed mapping
+Detection of malware and viruses,Malware infection,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Malware infection,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Ransomware,NIST CSF 2.0 threat-informed mapping
+Detection of malware and viruses,Ransomware,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Ransomware,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Detection of malware and viruses,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
+Detection of malware and viruses,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Detection of malware and viruses,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Device hardening policy and standard,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Device hardening policy and standard,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Configuration monitoring,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Device hardening policy and standard,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Suppliers are assessed,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Threats are identified,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Monitoring coverage,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Suppliers are audited,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Asset return and disposal,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Unsupported software and hardware,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Equipment maintenance,Hardware or software failure,NIST CSF 2.0 threat-informed mapping
+Identity management policy,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Service and system accounts,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Device identification and network access (802.1X),Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Identity management policy,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Service and system accounts,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Device identification and network access (802.1X),Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Authentication information is protected,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
+Containment and recovery,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
+Containment and recovery,Ransomware,NIST CSF 2.0 threat-informed mapping
+Containment and recovery,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Containment and recovery,Malware infection,NIST CSF 2.0 threat-informed mapping
+Role-based training,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Central monitoring team,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Software installation is controlled,Malware infection,NIST CSF 2.0 threat-informed mapping
+Software installation is controlled,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Software installation is controlled,Ransomware,NIST CSF 2.0 threat-informed mapping
+Devices register,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Devices register,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
+Suppliers are recorded,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Systems register,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Software register,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Log aggregation and storage,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Log aggregation and storage,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Log aggregation and storage,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
+Redundancy,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
+Redundancy,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Network policy enforcement (firewalls),Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
+Zoning and segregation,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
+Network policy enforcement (firewalls),Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Zoning and segregation,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Network policy enforcement (firewalls),Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
+Zoning and segregation,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
+Network policy enforcement (firewalls),Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Zoning and segregation,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Malware infection,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Network Intrusion Detection and Prevention,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Logging policy,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Logging policy,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Logging policy,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Logging policy,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Logging policy,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Detection and prevention of malicious activity,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Security awareness programme,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Security awareness programme,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Physical entry is controlled,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Physical security monitoring,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Physical entry is controlled,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Physical security monitoring,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Physical entry is controlled,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
+Physical security monitoring,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
+Central monitoring team,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Vulnerability reports are handled,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Recovery objectives,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Recovery is managed,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Secure development policy,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Patching within target timescales,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Unsupported software and hardware,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Patching within target timescales,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Unsupported software and hardware,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Patching within target timescales,Malware infection,NIST CSF 2.0 threat-informed mapping
+Unsupported software and hardware,Malware infection,NIST CSF 2.0 threat-informed mapping
+Patching within target timescales,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Unsupported software and hardware,Privilege escalation,NIST CSF 2.0 threat-informed mapping
+Registers are kept current,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Asset return and disposal,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Trusted products,Supply chain or third-party compromise,NIST CSF 2.0 threat-informed mapping
+Protection of data at rest,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Protection of data at rest,Lost or stolen device or media,NIST CSF 2.0 threat-informed mapping
+Protection of data at rest,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
+Protection of data at rest,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
+Protection of data in transit,Accidental data disclosure,NIST CSF 2.0 threat-informed mapping
+Protection of data in transit,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Protection of data in transit,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
+Restores are tested,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
+Environmental threats,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Continuity and recovery plans,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Containment and recovery,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
+Continuity and recovery plans,Ransomware,NIST CSF 2.0 threat-informed mapping
+Strong authentication,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Device identification and network access (802.1X),Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
+Strong authentication,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
+Vulnerabilities are identified,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Vulnerabilities are identified,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Vulnerabilities are identified,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Malware protection,Malware infection,
+Malware protection,Ransomware,

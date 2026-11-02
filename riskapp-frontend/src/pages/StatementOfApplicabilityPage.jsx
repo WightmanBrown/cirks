@@ -36,10 +36,10 @@ function deriveBand(c) {
 // A requirement's state on a standard's lens — DERIVED on the server from the
 // controls mapped to it (v122). The requirement records nothing but an exclusion.
 const REQ_STATES = {
-  covered:  { label: 'Covered',        hint: 'At least one fully mapped control objective is applicable.' },
-  partial:  { label: 'Partly covered', hint: 'Only partially mapped control objectives are applicable.' },
+  covered:  { label: 'Covered',        hint: 'Every control objective mapped to this requirement is implemented.' },
+  partial:  { label: 'Partly covered', hint: 'Some of the control objectives mapped to this requirement are implemented or under way, and some are not. The ones that fall short are listed.' },
   excluded: { label: 'Excluded',       hint: 'Excluded for this standard, with a reason.' },
-  gap:      { label: 'Gap',            hint: 'No applicable control objective meets this requirement, and it is not excluded.' },
+  gap:      { label: 'Gap',            hint: 'None of the control objectives mapped to this requirement is implemented or under way, or none is mapped, and it is not excluded.' },
 };
 const STATUS_LABEL = IMPLEMENTATION_LABEL;
 
@@ -812,6 +812,11 @@ function RequirementRow({ req, canEdit, onPatch, showBand, justSaved = false, on
           <span className={`${styles.bandBadge} ${styles[`band_${band}`]}`} title={BANDS[band]?.hint}>{BANDS[band]?.label}</span>
         )}
         {req.applicable && <span className={styles.derivedStatus}>{STATUS_LABEL[req.implementation_status]}</span>}
+        {req.counted > 0 && (
+          <span className={styles.derivedStatus} title="Control objectives mapped to this requirement that are implemented, of those that count (not applicable ones do not)">
+            {req.implemented_count} of {req.counted} implemented
+          </span>
+        )}
         {justSaved && <span className={styles.savedTick} title="Saved">✓</span>}
       </div>
 
@@ -827,7 +832,6 @@ function RequirementRow({ req, canEdit, onPatch, showBand, justSaved = false, on
               <li key={m.control_id} className={styles.mappedItem}>
                 <span className={styles.mappedTitle}>{m.title}</span>
                 <span className={styles.mappedMeta}>
-                  {m.coverage === 'full' ? 'full' : 'partial'} ·{' '}
                   {!m.decided ? 'not yet decided' : m.applicable ? STATUS_LABEL[m.implementation_status] : 'not applicable'}
                 </span>
                 {m.implementation_description && <span className={styles.mappedImpl}>{m.implementation_description}</span>}

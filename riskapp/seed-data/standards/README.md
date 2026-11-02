@@ -1,8 +1,14 @@
 # Bundled standard reference catalogues
 
+> **Since v1.1** the library CIRKS ships is its own control objectives
+> (`riskapp/db/seed/cirks_objectives_v1.csv`), with NIST CSF 2.0, ISO/IEC 27001:2022 and
+> CIS Controls v8.1 mapped onto them as reporting sets. NIST ships with its wording
+> (`riskapp/db/seed/nist_csf_reference.sql`, generated from the file below); ISO and
+> CIS ship as reference numbers only, and the upload below gives them their words.
+
 CSV reference catalogues for the per-standard Statement of Applicability (the "audit
 subset" views). Each row is one reference control in a standard; import via
-**Setup → Control Sets → Upload catalogue (CSV)** (`POST /standards/:id/controls/import`).
+**Setup → Objectives & standards → Upload catalogue (CSV)** (`POST /standards/:id/controls/import`).
 
 Columns: `ref_code, title, description, grouping, implementation_group`.
 

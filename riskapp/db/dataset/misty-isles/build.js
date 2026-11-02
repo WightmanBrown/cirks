@@ -136,45 +136,58 @@ const BACKUP = [
   { name: 'Configuration backup (network appliances)', parts: [['Network configuration backup', 'on_system']] },
   { name: 'Provided by the supplier', kind: 'supplier' },
 ];
+const named = (list, ...names) => list.filter((p) => names.includes(p.name));
+const CONTAINMENT = [
+  { name: 'CrowdStrike host containment', parts: [['Crowdstrike Falcon Agent', 'on_system'], ['Crowdstrike SaaS', 'service', 'Host Intrusion Detection System'],
+    ['InfoSec Team', 'service', 'Host Intrusion Detection System'], ['Incident management', 'organisation']] },
+  { name: 'Provided by the supplier', kind: 'supplier' },
+];
+// Keyed by CIRKS control objective (v1.1). Endpoint agents deliver host
+// detection, central analysis, logging and execution control alike.
 const PATTERNS = {
-  // Endpoint agents deliver monitoring, analysis, logging, execution control and eradication alike.
-  'DE.CM-09': EDR, 'DE.AE-03': EDR, 'PR.PS-04': EDR, 'PR.PS-05': EDR, 'RS.MI-02': EDR, 'DE.CM-03': EDR,
-  'PR.DS-11': BACKUP, 'RC.RP-01': BACKUP, 'RC.RP-03': BACKUP,
-  // Containment is a capability of the EDR or of the network, not a part on each system.
-  'RS.MI-01': [
-    { name: 'CrowdStrike host containment', parts: [['Crowdstrike Falcon Agent', 'on_system'], ['Crowdstrike SaaS', 'service', 'Host Intrusion Detection System'],
-      ['InfoSec Team', 'service', 'Host Intrusion Detection System'], ['Incident management', 'organisation']] },
+  'CIRKS1.DM-07': EDR, 'CIRKS1.DM-08': EDR, 'CIRKS1.DM-09': EDR, 'CIRKS1.SVM-06': EDR,
+  'CIRKS1.BRR-02': BACKUP, 'CIRKS1.BRR-06': BACKUP, 'CIRKS1.BRR-03': BACKUP,
+  // Containment and recovery (owner, 2026-10-28): delivered by endpoint protection.
+  // Network isolation's effect is secondary, so it does not put the objective in
+  // place on its own; where endpoint protection is missing or cannot run (OT,
+  // Windows 7) that is a talking point. Appliance syslog contains nothing.
+  'CIRKS1.IR-04': [...EDR.filter((p) => p.name !== 'Syslog to Wazuh (network appliances)' && p.kind !== 'supplier'),
+                   ...named(CONTAINMENT, 'CrowdStrike host containment', 'Provided by the supplier')],
+  // Malware protection: the endpoint protection that prevents, not only detects.
+  'CIRKS1.CVM-04': named(EDR, 'CrowdStrike EDR', 'Microsoft Defender for Servers (Azure)', 'Provided by the supplier'),
+  // Zoning and segregation (owner, 2026-10-29): network isolation is exactly this:
+  // a compromise in one zone is contained. It is not containment of an incident.
+  'CIRKS1.CS-04': [
     { name: 'Network isolation', parts: [['PaloAlto 850-22', 'service', 'Network Intrusion Detection System'],
       ['InfoSec Team', 'service', 'Network Intrusion Detection System'], ['Incident management', 'organisation']] },
-    { name: 'Provided by the supplier', kind: 'supplier' },
   ],
-  'PR.IR-01': [
+  'CIRKS1.CS-02': [
     { name: 'Perimeter firewall and segmentation', parts: [['PaloAlto 850-22', 'service', 'Network Intrusion Detection System'],
       ['IT Administrators', 'service', 'Network Intrusion Detection System']] },
     { name: 'Provided by the supplier', kind: 'supplier' },
   ],
-  'DE.CM-01': [
+  'CIRKS1.CS-12': [
     { name: 'NIDS (Palo Alto ATP)', parts: [['PaloAlto ATP', 'service', 'Network Intrusion Detection System'],
       ['Advanced Threat Prevention Network Intrusion Detection platform', 'service', 'Network Intrusion Detection System'],
       ['InfoSec Team', 'service', 'Network Intrusion Detection System']] },
     { name: 'Provided by the supplier', kind: 'supplier' },
   ],
-  'PR.DS-02': [
+  'CIRKS1.DCH-05': [
     { name: 'TLS', parts: [['TLS 1.2+ configuration', 'on_system'], ['Encryption Standard', 'organisation']] },
     { name: 'Remote-access VPN', parts: [['PaloAlto GlobalProtect VPN', 'on_system'], ['PaloAlto GlobalProtect gateway', 'service', 'MIG Remote Access VPN']] },
     { name: 'Secure radio', parts: [['Plotnet Secure Radio', 'on_system']] },
     { name: 'Signal secure messaging', parts: [['Signal', 'on_system']] },
     { name: 'Provided by the supplier', kind: 'supplier' },
   ],
-  'PR.AA-05': [
+  'CIRKS1.AA-03': [
     { name: 'Active Directory (on-premises)', parts: [['Microsoft Active Directory Domain Services', 'service', 'MIG Authentication, Authorisation and Access Control system'],
       ['IT Administrators', 'service', 'MIG Authentication, Authorisation and Access Control system']] },
     { name: 'Entra ID (cloud)', parts: [['Microsoft Entra ID', 'service', 'MIG Authentication, Authorisation and Access Control system']] },
   ],
 };
 // Library lists follow the patterns' on-system parts (§4): Starlink and OneWeb
-// are transport, not encryption, and leave PR.DS-02.
-const LIBRARY_REMOVE = { 'PR.DS-02': ['Starlink LEO portable terminal'] };
+// are transport, not encryption, and leave Protection of data in transit.
+const LIBRARY_REMOVE = { 'CIRKS1.DCH-05': ['Starlink LEO portable terminal'] };
 
 // §6 — the deliberate problems, each on a named part, with a reason.
 const DEGRADED_PARTS = [
@@ -307,8 +320,9 @@ for (const [sys, m] of Object.entries(onSystem)) {
 }
 
 // ── 4. Library: links and delivery patterns ─────────────────────────────────────
+// Objectives by their own CIRKS reference (v1.1; NIST CSF is a reporting set).
 const titleByRef = {};
-for (const r of rows('control-mappings')) if (r.standard === 'nist_csf') titleByRef[r.standard_ref] = r.control_title;
+for (const r of rows('controls')) if (r.reference_code) titleByRef[r.reference_code] = r.title;
 const T = (ref) => { if (!titleByRef[ref]) throw new Error(`no objective for ${ref}`); return titleByRef[ref]; };
 const refOfTitle = (title) => Object.keys(titleByRef).find((ref) => titleByRef[ref] === title);
 for (const [ref, names] of Object.entries(LIBRARY_REMOVE)) {
@@ -345,8 +359,8 @@ for (const [ref, patterns] of Object.entries(PATTERNS)) {
 }
 
 // The new systems' deployments.
-for (const [sys, refs] of [['MIG Remote Access VPN', ['DE.CM-09', 'PR.AA-05', 'DE.CM-01', 'PR.DS-02']],
-                           ['Microsoft Defender for Cloud', ['DE.CM-09', 'PR.AA-05']]]) {
+for (const [sys, refs] of [['MIG Remote Access VPN', ['CIRKS1.DM-07', 'CIRKS1.AA-03', 'CIRKS1.CS-12', 'CIRKS1.DCH-05']],
+                           ['Microsoft Defender for Cloud', ['CIRKS1.DM-07', 'CIRKS1.AA-03']]]) {
   for (const ref of refs) {
     rows('system-controls').push({ system_name: sys, control_title: T(ref), status: 'unknown',   // derived in section 6
       provenance: 'recorded', notes: '', exclusion_reason: '' });
@@ -397,20 +411,20 @@ const DEPT = Object.fromEntries(rows('systems').map((r) => [r.name, r.department
 // SaaS hosted for us.
 const SP = 'service_provider';
 rel('Island Mutual Bank', SP, DEPT['MIG Banking System'], 'MIG Banking System', null, { ref: 'IMB-PAY-2024' });
-ev('Island Mutual Bank', SP, 'MIG Banking System', null, 'report', 'SOC 2 Type II report', 'Island Audit LLP', day(240), () => except(expected(SP), 'GV.SC-10'));
-ev('Island Mutual Bank', SP, 'MIG Banking System', null, 'contract_terms', 'Payments services agreement, schedule 7 (exit and data return)', 'IMB-PAY-2024 sch.7', '', [T('GV.SC-10')]);
+ev('Island Mutual Bank', SP, 'MIG Banking System', null, 'report', 'SOC 2 Type II report', 'Island Audit LLP', day(240), () => except(expected(SP), 'CIRKS1.SCM-07'));
+ev('Island Mutual Bank', SP, 'MIG Banking System', null, 'contract_terms', 'Payments services agreement, schedule 7 (exit and data return)', 'IMB-PAY-2024 sch.7', '', [T('CIRKS1.SCM-07')]);
 for (const s of ['IT Support Ticketing System', 'Support Knowledge base']) rel('Helix ServiceDesk', SP, DEPT[s], s, null, { ref: 'HSD-0931' });
 ev('Helix ServiceDesk', SP, 'IT Support Ticketing System', null, 'report', 'ISO/IEC 27001 surveillance audit report', 'Certification body report', day(300), () => expected(SP));
 ev('Helix ServiceDesk', SP, 'Support Knowledge base', null, 'contract_terms', 'Master subscription agreement, clause 12 (security)', 'HSD-0931 cl.12', '',
-   () => except(expected(SP), 'PR.DS-11', 'RC.RP-01'));
+   () => except(expected(SP), 'CIRKS1.BRR-02', 'CIRKS1.BRR-06'));
 rel('PeopleFirst HR', SP, DEPT['HR System'], 'HR System', null, { ref: 'PF-HR-7710' });
-ev('PeopleFirst HR', SP, 'HR System', null, 'report', 'SOC 2 Type II report', 'Independent service auditor', day(200), () => except(expected(SP), 'GV.SC-10'));
+ev('PeopleFirst HR', SP, 'HR System', null, 'report', 'SOC 2 Type II report', 'Independent service auditor', day(200), () => except(expected(SP), 'CIRKS1.SCM-07'));
 rel('SkyPlan Ops', SP, DEPT['Flight operations system'], 'Flight operations system', null, { ref: 'SKY-OPS-12', start: day(-60) });
 rel('FacilityFlow', SP, DEPT['Schools facilities management'], 'Schools facilities management', null, { ref: 'FF-EDU-3' });
 ev('FacilityFlow', SP, 'Schools facilities management', null, 'contract_terms', 'Education services agreement, security schedule', 'FF-EDU-3 sch.2', '', () => expected(SP));
 // Super Bill (existing): its SOC 2 report has expired (§6.8).
-ev('Super Bill', SP, 'Billing and meter reading', null, 'report', 'SOC 2 Type II report (last year)', 'Independent service auditor', day(-45), () => except(expected(SP), 'GV.SC-10'), day(-410));
-ev('Super Bill', SP, 'Billing and meter reading', null, 'contract_terms', 'Billing services contract, exit clause', 'SB-UTIL-09 cl.21', '', [T('GV.SC-10')]);
+ev('Super Bill', SP, 'Billing and meter reading', null, 'report', 'SOC 2 Type II report (last year)', 'Independent service auditor', day(-45), () => except(expected(SP), 'CIRKS1.SCM-07'), day(-410));
+ev('Super Bill', SP, 'Billing and meter reading', null, 'contract_terms', 'Billing services contract, exit clause', 'SB-UTIL-09 cl.21', '', [T('CIRKS1.SCM-07')]);
 // Microsoft hosts more than video conferencing.
 const MS_TERMS = 'Microsoft Online Services agreement and Data Protection Addendum';
 for (const s of ['MIG Telephony and Messaging', 'MIG Document Management', 'Information Security Management System', 'Microsoft Defender for Cloud',
@@ -423,21 +437,21 @@ const CS = 'contracted_service';
 rel('Aerowatch Systems', CS, DEPT['Approach radar'], 'Approach radar', null, { ref: 'AW-RADAR-5' });
 ev('Aerowatch Systems', CS, 'Approach radar', null, 'contract_terms', 'Radar maintenance contract, security schedule', 'AW-RADAR-5 sch.4', '', () => expected(CS));
 rel('Harbour Fuel Services', CS, DEPT['Aircraft fuelling'], 'Aircraft fuelling', null, { ref: 'HFS-22' });
-ev('Harbour Fuel Services', CS, 'Aircraft fuelling', null, 'contract_terms', 'Fuel services contract', 'HFS-22', '', () => except(expected(CS), 'DE.CM-06', 'PR.PS-04'));
+ev('Harbour Fuel Services', CS, 'Aircraft fuelling', null, 'contract_terms', 'Fuel services contract', 'HFS-22', '', () => except(expected(CS), 'CIRKS1.DM-05', 'CIRKS1.DM-09'));
 for (const s of ['Power Generation', 'Power Distribution']) rel('Gridline Controls', CS, DEPT[s], s, null, { ref: 'GLC-2025' });
 ev('Gridline Controls', CS, 'Power Generation', null, 'contract_terms', 'Control systems support contract, security schedule', 'GLC-2025 sch.3', '', () => expected(CS));
-ev('Gridline Controls', CS, 'Power Distribution', null, 'contract_terms', 'Control systems support contract, security schedule', 'GLC-2025 sch.3', '', () => except(expected(CS), 'DE.CM-06'));
+ev('Gridline Controls', CS, 'Power Distribution', null, 'contract_terms', 'Control systems support contract, security schedule', 'GLC-2025 sch.3', '', () => except(expected(CS), 'CIRKS1.DM-05'));
 // Onshore contractors.
 rel('Island Staffing Agency', 'onshore', 'Department of Communications', null, 'Agency IT contractors', { ref: 'ISA-IT-4' });
 ev('Island Staffing Agency', 'onshore', null, 'Agency IT contractors', 'contract_terms', 'Agency terms: vetting and induction', 'ISA-IT-4 cl.6', '',
-   [T('GV.RR-04'), T('PR.AT-01'), T('PR.AA-02')]);
+   [T('CIRKS1.PER-02'), T('CIRKS1.SAT-01'), T('CIRKS1.IDA-03')]);
 // Products (real vendors as products only: our own contract terms, no claims about them).
 const PR = 'product';
 rel('Palo Alto Networks', PR, 'Department of Information Security', null, 'PaloAlto 850-22', { ref: 'PAN-SUP-3' });
-ev('Palo Alto Networks', PR, null, 'PaloAlto 850-22', 'contract_terms', 'Support and subscription contract', 'PAN-SUP-3', '', [T('ID.RA-01'), T('PR.PS-02'), T('GV.SC-10')]);
+ev('Palo Alto Networks', PR, null, 'PaloAlto 850-22', 'contract_terms', 'Support and subscription contract', 'PAN-SUP-3', '', [T('CIRKS1.SVM-02'), T('CIRKS1.SVM-03'), T('CIRKS1.SCM-07')]);
 rel('Veeam', PR, 'Department of Information Security', null, 'Veeam Backup', { ref: 'VEEAM-UL-9' });
 rel('Plotnet', PR, 'Disaster and Emergency Management', null, 'Plotnet Secure Radio', { ref: 'PLT-77' });
-ev('CrowdStrike', PR, null, 'Crowdstrike Falcon Agent', 'contract_terms', 'Falcon subscription agreement, support schedule', 'CS-FAL-2025', '', [T('ID.RA-01'), T('PR.PS-02')]);
+ev('CrowdStrike', PR, null, 'Crowdstrike Falcon Agent', 'contract_terms', 'Falcon subscription agreement, support schedule', 'CS-FAL-2025', '', [T('CIRKS1.SVM-02'), T('CIRKS1.SVM-03')]);
 
 // ── 6. Control status on each system, derived from the patterns ─────────────────
 const statusOn = (sys, comp) => onSystem[sys]?.get(comp)?.status;
@@ -472,7 +486,7 @@ for (const r of rows('system-controls')) {
   if (PATTERNS[ref]) {
     const d = delivered(r.system_name, ref);
     r.status = { complete: 'operational', degraded: 'degraded' }[d] || 'missing';
-  } else if (ref === 'PR.PS-02' && (DEGRADED_PATCHING.has(r.system_name) || r.system_name === 'MIG Corporate Email')) {
+  } else if (ref === 'CIRKS1.SVM-03' && (DEGRADED_PATCHING.has(r.system_name) || r.system_name === 'MIG Corporate Email')) {
     r.status = 'degraded';   // §6.7 patching server degraded; §6.1 Exchange out of support
   } else if (r.status === 'unknown' || r.status === 'degraded') {
     r.status = 'operational';   // assessed; degradation lives on named parts now
@@ -480,7 +494,7 @@ for (const r of rows('system-controls')) {
 }
 // §6.2 — Prison: someone marked endpoint monitoring operational; nothing delivers it.
 for (const r of rows('system-controls')) {
-  if (r.system_name === 'Prison Management System' && refOf[r.control_title] === 'DE.CM-09') r.status = 'operational';
+  if (r.system_name === 'Prison Management System' && refOf[r.control_title] === 'CIRKS1.DM-07') r.status = 'operational';
 }
 // ── 7. Ratings: every asset assessed against every mandatory table ───────────────
 const mandatory = rows('impact-tables').filter((t) => t.mandatory === 'true').map((t) => t.name);

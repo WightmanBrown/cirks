@@ -146,7 +146,7 @@ Lewis Fisher is the CISO (ciso@mig.local), and also holds the risk analyst and s
 
 ### What the history gives you
 
-The installer replays a year of work through the real screens as these people. You get 228 risks, 77 of them at or above the mandatory-action score of 12, a backlog of new risks awaiting the CISO, 5 security actions (some overdue), 5 exceptions (one lapsed into breach), and four quarterly review cycles. Three cycles are closed and signed off; the current one is open, with its next SWG meeting already planned.
+The installer replays a year of work through the real screens as these people. You get 227 risks, 69 of them at or above the mandatory-action score of 12, a backlog of new risks awaiting the CISO, 8 security actions (three awaiting acceptance, three under way, two finished), 5 exceptions (one lapsed into breach), and four quarterly review cycles. Three cycles are closed and signed off; the current one is open, with its next SWG meeting already planned.
 
 ## Finding your way around
 
@@ -332,7 +332,7 @@ Water Distribution's backups are taken by Veeam, but the last quarterly restore 
 2. **The impact (IAO and IAM).** Open the system's information assets and their ratings. The system's impact is the highest of them.
 3. **The risk (analyst).** Open the system's risks and choose the ransomware risk. Read the rationale; it was written by the analyst and names the failed restore test. In the controls panel, notice that the backup objective is not counting because its delivering part is degraded.
 4. **The decision (CISO).** The risk is in Current Risks, so the CISO has already validated it. Look at its treatment decision and its Security actions section.
-5. **The plan (analyst, then CISO).** If there is no action yet, switch to the risk analyst role and build one from the coverage gap; its item will be to bring Veeam Backup back to operational on this system. Switch back to CISO and accept it in the Acceptance Queue. The risk now shows a **target risk**, lower than the current one. *Changes data.*
+5. **The plan (analyst, then CISO).** The installer leaves a proposed action for this risk in the Acceptance Queue; its item is to bring Veeam Backup back to operational on this system. As the CISO, accept it there. (If there is no action, switch to the risk analyst role, build one from the coverage gap, then switch back and accept it.) The risk now shows a **target risk**, lower than the current one. *Changes data.*
 6. **The fix (system owner or CISO).** Pretend the restore test has been rerun successfully. On the risk page, choose **Complete…** on the item. *Changes data.* Veeam Backup becomes operational on the system, the backup objective is met, the probability falls, and the current risk drops to meet the target. Check the Risk history panel, which records the change and why.
 7. **The record (secretary).** Sign in as Morag Sinclair and look at the planned SWG meeting's agenda. The agenda is built from the register, with sections for new risks, action progress, exceptions and assurance. Its agenda was generated when the meeting was planned, so choose Generate agenda to refresh it and see your change appear.
 8. **The sign-off (SIRO).** Once the secretary issues the minutes, sign in as Helen Wright and approve the review cycle that now contains this change.
@@ -382,7 +382,7 @@ CIRKS uses its words strictly, and much of the early confusion comes from readin
 | Business service | What a department does for people, linked to the systems it relies on |
 | Component | A building block of a system, of four kinds, i.e. people, process, technology and facility. Policies and documents are components too |
 | Threat | Something that could go wrong, with a starting likelihood |
-| Control objective | A job to be done, from the control library (NIST CSF 2.0 by default), such as "administrative access requires multi-factor authentication" |
+| Control objective | A job to be done, from the control library (the CIRKS control objectives), such as "administrative access requires multi-factor authentication" |
 | Control | How the organisation actually does that job, i.e. the components that together meet the objective |
 | Standard requirement | A clause of an external standard (ISO 27001, PCI and so on), mapped onto control objectives. Only matters if you report against a standard |
 | Security solution | A reusable bundle of parts that delivers one or more objectives, such as CrowdStrike EDR or Veeam backup |

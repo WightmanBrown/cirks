@@ -20,6 +20,7 @@ import { HelpDot } from '../components/HelpDot';
 const TYPES      = ['preventive', 'detective', 'corrective', 'deterrent'];
 
 const FRAMEWORK_LABELS = {
+  cirks:    'CIRKS',
   iso27001: 'ISO',
   cis_v8:   'CIS',
   nist_csf: 'NIST',
@@ -193,7 +194,8 @@ export function ControlLibraryPage() {
         {/* Secondary filters */}
         <div className={styles.chipRow}>
           <span className={styles.chipGroupLabel}>Source</span>
-          {[...frameworks, { code: 'custom', name: 'Custom — your own, mapped to no standard' }].map(({ code, name }) => (
+          {[{ code: 'cirks', name: 'CIRKS — the control objectives CIRKS ships' }, ...frameworks,
+            { code: 'custom', name: 'Custom — your organisation\'s own objectives' }].map(({ code, name }) => (
             <button
               key={code}
               className={`${styles.chip} ${frameworkFilter === code ? styles.chipActive : ''}`}

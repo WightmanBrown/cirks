@@ -37,8 +37,11 @@ On first boot the entrypoint:
    carries no data, so this populates: the `org_config` singleton (name from the
    `ORG_NAME` env var, default *My Organisation*), the capability catalogue, the
    four SoA-lens `standards` rows, the canonical `role_permissions` grants (from
-   `src/auth/capabilityDefaults.js`), and the **bundled NIST CSF 2.0 catalogue**
-   (106 controls → the NIST SoA is covered out of the box). No users are created.
+   `src/auth/capabilityDefaults.js`), the **NIST CSF 2.0 reporting set** (its 106
+   requirements) and, on a new install, the **CIRKS control objectives**: 156,
+   mapped to ISO 27001, CIS Controls v8.1 and NIST CSF, so every standard's
+   Statement of Applicability is covered out of the box. ISO and CIS ship as
+   reference numbers only; upload your licensed copy for their wording. No users are created.
 3. Serves on `http://localhost:${APP_PORT}` (default **8080**).
 
 Quick check: `make smoke` (or `curl localhost:8080/health`).
@@ -143,8 +146,9 @@ compute themselves.
 password is refused. CIRKS has no self-service password change yet, so an
 administrator then sets each person's own password (Admin → Account Management →
 Reset password). **Not imported here:**
-the RBAC/capability/standards datasets (seeded by `db/seed.js`). The per-standard reference catalogues (ISO/CIS) load
-via **Setup → Control Sets**. Owner/manager emails resolve to a user when present,
+the RBAC/capability/standards datasets and the CIRKS control objectives (seeded by `db/seed.js`). The licensed
+wording of ISO and CIS requirements, which ship as reference numbers only, loads via **Setup → Objectives &
+standards**. Owner/manager emails resolve to a user when present,
 else are left unset.
 
 ## 2. Upgrades (the data-loss guarantee)

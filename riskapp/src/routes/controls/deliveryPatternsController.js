@@ -520,7 +520,7 @@ async function useCirks(req, res, next) {
   try {
     const out = await withActor(req.user.id, async (db) => {
       const c = await db.query(
-        `SELECT c.title,
+        `SELECT c.title, c.reference_code,
                 COALESCE((SELECT json_agg(json_build_object('standard', s.code, 'ref', sc.ref_code))
                             FROM control_mappings cm
                             JOIN standard_controls sc ON sc.id = cm.standard_control_id
@@ -528,7 +528,7 @@ async function useCirks(req, res, next) {
                            WHERE cm.control_id = c.id), '[]'::json) AS refs
            FROM controls c WHERE c.id = $1`, [req.params.id]);
       if (!c.rows.length) return { status: 404, error: 'Control objective not found.' };
-      const why = cirksReasonFor(c.rows[0].refs);
+      const why = cirksReasonFor(c.rows[0].refs, c.rows[0].reference_code);
       if (!why) return { status: 400, error: 'CIRKS does not deliver this control objective. Choose or create the security solution that does.' };
 
       // The component: CIRKS, once for the organisation. Created operational: the

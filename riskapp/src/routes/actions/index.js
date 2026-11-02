@@ -582,11 +582,7 @@ router.get('/roll-up', canRead, async (req, res, next) => {
              sai.owner_user_id AS item_owner_id, iow.full_name AS item_owner_name,
              sai.control_id, c.title AS control_title,
              c.owner_user_id AS control_owner_id, cow.full_name AS control_owner_name,
-             (SELECT sc2.ref_code FROM control_mappings cm
-                JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-                JOIN standards s2 ON s2.id = sc2.standard_id
-               WHERE cm.control_id = sai.control_id
-               ORDER BY s2.sort_index, sc2.sort_index LIMIT 1) AS framework_ref,
+             (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = sai.control_id) AS framework_ref,
              sai.component_id, cc.name AS component_name, cc.component_type
         FROM security_action_items sai
         JOIN security_actions sa ON sa.id = sai.action_id
@@ -729,11 +725,7 @@ router.get('/:id', canRead, async (req, res, next) => {
              sai.comment, sai.completed_at, sai.completed_by,
              sys.name AS system_name, sys.owner_user_id AS system_owner_user_id,
              c.title  AS control_title,
-             (SELECT sc2.ref_code FROM control_mappings cm
-                JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-                JOIN standards s2 ON s2.id = sc2.standard_id
-               WHERE cm.control_id = sai.control_id
-               ORDER BY s2.sort_index, sc2.sort_index LIMIT 1) AS framework_ref,
+             (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = sai.control_id) AS framework_ref,
              cc.name AS component_name, cc.component_type,
              sai.owner_user_id, ow.full_name AS owner_name, ow.role AS owner_role,
              cbu.full_name AS completed_by_name, cbu.role AS completed_by_role,

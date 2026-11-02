@@ -38,14 +38,14 @@ node db/import.js db/dataset/misty-isles/data --password '<password>'
 
 Then the operational tier, through the real API as each persona. Start the API
 against the new database first (`npm start`, or the container), set
-`CIRKS_PASSWORD='<password>'` (the last two scripts sign in with it), then:
+`CIRKS_PASSWORD='<password>'` (the scripts sign in with it), then:
 
 ```bash
+node db/dataset/misty-isles/architecture.js --base <api>  # the security architecture (v148) and each system's answers
+node db/dataset/misty-isles/objective-solutions.js --base <api>  # a security solution for every objective that needs one (v153)
 node db/isms-cycle.js --base <api>                    # a first risk portfolio, actions, exceptions, one SWG meeting
 node db/isms-cycle.js --base <api> --assess-backlog   # assess the rest (four systems held back, deliberately)
 node db/dataset/misty-isles/story-cycle.js --base <api>   # the story's problems bite; a backlog; a year of history
-node db/dataset/misty-isles/architecture.js --base <api>  # the security architecture (v148) and each system's answers
-node db/dataset/misty-isles/objective-solutions.js --base <api>  # a security solution for every objective that needs one (v153)
 ```
 
 `architecture.js` is idempotent and also brings an existing instance up to date.
@@ -59,12 +59,43 @@ the roadmap), and moving history back to the dates it happened.
 administrator can sign in, with the password typed at the start; set any other
 account's password on Admin → Account Management (or `node db/reset-password.js`).
 
-What a build produces (checked 2026-10-15 with `install.js`, schema 0159): 12
-departments, 31 people, 52 systems, 228 risks (77 at or above the
+**The order matters.** The estate is settled (the architecture and the
+security solutions) before any risk is assessed, because each control is judged
+from its status at that moment. Assessed first and settled after, 24 risks were
+left scored against statuses that had since changed (fixed 2026-10-28).
+
+What a build produces (checked 2026-10-28 with `install.js`, schema 0163): 12
+departments, 31 people, 52 systems, 227 risks (69 at or above the
 mandatory-action score of 12), all from the story's deliberate problems; a
-validation backlog; 5 security actions across the past year, some overdue; 5 exceptions, one lapsed into the breach queue;
+validation backlog; 8 security actions — 3 awaiting acceptance, 3 under way on
+the story's own problems, 2 finished — and no work ever lands on a deliberately
+degraded part, so every problem in §6 of the sheet is still there; 5 exceptions, one lapsed into the breach queue;
 four quarterly review cycles, three closed and signed off, each with a minuted SWG
 meeting.
+
+## The story is checked on every change
+
+The application changes independently of this dataset, and a change can stop the
+story being true without breaking any test. On 2026-10-28 the install was found
+to mend Approach radar's out-of-date Wazuh agents in every build, a problem the
+walkthrough asks people to find.
+
+So what a build promises is written down in `story-promises.js`: the counts
+above, every deliberately degraded part, and the facts the walkthrough's
+exercises depend on. The CI job **Misty Isles story check** builds the dataset
+with the real `install.js` and runs `story-check.js` against it, for every pull
+request that touches `riskapp/`. Run it yourself against any freshly built
+instance:
+
+```bash
+node db/dataset/misty-isles/story-check.js
+```
+
+**When it fails**, the application's own tests may all be green: this check is
+about the story. Decide consciously. Either the change broke the story (fix
+the change), or the story has legitimately changed (update `story-promises.js`
+and the documents that quote it, `docs/INSTALL.md`, the top-level `README.md`
+and `docs/dataset/misty-isles-walkthrough.md`, in the same pull request).
 
 ## What the story guarantees
 

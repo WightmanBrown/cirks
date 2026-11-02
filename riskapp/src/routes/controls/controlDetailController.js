@@ -6,8 +6,8 @@ const { query } = require('../../db/pool');
 const { CIRKS_NAME, cirksReasonFor } = require('../../lib/cirksDelivers');
 
 // CIRKS itself can deliver this objective: the reason, and whether it is chosen.
-function cirksSuggestion(standardRefs, patterns) {
-  const why = cirksReasonFor(standardRefs);
+function cirksSuggestion(standardRefs, patterns, referenceCode) {
+  const why = cirksReasonFor(standardRefs, referenceCode);
   return why && { ...why, chosen: patterns.some((p) => p.name.toLowerCase() === CIRKS_NAME.toLowerCase()) };
 }
 
@@ -27,7 +27,8 @@ async function getControl(req, res, next) {
            (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status,
            c.is_baseline,
            c.owner_user_id,
-           c.reference_code,
+           c.reference_code, c.subject,
+           vcr.framework, vcr.framework_label, vcr.framework_ref,
            c.delivery,
            ow.full_name AS owner_name,
            ru.full_name AS rated_by_name,
@@ -44,6 +45,7 @@ async function getControl(req, res, next) {
              WHERE cm.control_id = c.id
            ), '[]'::json) AS standard_refs
          FROM controls c
+         JOIN v_control_reference vcr ON vcr.control_id = c.id
          LEFT JOIN users ru ON ru.id = c.rated_by
          LEFT JOIN users cu ON cu.id = c.created_by
          LEFT JOIN users ow ON ow.id = c.owner_user_id
@@ -185,11 +187,7 @@ async function getControl(req, res, next) {
     }
 
     const control = controlResult.rows[0];
-    // Primary mapped reference for legacy framework/framework_ref consumers.
-    // An objective mapped to no standard is CUSTOM and shows its own reference.
-    control.framework       = control.standard_refs?.[0]?.standard ?? 'custom';
-    control.framework_label = control.standard_refs?.[0]?.standard_name ?? 'Custom';
-    control.framework_ref   = control.standard_refs?.[0]?.ref ?? control.reference_code ?? null;
+    // framework/framework_label/framework_ref: from v_control_reference (v162).
 
     // A read-out of how well the objective is being met, for anyone who opens it.
     const byStatus = Object.fromEntries((deployResult?.rows || []).map(r => [r.status, r.n]));
@@ -238,7 +236,7 @@ async function getControl(req, res, next) {
       delivery_by_system: deliveryBySystem,
       // CIRKS itself can deliver this objective (lib/cirksDelivers.js): the reason,
       // and whether it has been chosen. Only a suggestion until someone chooses it.
-      cirks: cirksSuggestion(control.standard_refs, deliveryPatterns),
+      cirks: cirksSuggestion(control.standard_refs, deliveryPatterns, control.reference_code),
     });
   } catch (err) {
     next(err);

@@ -32,8 +32,9 @@ const STANDARD_REFS_SUBQUERY = `
 async function getControls(req, res, next) {
   const { framework, type, status, needs_rating, q } = req.query;
 
-  // 'custom' = objectives mapped to no standard: the organisation's own.
-  if (framework && framework !== 'custom' && !STANDARD_CODE.test(framework)) {
+  // 'cirks' = the shipped CIRKS objectives; 'custom' = the organisation's own
+  // (v_control_reference, v162); any other code = mapped to that standard.
+  if (framework && framework !== 'custom' && framework !== 'cirks' && !STANDARD_CODE.test(framework)) {
     return res.status(400).json({ error: `Invalid standard: ${framework}` });
   }
   if (type && !VALID_TYPES.has(type)) {
@@ -53,8 +54,9 @@ async function getControls(req, res, next) {
         SELECT 1 FROM control_mappings cm JOIN standard_controls sc ON sc.id = cm.standard_control_id
         WHERE cm.control_id = c.id AND sc.ref_code ILIKE $${params.length}))`);
     }
-    if (framework === 'custom') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM control_mappings cm WHERE cm.control_id = c.id)`);
+    if (framework === 'custom' || framework === 'cirks') {
+      params.push(framework);
+      conditions.push(`vcr.framework = $${params.length}`);
     } else if (framework) {
       params.push(framework);
       conditions.push(`EXISTS (
@@ -90,7 +92,7 @@ async function getControls(req, res, next) {
            vcs.status,
            c.is_baseline,
            c.owner_user_id,
-           c.reference_code,
+           c.reference_code, c.subject, vcr.framework, vcr.framework_label, vcr.framework_ref,
            ow.full_name AS owner_name,
            u.full_name AS rated_by_name,
            c.rated_at,
@@ -98,6 +100,7 @@ async function getControls(req, res, next) {
            ${STANDARD_REFS_SUBQUERY}
          FROM controls c
          JOIN v_control_status vcs ON vcs.control_id = c.id
+         JOIN v_control_reference vcr ON vcr.control_id = c.id
          LEFT JOIN users u  ON u.id  = c.rated_by
          LEFT JOIN users ow ON ow.id = c.owner_user_id
          ${whereClause}
@@ -118,15 +121,10 @@ async function getControls(req, res, next) {
       ),
     ]);
 
-    // Surface the primary mapped reference as framework/framework_ref so existing
-    // list UIs keep working; standard_refs carries the full mapping set.
-    const controls = listResult.rows.map(r => ({
-      ...r,
-      // An objective mapped to no standard is CUSTOM and shows its own reference.
-      framework:       r.standard_refs?.[0]?.standard ?? 'custom',
-      framework_label: r.standard_refs?.[0]?.name ?? 'Custom',
-      framework_ref:   r.standard_refs?.[0]?.ref ?? r.reference_code ?? null,
-    }));
+    // framework/framework_ref come from v_control_reference (v162): a shipped CIRKS
+    // objective under its own reference, otherwise its first mapped standard,
+    // otherwise Custom. standard_refs carries the full mapping set.
+    const controls = listResult.rows;
 
     res.json({
       controls,

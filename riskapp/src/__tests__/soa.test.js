@@ -351,19 +351,42 @@ describe('deriveRequirement — a requirement read through the controls mapped t
   const { deriveRequirement } = require('../routes/soa');
   const ctl = (o) => ({ decided: true, applicable: true, coverage: 'full', implementation_status: 'implemented', justification: null, drivers: [], ...o });
 
-  it('covered by any applicable full mapping, at the best status among them', () => {
-    const d = deriveRequirement([ctl({ implementation_status: 'planned' }), ctl({ implementation_status: 'partial' })]);
-    expect(d).toMatchObject({ state: 'covered', applicable: true, implementation_status: 'partial' });
+  // The owner's rule (2026-10-28): met only when EVERY mapped objective is in place.
+  it('covered only when every mapped objective is implemented: 100%, nothing falls short', () => {
+    const d = deriveRequirement([ctl({ control_id: 'a' }), ctl({ control_id: 'b' })]);
+    expect(d).toMatchObject({ state: 'covered', applicable: true, implementation_status: 'implemented',
+                              implemented_count: 2, counted: 2, percent: 100, shortfalls: [] });
   });
 
-  it('only partial mappings: partly covered, and never better than partial', () => {
-    const d = deriveRequirement([ctl({ coverage: 'partial', implementation_status: 'implemented' })]);
-    expect(d).toMatchObject({ state: 'partial', implementation_status: 'partial' });
+  it('one objective short of implemented: partly covered, and it names the shortfall', () => {
+    const d = deriveRequirement([ctl({ control_id: 'a', title: 'EDR' }),
+                                 ctl({ control_id: 'b', title: 'NIDS', implementation_status: 'not_implemented' })]);
+    expect(d).toMatchObject({ state: 'partial', implementation_status: 'partial', percent: 50,
+                              shortfalls: [{ control_id: 'b', title: 'NIDS', status: 'not_implemented' }] });
   });
 
-  it('a full mapping to a not-applicable control does not cover; an applicable partial one partly does', () => {
-    const d = deriveRequirement([ctl({ applicable: false }), ctl({ coverage: 'partial' })]);
-    expect(d.state).toBe('partial');
+  it('marking a mapping full or partial no longer decides anything', () => {
+    expect(deriveRequirement([ctl({ coverage: 'partial' })])).toMatchObject({ state: 'covered', percent: 100 });
+  });
+
+  it('nothing implemented but work under way: partly covered, at planned when nothing is partial', () => {
+    expect(deriveRequirement([ctl({ implementation_status: 'planned' }), ctl({ implementation_status: 'not_implemented' })]))
+      .toMatchObject({ state: 'partial', implementation_status: 'planned', percent: 0 });
+  });
+
+  it('applicable objectives none of which has started: a gap, with each named', () => {
+    const d = deriveRequirement([ctl({ control_id: 'a', implementation_status: 'not_implemented' })]);
+    expect(d).toMatchObject({ state: 'gap', applicable: true, percent: 0, shortfalls: [{ control_id: 'a', status: 'not_implemented' }] });
+  });
+
+  it('an objective ruled not applicable leaves the calculation; the rest decide', () => {
+    expect(deriveRequirement([ctl({ applicable: false }), ctl({ control_id: 'b' })]))
+      .toMatchObject({ state: 'covered', counted: 1, percent: 100 });
+  });
+
+  it('an undecided objective counts as a shortfall: nobody can say it is in place', () => {
+    const d = deriveRequirement([ctl({ control_id: 'a' }), ctl({ control_id: 'b', decided: false, applicable: false })]);
+    expect(d).toMatchObject({ state: 'partial', percent: 50, shortfalls: [{ control_id: 'b', status: 'not_decided' }] });
   });
 
   it('an explicit exclusion wins over an applicable control and carries its own reason', () => {
@@ -384,7 +407,7 @@ describe('deriveRequirement — a requirement read through the controls mapped t
     expect(deriveRequirement([]).state).toBe('gap');
   });
 
-  it('drivers and justifications are the union of the controls that cover it', () => {
+  it('drivers and justifications are the union of the applicable objectives', () => {
     const d = deriveRequirement([ctl({ drivers: ['legal'], justification: 'A' }), ctl({ drivers: ['business', 'legal'], justification: 'B' })]);
     expect(d.drivers).toEqual(['business', 'legal']);
     expect(d.justification).toBe('A; B');

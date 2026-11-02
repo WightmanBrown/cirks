@@ -144,12 +144,8 @@ router.get('/:id/controls', canView, async (req, res, next) => {
     const { rows } = await query(
       `SELECT c.id, c.title, c.control_type,
               c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status, c.is_baseline,
-              (SELECT s.code FROM control_mappings cm JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-               JOIN standards s ON s.id = sc2.standard_id WHERE cm.control_id = c.id
-               ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework,
-              (SELECT sc2.ref_code FROM control_mappings cm JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-               JOIN standards s ON s.id = sc2.standard_id WHERE cm.control_id = c.id
-               ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework_ref,
+              (SELECT vcr.framework FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework,
+              (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref,
               ct.id AS link_id, ct.notes
        FROM control_threats ct
        JOIN controls c ON c.id = ct.control_id
@@ -179,12 +175,8 @@ router.post('/:id/controls', canWriteControlLink, async (req, res, next) => {
     const { rows } = await query(
       `SELECT c.id, c.title, c.control_type,
               c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status, c.is_baseline,
-              (SELECT s.code FROM control_mappings cm JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-               JOIN standards s ON s.id = sc2.standard_id WHERE cm.control_id = c.id
-               ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework,
-              (SELECT sc2.ref_code FROM control_mappings cm JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-               JOIN standards s ON s.id = sc2.standard_id WHERE cm.control_id = c.id
-               ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework_ref,
+              (SELECT vcr.framework FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework,
+              (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref,
               ct.id AS link_id, ct.notes
        FROM control_threats ct
        JOIN controls c ON c.id = ct.control_id

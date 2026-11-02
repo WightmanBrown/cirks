@@ -80,7 +80,7 @@ INSERT INTO controls (id, title, description, control_type, created_by) VALUES
 -- ── standards registry + reference catalogues + mappings (v87) ────────────────────
 INSERT INTO standards (code, name, version, publisher, is_active, is_enabled, license, sort_index, bundled) VALUES
   ('iso27001',    'ISO/IEC 27001',                  '2022',  'ISO',  TRUE, TRUE, 'Copyrighted (ISO) — paraphrased; reference only', 1, TRUE),
-  ('cis_v8',      'CIS Critical Security Controls', 'v8',    'CIS',  TRUE, TRUE, 'CC BY-NC-SA 4.0 — import your own copy',          2, FALSE),
+  ('cis_v8',      'CIS Critical Security Controls', 'v8.1',  'CIS',  TRUE, TRUE, 'CC BY-NC-SA 4.0 — import your own copy',          2, FALSE),
   ('nist_csf',    'NIST Cybersecurity Framework',   '2.0',   'NIST', TRUE, TRUE, 'Public domain (US Government work)',              3, TRUE),
   ('nist_800_53', 'NIST SP 800-53',                 'Rev 5', 'NIST', TRUE, TRUE, 'Public domain (US Government work)',              4, TRUE)
 ON CONFLICT (code) DO NOTHING;

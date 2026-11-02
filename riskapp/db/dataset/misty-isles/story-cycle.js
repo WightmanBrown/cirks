@@ -71,7 +71,7 @@ const STORY_RISKS = [
   ['MIG Corporate Email', 'Phishing targeting user credentials', [5, 1, 1],
     'Mailboxes sit on an Exchange 2019 server out of support since October 2025, without modern authentication or MFA for Outlook on the web. Credential phishing is the most likely route in and nothing on the server limits it.'],
   ['MIG Corporate Email', 'Exploitation of an unpatched vulnerability', [4, 4, 4],
-    'Exchange 2019 no longer receives security updates. Patching (PR.PS-02) cannot help, and the server faces the internet.'],
+    'Exchange 2019 no longer receives security updates. Patching (SVM-03) cannot help, and the server faces the internet.'],
   ['MIG Corporate Email', 'Exploitation of a public-facing application', [4, 4, 3],
     'Outlook on the web is published directly; with the server out of support, a public exploit would not be patched.'],
   ['Water Distribution', 'Ransomware', [3, 5, 5],
@@ -130,7 +130,7 @@ async function storyRisks({ t }) {
     if (await tolerate(() => api(t.ciso, 'POST', `/governance/risks/${r.id}/validate`, { action: 'validate' }), `validate ${r.label}`)) validated++;
   }
   const { rows } = await query(`SELECT r.risk_score, s.name, t.name AS threat FROM risks r JOIN systems s ON s.id = r.system_id JOIN threats t ON t.id = r.threat_id
-    WHERE r.id = ANY($1) ORDER BY r.risk_score DESC`, [made.map((m) => m.id)]);
+    WHERE r.id = ANY($1) ORDER BY r.risk_score DESC, s.name, t.name`, [made.map((m) => m.id)]);
   for (const r of rows) log(`   ${String(r.risk_score).padStart(2)}  ${r.threat} — ${r.name}`);
   log(`   ✓ ${made.length} story risks, ${validated} validated`);
 }
@@ -182,7 +182,13 @@ async function actions({ t }) {
       FROM risks r JOIN systems s ON s.id = r.system_id JOIN threats t ON t.id = r.threat_id
      WHERE r.is_active AND r.validation_status = 'validated' AND r.risk_score >= 12
        AND NOT EXISTS (SELECT 1 FROM security_action_risks sar WHERE sar.risk_id = r.id)
-     ORDER BY r.risk_score DESC, s.name LIMIT 30`);
+     ORDER BY r.risk_score DESC, s.name, t.name DESC LIMIT 30`);
+  // Every tie is broken, so every build picks the same 30. Without the threat
+  // name, two risks on one system with one score came back in either order, and
+  // the 30th place went to MIG Backup's Ransomware (no candidates) or its
+  // Unauthorised data modification (the BitLocker action whose item is completed)
+  // — 7 actions in one build and 6 in the next (story check, 2026-10-29). Z to A
+  // keeps the latter inside the 30, which is the build the documents describe.
   const built = [];
   for (const r of risks) {
     const cand = await tolerate(() => api(t.analyst, 'GET', `/risks/${r.id}/action-items/candidates`), `candidates for ${r.threat_name} / ${r.system_name}`);
@@ -199,20 +205,48 @@ async function actions({ t }) {
       `action for ${r.threat_name} / ${r.system_name}`);
     if (a?.id) built.push({ risk: r, id: a.id });
   }
-  // Accept all but three (the acceptance queue is never empty in a live ISMS).
-  const accept = built.slice(0, Math.max(0, built.length - 3));
-  for (const b of accept) await tolerate(() => api(t.ciso, 'POST', `/risks/${b.risk.id}/actions/${b.id}/accept`, {}), `accept ${b.id}`);
-  // Work lands on the first third: their first item completes — but never on the
-  // story's own problems, which are still open (§6 of the sheet).
+  // Work lands on accepted actions — but never on the story's own problems,
+  // which are still open (§6 of the sheet).
   const storyIds = new Set((await query(`
     SELECT r.id FROM risks r JOIN systems s ON s.id = r.system_id JOIN threats t ON t.id = r.threat_id
      WHERE (s.name, t.name) IN (${STORY_RISKS.map((_, k) => `($${2 * k + 1}, $${2 * k + 2})`).join(', ')})`,
     STORY_RISKS.flatMap(([sys, th]) => [sys, th]))).rows.map((r) => r.id));
+  // Leave three in the acceptance queue (it is never empty in a live ISMS) and
+  // accept the rest — counting every proposed action, not only those built here,
+  // since isms-cycle.js proposes some too. The ones that are NOT the story's
+  // problems are accepted first: an estate settled before it is assessed has few
+  // gaps, so few actions, and the only accepted ones could otherwise all be story
+  // problems, on which no work lands.
+  const { rows: proposed } = await query(`
+    SELECT a.id, r.id AS risk_id, r.risk_score
+      FROM security_actions a
+      JOIN security_action_risks sar ON sar.action_id = a.id
+      JOIN risks r ON r.id = sar.risk_id
+     WHERE a.accepted_at IS NULL
+     ORDER BY r.risk_score DESC, a.created_at`);
+  const queue = proposed.map((p) => ({ id: p.id, risk: { id: p.risk_id } }));
+  const ordered = [...queue.filter((b) => !storyIds.has(b.risk.id)), ...queue.filter((b) => storyIds.has(b.risk.id))];
+  const accept = ordered.slice(0, Math.max(0, ordered.length - 3));
+  for (const b of accept) await tolerate(() => api(t.ciso, 'POST', `/risks/${b.risk.id}/actions/${b.id}/accept`, {}), `accept ${b.id}`);
   const workable = accept.filter((b) => !storyIds.has(b.risk.id));
   let done = 0;
-  for (const b of workable.slice(0, Math.ceil(workable.length / 2))) {
+  // Every deliberate problem is a DEGRADED part with a reason (build.js
+  // DEGRADED_PARTS), and another risk's action can name the same part — so work
+  // never lands on a degraded part, whichever risk the action is for. Completing
+  // one would mend the story (Water Distribution's Veeam restore test, 2026-10-28).
+  const { rows: degradedRows } = await query(`
+    SELECT sai.id FROM security_action_items sai
+      JOIN system_components sc ON sc.system_id = sai.system_id AND sc.component_id = sai.component_id
+     WHERE sc.status = 'degraded'`);
+  const onDegradedPart = new Set(degradedRows.map((d) => d.id));
+  // Work lands on half of the workable actions — the first ones with an item that
+  // can be done, not simply the first half, which may hold nothing but story parts.
+  const wanted = Math.ceil(workable.length / 2);
+  for (const b of workable) {
+    if (done >= wanted) break;
     const list = await tolerate(() => api(t.ciso, 'GET', `/risks/${b.risk.id}/actions`), 'read actions');
-    const item = (Array.isArray(list) ? list.find((x) => x.id === b.id) : null)?.items?.find((i) => i.status !== 'completed');
+    const item = (Array.isArray(list) ? list.find((x) => x.id === b.id) : null)?.items
+      ?.find((i) => i.status !== 'completed' && !onDegradedPart.has(i.id));
     if (!item) continue;
     const body = item.element_type === 'control' ? { probability_c: item.target_p_c ?? 2, probability_i: item.target_p_i ?? 2, probability_a: item.target_p_a ?? 2 } : {};
     if (await tolerate(() => api(t.ciso, 'POST', `/risks/${b.risk.id}/action-items/${item.id}/complete`, body), `complete ${item.id}`)) done++;

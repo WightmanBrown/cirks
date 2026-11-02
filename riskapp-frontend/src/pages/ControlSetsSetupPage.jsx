@@ -17,8 +17,8 @@ import styles from './ControlSetsSetupPage.module.css';
 // The "select & import control sets" setup step (v87 Phase B). An org's controls are
 // CIRKS-native; each standard (ISO/CIS/NIST) is a reference lens its controls map to.
 // Here an admin enables standards and imports their reference catalogues + the
-// crosswalk. Only NIST CSF 2.0 ships with bundled text (public domain); ISO and
-// CIS ship none and are imported here under the organisation's own licence.
+// crosswalk. Only NIST CSF 2.0 ships with its wording (public domain); ISO and
+// CIS ship as reference numbers only; a licensed copy uploaded here gives them words.
 export function ControlSetsSetupPage() {
   const { hasCapability } = useAuth();
   const navigate = useNavigate();
@@ -78,7 +78,7 @@ export function ControlSetsSetupPage() {
           </p>
           <p className={styles.desc}>
             A <b>control objective</b> is a job to be done. The Control Library holds the ideal set:
-            NIST CSF 2.0 ships as the default, and you can add your own. Tick one{' '}
+            the CIRKS control objectives ship with CIRKS, and you can add your own. Tick one{' '}
             <em>applicable</em> in the Statement of Applicability to adopt it; you then build and
             rate the <b>control</b> that meets it — the components that together do the job.
             A <b>standard requirement</b> is a standard&apos;s own text, in its own numbering. You only
@@ -86,16 +86,17 @@ export function ControlSetsSetupPage() {
             control objectives. (ISO 27001 calls its requirements &ldquo;Annex A controls&rdquo;.)
           </p>
           <p className={styles.desc}>
-            Only NIST CSF 2.0 ships with CIRKS — it is a public-domain US Government work. Every
-            other standard you load yourself: ISO/IEC 27001 is copyrighted and CIS is licensed
-            non-commercially, so import your own licensed copy of either.
+            ISO/IEC 27001, CIS Controls v8.1 and NIST CSF 2.0 ship as reporting sets, already mapped to
+            the CIRKS control objectives. NIST CSF is a public-domain US Government work and ships with its
+            wording. ISO is copyrighted and CIS is licensed non-commercially, so they ship as reference
+            numbers only: upload your own licensed copy on their cards and the numbers gain their words.
           </p>
         </div>
 
         {error && <div className={styles.errorBanner} role="alert">{error}</div>}
         {result && (
           <div className={styles.resultBanner} role="status">
-            <strong>{result.label}:</strong> imported {result.imported}, skipped {result.skipped}.
+            <strong>{result.label}:</strong> imported {result.imported}{result.updated ? `, wording updated on ${result.updated}` : ''}, skipped {result.skipped}.
             {result.errors?.length > 0 && (
               <ul className={styles.errList}>
                 {result.errors.slice(0, 8).map((e, i) => <li key={i}>Row {e.row}: {e.message}</li>)}

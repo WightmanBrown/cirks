@@ -87,6 +87,8 @@ const RULES = [
   // Containment is not on the OS rule: on an Azure server it would ask for a
   // Falcon agent that Defender replaces. A threat that calls for it gets a choice.
   ['Wazuh agent (OT)', OT_NETS],
+  // Network isolation delivers Zoning and segregation (CS-04), not Containment and
+  // recovery: its effect on an incident is secondary (owner, 2026-10-28/29).
   ['Network isolation', OT_NETS],
   ['Syslog to Wazuh (network appliances)', ['Cisco IOS XE V26 26.1.1', 'PAN-OS']],
   ['Configuration backup (network appliances)', ['Cisco IOS XE V26 26.1.1']],

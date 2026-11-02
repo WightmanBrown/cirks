@@ -204,3 +204,79 @@ jobs:
           npm run migrate            # fresh DB → baseline + pending migrations (exercises the runner)
           psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f test/e2e/db/seed.sql
       - run: npm run test:integration
+
+  misty-isles-story:
+    name: Misty Isles story check (the training dataset, not the app)
+    runs-on: ubuntu-latest
+    # A full Misty Isles build takes about 21 minutes on a GitHub runner (8 here).
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: riskapp
+    # The application changes independently of the training dataset, and a change
+    # can stop the story being true without breaking any test: on 2026-10-28 the
+    # install was found to mend Approach radar's out-of-date Wazuh agents in every
+    # build, a problem the walkthrough asks people to find. This job builds Misty
+    # Isles with the real install.js and checks every promise in
+    # db/dataset/misty-isles/story-promises.js. When it fails, the job name, the
+    # annotations and the summary all say that the STORY CHECK is the reason.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: riskapp_story
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_story
+      JWT_ACCESS_SECRET: story-check-access-secret-not-used-anywhere-else
+      JWT_REFRESH_SECRET: story-check-refresh-secret-not-used-anywhere-else
+      PORT: '3000'
+      AUTH_RATE_LIMIT_MAX: '100000'   # the install signs in as many people, many times
+      ADMIN_PASSWORD: Story-Check-Pass-2026
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # to see whether this pull request touches riskapp/
+      - name: Does this change touch the application or the dataset?
+        id: scope
+        working-directory: .
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] \
+             && git diff --quiet "origin/${{ github.base_ref }}...HEAD" -- riskapp/; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing under riskapp/ changed: the story cannot have changed. Skipped." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.scope.outputs.run == 'true'
+        with:
+          node-version: '24'
+          check-latest: true
+          cache: npm
+          cache-dependency-path: riskapp/package-lock.json
+      - if: steps.scope.outputs.run == 'true'
+        run: npm ci
+      - name: An empty CIRKS, as a new installation has
+        if: steps.scope.outputs.run == 'true'
+        run: |
+          node db/migrate.js up
+          node db/seed.js
+      - name: Build Misty Isles with the real install.js
+        if: steps.scope.outputs.run == 'true'
+        run: |
+          node src/server.js > /tmp/api.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:3000/health > /dev/null && break; sleep 1; done
+          node db/dataset/misty-isles/install.js --base http://127.0.0.1:3000/api/v1 \
+            || { echo "::error title=Misty Isles story check could not build the dataset::install.js failed — see this step's log"; tail -40 /tmp/api.log; exit 1; }
+      - name: Check the story's promises
+        if: steps.scope.outputs.run == 'true'
+        run: node db/dataset/misty-isles/story-check.js

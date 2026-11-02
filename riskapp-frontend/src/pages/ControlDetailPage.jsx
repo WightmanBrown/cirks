@@ -34,8 +34,9 @@ import { DeliveryPatternsSection } from '../components/DeliveryPatternsSection';
 // where components and a component graph mean nothing.
 
 const FRAMEWORK_LABELS = {
+  cirks:    'CIRKS',
   iso27001: 'ISO 27001',
-  cis_v8:   'CIS v8',
+  cis_v8:   'CIS v8.1',
   nist_csf: 'NIST CSF',
   custom:   'Custom',
 };

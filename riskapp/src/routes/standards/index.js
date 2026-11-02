@@ -89,6 +89,12 @@ router.patch('/:id', canImport, async (req, res, next) => {
 // Import a standard's REFERENCE catalogue from CSV → standard_controls.
 // Columns: ref_code (required), title (required), description, grouping,
 // implementation_group (1–3). Idempotent on (standard_id, ref_code).
+//
+// A requirement that already exists takes the uploaded wording. CIRKS ships the
+// ISO and CIS requirements as reference numbers only (their text is licensed),
+// with the mappings onto its objectives; an organisation that holds a licence
+// uploads its own copy here and the numbers gain their words. The order CIRKS
+// ships (sort_index) is kept; a blank uploaded field never erases a value.
 router.post('/:id/controls/import', canImport, async (req, res, next) => {
   try {
     await runUpload(req, res);
@@ -142,12 +148,19 @@ router.post('/:id/controls/import', canImport, async (req, res, next) => {
     const result = await query(
       `INSERT INTO standard_controls (standard_id, ref_code, title, description, grouping, implementation_group, sort_index)
        VALUES ${placeholders.join(',')}
-       ON CONFLICT (standard_id, ref_code) DO NOTHING
-       RETURNING id`,
+       ON CONFLICT (standard_id, ref_code) DO UPDATE SET
+         title                = EXCLUDED.title,
+         description          = COALESCE(EXCLUDED.description, standard_controls.description),
+         grouping             = COALESCE(EXCLUDED.grouping, standard_controls.grouping),
+         implementation_group = COALESCE(EXCLUDED.implementation_group, standard_controls.implementation_group),
+         sort_index           = COALESCE(standard_controls.sort_index, EXCLUDED.sort_index),
+         updated_at           = now()
+       RETURNING (xmax = 0) AS inserted`,
       params
     );
-    const imported = result.rowCount;
-    res.status(201).json({ imported, skipped: valid.length - imported, errors });
+    const imported = result.rows.filter(r => r.inserted).length;
+    const updated  = result.rows.length - imported;
+    res.status(201).json({ imported, updated, skipped: valid.length - result.rows.length, errors });
   } catch (err) { next(err); }
 });
 

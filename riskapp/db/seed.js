@@ -16,8 +16,9 @@
 //                         single source of truth src/auth/capabilityDefaults.js.
 //                         Seeded ONLY when the table is empty, so a later admin
 //                         RBAC edit is never clobbered on restart.
-//   * NIST CSF 2.0      — the bundled native control catalogue + reference +
-//                         mapping (only when no native controls exist yet).
+//   * NIST CSF 2.0      — the reporting set's requirements (every boot)
+//   * CIRKS objectives  — the shipped library, with ISO 27001, CIS v8.1 and NIST
+//                         CSF mapped onto it (only when no objectives exist yet).
 //
 // Deliberately seeds NO users — create the first admin with db/create-admin.js.
 // Connection resolves like src/db/pool.js (DATABASE_URL or DB_*).
@@ -27,6 +28,7 @@ const fs = require('fs');
 const path = require('path');
 const { pool } = require('../src/db/pool');
 const capabilityDefaults = require('../src/auth/capabilityDefaults');
+const { loadCirksObjectives } = require('./seed/cirksObjectives');
 
 const SEED_DIR = path.join(__dirname, 'seed');
 const readSql = (f) => fs.readFileSync(path.join(SEED_DIR, f), 'utf8');
@@ -90,21 +92,28 @@ async function main() {
       'SELECT count(*) n FROM bil_reference_levels')} level descriptors across ${await count(client,
       'SELECT count(*) n FROM bil_subcategories')} sub-categories).`);
 
-    // ── NIST CSF 2.0 catalogue (only when no native controls exist) ──────────
+    // ── NIST CSF 2.0, a reporting set: its requirements, on every boot ───────
+    await client.query(readSql('nist_csf_reference.sql'));
+    console.log(`[seed] NIST CSF 2.0 reference ensured (${await count(client,
+      `SELECT count(*) n FROM standard_controls sc JOIN standards s ON s.id = sc.standard_id WHERE s.code = 'nist_csf'`)} requirements).`);
+
+    // ── The CIRKS control objectives (only when no objectives exist) ─────────
+    // The library CIRKS ships since v1.1, with ISO 27001, CIS v8.1 and NIST CSF
+    // mapped onto it (db/seed/cirksObjectives.js). An install whose library is
+    // already there, NIST or its own, is never touched.
     const controlCount = await count(client, 'SELECT count(*) n FROM controls');
     if (controlCount === 0) {
-      console.log('[seed] loading bundled NIST CSF 2.0 catalogue…');
-      await client.query(readSql('nist_csf_catalogue.sql'));
-      console.log(`[seed] NIST CSF catalogue loaded (${await count(client,
-        'SELECT count(*) n FROM controls')} native controls).`);
-      // The supplier control sets (v143) resolve through this catalogue, so a
-      // fresh install seeds them here — the migration ran before it existed.
-      // Only alongside the catalogue load, never on every boot: an objective an
-      // organisation removed from a set must stay removed.
+      console.log('[seed] loading the CIRKS control objectives…');
+      const loaded = await loadCirksObjectives(client);
+      console.log(`[seed] CIRKS control objectives loaded (${loaded.objectives} objectives, ${loaded.mappings} mappings to ISO 27001, CIS v8.1 and NIST CSF).`);
+      // The supplier control sets (v143, CIRKS objectives since v163) need the
+      // library, so a fresh install seeds them here. Only alongside the library
+      // load, never on every boot: an objective an organisation removed from a
+      // set must stay removed.
       const { rows } = await client.query('SELECT seed_supplier_type_objectives() AS n');
       console.log(`[seed] supplier control sets seeded (${rows[0].n} objectives).`);
     } else {
-      console.log(`[seed] controls already present (${controlCount}) — skipping NIST CSF load.`);
+      console.log(`[seed] control objectives already present (${controlCount}) — library left untouched.`);
     }
 
     console.log('[seed] done.');

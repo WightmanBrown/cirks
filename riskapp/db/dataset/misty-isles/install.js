@@ -20,11 +20,15 @@
 //   1. build.js            the architecture tier from the story, into a temporary
 //                          directory (the container's root filesystem is read-only)
 //   2. import.js           loads it — every account gets the demo password
-//   3. isms-cycle.js       a first risk portfolio, actions, exceptions, a meeting
-//   4. isms-cycle.js --assess-backlog
-//   5. story-cycle.js      the story's problems bite; a year of history
-//   6. architecture.js     the security architecture and each system's answers
-//   7. objective-solutions.js   a security solution for every objective that needs one
+//   3. architecture.js     the security architecture and each system's answers
+//   4. objective-solutions.js   a security solution for every objective that needs one
+//   5. isms-cycle.js       a first risk portfolio, actions, exceptions, a meeting
+//   6. isms-cycle.js --assess-backlog
+//   7. story-cycle.js      the story's problems bite; a year of history
+//
+// The estate is settled (3, 4) BEFORE any risk is assessed (5–7): each control
+// is judged from its status at the time, so judging first and settling after
+// left risks scored against statuses that later changed (24 of them, 2026-10-28).
 //   8. lock every account except the administrator
 //
 // The steps sign in as Misty Isles people (the CISO, the analyst, …), so while
@@ -119,11 +123,11 @@ async function lockPersonas() {
   step(1, 'build the organisation from the story', 'db/dataset/misty-isles/build.js', ['--out', dir]);
   step(2, 'import it', 'db/import.js', [dir, '--password', PASSWORD], pw);
   fs.rmSync(dir, { recursive: true, force: true });
-  step(3, 'first risk portfolio', 'db/isms-cycle.js', ['--base', BASE], pw);
-  step(4, 'assess the backlog', 'db/isms-cycle.js', ['--base', BASE, '--assess-backlog'], pw);
-  step(5, 'a year of history', 'db/dataset/misty-isles/story-cycle.js', ['--base', BASE], pw);
-  step(6, 'security architecture', 'db/dataset/misty-isles/architecture.js', ['--base', BASE], pw);
-  step(7, 'security solutions for objectives', 'db/dataset/misty-isles/objective-solutions.js', ['--base', BASE], pw);
+  step(3, 'security architecture', 'db/dataset/misty-isles/architecture.js', ['--base', BASE], pw);
+  step(4, 'security solutions for objectives', 'db/dataset/misty-isles/objective-solutions.js', ['--base', BASE], pw);
+  step(5, 'first risk portfolio', 'db/isms-cycle.js', ['--base', BASE], pw);
+  step(6, 'assess the backlog', 'db/isms-cycle.js', ['--base', BASE, '--assess-backlog'], pw);
+  step(7, 'a year of history', 'db/dataset/misty-isles/story-cycle.js', ['--base', BASE], pw);
   await lockPersonas();
   await pool.end();
 

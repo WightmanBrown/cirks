@@ -5,12 +5,12 @@ two forms:
 
 - **A. A training instance** loaded with **Misty Isles Government (MIG)**, a
   fictional organisation with a year of risk management already done: about 50
-  systems, 228 risks, security actions, exceptions and minuted meetings. Use it
+  systems, 227 risks, security actions, exceptions and minuted meetings. Use it
   to learn CIRKS, to demonstrate it, or to try things out. **Never put real
   information in it.**
 - **B. Your organisation's instance**: an empty CIRKS holding only its reference
-  data (roles and permissions, the NIST CSF 2.0 control objectives, impact
-  descriptors). You load your organisation into it.
+  data (roles and permissions, the CIRKS control objectives mapped to ISO
+  27001, CIS Controls and NIST CSF, impact descriptors). You load your organisation into it.
 
 Parts 1 and 2 are the same for both. Part 3A or 3B then makes it one or the
 other. Use **separate machines** (or VMs) for the two: one CIRKS per machine, and
@@ -321,10 +321,10 @@ information.
 > For an unattended build, give the password in the environment instead of at
 > the prompt: `docker compose exec -e ADMIN_PASSWORD='…' app node riskapp/db/dataset/misty-isles/install.js`.
 
-What you get (checked 2026-10-15): 12 departments, 31 people, 52 systems and 228
-risks — 77 at or above the mandatory-action score of 12, from the story's
-deliberate problems — with a validation backlog, 5 security actions, 5
-exceptions (one lapsed), 5 meetings and 4 quarterly review cycles. Dates are
+What you get (checked 2026-10-28): 12 departments, 31 people, 52 systems and 227
+risks — 69 at or above the mandatory-action score of 12, from the story's
+deliberate problems — with a validation backlog, 8 security actions (3 awaiting
+acceptance), 5 exceptions (one lapsed), 5 meetings and 4 quarterly review cycles. Dates are
 relative to the day you run it. The story behind it is
 [`dataset/misty-isles-architecture.md`](dataset/misty-isles-architecture.md).
 To find your way around it role by role, read the walkthrough,

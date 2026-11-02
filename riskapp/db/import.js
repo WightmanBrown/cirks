@@ -702,6 +702,13 @@ async function run(opts) {
     // record land together, and the settle's audit rows carry the same actor.
     if (totalImported > 0) {
       await ctx.actor().catch(() => null);   // attribution only; settling does not need it
+      // Statistics first: the tables were empty a moment ago, and without them the
+      // planner plans the settle (here and for the application's next writes)
+      // blind. Seen 2026-10-28: architecture.js run straight after an import
+      // stalled 9–15 minutes on one settle until autovacuum caught up. ANALYZE
+      // may run in the transaction and sees its rows; a role that does not own a
+      // table gets a warning for it, not an error.
+      await client.query('ANALYZE');
       const t0 = Date.now();
       const { rows: [{ n }] } = await client.query('SELECT settle_system_security() AS n');
       console.log(`  security record: settled, ${n} change${n === 1 ? '' : 's'} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);

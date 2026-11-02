@@ -11,6 +11,50 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.1.0
+
+CIRKS now ships its own control objectives, and a standard's requirement counts
+as met only when everything mapped to it is in place.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. Three
+migrations run by themselves when CIRKS starts (v161 to v163). **Your existing
+control objectives are not changed:** the CIRKS objectives load only into a new
+installation's empty library. After upgrading, expect some requirements in the
+Statement of Applicability to read *partly covered* where they read *covered*
+before (see below).
+
+- **CIRKS control objectives.** A new installation's library is now 156 CIRKS
+  control objectives (references such as `CIRKS1.SVM-03`), written for CIRKS
+  and grouped by subject, rather than NIST CSF 2.0. They are mapped onto every
+  NIST CSF 2.0 subcategory, every ISO 27001:2022 clause and Annex A control,
+  and every CIS Controls v8.1 safeguard, so those standards become ways of
+  reporting on the one library. NIST ships with its wording. ISO and CIS ship
+  as reference numbers only: upload your licensed copy of a catalogue to give
+  them their words (the upload now fills in the wording of requirements that
+  already exist). The Control Library has a *CIRKS* filter, and *Custom* now
+  means objectives your organisation wrote itself.
+- **A requirement is met only when every objective mapped to it is in place.**
+  In the Statement of Applicability, a standard's requirement is *covered* only
+  when every control objective mapped to it is implemented, *partly covered*
+  when some are implemented or under way, and a *gap* when none has started.
+  Each requirement shows how many of its objectives are implemented and names
+  the ones that fall short; the CSV export adds both. An objective ruled not
+  applicable is left out; one nobody has decided counts against the
+  requirement. Before, any one objective covered a requirement, which
+  overstated coverage wherever several objectives map to one requirement.
+- **CIS Controls registered as v8.1** (v161).
+- **Starting supplier control sets** are stated in CIRKS objectives for new
+  installations (v163).
+- **The Misty Isles training dataset is built in CIRKS objectives**, settles
+  each system's security before assessing its risks, and builds the same data
+  every time: 227 risks (69 at or above 12), 8 security actions (3 awaiting
+  acceptance, 3 under way, 2 finished) and all 34 deliberate problems intact.
+  A new automated check builds it for every change and fails if the dataset
+  stops telling the story the walkthrough describes.
+- **Templates README** links each template file and explains
+  `starter-threats.csv`.
+- **Security update:** `qs` 6.16.2 (GHSA-6pq8-jhm2-2vcw).
+
 ## v1.0.6
 
 A guide to the Misty Isles training dataset. Nothing in CIRKS itself changes.

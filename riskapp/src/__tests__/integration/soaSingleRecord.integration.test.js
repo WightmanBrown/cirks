@@ -46,7 +46,10 @@ describe('a standard is a lens on the one record', () => {
     try {
       expect((await patch(`/api/v1/soa/${MFA}`, { implementation_status: 'partial' })).status).toBe(200);
       const res = await get('/api/v1/soa?framework=iso27001');
-      expect(find(res.body, REF_1)).toMatchObject({ requirement_state: 'covered', implementation_status: 'partial' });
+      // Met only when every mapped objective is in place (owner, 2026-10-28): one
+      // objective partly in place leaves the requirement partly covered, and names it.
+      expect(find(res.body, REF_1)).toMatchObject({ requirement_state: 'partial', implementation_status: 'partial', percent: 0 });
+      expect(find(res.body, REF_1).shortfalls.map(f => f.control_id)).toEqual([MFA]);
 
       // Excluding the control, with a reason, excludes the requirement it alone meets.
       await patch(`/api/v1/soa/${MFA}`, { applicable: false, justification: 'No privileged accounts' });
@@ -135,7 +138,9 @@ describe('standards come from the registry, not a list in the code', () => {
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({ framework: 'int_test_std', framework_label: 'Integration Test Standard' });
     expect(res.body.groups.map(g => g.label)).toEqual(['Invented section']);
-    expect(find(res.body, reqId).requirement_state).toBe('partial');
+    // Its one mapping is marked 'partial', which no longer decides anything: the
+    // objective behind it is implemented, so the requirement is met.
+    expect(find(res.body, reqId)).toMatchObject({ requirement_state: 'covered', percent: 100 });
   });
 
   it('the overlap shows on the control in the record', async () => {

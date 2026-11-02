@@ -442,7 +442,7 @@ async function buildActions(tokens, personas) {
       JOIN threats t ON t.id = r.threat_id
      WHERE r.is_active AND r.risk_score >= $1
        AND NOT EXISTS (SELECT 1 FROM security_action_risks sar WHERE sar.risk_id = r.id)
-     ORDER BY r.risk_score DESC`, [threshold]);
+     ORDER BY r.risk_score DESC, s.name, t.name`, [threshold]);
 
   log(`   ${candidates.length} risks at or above the mandatory action score (${threshold})`);
   const built = [];
@@ -491,14 +491,24 @@ async function buildActions(tokens, personas) {
   ok(`${accepted} accepted, ${built.length - accepted} left in the acceptance queue`);
 
   // Complete a third of the accepted actions' items so remediation shows real
-  // progress and the risk scores actually move.
+  // progress and the risk scores actually move — but never an item on a part
+  // someone has recorded as DEGRADED. A degraded part carries a reason (a
+  // dataset's deliberate problem: Misty Isles' out-of-date Wazuh agents, its
+  // failed Veeam restore test); a generic cycle completing it quietly mends the
+  // story, and which part gets mended depended on which actions it happened to
+  // pick (2026-10-28).
+  const { rows: onDegraded } = await query(`
+    SELECT sai.id FROM security_action_items sai
+      JOIN system_components sc ON sc.system_id = sai.system_id AND sc.component_id = sai.component_id
+     WHERE sc.status = 'degraded'`);
+  const onDegradedPart = new Set(onDegraded.map((d) => d.id));
   let completed = 0;
   for (const b of toAccept.slice(0, Math.ceil(toAccept.length / 3))) {
     // GET /risks/:id/actions answers with a bare array, not an envelope.
     const detail = await tolerate(() => api(tokens.ciso, 'GET', `/risks/${b.risk.id}/actions`), `actions for risk ${b.risk.id}`);
     const action = Array.isArray(detail) ? detail.find(a => a.id === b.actionId) : null;
     for (const item of (action?.items || []).slice(0, 2)) {
-      if (item.status === 'completed') continue;
+      if (item.status === 'completed' || onDegradedPart.has(item.id)) continue;
       const r = await tolerate(() => api(tokens.ciso, 'POST', `/risks/${b.risk.id}/action-items/${item.id}/complete`,
         item.element_type === 'control'
           // v120: an item's target is blank unless someone judged one. Completing
@@ -521,7 +531,9 @@ async function acceptExceptions(tokens) {
       JOIN threats t ON t.id = r.threat_id
      WHERE r.is_active AND r.validation_status = 'validated'
        AND NOT EXISTS (SELECT 1 FROM exceptions e WHERE e.risk_id = r.id AND e.status = 'active')
-     ORDER BY r.risk_score DESC LIMIT 3`);
+     -- Ties broken by name: Misty Isles has five risks at 20 behind its two at 25,
+     -- and which one took the third exception changed from build to build.
+     ORDER BY r.risk_score DESC, s.name, t.name LIMIT 3`);
 
   const JUSTIFY = [
     'Remediation requires a plant shutdown that cannot be scheduled before the next maintenance window. Compensating monitoring is in place and reported to the SWG monthly.',

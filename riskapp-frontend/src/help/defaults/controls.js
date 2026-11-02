@@ -3,7 +3,7 @@
 // Draft help text — see index.js.
 export default {
   // ControlLibraryPage
-  'controls.library': { title: 'Control Library', body: 'Every control objective your organisation may adopt: the ideal set, with NIST CSF 2.0 as the default and your own added beside it. Nothing here is done until it is adopted in the Statement of Applicability. Select a row to open the objective.' },
+  'controls.library': { title: 'Control Library', body: 'Every control objective your organisation may adopt: the CIRKS control objectives, with your own added beside them. Nothing here is done until it is adopted in the Statement of Applicability. Select a row to open the objective.' },
   'controls.col.title': { title: 'Title', body: 'What the control objective asks for, in a few words. The full wording is on the objective’s own page.' },
   'controls.col.type': { title: 'Type', body: 'How the control acts: preventive (stops it happening), detective (spots it), corrective (puts it right) or deterrent (discourages it).' },
   'controls.col.status': { title: 'Status', body: 'Derived, never typed in: Not decided (no SoA decision yet), Not applicable, Not assessed (adopted, maturity not rated) or Adopted (adopted and rated).' },
@@ -48,7 +48,7 @@ export default {
   'soa.group': { title: 'Group', body: 'Rows are grouped by the structure of the catalogue or standard they come from. The number is how many rows in the group match the current filters.' },
 
   // ControlSetsSetupPage
-  'setup.control_sets': { title: 'Objectives & standards', body: 'Where control objectives, standards and the mappings between them are loaded. You only need a standard if you report against one. Only NIST CSF 2.0 ships with CIRKS; load your own licensed copy of anything else.' },
+  'setup.control_sets': { title: 'Objectives & standards', body: 'Where control objectives, standards and the mappings between them are loaded. You only need a standard if you report against one. ISO 27001, CIS Controls and NIST CSF ship already mapped to the CIRKS objectives; ISO and CIS as reference numbers only, so upload your licensed copy for their wording.' },
   'setup.step_objectives': { title: 'Control objectives', body: 'Import control objectives into the library from a CSV file. Objectives that already exist are skipped. The library is the ideal set; the SoA decides which apply.' },
   'setup.step_standards': { title: 'Standards and their requirements', body: 'Each standard CIRKS knows about. Upload a standard’s requirements on its card, and enable it to show it as a view on the Statement of Applicability.' },
   'setup.step_mappings': { title: 'Mappings', body: 'Import which control objectives meet which standard requirements, fully or partly. One objective can meet several requirements, and one requirement can need several objectives.' },

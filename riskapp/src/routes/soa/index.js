@@ -30,8 +30,6 @@ const canWrite = requireCapability('controls.write');
 
 const VALID_STATUS  = new Set(['not_implemented', 'planned', 'partial', 'implemented']);
 const VALID_DRIVERS = new Set(['risk', 'legal', 'regulatory', 'contractual', 'business']);
-const STATUS_RANK   = { not_implemented: 0, planned: 1, partial: 2, implemented: 3 };
-const RANKED_STATUS = ['not_implemented', 'planned', 'partial', 'implemented'];
 
 // Annex A theme from the control ref prefix (A.5/A.6/A.7/A.8).
 const THEMES = [
@@ -40,7 +38,9 @@ const THEMES = [
   { key: 'A.7', label: 'Physical' },
   { key: 'A.8', label: 'Technological' },
 ];
+const CLAUSES_THEME = 'Management system (clauses 4–10)';
 function themeForRef(ref) {
+  if (/^\d/.test(ref || '')) return CLAUSES_THEME;
   const t = THEMES.find(t => (ref || '').startsWith(t.key));
   return t ? t.label : 'Other';
 }
@@ -60,6 +60,9 @@ const ALL_VIEW = { key: 'all', label: 'All control objectives', stdCode: null };
 // Still the record (editable, not derived); just filtered. 'custom' is reserved: a
 // standard registered under that code would be unreachable here.
 const CUSTOM_VIEW = { key: 'custom', label: 'Custom control objectives', stdCode: null, customOnly: true };
+// (v162) Custom = the organisation's own: not a shipped CIRKS objective and mapped
+// to no standard (v_control_reference). A CIRKS objective no standard covers, such as
+// the AI ones, is still CIRKS.
 // Objectives mapped to no standard: the organisation's own, under their own reference.
 const UNMAPPED_GROUP = 'Custom control objectives';
 
@@ -92,7 +95,7 @@ function groupRows(view, rows) {
   }
   let keys = [...map.keys()];
   if (view.stdCode === 'iso27001') {
-    const order = THEMES.map(t => t.label);
+    const order = [CLAUSES_THEME, ...THEMES.map(t => t.label)];
     keys.sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
   } else if (view.stdCode === 'cis_v8') {
     const num = g => parseInt(String(g).replace(/[^0-9]/g, ''), 10) || 999;
@@ -108,44 +111,63 @@ function groupRows(view, rows) {
 // `mapped` is each mapped control's SoA facts; `exclusion` is the requirement's own
 // exclusion reason, if one is recorded. Pure, so the rule is testable without a DB.
 //
-//   excluded — an explicit requirement exclusion (it wins even over an applicable
-//              control: that control may serve another standard), OR every mapped
-//              control carries a DECIDED not-applicable entry
-//   covered  — at least one fully mapped control is applicable
-//   partial  — only partially mapped controls are applicable
-//   gap      — anything else: unmapped, or mapped only to undecided controls
+// The owner's rule (2026-10-28): a requirement is met only when EVERY control
+// objective mapped to it is in place. Marking a mapping full or partial was too
+// subjective to carry the answer, so `coverage` no longer decides anything; the
+// mapping itself says "this objective is part of meeting that requirement".
 //
-// A requirement is as implemented as its best applicable full mapping; with only
-// partial mappings it is 'partial' at best.
+//   excluded — an explicit requirement exclusion (it wins even over an applicable
+//              objective: that objective may serve another standard), OR every
+//              mapped objective carries a DECIDED not-applicable entry
+//   covered  — every mapped objective that is not ruled out is implemented
+//   partial  — some are implemented or under way, and some are not
+//   gap      — none is implemented or under way: unmapped, only undecided
+//              objectives, or applicable ones none of which has started
+//
+// An objective ruled not applicable leaves the calculation (it is shown, with its
+// reason); one nobody has decided on counts as a shortfall, because nobody can say
+// it is in place. `shortfalls` names every objective that keeps the requirement
+// from being met, and `percent` is the share of the counted objectives implemented.
 function deriveRequirement(mapped = [], exclusion = null) {
   const justifications = (list) => {
     const seen = [...new Set(list.map(m => (m.justification || '').trim()).filter(Boolean))];
     return seen.length ? seen.join('; ') : null;
   };
-  const best = (list) => RANKED_STATUS[Math.max(0, ...list.map(m => STATUS_RANK[m.implementation_status] ?? 0))];
   const drivers = (list) => [...new Set(list.flatMap(m => m.drivers || []))].sort();
+  const none = { implemented_count: 0, counted: 0, percent: null, shortfalls: [] };
 
   if (exclusion && exclusion.trim()) {
     return { state: 'excluded', exclusion: 'explicit', applicable: false,
-             implementation_status: 'not_implemented', justification: exclusion.trim(), drivers: [] };
+             implementation_status: 'not_implemented', justification: exclusion.trim(), drivers: [], ...none };
   }
-  const full    = mapped.filter(m => m.applicable && m.coverage === 'full');
-  const partial = mapped.filter(m => m.applicable && m.coverage !== 'full');
-  if (full.length) {
-    return { state: 'covered', exclusion: null, applicable: true,
-             implementation_status: best(full), justification: justifications(full), drivers: drivers(full) };
+  const ruledOut = (m) => m.decided && !m.applicable;
+  const counted = mapped.filter(m => !ruledOut(m));
+  if (!counted.length) {
+    if (mapped.length) {
+      return { state: 'excluded', exclusion: 'inherited', applicable: false,
+               implementation_status: 'not_implemented', justification: justifications(mapped), drivers: [], ...none };
+    }
+    return { state: 'gap', exclusion: null, applicable: false,
+             implementation_status: 'not_implemented', justification: null, drivers: [], ...none };
   }
-  if (partial.length) {
-    const status = RANKED_STATUS[Math.min(STATUS_RANK.partial, STATUS_RANK[best(partial)])];
-    return { state: 'partial', exclusion: null, applicable: true,
-             implementation_status: status, justification: justifications(partial), drivers: drivers(partial) };
+  const applicable = counted.filter(m => m.decided && m.applicable);
+  const implemented = applicable.filter(m => m.implementation_status === 'implemented');
+  const underWay = applicable.filter(m => m.implementation_status === 'partial' || m.implementation_status === 'planned');
+  const shortfalls = counted.filter(m => !(m.decided && m.applicable && m.implementation_status === 'implemented'))
+    .map(m => ({ control_id: m.control_id, title: m.title,
+                 status: m.decided ? m.implementation_status : 'not_decided' }));
+  const tally = { implemented_count: implemented.length, counted: counted.length,
+                  percent: Math.round((100 * implemented.length) / counted.length), shortfalls };
+  const shared = { exclusion: null, applicable: applicable.length > 0,
+                   justification: justifications(applicable), drivers: drivers(applicable), ...tally };
+
+  if (!shortfalls.length) return { state: 'covered', implementation_status: 'implemented', ...shared };
+  if (implemented.length || underWay.length) {
+    // The requirement is never better than partial while anything falls short.
+    const status = implemented.length || underWay.some(m => m.implementation_status === 'partial') ? 'partial' : 'planned';
+    return { state: 'partial', implementation_status: status, ...shared };
   }
-  if (mapped.length && mapped.every(m => m.decided && !m.applicable)) {
-    return { state: 'excluded', exclusion: 'inherited', applicable: false,
-             implementation_status: 'not_implemented', justification: justifications(mapped), drivers: [] };
-  }
-  return { state: 'gap', exclusion: null, applicable: false,
-           implementation_status: 'not_implemented', justification: null, drivers: [] };
+  return { state: 'gap', implementation_status: 'not_implemented', ...shared };
 }
 
 // Fetch the live SoA rows for a view. Both shapes carry `control_id` (a controls.id
@@ -157,6 +179,7 @@ async function fetchSoaRows(view = ALL_VIEW) {
     // mapped standard, carrying ALL its mappings so overlap is visible.
     const { rows } = await query(`
       SELECT c.id AS control_id, 'control'::text AS entry_kind, c.title, c.description, vcs.status, c.reference_code,
+             c.subject, vcr.framework AS reference_framework,
              c.effectiveness, c.effectiveness_notes, c.rated_at, ru.full_name AS rated_by_name, c.delivery,
              COALESCE(se.applicable, FALSE)                        AS applicable,
              COALESCE(se.drivers, '{}')                            AS drivers,
@@ -173,6 +196,7 @@ async function fetchSoaRows(view = ALL_VIEW) {
              COALESCE(scp.list, '[]'::json)                        AS scopes
       FROM controls c
       JOIN v_control_status vcs ON vcs.control_id = c.id
+      JOIN v_control_reference vcr ON vcr.control_id = c.id
       LEFT JOIN soa_entries se ON se.control_id = c.id
       LEFT JOIN v_control_implementation vci ON vci.control_id = c.id
       LEFT JOIN users u        ON u.id = se.owner_user_id
@@ -194,20 +218,34 @@ async function fetchSoaRows(view = ALL_VIEW) {
     `);
     const { rows: stds } = await query(`SELECT name FROM standards ORDER BY sort_index, name`);
     const stdOrder = stds.map(s => s.name);
+    const subjects = new Set();
     for (const r of rows) {
       r.drivers       = r.drivers || [];
       r.standard_refs = r.standard_refs || [];
       r.scopes        = r.scopes || [];
       const primary   = r.standard_refs[0];
-      r.ref           = primary ? primary.ref : (r.reference_code || null);
-      r.sort_index    = primary ? primary.sort_index : null;
-      r.group         = primary ? primary.name : UNMAPPED_GROUP;
+      if (r.reference_framework === 'cirks') {
+        // A shipped CIRKS objective: under its own reference, grouped by subject (v162).
+        r.ref = r.reference_code; r.sort_index = r.reference_code; r.group = r.subject || 'CIRKS';
+        subjects.add(r.group);
+      } else {
+        r.ref           = primary ? primary.ref : (r.reference_code || null);
+        r.sort_index    = primary ? primary.sort_index : null;
+        r.group         = primary ? primary.name : UNMAPPED_GROUP;
+      }
     }
-    const rank = g => { const i = stdOrder.indexOf(g); return i === -1 ? 999 : i; };
+    // CIRKS subjects first (alphabetically), then standards in registry order, the
+    // organisation's own unmapped objectives last.
+    const subjectOrder = [...subjects].sort((a, b) => a.localeCompare(b));
+    const rank = g => {
+      const s = subjectOrder.indexOf(g);
+      if (s !== -1) return s - 1000;
+      const i = stdOrder.indexOf(g); return i === -1 ? 999 : i;
+    };
     rows.sort((a, b) => (rank(a.group) - rank(b.group))
       || String(a.sort_index ?? '').localeCompare(String(b.sort_index ?? ''))
       || byRef(a, b) || a.title.localeCompare(b.title));
-    return view.customOnly ? rows.filter(r => r.standard_refs.length === 0) : rows;
+    return view.customOnly ? rows.filter(r => r.reference_framework === 'custom') : rows;
   }
 
   // A standard's lens: its requirements, each derived from the mapped controls.
@@ -247,6 +285,10 @@ async function fetchSoaRows(view = ALL_VIEW) {
     r.implementation_status = d.implementation_status;
     r.justification         = d.justification;
     r.drivers               = d.drivers;
+    r.implemented_count     = d.implemented_count;
+    r.counted               = d.counted;
+    r.percent               = d.percent;
+    r.shortfalls            = d.shortfalls;
     r.group                 = requirementGroup(view.stdCode, r.ref, r.grouping);
   }
   // The standard's own order (sort_index; NIST's was repaired in v125), with a
@@ -264,13 +306,15 @@ function soaCsv(rows, view = ALL_VIEW) {
   };
   const isStd = !!view.stdCode;
   const header = isStd
-    ? ['Reference', view.stdCode === 'iso27001' ? 'Theme' : 'Group', 'Requirement', 'Description', 'State', 'Implementation status', 'Justification', 'Mapped controls']
+    ? ['Reference', view.stdCode === 'iso27001' ? 'Theme' : 'Group', 'Requirement', 'Description', 'State', 'Implementation status',
+       'Objectives implemented (%)', 'Falls short on', 'Justification', 'Mapped control objectives']
     : ['Reference', 'Standards', 'Control', 'Description', 'Applicable', 'Drivers', 'Justification', 'Implementation status', 'Implementation description', 'Owner'];
   const lines = [header.join(',')];
   for (const r of rows) {
     lines.push((isStd
-      ? [r.ref, r.group, r.title, r.description, r.requirement_state, r.implementation_status, r.justification,
-         (r.mapped_controls || []).map(m => `${m.title} (${m.coverage})`).join('; ')]
+      ? [r.ref, r.group, r.title, r.description, r.requirement_state, r.implementation_status,
+         r.percent ?? '', (r.shortfalls || []).map(f => `${f.title} (${f.status.replace(/_/g, ' ')})`).join('; '), r.justification,
+         (r.mapped_controls || []).map(m => `${m.title} (${!m.decided ? 'not decided' : m.applicable ? m.implementation_status.replace(/_/g, ' ') : 'not applicable'})`).join('; ')]
       : [r.ref, (r.standard_refs || []).map(s => `${s.name} ${s.ref}`).join('; '), r.title, r.description,
          r.applicable ? 'Yes' : 'No', (r.drivers || []).join('; '), r.justification, r.implementation_status,
          r.implementation_description, r.owner_name]

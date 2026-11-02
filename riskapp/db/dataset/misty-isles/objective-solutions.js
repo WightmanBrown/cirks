@@ -31,7 +31,7 @@ if (!PASSWORD) { console.error('Set CIRKS_PASSWORD to the password of the accoun
 const STANDARD = 'MIG Security Architecture Standard';
 
 // ── The owner's answers ──────────────────────────────────────────────────────
-// Q3: BitLocker and FileVault as technology components. Q2: PR.IR-03 is
+// Q3: BitLocker and FileVault as technology components. Q2: BRR-05 is
 // failover, not backup, so the failover arrangement is a thing a system has.
 const NEW_COMPONENTS = [
   ['BitLocker', 'technology', 'Full-disk encryption on Windows desktops and servers.'],
@@ -41,18 +41,18 @@ const NEW_COMPONENTS = [
 
 // §2 — the solution already does this job; the library just did not say so.
 const ADD_TO_EXISTING = {
-  'DE.AE-02': ['CrowdStrike EDR', 'Microsoft Defender for Servers (Azure)', 'Wazuh agent (OT)', 'Syslog to Wazuh (network appliances)', 'Provided by the supplier'],
-  'PR.AA-01': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],
-  'PR.AA-03': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],
-  'PR.AA-04': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],        // Q1: yes
-  'RC.RP-02': ['Veeam backup', 'Azure Backup', 'Microsoft 365 Backup', 'Configuration backup (network appliances)', 'Provided by the supplier'],
+  'CIRKS1.DM-08': ['CrowdStrike EDR', 'Microsoft Defender for Servers (Azure)', 'Wazuh agent (OT)', 'Syslog to Wazuh (network appliances)', 'Provided by the supplier'],
+  'CIRKS1.IDA-01': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],
+  'CIRKS1.IDA-04': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],
+  'CIRKS1.IDA-05': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],        // Q1: yes
+  'CIRKS1.IR-09': ['Veeam backup', 'Azure Backup', 'Microsoft 365 Backup', 'Configuration backup (network appliances)', 'Provided by the supplier'],
 };
 
 // §3 — new solutions. parts: [component, where]; triggers: components that imply it.
 // Q4: one per facility. Bank Street is recorded operational and The Castle
 // degraded, so the two on-premises datacentres read good and degraded as the
 // owner asked, from the facilities' own state.
-const DATACENTRE = ['PR.AA-06', 'DE.CM-02', 'PR.IR-02'];
+const DATACENTRE = ['CIRKS1.PHY-02', 'CIRKS1.PHY-04', 'CIRKS1.PHY-05'];
 const WINDOWS = ['Windows 10', 'Windows 11', 'Windows Server 2016', 'Windows Server 2025'];
 const NEW_SOLUTIONS = [
   { name: 'Secure datacentre — Bank Street', was: 'Secure Datacentre', delivers: DATACENTRE,
@@ -61,32 +61,32 @@ const NEW_SOLUTIONS = [
     parts: [['The Castle server room', 'organisation'], ['Physical security', 'organisation']], triggers: ['The Castle server room'] },
   { name: 'Secure datacentre — Shark Point', delivers: DATACENTRE,
     parts: [['Shark Point Server Room', 'organisation'], ['Physical security', 'organisation']], triggers: ['Shark Point Server Room'] },
-  { name: 'Secure premises — MIG Official Premises', delivers: ['PR.AA-06'],
+  { name: 'Secure premises — MIG Official Premises', delivers: ['CIRKS1.PHY-02'],
     parts: [['MIG Official Premises', 'organisation'], ['Physical security', 'organisation']], triggers: ['MIG Official Premises'] },
-  { name: 'Patch and configuration management (ME End-Point Central)', delivers: ['PR.PS-01', 'PR.PS-02'],
+  { name: 'Patch and configuration management (ME End-Point Central)', delivers: ['CIRKS1.CVM-01', 'CIRKS1.SVM-03'],
     parts: [['ME End-Point Central', 'organisation'], ['IT Administrators', 'organisation'],
             ['System configuration', 'organisation'], ['Vulnerability management', 'organisation']],
     triggers: [...WINDOWS, 'Ubuntu Server 24.04 LTS', 'AlmaLinux 9'] },
-  { name: 'Data-at-rest encryption (BitLocker)', delivers: ['PR.DS-01'], onSystem: 'BitLocker', preserveOn: WINDOWS,
+  { name: 'Data-at-rest encryption (BitLocker)', delivers: ['CIRKS1.DCH-04'], onSystem: 'BitLocker', preserveOn: WINDOWS,
     parts: [['BitLocker', 'on_system'], ['Encryption Standard', 'organisation'],
             ['Data handling policy', 'organisation'], ['Data protection and handling', 'organisation']],
     triggers: WINDOWS },
-  { name: 'Data-at-rest encryption (FileVault)', delivers: ['PR.DS-01'], onSystem: 'FileVault', preserveOn: ['MacOS Sequoia (15)'],
+  { name: 'Data-at-rest encryption (FileVault)', delivers: ['CIRKS1.DCH-04'], onSystem: 'FileVault', preserveOn: ['MacOS Sequoia (15)'],
     parts: [['FileVault', 'on_system'], ['Encryption Standard', 'organisation'],
             ['Data handling policy', 'organisation'], ['Data protection and handling', 'organisation']],
     triggers: ['MacOS Sequoia (15)'] },
   // No trigger: nothing a system is built on says it has failover. It is in
   // place where the arrangement is recorded on the system.
-  { name: 'Failover to the Castle Vaults DR room', delivers: ['PR.IR-03'], onSystem: 'Failover to Castle Vaults DR room',
+  { name: 'Failover to the Castle Vaults DR room', delivers: ['CIRKS1.BRR-05'], onSystem: 'Failover to Castle Vaults DR room',
     parts: [['Failover to Castle Vaults DR room', 'on_system'], ['Castle Vaults DR room', 'organisation'],
             ['Resilience and recovery', 'organisation']],
     triggers: [] },
 ];
 
 // §4 / Q5 — one process for the whole organisation, not something each system has.
-const ORGANISATION_WIDE = ['ID.RA-10', 'DE.CM-06', 'ID.AM-04', 'ID.RA-08', 'ID.AM-01', 'ID.AM-02'];
+const ORGANISATION_WIDE = ['CIRKS1.SCM-03', 'CIRKS1.DM-05', 'CIRKS1.SCM-02', 'CIRKS1.SD-10', 'CIRKS1.EST-03', 'CIRKS1.EST-02'];
 
-// §5 / Q6 — PR.IR-04, PR.PS-03, ID.AM-08, ID.RA-09, PR.PS-06, ID.RA-02: the
+// §5 / Q6 — BRR-07, SVM-04, EST-05, SCM-08, SD-01, IRM-06: the
 // owner is building these by hand. Nothing here touches them.
 
 // ── Plumbing ─────────────────────────────────────────────────────────────────

@@ -160,11 +160,7 @@ router.get('/gap', canRead, async (req, res, next) => {
                  AND sai.status NOT IN ('completed', 'withdrawn')
                  AND sa.status NOT IN ('completed', 'cancelled')
              ) AS has_open_action,
-             (SELECT sc2.ref_code FROM control_mappings cm
-                JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-                JOIN standards s ON s.id = sc2.standard_id
-               WHERE cm.control_id = c.id
-               ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework_ref
+             (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref
         FROM control_threats ct
         JOIN controls c ON c.id = ct.control_id
         JOIN threats t ON t.id = ct.threat_id
@@ -788,11 +784,7 @@ router.get('/:id/actions', canRead, async (req, res, next) => {
                WHERE n.item_id = sai.id
                ORDER BY n.created_at DESC LIMIT 1) AS latest_note,
              c.title AS control_title, cc.name AS component_name, cc.component_type,
-             (SELECT sc2.ref_code FROM control_mappings cm
-                JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-                JOIN standards s ON s.id = sc2.standard_id
-               WHERE cm.control_id = sai.control_id
-               ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework_ref
+             (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = sai.control_id) AS framework_ref
         FROM security_action_items sai
         JOIN security_action_risks sar ON sar.action_id = sai.action_id
         LEFT JOIN users ow ON ow.id = sai.owner_user_id
@@ -1011,12 +1003,8 @@ router.get('/:id', canRead, async (req, res, next) => {
     const { rows: controls } = await query(`
       SELECT c.id, c.title, c.control_type,
              c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status, c.is_baseline,
-             (SELECT s.code FROM control_mappings cm JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-              JOIN standards s ON s.id = sc2.standard_id WHERE cm.control_id = c.id
-              ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework,
-             (SELECT sc2.ref_code FROM control_mappings cm JOIN standard_controls sc2 ON sc2.id = cm.standard_control_id
-              JOIN standards s ON s.id = sc2.standard_id WHERE cm.control_id = c.id
-              ORDER BY s.sort_index, sc2.sort_index LIMIT 1) AS framework_ref,
+             (SELECT vcr.framework FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework,
+             (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref,
              c.effectiveness AS maturity, sc.status AS system_status, sc.created_at AS added_at,
              sc.via AS delivered_via
       FROM v_control_presence sc

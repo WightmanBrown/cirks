@@ -63,8 +63,8 @@ describe('a standard view', () => {
   test('shows each requirement\'s derived state and the controls that meet it', async () => {
     show();
     // The row badges (the summary strip repeats the words, so match the badge's hint).
-    expect(await screen.findByTitle(/At least one fully mapped control objective is applicable/)).toHaveTextContent('Covered');
-    expect(screen.getByTitle(/No applicable control objective meets this requirement/)).toHaveTextContent('Gap');
+    expect(await screen.findByTitle(/Every control objective mapped to this requirement is implemented/)).toHaveTextContent('Covered');
+    expect(screen.getByTitle(/None of the control objectives mapped to this requirement is implemented or under way/)).toHaveTextContent('Gap');
     expect(screen.getByText('Inventories of systems')).toBeInTheDocument();
     expect(screen.getByText('ManageEngine 365')).toBeInTheDocument();
     expect(screen.getByText(/No control objective is mapped/)).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('a standard view', () => {
 
   test('offers no applicability or status controls — those live on the control', async () => {
     show();
-    await screen.findByTitle(/At least one fully mapped control objective is applicable/);
+    await screen.findByTitle(/Every control objective mapped to this requirement is implemented/);
     expect(screen.queryByRole('checkbox', { name: /^Applicable$/ })).not.toBeInTheDocument();
     expect(screen.queryAllByRole('combobox').filter(el => el.value === 'implemented')).toHaveLength(0);
   });

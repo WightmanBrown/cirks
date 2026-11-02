@@ -84,6 +84,19 @@ describe('POST /api/v1/standards/:id/controls/import', () => {
     expect(res.status).toBe(400);
     expect(res.body.error).toMatch(/ref_code/i);
   });
+  it('a requirement CIRKS already ships by number takes the uploaded wording', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ id: 's1' }], rowCount: 1 });                        // standard exists
+    mockQuery.mockResolvedValueOnce({ rows: [{ inserted: false }, { inserted: true }], rowCount: 2 }); // upsert
+    const csv = 'ref_code,title\nA.5.1,Policies for information security\nA.9.9,A new one';
+    const res = await request(app).post('/api/v1/standards/s1/controls/import')
+      .set('Authorization', admin())
+      .attach('file', Buffer.from(csv), { filename: 'cat.csv', contentType: 'text/csv' });
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchObject({ imported: 1, updated: 1, skipped: 0 });
+    const sql = mockQuery.mock.calls[1][0];
+    expect(sql).toMatch(/ON CONFLICT \(standard_id, ref_code\) DO UPDATE/);
+    expect(sql).toMatch(/sort_index\s+= COALESCE\(standard_controls\.sort_index/);
+  });
 });
 
 describe('POST /api/v1/standards/mappings/import', () => {

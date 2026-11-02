@@ -4,6 +4,7 @@ import styles from './ControlBadges.module.css';
 import { OBJECTIVE_STATUS } from '../utils/objectiveStatus';
 
 const FRAMEWORK_LABELS = {
+  cirks:    'CIRKS',
   iso27001: 'ISO',
   cis_v8:   'CIS',
   nist_csf: 'NIST',
