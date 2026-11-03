@@ -55,9 +55,16 @@ describe('what the new system will record, and imply', () => {
   });
 
   test('a group with triggers applies only when one of them is recorded', () => {
-    const groups = [...LIB.groups, { id: 'g-x', name: 'Cloud region', members: [], triggers: [{ id: 'azure' }] }];
+    const groups = [...LIB.groups, { id: 'g-x', name: 'Cloud region', members: [{ id: 'uk-south' }], triggers: [{ id: 'azure' }] }];
     expect(groupsThatApply(groups, [NET]).map(g => g.name)).not.toContain('Cloud region');
     expect(groupsThatApply(groups, [{ id: 'azure' }]).map(g => g.name)).toContain('Cloud region');
+  });
+
+  // v165: the starter template's groups arrive empty; they ask nothing until
+  // the organisation adds its own answers.
+  test('a group with no members is not asked', () => {
+    const groups = [...LIB.groups, { id: 'g-empty', name: 'Support team', members: [], triggers: [] }];
+    expect(groupsThatApply(groups, [NET]).map(g => g.name)).not.toContain('Support team');
   });
 
   test('a security solution is implied by a component that triggers it', () => {

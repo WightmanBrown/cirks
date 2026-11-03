@@ -7,6 +7,7 @@ const bcrypt       = require('bcrypt');
 const authenticate = require('../../middleware/authenticate');
 const { requireCapability } = require('../../auth/permissions');
 const { passwordProblem } = require('../../auth/passwordPolicy');
+const { lockedPasswordHash } = require('../../auth/lockedPassword');
 const { query }    = require('../../db/pool');
 
 const SALT_ROUNDS = 12;
@@ -73,7 +74,7 @@ router.get('/setup-status', async (req, res, next) => {
           description:  'At least one department is required before users, services, and systems can be created.',
           ok:           dept > 0,
           count:        dept,
-          action_path:  '/wizard/department',
+          action_path:  '/departments',
           action_label: 'Set up departments',
         },
         {
@@ -151,8 +152,9 @@ const VALID_ROLES = new Set([
  * the user_roles table.
  *
  * Response: Array<UserRecord>
- * UserRecord: { id, email, full_name, role, is_active, last_login_at,
- *               department_name, additional_roles }
+ * UserRecord: { id, email, full_name, role, is_active, password_set, totp_enabled,
+ *               last_login_at, department_name, additional_roles }
+ * password_set false = nobody can sign in until an administrator sets one (v164).
  */
 router.get('/users', async (req, res, next) => {
   try {
@@ -163,6 +165,8 @@ router.get('/users', async (req, res, next) => {
         u.full_name,
         u.role,
         u.is_active,
+        u.password_set_at IS NOT NULL AS password_set,
+        u.totp_enabled,
         u.last_login_at,
         u.department_id,
         d.name AS department_name,
@@ -380,8 +384,14 @@ async function additionalRoles(userId) {
 }
 
 /**
- * POST /admin/users — create a new account.
- * Body: { email, full_name, role, department_id?, password }
+ * POST /admin/users — create a new account, with sign-in locked.
+ * Body: { email, full_name, role, department_id? }
+ *
+ * The account gets its own random password nobody is told (auth/lockedPassword.js)
+ * and stays active, so it can own risks and actions straight away; nobody can
+ * sign in until an administrator sets a password with reset-password (v164,
+ * owner 2026-11-02). A password in the body is refused rather than ignored, so a
+ * caller written for the old contract finds out.
  */
 router.post('/users', async (req, res, next) => {
   try {
@@ -389,21 +399,24 @@ router.post('/users', async (req, res, next) => {
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'A valid email is required.' });
     if (!full_name || !full_name.trim()) return res.status(400).json({ error: 'full_name is required.' });
     if (!VALID_ROLES.has(role)) return res.status(400).json({ error: `Invalid role: ${role}` });
-    // 12 characters to 72 bytes — the one rule, and why, in auth/passwordPolicy.js.
-    const pwProblem = passwordProblem(password);
-    if (pwProblem) return res.status(400).json({ error: pwProblem });
+    if (password !== undefined) {
+      return res.status(400).json({
+        error: 'A new account is created with sign-in locked. Create it, then set its password.',
+      });
+    }
     if (department_id) {
       const { rows: d } = await query('SELECT 1 FROM departments WHERE id = $1', [department_id]);
       if (!d.length) return res.status(400).json({ error: 'Unknown department.' });
     }
 
-    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+    const password_hash = await lockedPasswordHash(SALT_ROUNDS);
     let rows;
     try {
       ({ rows } = await query(
         `INSERT INTO users (email, full_name, password_hash, role, department_id)
          VALUES ($1, $2, $3, $4, $5)
-         RETURNING id, email, full_name, role, department_id, is_active`,
+         RETURNING id, email, full_name, role, department_id, is_active,
+                   password_set_at IS NOT NULL AS password_set`,
         [email.trim().toLowerCase(), full_name.trim(), password_hash, role, department_id || null],
       ));
     } catch (dbErr) {
@@ -417,7 +430,8 @@ router.post('/users', async (req, res, next) => {
 });
 
 /**
- * POST /admin/users/:id/reset-password — set a new password.
+ * POST /admin/users/:id/reset-password — set a new password. Also how a new
+ * account's sign-in is unlocked: it stamps password_set_at (v164).
  * Body: { password }
  */
 router.post('/users/:id/reset-password', async (req, res, next) => {
@@ -428,7 +442,7 @@ router.post('/users/:id/reset-password', async (req, res, next) => {
     if (pwProblem) return res.status(400).json({ error: pwProblem });
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
     const { rowCount } = await query(
-      'UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2',
+      'UPDATE users SET password_hash = $1, password_set_at = now(), updated_at = now() WHERE id = $2',
       [password_hash, req.params.id],
     );
     if (!rowCount) return res.status(404).json({ error: 'User not found.' });
@@ -442,11 +456,20 @@ router.post('/users/:id/reset-password', async (req, res, next) => {
  */
 router.post('/users/:id/reset-totp', async (req, res, next) => {
   try {
+    // v166: also a set-up left half done, and recorded — clearing someone's
+    // second factor is exactly what an attacker holding an admin session would do.
     const { rowCount } = await query(
-      'UPDATE users SET totp_enabled = FALSE, totp_secret = NULL, updated_at = now() WHERE id = $1',
+      `UPDATE users SET totp_enabled = FALSE, totp_secret = NULL, totp_enabled_at = NULL,
+                        totp_pending_secret = NULL, totp_pending_at = NULL, totp_last_step = NULL, updated_at = now()
+        WHERE id = $1`,
       [req.params.id],
     );
     if (!rowCount) return res.status(404).json({ error: 'User not found.' });
+    await query(
+      `INSERT INTO audit_log (user_id, user_role, entity_type, entity_id, entity_label, action, human_narrative)
+       SELECT $1, $2, 'users', u.id, u.email, 'update', 'Two-factor sign-in cleared by an administrator.'
+         FROM users u WHERE u.id = $3`,
+      [req.user.id, req.user.role, req.params.id]);
     res.json({ id: req.params.id, totp_enabled: false });
   } catch (err) { next(err); }
 });

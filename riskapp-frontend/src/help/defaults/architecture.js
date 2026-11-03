@@ -150,8 +150,6 @@ export default {
   'department_detail.services': { title: 'Business services', body: 'The business services this department owns. A shared service may also be adopted by other departments.' },
 
   // DepartmentSetupWizard
-  'dept_wizard.title': { title: 'Department setup', body: 'Set up a department and catalogue the business services it runs. Pick a department, or create one, to start; you then choose an optional service template and add its services.' },
-  'dept_wizard.col.department': { title: 'Department', body: 'The department’s name. Select a row to set it up or edit it.' },
   'dept_wizard.template': { title: 'Service template', body: 'Optional. Each template lists typical services for a kind of department, such as IT or Finance, as examples to add. Nothing is added until you choose a service. Skip it to add your own.' },
   'dept_wizard.examples': { title: 'Examples', body: 'Services you can add with one click: shared services other departments already run, and examples from the templates you chose.' },
   'dept_wizard.from_org': { title: 'From your organisation', body: 'Shared services that other departments already run. Adopting one lets this department use it without creating a copy.' },
@@ -165,7 +163,7 @@ export default {
   'suppliers.col.relationships': { title: 'Relationships', body: 'The supplier types of this supplier’s relationships, and how many are active out of all recorded. One supplier can be several types.' },
   'suppliers.col.contracted_by': { title: 'Contracted by', body: 'The departments that contract this supplier. Each owns its relationships, and its information asset owner (IAO) is accountable for them.' },
   'suppliers.col.criticality': { title: 'Criticality', body: 'Derived, never typed in: the highest impact of the systems the supplier’s current relationships touch. Business view shows a word; expert view shows the number.' },
-  'suppliers.col.assurance': { title: 'Assurance', body: 'Whether every live relationship has all its supplier control objectives met by current evidence. Gaps are counted, and whether anyone has answered them with an action or an acceptance.' },
+  'suppliers.col.assurance': { title: 'Assurance', body: 'How completely the supplier\u2019s live relationships have their control objectives met by the supplier\u2019s evidence. The ring shows the share met (green), evidenced once but now expired (amber) and never evidenced (red); the centre is the percentage met. Objectives we meet with our own control are not counted. Below it: the relationships with gaps, and whether anyone has answered them with an action or an acceptance.' },
   'supplier_detail.title': { title: 'Supplier', body: 'One supplier, with how critical it is and every relationship we have with it. A supplier with no relationships can be deleted; one with relationships cannot.' },
   'supplier_detail.relationships': { title: 'Relationships', body: 'Each thing we have with this supplier: its type, what it touches, the contract and who is accountable, with its assurance beneath. A relationship that has run its course is set to Ended, not deleted.' },
   'supplier.criticality': { title: 'Criticality', body: 'A supplier is as critical as the most important system its live relationships give it access to: the highest impact rating of the information on that system. Worked out from the systems, never typed in.' },

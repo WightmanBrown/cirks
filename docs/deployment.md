@@ -107,9 +107,8 @@ files (one per dataset) in dependency order.
 # 1. Preview — every row runs and is rolled back:
 docker compose exec app node riskapp/db/import.js /import --dry-run
 
-# 2. Load for real. --password is the starting password for every new account;
-#    there is no default, and a user row without one is refused:
-docker compose exec app node riskapp/db/import.js /import --password '<starting password>'
+# 2. Load for real. Each new account starts with sign-in locked (see below):
+docker compose exec app node riskapp/db/import.js /import
 ```
 
 To get header-only templates, use the capture workbook (`docs/templates/`) or
@@ -141,15 +140,44 @@ is derived from `asset-impact-ratings`, and system/service impact then cascades
 from the linked assets, so import the ratings and the links and the scores
 compute themselves.
 
-**Users are imported** with a starting password: a blank `password` cell takes
-`--password <pw>` (or `DEMO_PASSWORD`). There is no default — a user with no
-password is refused. CIRKS has no self-service password change yet, so an
-administrator then sets each person's own password (Admin → Account Management →
-Reset password). **Not imported here:**
+**Users are imported with sign-in locked** (v164): a person with no password —
+a blank `password` cell and no `--password` / `DEMO_PASSWORD` — gets their own
+random password that nobody is told. The account is active, so it owns its
+risks and actions, but nobody can sign in until an administrator sets a password
+(Admin → Account Management → Set password); the load reports how many accounts
+it locked. A `password` cell, or `--password` for everyone, sets a real password
+instead — for training data, not for a real organisation. CIRKS has no
+self-service password change yet. **Not imported here:**
 the RBAC/capability/standards datasets and the CIRKS control objectives (seeded by `db/seed.js`). The licensed
 wording of ISO and CIS requirements, which ship as reference numbers only, loads via **Setup → Objectives &
 standards**. Owner/manager emails resolve to a user when present,
 else are left unset.
+
+### The CIRKS starter library
+
+What a new organisation would otherwise have to write before CIRKS can do
+anything for it (owner, 2026-11-02). Its files are in `riskapp/db/seed/starter/`,
+in the importer's format.
+
+| What | When a new installation gets it |
+|---|---|
+| **20 threats**, each linked to the CIRKS control objectives that counter it (157 links). A risk's controls are the objectives deployed on its system *and* linked to its threat, so without the links no control reduces a risk | On first start, with the CIRKS objectives (`db/seed.js`), into an empty threat catalogue only |
+| **25 policies, standards and procedures**, *not published*, organisational, each linked to the objectives it supports | When `db/create-admin.js` creates the first administrator, if there are no documents yet (a document needs a creating user) |
+| **Six impact tables**, worded, not published | On demand: **Impact Tables → Starter tables…** (CISO, SIRO, admin) |
+| **Six systems architecture template groups** — connectivity, hosting, operating system, authentication service, support team, user group — created empty | On demand: **Systems architecture template → Add the starter groups**, citing a document (by default the starter *Security architecture standard*). An empty group asks nothing of any system until it has a member |
+
+Nothing is loaded over what is already there. **An installation from before the
+starter library** loads the threats, links and documents with the importer —
+anything already present is skipped:
+
+```bash
+docker compose exec app node riskapp/db/import.js riskapp/db/seed/starter --dry-run
+docker compose exec app node riskapp/db/import.js riskapp/db/seed/starter
+```
+
+The links name CIRKS objectives (v1.1 and later). On an installation whose
+library is still NIST CSF, the threats and documents load and every link is
+reported as an error, because the objective it names is not there.
 
 ## 2. Upgrades (the data-loss guarantee)
 

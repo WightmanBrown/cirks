@@ -23,10 +23,11 @@ vi.mock('../api', () => ({
   listSecuritySolutions: vi.fn(async () => []),
   listComponents: vi.fn(async () => []),
   createArchitectureItem: vi.fn(), deleteArchitectureItem: vi.fn(), updateArchitectureItem: vi.fn(async () => ({})),
+  createStarterGroups: vi.fn(async () => ({ created: ['Connectivity', 'Hosting'], skipped: [] })),
   addArchitectureComponent: vi.fn(), removeArchitectureComponent: vi.fn(),
 }));
 
-import { updateArchitectureItem } from '../api';
+import { updateArchitectureItem, createStarterGroups } from '../api';
 import { ArchitectureTemplatePage, SecurityPatternTriggersPage, ArchitecturePatternsPage } from './ArchitecturePages';
 
 const renderPage = (Page) => render(<MemoryRouter><Page /></MemoryRouter>);
@@ -102,5 +103,27 @@ describe('the security architecture, as three pages', () => {
     renderPage(SecurityPatternTriggersPage);
     await waitFor(() => expect(screen.getByText('Create rule')).toBeInTheDocument());
     expect(screen.getByLabelText('Remove trigger Windows Server 2025')).toBeInTheDocument();
+  });
+
+  // The CIRKS starter template (owner, 2026-11-02): six empty groups citing a
+  // document; only the ones not already there are offered.
+  test('the starter template adds the groups not already there, citing the chosen document', async () => {
+    caps = new Set(['controls.read', 'architecture.write']);
+    renderPage(ArchitectureTemplatePage);
+    const offer = await screen.findByText(/Start from the CIRKS template: Connectivity, Hosting, Operating system/);
+    expect(offer).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Document the template comes from'), { target: { value: 'd1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add the starter groups' }));
+    await waitFor(() => expect(createStarterGroups).toHaveBeenCalledWith({ standard_id: 'd1' }));
+    expect(await screen.findByText('Added Connectivity, Hosting. Add members to each.')).toBeInTheDocument();
+  });
+
+  test('a group with no members says it asks nothing yet', async () => {
+    caps = new Set(['controls.read']);
+    LIB.groups.push({ id: 'g2', name: 'Support team', standard_name: 'MIG Security Architecture Standard',
+                      systems_unanswered: 0, members: [], triggers: [] });
+    renderPage(ArchitectureTemplatePage);
+    expect(await screen.findByText('asks nothing until it has a member')).toBeInTheDocument();
+    LIB.groups.pop();
   });
 });

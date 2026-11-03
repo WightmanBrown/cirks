@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Fragment, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   getImpactTables,
-  createImpactTable,
+  createImpactTable, createStarterImpactTables,
   getImpactTable,
   publishImpactTable,
   setImpactTableMandatory,
@@ -349,6 +349,13 @@ export function ImpactTablesPage() {
   const [newDeptId,   setNewDeptId]   = useState('');
   const [createBusy,  setCreateBusy]  = useState(false);
   const [createError, setCreateError] = useState('');
+  // The CIRKS starter tables (POST /bil/impact-tables/starter): six areas of
+  // harm, created unpublished, owned by the department chosen here.
+  const [starterOpen,  setStarterOpen]  = useState(false);
+  const [starterDept,  setStarterDept]  = useState('');
+  const [starterBusy,  setStarterBusy]  = useState(false);
+  const [starterMsg,   setStarterMsg]   = useState('');
+  const [starterError, setStarterError] = useState('');
 
   const loadTables = useCallback(async () => {
     setLoading(true);
@@ -394,6 +401,24 @@ export function ImpactTablesPage() {
       setCreateError(err.response?.data?.error || 'Create failed');
     } finally {
       setCreateBusy(false);
+    }
+  }
+
+  async function handleStarter() {
+    if (!starterDept) { setStarterError('Choose the department that owns the tables'); return; }
+    setStarterBusy(true); setStarterError(''); setStarterMsg('');
+    try {
+      const { created, skipped } = await createStarterImpactTables({ department_id: starterDept });
+      await loadTables();
+      setStarterOpen(false);
+      setStarterMsg(created.length
+        ? `${created.length} starter table${created.length === 1 ? '' : 's'} created, not published. Read each one, add your own thresholds, then publish it.`
+          + (skipped.length ? ` Already there: ${skipped.join(', ')}.` : '')
+        : `The starter tables are already there: ${skipped.join(', ')}.`);
+    } catch (err) {
+      setStarterError(err.response?.data?.error || 'Could not create the starter tables');
+    } finally {
+      setStarterBusy(false);
     }
   }
 
@@ -443,6 +468,14 @@ export function ImpactTablesPage() {
           </div>
           <div className={styles.headerActions}>
             {!canEdit && <ReadOnlyBadge reason="Your role has view-only access to impact tables." />}
+            {canEdit && canOrg && (
+              <button
+                className={styles.btnSecondary}
+                onClick={() => { setStarterOpen((o) => !o); setStarterDept(user?.department_id || ''); setStarterError(''); setStarterMsg(''); }}
+              >
+                {starterOpen ? 'Cancel' : 'Starter tables…'}
+              </button>
+            )}
             {canEdit && (
               <button
                 className={creating ? styles.btnSecondary : styles.btnPrimary}
@@ -457,6 +490,31 @@ export function ImpactTablesPage() {
         <div className={styles.scopeTabs}>
           <DepartmentScopeFilter {...scopeCtl} setScope={setScope} showShared={false} />
         </div>
+
+        {starterOpen && (
+          <div className={styles.createForm}>
+            <p className={styles.starterText}>
+              Six organisation-wide tables to start from: financial loss, reputation and trust, legal and
+              regulatory, service delivery, personal data and privacy, and health and safety. Each level is
+              described in words, not figures — add your own thresholds where you want them. They are created
+              not published, so nothing can be rated against them until you publish each one. A table whose
+              name is already used is left alone.
+            </p>
+            <select className={styles.createSelect} value={starterDept} onChange={e => setStarterDept(e.target.value)}
+              aria-label="Owning department">
+              <option value="">— department that owns them —</option>
+              {depts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            </select>
+            {starterError && <p className={styles.createError}>{starterError}</p>}
+            <div className={styles.createActions}>
+              <button type="button" className={styles.btnTiny} onClick={() => setStarterOpen(false)}>Cancel</button>
+              <button type="button" className={styles.btnTinyPrimary} disabled={starterBusy} onClick={handleStarter}>
+                {starterBusy ? '…' : 'Create the starter tables'}
+              </button>
+            </div>
+          </div>
+        )}
+        {starterMsg && <p className={styles.starterText} role="status">{starterMsg}</p>}
 
         {creating && (
           <form className={styles.createForm} onSubmit={handleCreate}>

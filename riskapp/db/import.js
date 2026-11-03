@@ -13,12 +13,14 @@
 //   node db/import.js --template <dir>      # write header-only template files
 //
 // Scope = org CONTENT in dependency order, INCLUDING users + user_roles (needed
-// for a self-contained demo/training dataset). Users are bcrypt-hashed with a
-// shared starting password (blank `password` cell → --password / DEMO_PASSWORD
-// env); a per-row `password` overrides it. There is NO built-in fallback: until
-// 2026-10-15 a blank cell silently became 'Riskapp123' — the demo password
-// published in this repository — which on a real installation would have opened
-// every such account with a known password. Now the row is refused instead. RBAC (capabilities /
+// for a self-contained demo/training dataset). A person with no password —
+// a blank `password` cell and no --password / DEMO_PASSWORD — gets their own
+// random password nobody is told (src/auth/lockedPassword.js): the account is
+// active, owns what it owns, and nobody can sign in until an administrator sets
+// a password (v164, owner 2026-11-02). Before that the row was refused, and
+// before 2026-10-15 a blank cell silently became 'Riskapp123' — the demo password
+// published in this repository. A per-row `password`, or --password for everyone
+// (the training dataset uses it), sets a real one instead. RBAC (capabilities /
 // role_permissions) + the NIST catalogue stay seeded by db/seed.js — they are
 // canonical reference data, deliberately NOT spreadsheet-driven. Owner/manager
 // emails resolve to a user when present, else NULL.
@@ -36,6 +38,7 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const { passwordProblem, assertPassword } = require('../src/auth/passwordPolicy');
+const { lockedPasswordHash } = require('../src/auth/lockedPassword');
 const { pool } = require('../src/db/pool');
 const { parse } = require('./csv');
 
@@ -85,6 +88,7 @@ function makeContext(client, actorEmail, demoPassword) {
     q,
     // Shared demo password + department-owner back-fill queue (see the users dataset).
     demoPassword,
+    lockedAccounts: 0,          // people loaded without a password (sign-in locked, v164)
     deptOwnerBackfill: [],
     deptId: (name) => one('dept', 'SELECT id FROM departments WHERE name = $1', [req(name, 'department_name')], `department "${name}"`),
     deptIdOpt: (name) => (txt(name) ? one('dept', 'SELECT id FROM departments WHERE name = $1', [name.trim()], `department "${name}"`) : Promise.resolve(null)),
@@ -156,10 +160,13 @@ const DATASETS = [
       const email = req(r.email, 'email');
       if ((await c.q('SELECT 1 FROM users WHERE lower(email) = lower($1)', [email])).rowCount) return 'skipped';
       const pw = txt(r.password) || c.demoPassword;
-      if (!pw) throw new Error('no password: load with --password <starting password> (or give this row a password)');
-      const pwProblem = passwordProblem(pw);
-      if (pwProblem) throw new Error(`password: ${pwProblem}`);
-      const hash = await bcrypt.hash(pw, BCRYPT_COST);
+      if (pw) {
+        const pwProblem = passwordProblem(pw);
+        if (pwProblem) throw new Error(`password: ${pwProblem}`);
+      }
+      // No password → locked until an administrator sets one; password_set_at
+      // left NULL says so on Account Management.
+      const hash = pw ? await bcrypt.hash(pw, BCRYPT_COST) : await lockedPasswordHash(BCRYPT_COST);
       await insertRow(c, 'users', {
         email,
         full_name: req(r.full_name, 'full_name'),
@@ -169,11 +176,17 @@ const DATASETS = [
         is_active: boolOpt(r.is_active),
         view_mode: defOpt(r.view_mode),
         password_hash: hash,
+        ...(pw ? { password_set_at: new Date() } : {}),
       });
+      if (!pw) c.lockedAccounts++;
       return 'imported';
     },
     // Now that users exist, back-fill department owners left NULL by the cycle.
     after: async (c) => {
+      if (c.lockedAccounts) {
+        console.log(`[import] users: ${c.lockedAccounts} account(s) loaded with sign-in locked — set each`
+          + ' password on Admin → Account Management before that person can sign in');
+      }
       for (const { name, email } of c.deptOwnerBackfill) {
         const uid = await c.userId(email);
         if (uid) await c.q('UPDATE departments SET owner_user_id = $1 WHERE name = $2 AND owner_user_id IS NULL', [uid, name]);

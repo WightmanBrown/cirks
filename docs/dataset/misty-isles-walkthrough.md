@@ -71,7 +71,7 @@ Several Misty Isles people hold more than one role, which saves you unlocking lo
 
 1. Sign in as A.James@mig.local with the password you chose at install.
 2. Open **Admin**, then **Account Management**.
-3. Find the person's row and choose **Reset password**, type a training password of at least 12 characters, then **Set**.
+3. Find the person's row (it says *sign-in locked*) and choose **Set password**, type a training password of at least 12 characters, then **Set**. On an instance built before this was added, the button reads **Reset password**.
 4. Repeat for each account in the table. Using one shared training password for all of them is fine on a training box.
 5. Choose **Sign out** (top right) and sign in as the next person.
 
@@ -293,7 +293,7 @@ Work through the roles in this order, because it follows the flow of real work. 
 
 **Things to try.**
 
-1. Open **Risk Management, Business Departments** to see the department setup wizard, the way a new organisation is entered by hand.
+1. Open **Business Architecture, Organisation**, choose a department and press **Set up services** to see how a department's business services are entered by hand.
 2. Open **Business Architecture, Systems** and start creating a system to see the questions the wizard asks, then cancel.
 
 **What to notice.** Do not complete the handover unless you have a snapshot; it cannot be undone. This role matters when you load a real organisation, much less for day-to-day use.

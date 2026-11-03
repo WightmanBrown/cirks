@@ -6,7 +6,8 @@ const { Router }   = require('express');
 const authenticate = require('../../middleware/authenticate');
 const { requireCapability } = require('../../auth/permissions');
 const { assertWriteScope } = require('../../auth/scoping');
-const { query }    = require('../../db/pool');
+const { query, pool } = require('../../db/pool');
+const { STARTER_TABLES } = require('./starterTables');
 const { recomputeAssetCia } = require('../assets/recomputeAssetCia');
 
 const router = Router();
@@ -140,6 +141,55 @@ router.get('/impact-tables', canView, async (req, res, next) => {
     }
     res.json(rows);
   } catch (err) { next(err); }
+});
+
+// ── POST /bil/impact-tables/starter ──────────────────────────────────────────
+// The CIRKS starter tables (starterTables.js): six organisation-wide areas of
+// harm with their level wording, created UNPUBLISHED for the organisation to
+// read, adapt and publish. Same rules as creating an organisation-scope table by
+// hand. A table whose name is already used is left alone, so pressing it twice
+// adds nothing. Body: { department_id? } — the owning department, defaulting to
+// the creator's.
+router.post('/impact-tables/starter', canEdit, async (req, res, next) => {
+  if (!['ciso', 'siro', 'admin'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'only ciso, siro or admin can create organisation-scope tables' });
+  }
+  const client = await pool.connect();
+  try {
+    const dept = req.body?.department_id
+      || (await client.query('SELECT department_id FROM users WHERE id=$1', [req.user.id])).rows[0]?.department_id;
+    if (!dept) {
+      return res.status(400).json({
+        error: 'Choose the department that owns these tables — your account has no department.',
+      });
+    }
+    await client.query('BEGIN');
+    const created = []; const skipped = [];
+    for (const t of STARTER_TABLES) {
+      const { rowCount } = await client.query('SELECT 1 FROM impact_tables WHERE lower(name) = lower($1)', [t.name]);
+      if (rowCount) { skipped.push(t.name); continue; }
+      const { rows: [row] } = await client.query(
+        `INSERT INTO impact_tables (name, description, scope, department_id, created_by)
+         VALUES ($1, $2, 'organisation', $3, $4) RETURNING id, name`,
+        [t.name, t.description, dept, req.user.id]);
+      for (const [i, statement] of t.levels.entries()) {
+        await client.query(
+          `INSERT INTO impact_table_bil_levels (impact_table_id, level, statement, updated_by) VALUES ($1, $2, $3, $4)`,
+          [row.id, i + 1, statement, req.user.id]);
+        await client.query(
+          `INSERT INTO impact_table_cia_levels (impact_table_id, level, dimension, statement, updated_by)
+           SELECT $1, $2, d, $3, $4 FROM (VALUES ('c'::CHAR(1)), ('i'::CHAR(1)), ('a'::CHAR(1))) dims(d)`,
+          [row.id, i + 1, statement, req.user.id]);
+      }
+      created.push(row);
+    }
+    await client.query('COMMIT');
+    res.status(created.length ? 201 : 200).json({ created, skipped });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '23503' || err.code === '22P02') return res.status(400).json({ error: 'Unknown department.' });
+    next(err);
+  } finally { client.release(); }
 });
 
 // ── POST /bil/impact-tables ───────────────────────────────────────────────────

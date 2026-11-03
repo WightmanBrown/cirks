@@ -889,3 +889,11 @@
 .deptMissing {
   color: var(--red);
 }
+
+.starterText {
+  flex-basis: 100%;
+  margin: 0 0 6px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}

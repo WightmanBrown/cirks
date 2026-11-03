@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  getArchitecture, createArchitectureItem, updateArchitectureItem, deleteArchitectureItem,
+  getArchitecture, createArchitectureItem, updateArchitectureItem, deleteArchitectureItem, createStarterGroups,
   addArchitectureComponent, removeArchitectureComponent, listSecuritySolutions, listComponents,
 } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -89,6 +89,9 @@ const PAGES = [
 ];
 
 // What each page loads, and the shared refresh-after-change.
+// The CIRKS starter template's groups (routes/architecture: STARTER_GROUPS).
+export const STARTER_GROUP_NAMES = ['Connectivity', 'Hosting', 'Operating system', 'Authentication service', 'Support team', 'User group'];
+
 // `cap`: the template and the patterns are an architect's work (architecture.write,
 // v155); the rules that require a security solution stay with controls.write.
 function useArchitecture(cap = 'controls.write') {
@@ -158,6 +161,13 @@ export function ArchitectureTemplatePage() {
   const a = useArchitecture('architecture.write');
   const { canEdit, lib, components, run, docs, noDocs, confirmRemove } = a;
   const [draftGroup, setDraftGroup] = useState({ name: '', standard_id: '' });
+  // The CIRKS starter template (POST /architecture/groups/starter): six groups,
+  // created empty. Defaults to the starter "Security architecture standard"
+  // document when it is there.
+  const [starterDoc, setStarterDoc] = useState('');
+  const [starterMsg, setStarterMsg] = useState('');
+  const starterDefault = docs.find(d => d.name === 'Security architecture standard')?.id || '';
+  const missingStarter = STARTER_GROUP_NAMES.filter(n => !lib?.groups.some(g => g.name.toLowerCase() === n.toLowerCase()));
   return (
     <Frame title="Systems architecture template" comment="What every system must record." a={a} needsDocs helpKey="security_architecture.template">
       {lib && (<>
@@ -182,9 +192,13 @@ export function ArchitectureTemplatePage() {
                         From {g.standard_name} ·{' '}
                         {g.triggers.length ? 'applies to systems recording a trigger below' : `applies to all ${plural(lib.active_systems, 'system')}`}
                         {' · '}
-                        <span className={g.systems_unanswered ? shared.warn : shared.good}>
-                          {g.systems_unanswered ? `${plural(g.systems_unanswered, 'system')} ${g.systems_unanswered === 1 ? 'has' : 'have'} not recorded one` : 'every system has recorded one'}
-                        </span>
+                        {g.members.length === 0
+                          ? <span className={shared.warn}>asks nothing until it has a member</span>
+                          : (
+                            <span className={g.systems_unanswered ? shared.warn : shared.good}>
+                              {g.systems_unanswered ? `${plural(g.systems_unanswered, 'system')} ${g.systems_unanswered === 1 ? 'has' : 'have'} not recorded one` : 'every system has recorded one'}
+                            </span>
+                          )}
                       </span>
                     </div>
                     {canEdit && (
@@ -194,7 +208,7 @@ export function ArchitectureTemplatePage() {
                   </header>
                   <div className={styles.row}>
                     <span className={styles.label}>Members</span>
-                    <ComponentChips items={g.members} canEdit={canEdit} empty="No members yet — a system cannot answer this group."
+                    <ComponentChips items={g.members} canEdit={canEdit} empty="No members yet — add the answers a system can give, and the group starts asking."
                       removeLabel="Remove member" onRemove={(cid) => run(() => removeArchitectureComponent('groups', g.id, 'members', cid))} />
                   </div>
                   {canEdit && (
@@ -227,6 +241,26 @@ export function ArchitectureTemplatePage() {
                 </button>
               </div>
             )}
+            {canEdit && !noDocs && missingStarter.length > 0 && (
+              <div className={shared.create}>
+                <span className={shared.note}>
+                  Start from the CIRKS template: {missingStarter.join(', ')}. The groups arrive empty — add your own
+                  answers to each — and ask nothing until they have a member.
+                </span>
+                <DocumentSelect documents={docs} value={starterDoc || starterDefault} label="Document the template comes from"
+                  onChange={setStarterDoc} />
+                <button className={shared.primary} disabled={!(starterDoc || starterDefault)}
+                  onClick={async () => {
+                    let r;
+                    if (await run(async () => { r = await createStarterGroups({ standard_id: starterDoc || starterDefault }); })) {
+                      setStarterMsg(`Added ${r.created.join(', ')}. Add members to each.`);
+                    }
+                  }}>
+                  Add the starter groups
+                </button>
+              </div>
+            )}
+            {starterMsg && <p className={shared.note} role="status">{starterMsg}</p>}
           </section>
 
       </>)}

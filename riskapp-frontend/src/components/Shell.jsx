@@ -30,7 +30,6 @@ const NAV_GROUPS = [
       { label: 'Security Exceptions',  path: '/exceptions',     cap: 'exceptions.read' },
       { label: 'Assurance Findings',   path: '/findings',       cap: 'findings.read' },
       { label: 'Impact Tables',         path: '/impact-tables',      cap: 'bil.read' },
-      { label: 'Business Departments', path: '/wizard/department',  roles: ['admin','security_consultant','ciso','risk_analyst'] },
       { type: 'divider' },
       { type: 'header', label: 'Security Meetings' },
       { label: 'All Meetings',    path: '/meetings',       cap: 'meetings.read' },
@@ -258,7 +257,8 @@ export function Shell({ children }) {
               Change Role
             </button>
           )}
-          <span className={styles.userEmail}>{user?.email}</span>
+          <button className={styles.userEmail} onClick={() => navigate('/account')}
+            title="My account: two-factor sign-in">{user?.email}</button>
           <button className={styles.logoutBtn} onClick={handleLogout}>
             Sign out
           </button>

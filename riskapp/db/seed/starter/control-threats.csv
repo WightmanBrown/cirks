@@ -1,0 +1,158 @@
+control_title,threat_name,notes
+Least privilege,Accidental data disclosure,CIRKS starter library
+Access is reviewed,Accidental data disclosure,CIRKS starter library
+Segregation of duties,Accidental data disclosure,CIRKS starter library
+Least privilege,Data exfiltration,CIRKS starter library
+Access is reviewed,Data exfiltration,CIRKS starter library
+Segregation of duties,Data exfiltration,CIRKS starter library
+Least privilege,Malicious insider misuse,CIRKS starter library
+Access is reviewed,Malicious insider misuse,CIRKS starter library
+Segregation of duties,Malicious insider misuse,CIRKS starter library
+Least privilege,Privilege escalation,CIRKS starter library
+Access is reviewed,Privilege escalation,CIRKS starter library
+Segregation of duties,Privilege escalation,CIRKS starter library
+Least privilege,Ransomware,CIRKS starter library
+Access is reviewed,Ransomware,CIRKS starter library
+Segregation of duties,Ransomware,CIRKS starter library
+Least privilege,Security misconfiguration,CIRKS starter library
+Access is reviewed,Security misconfiguration,CIRKS starter library
+Segregation of duties,Security misconfiguration,CIRKS starter library
+Least privilege,Stolen or compromised credentials,CIRKS starter library
+Access is reviewed,Stolen or compromised credentials,CIRKS starter library
+Segregation of duties,Stolen or compromised credentials,CIRKS starter library
+Capacity management,Denial of service (DoS/DDoS),CIRKS starter library
+Capacity management,Hardware or software failure,CIRKS starter library
+Backup policy,Hardware or software failure,CIRKS starter library
+Backups are protected,Hardware or software failure,CIRKS starter library
+Restores are tested,Hardware or software failure,CIRKS starter library
+Backup policy,Natural disaster or environmental event,CIRKS starter library
+Backups are protected,Natural disaster or environmental event,CIRKS starter library
+Restores are tested,Natural disaster or environmental event,CIRKS starter library
+Backup policy,Ransomware,CIRKS starter library
+Backups are protected,Ransomware,CIRKS starter library
+Restores are tested,Ransomware,CIRKS starter library
+Configuration monitoring,Exploitation of an unpatched vulnerability,CIRKS starter library
+Detection of malware and viruses,Exploitation of an unpatched vulnerability,CIRKS starter library
+Detection and prevention of malicious activity,Exploitation of an unpatched vulnerability,CIRKS starter library
+Configuration monitoring,Malware infection,CIRKS starter library
+Detection of malware and viruses,Malware infection,CIRKS starter library
+Detection and prevention of malicious activity,Malware infection,CIRKS starter library
+Configuration monitoring,Ransomware,CIRKS starter library
+Detection of malware and viruses,Ransomware,CIRKS starter library
+Detection and prevention of malicious activity,Ransomware,CIRKS starter library
+Configuration monitoring,Security misconfiguration,CIRKS starter library
+Detection of malware and viruses,Security misconfiguration,CIRKS starter library
+Detection and prevention of malicious activity,Security misconfiguration,CIRKS starter library
+Configuration monitoring,Unauthorised data modification,CIRKS starter library
+Detection of malware and viruses,Unauthorised data modification,CIRKS starter library
+Detection and prevention of malicious activity,Unauthorised data modification,CIRKS starter library
+Configuration monitoring,Zero-day exploitation,CIRKS starter library
+Detection of malware and viruses,Zero-day exploitation,CIRKS starter library
+Detection and prevention of malicious activity,Zero-day exploitation,CIRKS starter library
+Device hardening policy and standard,Exploitation of an unpatched vulnerability,CIRKS starter library
+Device hardening policy and standard,Privilege escalation,CIRKS starter library
+Configuration monitoring,Privilege escalation,CIRKS starter library
+Device hardening policy and standard,Security misconfiguration,CIRKS starter library
+Suppliers are assessed,Supply chain or third-party compromise,CIRKS starter library
+Threats are identified,Zero-day exploitation,CIRKS starter library
+Monitoring coverage,Supply chain or third-party compromise,CIRKS starter library
+Suppliers are audited,Supply chain or third-party compromise,CIRKS starter library
+Asset return and disposal,Hardware or software failure,CIRKS starter library
+Unsupported software and hardware,Hardware or software failure,CIRKS starter library
+Equipment maintenance,Hardware or software failure,CIRKS starter library
+Identity management policy,Lost or stolen device or media,CIRKS starter library
+Service and system accounts,Lost or stolen device or media,CIRKS starter library
+Device identification and network access (802.1X),Lost or stolen device or media,CIRKS starter library
+Identity management policy,Stolen or compromised credentials,CIRKS starter library
+Service and system accounts,Stolen or compromised credentials,CIRKS starter library
+Device identification and network access (802.1X),Stolen or compromised credentials,CIRKS starter library
+Authentication information is protected,Interception of internal network traffic,CIRKS starter library
+Containment and recovery,Denial of service (DoS/DDoS),CIRKS starter library
+Containment and recovery,Ransomware,CIRKS starter library
+Containment and recovery,Zero-day exploitation,CIRKS starter library
+Containment and recovery,Malware infection,CIRKS starter library
+Role-based training,Phishing targeting user credentials,CIRKS starter library
+Central monitoring team,Malicious insider misuse,CIRKS starter library
+Software installation is controlled,Malware infection,CIRKS starter library
+Software installation is controlled,Phishing targeting user credentials,CIRKS starter library
+Software installation is controlled,Ransomware,CIRKS starter library
+Devices register,Lost or stolen device or media,CIRKS starter library
+Devices register,Physical intrusion or theft,CIRKS starter library
+Suppliers are recorded,Supply chain or third-party compromise,CIRKS starter library
+Systems register,Security misconfiguration,CIRKS starter library
+Software register,Security misconfiguration,CIRKS starter library
+Log aggregation and storage,Malicious insider misuse,CIRKS starter library
+Log aggregation and storage,Privilege escalation,CIRKS starter library
+Log aggregation and storage,Unauthorised data modification,CIRKS starter library
+Redundancy,Denial of service (DoS/DDoS),CIRKS starter library
+Redundancy,Natural disaster or environmental event,CIRKS starter library
+Network policy enforcement (firewalls),Denial of service (DoS/DDoS),CIRKS starter library
+Zoning and segregation,Denial of service (DoS/DDoS),CIRKS starter library
+Network policy enforcement (firewalls),Exploitation of a public-facing application,CIRKS starter library
+Zoning and segregation,Exploitation of a public-facing application,CIRKS starter library
+Network policy enforcement (firewalls),Interception of internal network traffic,CIRKS starter library
+Zoning and segregation,Interception of internal network traffic,CIRKS starter library
+Network policy enforcement (firewalls),Zero-day exploitation,CIRKS starter library
+Zoning and segregation,Zero-day exploitation,CIRKS starter library
+Network Intrusion Detection and Prevention,Data exfiltration,CIRKS starter library
+Network Intrusion Detection and Prevention,Denial of service (DoS/DDoS),CIRKS starter library
+Network Intrusion Detection and Prevention,Exploitation of a public-facing application,CIRKS starter library
+Network Intrusion Detection and Prevention,Interception of internal network traffic,CIRKS starter library
+Network Intrusion Detection and Prevention,Malware infection,CIRKS starter library
+Network Intrusion Detection and Prevention,Phishing targeting user credentials,CIRKS starter library
+Network Intrusion Detection and Prevention,Stolen or compromised credentials,CIRKS starter library
+Network Intrusion Detection and Prevention,Zero-day exploitation,CIRKS starter library
+Logging policy,Accidental data disclosure,CIRKS starter library
+Detection and prevention of malicious activity,Accidental data disclosure,CIRKS starter library
+Logging policy,Malicious insider misuse,CIRKS starter library
+Detection and prevention of malicious activity,Malicious insider misuse,CIRKS starter library
+Logging policy,Phishing targeting user credentials,CIRKS starter library
+Detection and prevention of malicious activity,Phishing targeting user credentials,CIRKS starter library
+Logging policy,Privilege escalation,CIRKS starter library
+Detection and prevention of malicious activity,Privilege escalation,CIRKS starter library
+Logging policy,Stolen or compromised credentials,CIRKS starter library
+Detection and prevention of malicious activity,Stolen or compromised credentials,CIRKS starter library
+Security awareness programme,Accidental data disclosure,CIRKS starter library
+Security awareness programme,Phishing targeting user credentials,CIRKS starter library
+Physical entry is controlled,Lost or stolen device or media,CIRKS starter library
+Physical security monitoring,Lost or stolen device or media,CIRKS starter library
+Physical entry is controlled,Malicious insider misuse,CIRKS starter library
+Physical security monitoring,Malicious insider misuse,CIRKS starter library
+Physical entry is controlled,Physical intrusion or theft,CIRKS starter library
+Physical security monitoring,Physical intrusion or theft,CIRKS starter library
+Central monitoring team,Data exfiltration,CIRKS starter library
+Vulnerability reports are handled,Exploitation of an unpatched vulnerability,CIRKS starter library
+Recovery objectives,Natural disaster or environmental event,CIRKS starter library
+Recovery is managed,Natural disaster or environmental event,CIRKS starter library
+Secure development policy,Exploitation of a public-facing application,CIRKS starter library
+Patching within target timescales,Exploitation of an unpatched vulnerability,CIRKS starter library
+Unsupported software and hardware,Exploitation of an unpatched vulnerability,CIRKS starter library
+Patching within target timescales,Exploitation of a public-facing application,CIRKS starter library
+Unsupported software and hardware,Exploitation of a public-facing application,CIRKS starter library
+Patching within target timescales,Malware infection,CIRKS starter library
+Unsupported software and hardware,Malware infection,CIRKS starter library
+Patching within target timescales,Privilege escalation,CIRKS starter library
+Unsupported software and hardware,Privilege escalation,CIRKS starter library
+Registers are kept current,Supply chain or third-party compromise,CIRKS starter library
+Asset return and disposal,Supply chain or third-party compromise,CIRKS starter library
+Trusted products,Supply chain or third-party compromise,CIRKS starter library
+Protection of data at rest,Accidental data disclosure,CIRKS starter library
+Protection of data at rest,Lost or stolen device or media,CIRKS starter library
+Protection of data at rest,Physical intrusion or theft,CIRKS starter library
+Protection of data at rest,Unauthorised data modification,CIRKS starter library
+Protection of data in transit,Accidental data disclosure,CIRKS starter library
+Protection of data in transit,Data exfiltration,CIRKS starter library
+Protection of data in transit,Interception of internal network traffic,CIRKS starter library
+Restores are tested,Unauthorised data modification,CIRKS starter library
+Environmental threats,Natural disaster or environmental event,CIRKS starter library
+Continuity and recovery plans,Natural disaster or environmental event,CIRKS starter library
+Containment and recovery,Natural disaster or environmental event,CIRKS starter library
+Continuity and recovery plans,Ransomware,CIRKS starter library
+Strong authentication,Phishing targeting user credentials,CIRKS starter library
+Device identification and network access (802.1X),Phishing targeting user credentials,CIRKS starter library
+Strong authentication,Stolen or compromised credentials,CIRKS starter library
+Vulnerabilities are identified,Exploitation of an unpatched vulnerability,CIRKS starter library
+Vulnerabilities are identified,Exploitation of a public-facing application,CIRKS starter library
+Vulnerabilities are identified,Security misconfiguration,CIRKS starter library
+Malware protection,Malware infection,CIRKS starter library
+Malware protection,Ransomware,CIRKS starter library

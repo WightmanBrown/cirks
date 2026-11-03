@@ -19,8 +19,7 @@ opinion.
 - **[The organisation capture workbook](templates/README.md)** — one sheet per
   kind of record, in load order:
   [blank workbook](templates/CIRKS-organisation-capture.xlsx) ·
-  [worked example](templates/CIRKS-organisation-capture-EXAMPLE.xlsx) ·
-  [starter threat catalogue](templates/starter-threats.csv).
+  [worked example](templates/CIRKS-organisation-capture-EXAMPLE.xlsx).
 
 ## Model it well
 

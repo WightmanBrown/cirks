@@ -18,6 +18,7 @@ import { DashboardPage }     from './pages/DashboardPage';
 import { RiskSummaryPage }      from './pages/RiskSummaryPage';
 import { RoleHomeRedirect }     from './components/RoleHomeRedirect';
 import { SelectRolePage }       from './pages/SelectRolePage';
+import { MyAccountPage }        from './pages/MyAccountPage';
 import { ControlLibraryPage }          from './pages/ControlLibraryPage';
 import { ControlDetailPage }           from './pages/ControlDetailPage';
 import { BusinessServicesPage }        from './pages/BusinessServicesPage';
@@ -84,6 +85,7 @@ export default function App() {
           {/* Role selection — authenticated, no role restriction */}
           <Route element={<ProtectedRoute />}>
             <Route path="/select-role"   element={<SelectRolePage />} />
+            <Route path="/account"       element={<MyAccountPage />} />
             <Route path="/dashboard"     element={<DashboardPage />} />
             <Route path="/risks/current" element={<RiskSummaryPage view="current" />} />
             <Route path="/risks/future"  element={<RiskSummaryPage view="future" />} />
@@ -97,7 +99,8 @@ export default function App() {
             <Route path="/setup/control-sets" element={<ControlSetsSetupPage />} />
             <Route path="/services"           element={<BusinessServicesPage />} />
             <Route path="/services/:id"       element={<BusinessServiceDetailPage />} />
-            <Route path="/wizard/department"   element={<DepartmentSetupWizard />} />
+            {/* The department list and its setup are one page now (Organisation). */}
+            <Route path="/wizard/department"   element={<Navigate to="/departments" replace />} />
             <Route path="/wizard/impact-table" element={<Navigate to="/impact-tables" replace />} />
             <Route path="/impact-tables"       element={<ImpactTablesPage />} />
             <Route path="/impact-tables/:id"   element={<ImpactTableDetailPage />} />
@@ -109,6 +112,7 @@ export default function App() {
             <Route path="/systems/:id"         element={<SystemDetailPage />} />
             <Route path="/departments"         element={<DepartmentsPage />} />
             <Route path="/departments/:id"     element={<DepartmentDetailPage />} />
+            <Route path="/departments/:id/services" element={<DepartmentSetupWizard />} />
             <Route path="/people-groups"       element={<PeopleGroupsPage />} />
             <Route path="/processes"           element={<ProcessesPage />} />
             <Route path="/technology"          element={<TechnologyComponentsPage />} />

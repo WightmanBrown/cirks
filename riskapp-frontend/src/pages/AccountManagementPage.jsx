@@ -31,7 +31,9 @@ export function AccountManagementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState(null);
 
-  const blankForm = { email: '', full_name: '', role: 'risk_analyst', department_id: '', password: '' };
+  // No password here: a new account is created with sign-in locked, and its
+  // password is set from its row (v164, owner 2026-11-02).
+  const blankForm = { email: '', full_name: '', role: 'risk_analyst', department_id: '' };
   const [form, setForm]       = useState(blankForm);
   const [createErr, setCreateErr] = useState(null);
   const [createBusy, setCreateBusy] = useState(false);
@@ -60,14 +62,15 @@ export function AccountManagementPage() {
   async function handleCreate(e) {
     e.preventDefault();
     setCreateErr(null);
-    const pwProblem = passwordProblem(form.password);
-    if (pwProblem) { setCreateErr(pwProblem); return; }
     setCreateBusy(true);
     try {
       const payload = { ...form, department_id: form.department_id || null };
       const created = await createUser(payload);
       setUsers((prev) => [{ ...created, additional_roles: [] }, ...prev]);
       setForm(blankForm);
+      // Straight to the one thing left to do: its password field, open.
+      setPwOpenFor(created.id); setPwValue('');
+      setMsg(created.id, 'Created with sign-in locked. Set a password to let them sign in.');
     } catch (err) {
       setCreateErr(err.response?.data?.error || 'Could not create account.');
     } finally { setCreateBusy(false); }
@@ -96,8 +99,9 @@ export function AccountManagementPage() {
     if (pwProblem) { setErr(u.id, pwProblem); return; }
     try {
       await resetUserPassword(u.id, pwValue);
+      setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, password_set: true } : x)));
       setPwOpenFor(null); setPwValue('');
-      setMsg(u.id, 'Password reset.');
+      setMsg(u.id, u.password_set ? 'Password reset.' : 'Password set: they can sign in.');
     } catch (err) {
       setErr(u.id, err.response?.data?.error || 'Reset failed.');
     }
@@ -105,6 +109,9 @@ export function AccountManagementPage() {
 
   async function doResetTotp(u) {
     setErr(u.id, null); setMsg(u.id, null);
+    // Clearing a second factor is what an attacker with an admin session would
+    // do first, so it is asked, and the server records it (v166).
+    if (!window.confirm(`Clear two-factor sign-in for ${u.full_name}? They will sign in with their password alone until they set it up again on My account.`)) return;
     try {
       await resetUserTotp(u.id);
       setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, totp_enabled: false } : x)));
@@ -145,9 +152,6 @@ export function AccountManagementPage() {
                   <option value="">— no department —</option>
                   {depts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
-                <input className={styles.input} type="password" placeholder="temporary password (12+ characters)" required
-                  autoComplete="new-password"
-                  value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
                 <button className={styles.primaryBtn} type="submit" disabled={createBusy}>
                   {createBusy ? 'Creating…' : 'Create account'}
                 </button>
@@ -237,9 +241,15 @@ export function AccountManagementPage() {
                                 <button className={styles.linkBtn} onClick={() => { setPwOpenFor(null); setPwValue(''); }}>Cancel</button>
                               </span>
                             ) : (
-                              <button className={styles.smallBtn} onClick={() => { setPwOpenFor(u.id); setPwValue(''); setMsg(u.id, null); setErr(u.id, null); }}>
-                                Reset password
-                              </button>
+                              <>
+                                {!u.password_set && (
+                                  <span className={styles.lockedBadge}
+                                    title="Nobody can sign in to this account until a password is set">sign-in locked</span>
+                                )}
+                                <button className={styles.smallBtn} onClick={() => { setPwOpenFor(u.id); setPwValue(''); setMsg(u.id, null); setErr(u.id, null); }}>
+                                  {u.password_set ? 'Reset password' : 'Set password'}
+                                </button>
+                              </>
                             )}
                             <button className={styles.smallBtn} disabled={!u.totp_enabled}
                               title={u.totp_enabled ? 'Clear their authenticator enrolment' : 'No 2FA enrolled'}

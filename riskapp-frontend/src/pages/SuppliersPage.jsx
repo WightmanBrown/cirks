@@ -11,6 +11,7 @@ import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { RatingChip } from '../components/RatingChip';
+import { CompletenessRing } from '../components/CompletenessRing';
 import { supplierTypeLabel } from '../utils/supplierTypes';
 import styles from './ScopesPage.module.css';
 
@@ -18,24 +19,29 @@ import styles from './ScopesPage.module.css';
 // relationship — its supplier type, the department that contracts it (and so owns it),
 // what it touches and the contract. Criticality is derived from the systems the
 // relationships touch, never typed in.
-// Whether a supplier's live relationships have all their control objectives met
-// by current evidence (v144) — the gap, and whether anyone has answered it.
+// How well a supplier's live relationships have their control objectives met
+// by current evidence (v144): met, evidenced once but expired, never evidenced —
+// and whether anyone has answered the gap.
+const RING_LABELS = { complete: 'met', partial: 'evidence expired', missing: 'not evidenced' };
+
 function AssuranceCell({ s }) {
   if (s.live_count === 0) {
     return <span className={styles.muted}>no live relationship</span>;
   }
-  if (s.gap_count === 0) {
-    return <span className={styles.good}>All met</span>;
+  if (s.objectives_met + s.objectives_expired + s.objectives_missing === 0) {
+    return <span className={styles.muted}>no objectives expected</span>;
   }
   return (
     <>
-      <span className={styles.warn}>
-        ⚠ Gaps on {s.gap_count} of {s.live_count} live relationship{s.live_count === 1 ? '' : 's'}
-      </span>
-      <span className={styles.note}>
-        {s.unmet_objectives} control objective{s.unmet_objectives === 1 ? '' : 's'} not met
-        {s.unanswered_gaps > 0 ? ` · ${s.unanswered_gaps} not yet answered` : ' · answered (action or acceptance)'}
-      </span>
+      <CompletenessRing
+        complete={s.objectives_met} partial={s.objectives_expired} missing={s.objectives_missing}
+        labels={RING_LABELS} of="control objectives" />
+      {s.gap_count > 0 && (
+        <span className={styles.note}>
+          Gaps on {s.gap_count} of {s.live_count} live relationship{s.live_count === 1 ? '' : 's'}
+          {s.unanswered_gaps > 0 ? ` · ${s.unanswered_gaps} not yet answered` : ' · answered (action or acceptance)'}
+        </span>
+      )}
     </>
   );
 }
@@ -106,8 +112,12 @@ export function SuppliersPage() {
           const withGaps   = rows.filter(s => s.gap_count > 0);
           const unanswered = withGaps.filter(s => s.unanswered_gaps > 0).length;
           const shown      = gapsOnly ? withGaps : rows;
+          const sum = (k) => rows.reduce((n, s) => n + (s[k] || 0), 0);
           return (<>
           <div className={styles.create}>
+            <CompletenessRing size={44}
+              complete={sum('objectives_met')} partial={sum('objectives_expired')} missing={sum('objectives_missing')}
+              labels={RING_LABELS} of="control objectives" showCounts={false} />
             {withGaps.length === 0 ? (
               <span className={styles.good}>Every live supplier relationship has all its control objectives met.</span>
             ) : (

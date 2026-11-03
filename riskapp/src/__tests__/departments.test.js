@@ -92,3 +92,28 @@ describe('write endpoints require departments.write', () => {
     expect(res.status).toBe(403);
   });
 });
+
+describe('DELETE /api/v1/departments/:id', () => {
+  const none = { people: 0, systems: 0, assets: 0, services: 0, impact_tables: 0, supplier_relationships: 0 };
+
+  it('409 naming what still belongs to the department, and deletes nothing', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ ...none, people: 3, impact_tables: 1 }], rowCount: 1 });
+    const res = await request(app).delete('/api/v1/departments/d1').set('Authorization', admin());
+    expect(res.status).toBe(409);
+    expect(res.body.in_use).toEqual({ people: 3, impact_tables: 1 });
+    expect(res.body.error).toMatch(/3 people, 1 impact table\./);
+    expect(mockQuery).toHaveBeenCalledTimes(1);
+  });
+  it('204 when nothing belongs to it', async () => {
+    mockQuery
+      .mockResolvedValueOnce({ rows: [none], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 });
+    const res = await request(app).delete('/api/v1/departments/d1').set('Authorization', admin());
+    expect(res.status).toBe(204);
+  });
+  it('404 when not found', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [none], rowCount: 1 });
+    const res = await request(app).delete('/api/v1/departments/d9').set('Authorization', admin());
+    expect(res.status).toBe(404);
+  });
+});

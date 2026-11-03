@@ -315,6 +315,46 @@ function namedRoutes(path, { table, entityType, noun, sql, withDocument }) {
   });
 }
 
+// ── POST /architecture/groups/starter — the CIRKS starter template ─────────────
+// The six questions every system answers in the Misty Isles template, as groups
+// with NO members: which hosting, which operating system and so on are the
+// organisation's own, added afterwards. A group with no members asks nothing yet
+// (v165), so adding them flags no system. Body: { standard_id } — the document
+// the template comes from, as for any group. A group whose name is already used
+// is left alone.
+const STARTER_GROUPS = [
+  ['Connectivity', 'The networks the system is reached from or connects to.'],
+  ['Hosting', 'Where the system runs: a server room, a data centre or a cloud service.'],
+  ['Operating system', 'The operating system the system runs on, where it has one of its own.'],
+  ['Authentication service', 'How people sign in to the system: the directory or identity service it uses.'],
+  ['Support team', 'Who looks after the system day to day.'],
+  ['User group', 'Who uses the system.'],
+];
+router.post('/groups/starter', canArchitect, async (req, res, next) => {
+  const b = req.body || {};
+  if (!UUID_RE.test(b.standard_id || '')) return res.status(400).json({ error: 'Choose the document the template comes from.' });
+  try {
+    const result = await withActor(req.user.id, async (db) => {
+      const created = []; const skipped = [];
+      const { rows: [{ next: start }] } = await db.query(
+        'SELECT COALESCE(max(sort_index), 0) + 1 AS next FROM membership_groups');
+      for (const [name, notes] of STARTER_GROUPS) {
+        const { rowCount } = await db.query('SELECT 1 FROM membership_groups WHERE lower(name) = lower($1)', [name]);
+        if (rowCount) { skipped.push(name); continue; }
+        const { rows: [r] } = await db.query(
+          `INSERT INTO membership_groups (name, notes, created_by, standard_id, sort_index)
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          [name, notes, req.user.id, b.standard_id, start + created.length]);
+        await audit(db, req.user.id, 'membership_group', r.id, name, 'create',
+          `Membership group "${name}" created from the CIRKS starter template`);
+        created.push(name);
+      }
+      return { created, skipped };
+    });
+    res.status(result.created.length ? 201 : 200).json(result);
+  } catch (err) { fail(res, next)(err); }
+});
+
 namedRoutes('groups', { table: 'membership_groups', entityType: 'membership_group', noun: 'membership group', sql: GROUPS_SQL, withDocument: true });
 namedRoutes('builds', { table: 'system_builds', entityType: 'system_build', noun: 'build', sql: BUILDS_SQL, withDocument: false });
 

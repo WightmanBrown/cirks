@@ -29,6 +29,7 @@ const path = require('path');
 const { pool } = require('../src/db/pool');
 const capabilityDefaults = require('../src/auth/capabilityDefaults');
 const { loadCirksObjectives } = require('./seed/cirksObjectives');
+const { loadStarterThreats } = require('./seed/starterLibrary');
 
 const SEED_DIR = path.join(__dirname, 'seed');
 const readSql = (f) => fs.readFileSync(path.join(SEED_DIR, f), 'utf8');
@@ -112,6 +113,12 @@ async function main() {
       // set must stay removed.
       const { rows } = await client.query('SELECT seed_supplier_type_objectives() AS n');
       console.log(`[seed] supplier control sets seeded (${rows[0].n} objectives).`);
+      // The starter threats and their links to the objectives (db/seed/
+      // starterLibrary.js), on the same terms: a new installation only.
+      const threats = await loadStarterThreats(client);
+      console.log(threats
+        ? `[seed] starter threats loaded (${threats.threats} threats, ${threats.links} links to control objectives).`
+        : '[seed] threats already present — starter threats not loaded.');
     } else {
       console.log(`[seed] control objectives already present (${controlCount}) — library left untouched.`);
     }

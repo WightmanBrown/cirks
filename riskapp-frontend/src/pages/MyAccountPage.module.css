@@ -1,0 +1,42 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.page { max-width: 760px; margin: 0 auto; padding: 24px; }
+.title { font-family: var(--font-display); font-size: var(--text-2xl); color: var(--text-primary); margin: 8px 0 4px; }
+.muted { color: var(--text-secondary); font-size: var(--text-hint); }
+
+.card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+  padding: 16px 18px; margin: 18px 0; color: var(--text-primary); line-height: 1.55;
+}
+.cardTitle {
+  font-family: var(--font-mono); font-size: var(--text-sm);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 0 0 12px;
+}
+.steps ol { padding-left: 20px; margin: 0 0 12px; }
+.steps li { margin-bottom: 14px; }
+/* A QR code is read from dark modules on a light ground, whatever the theme. */
+.qr { margin: 10px 0; }
+.qr img { display: block; border-radius: var(--radius-sm); }
+.secret { font-family: var(--font-mono); letter-spacing: 0.05em; color: var(--text-primary); word-break: break-all; }
+
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.input {
+  font: inherit; font-size: var(--text-body);
+  background: var(--bg-inset); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 8px; width: 14em;
+}
+.input::placeholder { color: var(--text-muted); }
+
+.primary, .secondary, .danger {
+  font: inherit; font-size: var(--text-body); font-weight: 600;
+  border-radius: var(--radius-sm); padding: 6px 16px; cursor: pointer;
+}
+.primary { background: var(--amber); color: var(--text-on-fill); border: 1px solid var(--amber); }
+.secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border); }
+.danger { background: var(--red); color: var(--text-on-fill); border: 1px solid var(--red); }
+.primary:disabled, .danger:disabled { opacity: 0.6; cursor: default; }
+.link { font: inherit; font-size: var(--text-sm); background: none; border: none; color: var(--text-secondary); cursor: pointer; }
+
+.error { color: var(--red-light); }
+.ok { color: var(--green-light); }

@@ -117,8 +117,11 @@ or
 ```bash
 # B — your organisation: first administrator, then load the capture workbook
 docker compose exec app node riskapp/db/create-admin.js --email you@example.org --name "Your Name"
-docker compose exec app node riskapp/db/import.js /import --password '<starting password>'
+docker compose exec app node riskapp/db/import.js /import
 ```
+
+Everyone loaded starts with sign-in locked: the administrator sets each
+person's password on **Admin → Account Management**.
 
 The workbook for B is [docs/templates/CIRKS-organisation-capture.xlsx](docs/templates/CIRKS-organisation-capture.xlsx).
 Running CIRKS day to day — upgrades, backups, TLS options, air-gapped installs —

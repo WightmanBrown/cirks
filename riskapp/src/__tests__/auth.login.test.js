@@ -215,43 +215,44 @@ describe('POST /api/v1/auth/login — credential validation', () => {
 
 describe('POST /api/v1/auth/login — TOTP', () => {
 
-  // v112 (H-17) changed this deliberately, and the change is the point of the
-  // tests below. The app role no longer holds SELECT on users.totp_secret, so
-  // the controller cannot verify a code even if one is supplied.
-  //
-  // That is not a regression, because MFA CANNOT BE ENROLLED (H-05): nothing in
-  // the application ever writes totp_secret, so no account can legitimately
-  // reach this state. Implementing base32 + HMAC-SHA1 + dynamic truncation in
-  // PL/pgSQL to support a feature that does not work would have been the wrong
-  // order of events. When H-05 makes enrolment real, verification gets its own
-  // definer function beside verify_user_credentials.
-  //
-  // Until then it FAILS CLOSED and says so, which is the behaviour worth
-  // pinning: an account flagged for a second factor is refused, never waved
-  // through.
+  // v166 (H-05): the code is checked by verify_user_totp() INSIDE the database,
+  // because the app role holds no SELECT on the secret (H-17). These tests pin
+  // the controller's side: no code → asked for one; a wrong code → refused;
+  // no token is ever issued down a refused path. The SQL itself is tested
+  // against otplib in totp.integration.test.js.
   const TOTP_USER = { ...BASE_USER, totp_enabled: true };
 
-  test('an account flagged for a second factor is REFUSED, with or without a code', async () => {
-    for (const body of [
-      { email: 'ciso@example.com', password: 'correct-password' },
-      { email: 'ciso@example.com', password: 'correct-password', totp_code: '000000' },
-      { email: 'ciso@example.com', password: 'correct-password', totp_code: '123456' },
-    ]) {
-      mockQuery.mockResolvedValueOnce({ rows: [TOTP_USER], rowCount: 1 });
-      const res = await request(app).post('/api/v1/auth/login').send(body);
-      expect(res.status).toBe(401);
-      expect(res.body.totp_required).toBe(true);
-      expect(res.body.error).toMatch(/not yet available/i);
-      expect(res.body.access_token).toBeUndefined();
-    }
+  test('without a code, the account is asked for one and no database check runs', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [TOTP_USER], rowCount: 1 });
+    const res = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'ciso@example.com', password: 'correct-password' });
+    expect(res.status).toBe(401);
+    expect(res.body.totp_required).toBe(true);
+    expect(res.body.access_token).toBeUndefined();
+    expect(mockQuery).toHaveBeenCalledTimes(1);
   });
 
-  test('no token is issued down the second-factor path', async () => {
-    mockQuery.mockResolvedValueOnce({ rows: [TOTP_USER], rowCount: 1 });
-    const res = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: 'ciso@example.com', password: 'correct-password', totp_code: '999999' });
+  test('a code the database rejects is refused, and no token is issued', async () => {
+    mockQuery
+      .mockResolvedValueOnce({ rows: [TOTP_USER], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [{ ok: false }], rowCount: 1 });
+    const res = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'ciso@example.com', password: 'correct-password', totp_code: '123456' });
+    expect(res.status).toBe(401);
+    expect(res.body.totp_required).toBe(true);
+    expect(res.body.error).toMatch(/not right/);
     expect(res.body).not.toHaveProperty('refresh_token');
+    expect(mockQuery.mock.calls[1][0]).toMatch(/verify_user_totp/);
+    expect(mockQuery.mock.calls[1][1]).toEqual([TOTP_USER.id, '123456']);
+  });
+
+  test('a wrong password never reaches the code check', async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ ...TOTP_USER, password_ok: false }], rowCount: 1 });
+    const res = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'ciso@example.com', password: 'wrong', totp_code: '123456' });
+    expect(res.status).toBe(401);
+    expect(res.body.totp_required).toBeUndefined();
+    expect(mockQuery).toHaveBeenCalledTimes(1);
   });
 
 });

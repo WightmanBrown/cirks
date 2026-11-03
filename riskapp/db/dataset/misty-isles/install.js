@@ -39,7 +39,7 @@
 // accounts, so deactivating them would leave every risk without an owner (owner,
 // 2026-10-16: "no usable password", not deactivation). The administrator
 // enables a persona by setting its password: Admin → Account Management →
-// Reset password.
+// Set password.
 //
 // It refuses a database that already holds an organisation: Misty Isles is for
 // a fresh, throwaway instance, never one with real data in it. Stops at the
@@ -65,8 +65,7 @@ const BASE = opt('--base', `http://127.0.0.1:${process.env.PORT || 3000}/api/v1`
 
 require('dotenv').config({ path: path.join(RISKAPP, '.env') });
 const { pool, query } = require(path.join(RISKAPP, 'src/db/pool'));
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
+const { lockedPasswordHash } = require(path.join(RISKAPP, 'src/auth/lockedPassword'));
 const { resolvePassword } = require(path.join(RISKAPP, 'db/promptPassword'));
 const { assertPassword } = require(path.join(RISKAPP, 'src/auth/passwordPolicy'));
 
@@ -92,19 +91,21 @@ async function waitForApi() {
 
 // Step 8. Each account but the administrator gets a random password nobody is
 // told — a valid hash, so a sign-in attempt is simply refused — and its
-// sessions end. Active, so it still owns what it owns.
+// sessions end. Active, so it still owns what it owns. password_set_at is
+// cleared, so Account Management shows the account as locked (v164).
 async function lockPersonas() {
   console.log('\n[misty-isles] ── step 8 of 8: lock every account except the administrator');
   const { rows } = await query(
     `SELECT id, email FROM users WHERE lower(email) <> lower($1) ORDER BY email`, [ADMIN_EMAIL]);
   for (const u of rows) {
-    const hash = await bcrypt.hash(crypto.randomBytes(32).toString('base64'), 12);
-    await query('UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2', [hash, u.id]);
+    const hash = await lockedPasswordHash();
+    await query('UPDATE users SET password_hash = $1, password_set_at = NULL, updated_at = now() WHERE id = $2',
+      [hash, u.id]);
   }
   await query(`DELETE FROM refresh_tokens WHERE user_id IN
                  (SELECT id FROM users WHERE lower(email) <> lower($1))`, [ADMIN_EMAIL]);
   console.log(`[misty-isles] ${rows.length} accounts locked: active, but nobody can sign in to them until the`
-    + ' administrator sets a password (Admin → Account Management → Reset password).');
+    + ' administrator sets a password (Admin → Account Management → Set password).');
 }
 
 (async () => {

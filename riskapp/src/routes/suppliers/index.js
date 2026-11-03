@@ -143,6 +143,13 @@ router.get('/', canRead, async (req, res, next) => {
              COUNT(r.id) FILTER (WHERE r.status IN ('active', 'exiting'))::int AS live_count,
              COUNT(f.relationship_id)::int                                     AS gap_count,
              COALESCE(SUM(f.unmet_count), 0)::int                              AS unmet_objectives,
+             -- Completeness across the live relationships: each expected objective
+             -- the supplier's evidence must cover is met, met once but the evidence
+             -- has expired, or never evidenced. Ours (met by our own control) are
+             -- left out, as the finding leaves them out.
+             COALESCE(SUM(oc.met_count)     FILTER (WHERE r.status IN ('active', 'exiting')), 0)::int AS objectives_met,
+             COALESCE(SUM(oc.expired_count) FILTER (WHERE r.status IN ('active', 'exiting')), 0)::int AS objectives_expired,
+             COALESCE(SUM(oc.missing_count) FILTER (WHERE r.status IN ('active', 'exiting')), 0)::int AS objectives_missing,
              COUNT(f.relationship_id) FILTER (WHERE
                NOT EXISTS (SELECT 1 FROM security_actions a
                             WHERE a.origin = 'supplier_assurance' AND a.subject_id = f.relationship_id
@@ -155,6 +162,13 @@ router.get('/', canRead, async (req, res, next) => {
         LEFT JOIN departments d ON d.id = r.department_id
         LEFT JOIN v_supplier_relationship_criticality c ON c.relationship_id = r.id
         LEFT JOIN v_supplier_assurance_findings f ON f.relationship_id = r.id
+        LEFT JOIN (SELECT relationship_id,
+                          COUNT(*) FILTER (WHERE met)                          AS met_count,
+                          COUNT(*) FILTER (WHERE expired_only)                 AS expired_count,
+                          COUNT(*) FILTER (WHERE NOT met AND NOT expired_only) AS missing_count
+                     FROM v_supplier_objective_coverage
+                    WHERE NOT ours
+                    GROUP BY relationship_id) oc ON oc.relationship_id = r.id
        GROUP BY sp.id
        ORDER BY lower(sp.name)`, params);
     res.json({ suppliers: rows });

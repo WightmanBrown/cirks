@@ -639,6 +639,12 @@ export async function createImpactTable(body) {
   return data;
 }
 
+// The CIRKS starter tables, created unpublished (POST /bil/impact-tables/starter).
+export async function createStarterImpactTables(body) {
+  const { data } = await client.post('/bil/impact-tables/starter', body);
+  return data;
+}
+
 export async function getImpactTable(id) {
   const { data } = await client.get(`/bil/impact-tables/${id}`);
   return data;
@@ -728,6 +734,25 @@ export async function patchDepartmentIsolation(enabled) {
 }
 
 // Account management (admin.manage)
+// ── Two-factor sign-in on the signed-in account (H-05, v166) ─────────────────
+export async function getTotpStatus() {
+  const { data } = await client.get('/auth/totp');
+  return data;
+}
+// A new secret to scan: { secret, otpauth_url, qr } (qr is a PNG data URL).
+export async function setupTotp() {
+  const { data } = await client.post('/auth/totp/setup');
+  return data;
+}
+export async function confirmTotp(code) {
+  const { data } = await client.post('/auth/totp/confirm', { code });
+  return data;
+}
+export async function disableTotp(password, code) {
+  const { data } = await client.post('/auth/totp/disable', { password, code });
+  return data;
+}
+
 export async function createUser(payload) {
   const { data } = await client.post('/admin/users', payload);
   return data;
@@ -1415,6 +1440,11 @@ export async function applySystemBuild(systemId, buildId, status) {
 // kind: 'rules' | 'groups' | 'builds'
 export async function createArchitectureItem(kind, body) {
   const { data } = await client.post(`/architecture/${kind}`, body);
+  return data;
+}
+// The CIRKS starter template: six empty groups citing { standard_id }.
+export async function createStarterGroups(body) {
+  const { data } = await client.post('/architecture/groups/starter', body);
   return data;
 }
 export async function updateArchitectureItem(kind, id, body) {

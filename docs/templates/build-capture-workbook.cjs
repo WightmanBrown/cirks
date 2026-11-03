@@ -72,7 +72,7 @@ const SHEETS = [
       ['department_name', 34, false, 'Their department, exactly as on the Departments sheet. Required in practice for an IAO or IAM: those roles see only their own department.', from('01 Departments')],
       ['is_active', 12, false, 'yes or no. Blank = yes. "no" creates the account switched off.', YESNO],
       ['view_mode', 14, false, 'business (rating words) or expert (numbers). Blank = business. The person can change it.', ['business', 'expert']],
-      ['password', 22, false, 'LEAVE BLANK. Blank gives every account the starting password chosen when the file is loaded (the load refuses a user with no password at all). CIRKS has no self-service password change yet: an administrator then sets each person\'s own password on Admin, User accounts. Do not keep real passwords in a spreadsheet.'],
+      ['password', 22, false, 'LEAVE BLANK. Each account is loaded with sign-in locked: it gets its own random password that nobody is told, so the person owns their risks and actions but cannot sign in until an administrator sets their password on Admin, Account Management. Do not keep real passwords in a spreadsheet.'],
     ],
     example: [
       ['ciso@example.org', 'Priya Nair', 'ciso', 'Information Technology', 'yes', 'expert', ''],
@@ -333,7 +333,8 @@ function addReadMe(wb, example) {
   para('Loading into CIRKS', [
     'The files are loaded by the CIRKS import command on the server, not through a screen in the application. Whoever runs your CIRKS instance does this.',
     'Check first, changing nothing:   node db/import.js <folder> --dry-run',
-    'Then load:   node db/import.js <folder> --password <starting password for the new accounts>',
+    'Then load:   node db/import.js <folder>',
+    'Everyone loaded starts with sign-in locked. An administrator sets each person\'s password on Admin, Account Management, when they need to sign in.',
     'In a container installation, copy the folder in and prefix the command:   docker compose cp ./capture app:/tmp/capture   then   docker compose exec app node db/import.js /tmp/capture --dry-run',
     'All the files in the folder are loaded in the right order in one go. To load one sheet at a time, put only that file in the folder and run the command again for the next; keep to the numbered order, because each sheet refers to the ones before it.',
     'If you load one sheet at a time, load Departments once more after Users. The department heads (owner_email) cannot be set until the people exist; the second pass fills them in and changes nothing else.',

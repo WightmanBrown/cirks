@@ -51,10 +51,12 @@ export function chosenComponents({ build, picks, groups, custom }) {
 }
 
 // A template group applies to every system, or — with triggers — only to a
-// system that records one of them.
+// system that records one of them. A group with no members asks nothing yet
+// (v165), so it is not shown.
 export function groupsThatApply(groups, chosen) {
   const ids = new Set(chosen.map(c => c.id));
-  return (groups || []).filter(g => !g.triggers?.length || g.triggers.some(t => ids.has(t.id)));
+  return (groups || []).filter(g => g.members?.length
+    && (!g.triggers?.length || g.triggers.some(t => ids.has(t.id))));
 }
 
 // The security solutions the record will imply: a rule whose trigger is among

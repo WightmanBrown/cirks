@@ -142,8 +142,33 @@ router.patch('/:id', canManage, async (req, res, next) => {
 });
 
 // DELETE /departments/:id
+const IN_USE_ONE = {
+  people: 'person', systems: 'system', assets: 'asset', services: 'service',
+  impact_tables: 'impact table', supplier_relationships: 'supplier relationship',
+};
+// Refused while anything still belongs to the department. Some references
+// would block the delete anyway, but people and impact tables would be cut
+// loose silently (ON DELETE SET NULL), so every kind is checked here and named.
 router.delete('/:id', canManage, async (req, res, next) => {
   try {
+    const { rows: [inUse] } = await query(
+      `SELECT
+         (SELECT COUNT(*)::int FROM users u WHERE u.department_id = $1 AND u.is_active)    AS people,
+         (SELECT COUNT(*)::int FROM systems s WHERE s.department_id = $1)                  AS systems,
+         (SELECT COUNT(*)::int FROM information_assets ia WHERE ia.department_id = $1)     AS assets,
+         (SELECT COUNT(*)::int FROM business_services bs WHERE bs.department_id = $1)      AS services,
+         (SELECT COUNT(*)::int FROM impact_tables it WHERE it.department_id = $1)          AS impact_tables,
+         (SELECT COUNT(*)::int FROM supplier_relationships sr WHERE sr.department_id = $1) AS supplier_relationships`,
+      [req.params.id]
+    );
+    const held = Object.entries(inUse || {}).filter(([, n]) => n > 0);
+    if (held.length > 0) {
+      const words = held.map(([k, n]) => `${n} ${n === 1 ? IN_USE_ONE[k] : k.replace('_', ' ')}`).join(', ');
+      return res.status(409).json({
+        error: `This department still has ${words}. Move or remove them first.`,
+        in_use: Object.fromEntries(held),
+      });
+    }
     const { rowCount } = await query(
       `DELETE FROM departments WHERE id = $1`,
       [req.params.id]

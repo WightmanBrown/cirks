@@ -17,7 +17,7 @@ describe('admin account management', () => {
   test('non-admin cannot create accounts', async () => {
     const res = await request(app).post('/api/v1/admin/users')
       .set('Authorization', `Bearer ${tokenFor('ciso')}`)
-      .send({ email: 'itg-acct-x@org.local', full_name: 'X', role: 'risk_analyst', password: 'password1234' });
+      .send({ email: 'itg-acct-x@org.local', full_name: 'X', role: 'risk_analyst' });
     expect(res.status).toBe(403);
   });
 
@@ -29,12 +29,41 @@ describe('admin account management', () => {
     expect(withDept.department_id).toBeTruthy(); // was missing → UI showed "— none —"
   });
 
-  test('creates an account that can then log in', async () => {
+  // v164 (owner, 2026-11-02): an account is created active but with sign-in
+  // locked — its own random password, told to nobody — until an administrator
+  // sets one. Active, so it can own risks straight away.
+  test('creates an account active with sign-in locked; setting a password unlocks it', async () => {
     const create = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok())
-      .send({ email: 'itg-acct-1@org.local', full_name: 'Test One', role: 'risk_analyst', department_id: IT_DEPT, password: 'password1234' });
+      .send({ email: 'itg-acct-1@org.local', full_name: 'Test One', role: 'risk_analyst', department_id: IT_DEPT });
     expect(create.status).toBe(201);
     expect(create.body.email).toBe('itg-acct-1@org.local');
     expect(create.body.is_active).toBe(true);
+    expect(create.body.password_set).toBe(false);
+    const id = create.body.id;
+
+    // Its own random lock: a valid bcrypt hash, unlike any other account's.
+    const { rows: [h] } = await query(
+      `SELECT password_hash, password_set_at,
+              (SELECT count(*)::int FROM users o WHERE o.password_hash = u.password_hash) AS same
+         FROM users u WHERE id = $1`, [id]);
+    expect(h.password_hash).toMatch(/^\$2[aby]\$12\$/);
+    expect(h.password_set_at).toBeNull();
+    expect(h.same).toBe(1);
+
+    const listed = (await request(app).get('/api/v1/admin/users').set('Authorization', adminTok()))
+      .body.find((u) => u.id === id);
+    expect(listed.password_set).toBe(false);
+
+    const locked = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'itg-acct-1@org.local', password: 'password1234' });
+    expect(locked.status).toBe(401);
+
+    const set = await request(app).post(`/api/v1/admin/users/${id}/reset-password`).set('Authorization', adminTok())
+      .send({ password: 'password1234' });
+    expect(set.status).toBe(200);
+    const after = (await request(app).get('/api/v1/admin/users').set('Authorization', adminTok()))
+      .body.find((u) => u.id === id);
+    expect(after.password_set).toBe(true);
 
     const login = await request(app).post('/api/v1/auth/login')
       .send({ email: 'itg-acct-1@org.local', password: 'password1234' });
@@ -42,15 +71,22 @@ describe('admin account management', () => {
     expect(login.body.access_token).toBeTruthy();
   });
 
-  test('rejects duplicate email, bad email, short password, invalid role', async () => {
+  test('every seeded account counts as having a password set', async () => {
+    const { rows: [r] } = await query(
+      "SELECT count(*)::int AS n FROM users WHERE password_set_at IS NULL AND email NOT LIKE 'itg-%'");
+    expect(r.n).toBe(0);
+  });
+
+  test('rejects duplicate email, bad email, invalid role, and a password in the body', async () => {
     const dup = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok())
-      .send({ email: 'itg-acct-1@org.local', full_name: 'Dup', role: 'risk_analyst', password: 'password1234' });
+      .send({ email: 'itg-acct-1@org.local', full_name: 'Dup', role: 'risk_analyst' });
     expect(dup.status).toBe(409);
 
     const bads = [
-      { email: 'nope', full_name: 'A', role: 'risk_analyst', password: 'password1234' },
-      { email: 'itg-acct-2@org.local', full_name: 'A', role: 'risk_analyst', password: 'short' },
-      { email: 'itg-acct-2@org.local', full_name: 'A', role: 'not_a_role', password: 'password1234' },
+      { email: 'nope', full_name: 'A', role: 'risk_analyst' },
+      { email: 'itg-acct-2@org.local', full_name: 'A', role: 'not_a_role' },
+      // Refused, not ignored: a caller written for the old contract finds out.
+      { email: 'itg-acct-2@org.local', full_name: 'A', role: 'risk_analyst', password: 'password1234' },
     ];
     for (const body of bads) {
       const r = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok()).send(body);
@@ -60,10 +96,11 @@ describe('admin account management', () => {
 
   // 2026-10-22: the API allowed 8 characters while the command-line tools asked
   // for 12, and accepted up to 128 although bcrypt reads only the first 72 bytes.
-  // Now one rule (auth/passwordPolicy.js), for create and reset alike.
-  test('create and reset-password both refuse under 12 characters and over 72 bytes', async () => {
+  // Now one rule (auth/passwordPolicy.js). Since v164 only reset-password sets
+  // one from the admin API.
+  test('reset-password refuses under 12 characters and over 72 bytes', async () => {
     const create = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok())
-      .send({ email: 'itg-acct-5@org.local', full_name: 'Five', role: 'risk_analyst', password: 'password1234' });
+      .send({ email: 'itg-acct-5@org.local', full_name: 'Five', role: 'risk_analyst' });
     expect(create.status).toBe(201);
     const id = create.body.id;
 
@@ -73,9 +110,6 @@ describe('admin account management', () => {
       'é'.repeat(37),         // 37 characters but 74 bytes
     ];
     for (const password of refused) {
-      const c = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok())
-        .send({ email: 'itg-acct-6@org.local', full_name: 'Six', role: 'risk_analyst', password });
-      expect(c.status).toBe(400);
       const r = await request(app).post(`/api/v1/admin/users/${id}/reset-password`).set('Authorization', adminTok())
         .send({ password });
       expect(r.status).toBe(400);
@@ -100,7 +134,7 @@ describe('admin account management', () => {
 
   test('edits full_name and department, and reset-password lets them log in with the new password', async () => {
     const create = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok())
-      .send({ email: 'itg-acct-3@org.local', full_name: 'Three', role: 'risk_analyst', password: 'password1234' });
+      .send({ email: 'itg-acct-3@org.local', full_name: 'Three', role: 'risk_analyst' });
     const id = create.body.id;
 
     const patch = await request(app).patch(`/api/v1/admin/users/${id}`).set('Authorization', adminTok())
@@ -120,7 +154,7 @@ describe('admin account management', () => {
 
   test('reset-totp clears enrolment', async () => {
     const create = await request(app).post('/api/v1/admin/users').set('Authorization', adminTok())
-      .send({ email: 'itg-acct-4@org.local', full_name: 'Four', role: 'risk_analyst', password: 'password1234' });
+      .send({ email: 'itg-acct-4@org.local', full_name: 'Four', role: 'risk_analyst' });
     const id = create.body.id;
     await query('UPDATE users SET totp_enabled = TRUE, totp_secret = $1 WHERE id = $2', ['SECRET', id]);
 

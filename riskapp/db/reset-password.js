@@ -109,7 +109,7 @@ async function main() {
   assertPassword(password);
 
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
-  await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, user.id]);
+  await pool.query('UPDATE users SET password_hash = $1, password_set_at = now() WHERE id = $2', [hash, user.id]);
 
   console.log(`[reset-password] Password reset for "${user.full_name}" <${email}> (${user.role}).`);
   console.log('[reset-password] Log in at the app URL with the new password.');

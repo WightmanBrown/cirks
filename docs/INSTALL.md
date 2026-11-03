@@ -359,6 +359,19 @@ docker compose exec app node riskapp/db/create-admin.js --email you@example.org 
 
 Sign in at `https://cirks.local/` with that email and password.
 
+**Turn on two-factor sign-in for this account** — it can do anything. Select
+your email address in the top bar to open **My account**, choose **Set up
+two-factor sign-in**, scan the code with an authenticator app on your phone, and
+type the code it shows. From then on signing in needs your password and a code.
+Each person can do the same for their own account; if someone loses their phone,
+an administrator clears it on **Admin → Account Management → Reset 2FA**.
+
+Creating the first administrator also loads 25 **starter policies, standards and
+procedures** — information security policy, access control policy, incident
+response plan and so on — each *not published* and linked to the control
+objectives it supports. They are drafts to replace with your own on **Policies &
+documents**: until you approve and publish one, it counts for nothing.
+
 ### 3B.2 Capture the organisation in the workbook
 
 Fill in [`templates/CIRKS-organisation-capture.xlsx`](templates/CIRKS-organisation-capture.xlsx):
@@ -383,29 +396,28 @@ Save each sheet as **CSV UTF-8** into the `import/` folder of the checkout
 (`departments.csv`, `users.csv`, …). In Excel: select the sheet, then *File →
 Save a Copy → CSV UTF-8 (Comma delimited)*. Leave out sheets you have not used.
 
-**Add a threat catalogue.** CIRKS comes with no threats, and without them no
-risk can be recorded. A starting set of 20 common threats is provided:
+**Threats come with CIRKS.** A new installation starts with 20 common threats,
+each linked to the control objectives that counter it, so the workbook has no
+threat sheet. Each threat's likelihood is CIRKS's starting estimate, with a note
+saying where it comes from: review them for your organisation (**Risk
+Management → Threats**) before you assess risks, and add, rename or remove
+threats to suit.
 
-```bash
-cp ~/cirks/docs/templates/starter-threats.csv ~/cirks/import/threats.csv
-```
-
-Each starts with a likelihood of 3 (*Annual*) for confidentiality, integrity and
-availability. That is a placeholder, not an assessment: set each threat's
-likelihood for your organisation (**Risk Management → Threats**) before you
-assess risks. Add, rename or remove rows to suit.
+**Impact tables.** You can capture your own in the workbook, or start from
+CIRKS's: on **Impact Tables**, *Starter tables…* creates six organisation-wide
+tables (financial loss, reputation and trust, legal and regulatory, service
+delivery, personal data and privacy, health and safety), described in words, not
+figures, and not published until you have read and adapted each one.
 
 The application sees `~/cirks/import/` as `/import`, read-only. Copying files
 into the container does not work: its file system is read-only.
 
 ### 3B.4 Check, then load
 
-Check first. Every row is tried and then rolled back, so nothing is written.
-Give it the starting password you will load with (below), so the check covers
-that too — it must meet the password rule (3B.1):
+Check first. Every row is tried and then rolled back, so nothing is written:
 
 ```bash
-docker compose exec app node riskapp/db/import.js /import --dry-run --password '<starting password>'
+docker compose exec app node riskapp/db/import.js /import --dry-run
 ```
 
 Each file reports `imported / skipped / errors`, and each error names the row and
@@ -413,18 +425,21 @@ the reason — say, a department spelt differently on two sheets, or a value the
 drop-down would not have allowed. Fix the sheet, save it again, and repeat until
 every line reads `errors 0`.
 
-Then load it, choosing a **starting password** for the new accounts:
+Then load it:
 
 ```bash
-docker compose exec app node riskapp/db/import.js /import --password '<starting password>'
+docker compose exec app node riskapp/db/import.js /import
 ```
 
-- There is no default password: a person with no password, loaded without
-  `--password`, is refused.
-- **Everyone gets the same starting password, and CIRKS has no "change my
-  password" screen yet.** After the load, set each person's own password on
-  **Admin → Account Management → Reset password**, and pass it to them
-  yourself.
+- **Everyone loaded starts with sign-in locked.** Each account gets its own
+  random password that nobody is told, so nobody can sign in yet, but the
+  account is active: people own their risks and actions from the start. When
+  someone needs to sign in, find them on **Admin → Account Management** (their
+  row says *sign-in locked*), choose **Set password**, and pass the password to
+  them yourself. CIRKS has no "change my password" screen yet.
+- Do not put passwords in the workbook. (A `password` column and a
+  `--password` option for everyone exist for training data; a real
+  organisation should not use them.)
 - Loading again is safe: anything already there is skipped.
 - The load ends by bringing the security record up to date: every system's
   control objectives get their status from their security solutions. For a
@@ -702,4 +717,4 @@ do not contain these secrets.
 | Sign-in answers *Too many requests* | The sign-in throttle: 20 attempts per 15 minutes from one address. Wait, or raise `AUTH_RATE_LIMIT_MAX` in `.env` and run `docker compose up -d app`. |
 | `docker compose cp` into the app says *read-only* | Expected. Put files in `~/cirks/import/` instead (3B.3). |
 | The Misty Isles install says the database already has departments | It only goes into an empty instance. Start again from nothing (3A) — on a training machine only. |
-| An import row says *no password* | Load with `--password` (3B.4). |
+| A person loaded from the workbook cannot sign in | Expected until their password is set: Admin → Account Management, *Set password* on their row (3B.4). |

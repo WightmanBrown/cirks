@@ -40,7 +40,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES    IN SCHEMA public TO :"appr
 
 -- 2a. …except the credential columns (H-17). The blanket grant above covers
 -- every column, so the table-level SELECT on `users` is withdrawn and replaced
--- with a column list that omits password_hash and totp_secret. An attacker with
+-- with a column list that omits password_hash, totp_secret and (v166)
+-- totp_pending_secret. An attacker with
 -- the app's credentials — which a compromised container hands over — then gets
 -- no bcrypt hashes, which is what would otherwise turn a CIRKS breach into a
 -- breach of whatever else those passwords open.
@@ -58,13 +59,17 @@ SELECT format('GRANT SELECT (%s) ON users TO %I',
               (SELECT string_agg(quote_ident(column_name), ', ' ORDER BY ordinal_position)
                  FROM information_schema.columns
                 WHERE table_schema = 'public' AND table_name = 'users'
-                  AND column_name NOT IN ('password_hash', 'totp_secret')),
+                  AND column_name NOT IN ('password_hash', 'totp_secret', 'totp_pending_secret')),
               :'approle')
 \gexec
 
 -- The password comparison now happens inside the database (migration 0112), so
 -- the app needs EXECUTE on the definer function it can no longer do by hand.
 SELECT format('GRANT EXECUTE ON FUNCTION verify_user_credentials(TEXT, TEXT) TO %I', :'approle') \gexec
+-- Two-factor codes are checked the same way (v166, H-05): the app may write a
+-- new secret but never read one, so it can only ask the database.
+SELECT format('GRANT EXECUTE ON FUNCTION verify_user_totp(UUID, TEXT, BOOLEAN) TO %I', :'approle') \gexec
+SELECT format('GRANT EXECUTE ON FUNCTION confirm_user_totp(UUID, TEXT) TO %I', :'approle') \gexec
 
 -- 2b. The same for API-key hashes (migration 0132, H-17 part 2). They are
 -- SHA-256 of a 192-bit random secret, so reading one yields nothing replayable

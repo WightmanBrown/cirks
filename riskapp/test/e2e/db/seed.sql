@@ -603,3 +603,7 @@ INSERT INTO public.sod_rules VALUES ('action.complete', 'An action may not be ma
 INSERT INTO public.sod_rules VALUES ('exception.accept', 'A risk exception may not be accepted by the risk owner (the owning department''s IAO)', false);
 INSERT INTO public.sod_rules VALUES ('impact_table.publish', 'An impact table may not be published by its creator (maker-checker)', false);
 INSERT INTO public.sod_rules VALUES ('role.grant', 'A user may not grant a role to themselves', false);
+
+-- v164: every fixture account has a known password, so none reads "sign-in
+-- locked" (password_set_at NULL is what a new or imported account starts with).
+UPDATE users SET password_set_at = now() WHERE password_set_at IS NULL;

@@ -11,7 +11,7 @@ const { execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { query } = require('./helpers');
+const { app, request, query } = require('./helpers');
 
 const IMPORT = path.join(__dirname, '..', '..', '..', 'db', 'import.js');
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cirks-capture-'));
@@ -50,18 +50,40 @@ afterAll(async () => {
 
 describe('the capture workbook, loaded one sheet at a time', () => {
   // 2026-10-15: a blank password cell used to become 'Riskapp123' — the demo
-  // password published in the repository — when no --password was given.
-  test('a person with no password, loaded without --password, is refused — no built-in default', async () => {
+  // password published in the repository — when no --password was given; then
+  // it was refused. Since v164 (owner, 2026-11-02) the person is loaded ACTIVE
+  // with sign-in locked: their own random password, told to nobody, until an
+  // administrator sets one. Active, so they can own risks straight away.
+  test('a person with no password, loaded without --password, is active with sign-in locked', async () => {
     const env = { ...process.env }; delete env.DEMO_PASSWORD;
     const dir = path.join(root, String(++n)); fs.mkdirSync(dir);
     fs.writeFileSync(path.join(dir, 'users.csv'),
-      'email,full_name,role,department_name,is_active,view_mode,password\r\nocw.nopw@example.org,OCW No Password,information_asset_owner,,yes,business,\r\n');
+      'email,full_name,role,department_name,is_active,view_mode,password\r\n'
+      + 'ocw.nopw@example.org,OCW No Password,information_asset_owner,,yes,business,\r\n'
+      + 'ocw.nopw2@example.org,OCW No Password Two,information_asset_owner,,yes,business,\r\n'
+      + 'ocw.ownpw@example.org,OCW Own Password,information_asset_owner,,yes,business,Own-Password-123\r\n');
     let out;
     try { out = execFileSync('node', [IMPORT, dir], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }); }
     catch (err) { out = `${err.stdout || ''}${err.stderr || ''}`; }
-    expect(counts(out, 'users')).toEqual([0, 0, 1]);
-    expect(out).toMatch(/no password: load with --password/);
-    expect((await query(`SELECT 1 FROM users WHERE email = 'ocw.nopw@example.org'`)).rowCount).toBe(0);
+    expect(counts(out, 'users')).toEqual([3, 0, 0]);
+    expect(out).toMatch(/2 account\(s\) loaded with sign-in locked/);
+
+    const { rows } = await query(
+      `SELECT email, is_active, password_set_at IS NOT NULL AS set, password_hash
+         FROM users WHERE email LIKE 'ocw.%pw%@example.org' ORDER BY email`);
+    const by = Object.fromEntries(rows.map((r) => [r.email, r]));
+    expect(by['ocw.nopw@example.org']).toMatchObject({ is_active: true, set: false });
+    expect(by['ocw.nopw2@example.org']).toMatchObject({ is_active: true, set: false });
+    expect(by['ocw.ownpw@example.org']).toMatchObject({ is_active: true, set: true });
+    // Each its own lock, not one shared password.
+    expect(by['ocw.nopw@example.org'].password_hash).not.toBe(by['ocw.nopw2@example.org'].password_hash);
+
+    const locked = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'ocw.nopw@example.org', password: 'Capture-Test-Start-1' });
+    expect(locked.status).toBe(401);
+    const own = await request(app).post('/api/v1/auth/login')
+      .send({ email: 'ocw.ownpw@example.org', password: 'Own-Password-123' });
+    expect(own.status).toBe(200);
   });
 
   // 2026-10-22: the importer checked no length at all. One rule now, as the API.

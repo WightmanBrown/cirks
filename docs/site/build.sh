@@ -26,7 +26,6 @@ PUBLISHED=(
   templates/README.md
   templates/CIRKS-organisation-capture.xlsx
   templates/CIRKS-organisation-capture-EXAMPLE.xlsx
-  templates/starter-threats.csv
 )
 
 rm -rf "$OUT"; mkdir -p "$OUT"

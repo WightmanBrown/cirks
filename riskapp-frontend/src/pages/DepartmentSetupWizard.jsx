@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 import { HelpDot } from '../components/HelpDot';
-import { useState, useEffect, Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getDepartments, createDepartment, updateDepartment, deleteDepartment, getBusinessServices, getSharedServices, createBusinessService, updateBusinessService, deleteBusinessService, adoptService } from '../api';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getDepartment, getBusinessServices, getSharedServices, createBusinessService, updateBusinessService, deleteBusinessService, adoptService } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
@@ -136,7 +136,6 @@ const ARCHETYPES = [
   },
 ];
 
-const STEP_LIST     = 1;
 const STEP_TYPE     = 2;
 const STEP_SERVICES = 3;
 const STEP_DONE     = 4;
@@ -168,14 +167,16 @@ function StepIndicator({ step }) {
 // ── Main wizard ──────────────────────────────────────────────────────────────
 
 export function DepartmentSetupWizard() {
-  const { user, hasCapability } = useAuth();
+  const { hasCapability } = useAuth();
   const navigate  = useNavigate();
+  // The department comes from the route: the walkthrough is started from that
+  // department's page (Organisation), which is the one place departments are
+  // listed, created, edited and removed.
+  const { id: deptId } = useParams();
 
-  const [step,         setStep]         = useState(STEP_LIST);
-  const [departments,  setDepartments]  = useState([]);
-  const [deptLoading,  setDeptLoading]  = useState(true);
-  const [deptId,       setDeptId]       = useState('');
+  const [step,         setStep]         = useState(STEP_TYPE);
   const [deptName,     setDeptName]     = useState('');
+  const [loadError,    setLoadError]    = useState('');
   const [archetypeIds, setArchetypeIds] = useState(new Set());
   const [services,        setServices]        = useState([]);
   const [sharedFromOthers, setSharedFromOthers] = useState([]);
@@ -192,85 +193,11 @@ export function DepartmentSetupWizard() {
   const [deletingId,      setDeletingId]      = useState(null);
   const [error,           setError]           = useState('');
 
-  // List-page state
-  const [expandedDeptId,  setExpandedDeptId]  = useState(null);
-  const [creatingDept,    setCreatingDept]    = useState(false);
-
-  const canManageDepts = ['admin', 'ciso'].includes(user?.role);
-
-  const [editingDeptId,   setEditingDeptId]   = useState(null);
-  const [editingDeptName, setEditingDeptName] = useState('');
-  const [deptSaving,      setDeptSaving]      = useState(false);
-  const [deptError,       setDeptError]       = useState('');
-
-  const [newDeptName,    setNewDeptName]    = useState('');
-  const [newDeptSaving,  setNewDeptSaving]  = useState(false);
-
-  async function handleRenameDept(id) {
-    if (!editingDeptName.trim()) return;
-    setDeptSaving(true);
-    setDeptError('');
-    try {
-      const updated = await updateDepartment(id, editingDeptName.trim());
-      setDepartments(ds => ds.map(d => d.id === id ? { ...d, name: updated.name } : d));
-      if (deptId === id) setDeptName(updated.name);
-      setEditingDeptId(null);
-    } catch (err) {
-      setDeptError(err.response?.data?.error || 'Failed to rename.');
-    } finally {
-      setDeptSaving(false);
-    }
-  }
-
-  async function handleDeleteDept(id) {
-    setDeptSaving(true);
-    setDeptError('');
-    try {
-      await deleteDepartment(id);
-      setDepartments(ds => ds.filter(d => d.id !== id));
-      if (deptId === id) { setDeptId(''); setDeptName(''); }
-      if (expandedDeptId === id) setExpandedDeptId(null);
-    } catch (err) {
-      setDeptError(err.response?.data?.error || 'Failed to delete department.');
-    } finally {
-      setDeptSaving(false);
-    }
-  }
-
-  async function handleCreateAndStart(e) {
-    e.preventDefault();
-    if (!newDeptName.trim()) return;
-    setNewDeptSaving(true);
-    setDeptError('');
-    try {
-      const created = await createDepartment(newDeptName.trim());
-      setDepartments(ds => [...ds, { ...created, iao_names: null, iam_names: null, impact_table_count: 0, information_asset_count: 0 }].sort((a, b) => a.name.localeCompare(b.name)));
-      setNewDeptName('');
-      setCreatingDept(false);
-      selectDept(created.id, created.name);
-      setArchetypeIds(new Set());
-      setServices([]);
-      setStep(STEP_TYPE);
-    } catch (err) {
-      setDeptError(err.response?.data?.error || 'Failed to create department.');
-    } finally {
-      setNewDeptSaving(false);
-    }
-  }
-
-  function startWizard(dept) {
-    selectDept(dept.id, dept.name);
-    setArchetypeIds(new Set());
-    setServices([]);
-    setStep(STEP_TYPE);
-  }
-
   useEffect(() => {
-    getDepartments()
-      .then(setDepartments)
-      .catch(() => {})
-      .finally(() => setDeptLoading(false));
-  }, []);
+    getDepartment(deptId)
+      .then(d => setDeptName(d.name))
+      .catch(err => setLoadError(err.response?.data?.error || 'Department not found.'));
+  }, [deptId]);
 
   // Load existing services + shared services from other depts when entering step 3
   useEffect(() => {
@@ -296,7 +223,7 @@ export function DepartmentSetupWizard() {
     setError('');
     try {
       const body = { name, description: description || null, is_shared: !!is_shared };
-      if (deptId) body.department_id = deptId;
+      body.department_id = deptId;
       const svc = await createBusinessService(body);
       setServices(s => [...s, svc]);
       return true;
@@ -379,11 +306,6 @@ export function DepartmentSetupWizard() {
     }
   }
 
-  function selectDept(id, name) {
-    setDeptId(id);
-    setDeptName(name);
-  }
-
   // Gate the whole wizard up front: department setup needs departments.write.
   // Show a clear warning on entry rather than letting the user fill it in and
   // hit a 403 on save.
@@ -391,152 +313,8 @@ export function DepartmentSetupWizard() {
     return <CapabilityGate capability="departments.write" feature="set up departments" />;
   }
 
-  // ── Step 1: department list ────────────────────────────────────────────────
-
-  if (step === STEP_LIST) {
-    return (
-      <Shell>
-        <div className={styles.page}>
-          <BackButton />
-          <div className={styles.pageHeader}>
-            <div>
-              <h1 className={styles.title}>Department Setup <HelpDot k="dept_wizard.title" placement="bottom" /></h1>
-              {!deptLoading && (
-                <span className={styles.subtitle}>
-                  {departments.length} department{departments.length !== 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-            {canManageDepts && !creatingDept && (
-              <button className={styles.btnPrimary} onClick={() => setCreatingDept(true)}>
-                + New Department
-              </button>
-            )}
-          </div>
-
-          {creatingDept && (
-            <form className={styles.createForm} onSubmit={handleCreateAndStart}>
-              <input
-                className={styles.createInput}
-                value={newDeptName}
-                onChange={e => setNewDeptName(e.target.value)}
-                placeholder="Department name"
-                autoFocus
-                disabled={newDeptSaving}
-              />
-              <button
-                type="submit"
-                className={styles.btnPrimary}
-                disabled={!newDeptName.trim() || newDeptSaving}
-              >
-                {newDeptSaving ? 'Creating…' : 'Create and continue →'}
-              </button>
-              <button
-                type="button"
-                className={styles.btnSecondary}
-                onClick={() => { setCreatingDept(false); setNewDeptName(''); setDeptError(''); }}
-                disabled={newDeptSaving}
-              >
-                Cancel
-              </button>
-            </form>
-          )}
-
-          {deptError && <p className={styles.deptError}>{deptError}</p>}
-
-          {deptLoading ? (
-            <p className={styles.loading}>Loading departments…</p>
-          ) : departments.length === 0 ? (
-            <p className={styles.empty}>No departments yet. Use the button above to add the first one.</p>
-          ) : (
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th className={styles.th}>Department <HelpDot k="dept_wizard.col.department" placement="bottom" /></th>
-                    <th className={styles.th}>Information Asset Owner <HelpDot k="departments.col.iao" placement="bottom" /></th>
-                    <th className={styles.th}>Information Asset Manager <HelpDot k="departments.col.iam" placement="bottom" /></th>
-                    <th className={`${styles.th} ${styles.thNum}`}>Impact tables <HelpDot k="departments.col.impact_tables" placement="bottom" /></th>
-                    <th className={`${styles.th} ${styles.thNum}`}>Information assets <HelpDot k="departments.col.assets" placement="bottom" /></th>
-                    <th className={styles.th} />
-                  </tr>
-                </thead>
-                <tbody>
-                  {departments.map(d => {
-                    const isExpanded = expandedDeptId === d.id;
-                    const isEditing  = editingDeptId === d.id;
-                    return (
-                      <Fragment key={d.id}>
-                        {isEditing ? (
-                          <tr className={styles.tableRow}>
-                            <td colSpan={6} className={styles.tdEdit}>
-                              <div className={styles.deptEditForm}>
-                                <input
-                                  className={styles.deptEditInput}
-                                  value={editingDeptName}
-                                  onChange={e => setEditingDeptName(e.target.value)}
-                                  onKeyDown={e => {
-                                    if (e.key === 'Enter') handleRenameDept(d.id);
-                                    if (e.key === 'Escape') setEditingDeptId(null);
-                                  }}
-                                  autoFocus
-                                />
-                                <button className={styles.deptEditSave} onClick={() => handleRenameDept(d.id)} disabled={deptSaving || !editingDeptName.trim()}>Save</button>
-                                <button className={styles.deptEditCancel} onClick={() => setEditingDeptId(null)} disabled={deptSaving}>Cancel</button>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          <tr
-                            className={`${styles.tableRow} ${isExpanded ? styles.tableRowSelected : ''}`}
-                            onClick={() => setExpandedDeptId(isExpanded ? null : d.id)}
-                          >
-                            <td className={styles.tdName}>{d.name}</td>
-                            <td className={styles.tdMeta}>{d.iao_names || <span className={styles.muted}>—</span>}</td>
-                            <td className={styles.tdMeta}>{d.iam_names || <span className={styles.muted}>—</span>}</td>
-                            <td className={styles.tdNum}>{d.impact_table_count}</td>
-                            <td className={styles.tdNum}>{d.information_asset_count}</td>
-                            <td className={styles.tdActions} onClick={e => e.stopPropagation()}>
-                              {canManageDepts && (
-                                <div className={styles.rowActions}>
-                                  <button
-                                    className={styles.rowActionBtn}
-                                    onClick={() => { setEditingDeptId(d.id); setEditingDeptName(d.name); setDeptError(''); }}
-                                  >Rename</button>
-                                  <button
-                                    className={`${styles.rowActionBtn} ${styles.rowActionBtnDanger}`}
-                                    onClick={() => handleDeleteDept(d.id)}
-                                    disabled={deptSaving}
-                                  >Remove</button>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        )}
-                        {isExpanded && !isEditing && (
-                          <tr className={styles.summaryRow}>
-                            <td colSpan={6} className={styles.summaryCell}>
-                              <div className={styles.deptFoldCard}>
-                                <span className={styles.deptFoldHint}>
-                                  Set up or review the business services catalogued for <strong>{d.name}</strong>.
-                                </span>
-                                <button className={styles.btnPrimary} onClick={() => startWizard(d)}>
-                                  Set up services →
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </Shell>
-    );
+  if (loadError) {
+    return <Shell><div className={styles.page}><BackButton /><p className={styles.error}>{loadError}</p></div></Shell>;
   }
 
   // ── Step 2: archetype ──────────────────────────────────────────────────────
@@ -579,7 +357,7 @@ export function DepartmentSetupWizard() {
             </div>
 
             <div className={styles.stepActions}>
-              <button className={styles.btnSecondary} onClick={() => setStep(STEP_LIST)}>← Back</button>
+              <button className={styles.btnSecondary} onClick={() => navigate(`/departments/${deptId}`)}>← Back to department</button>
               <button
                 className={styles.btnPrimary}
                 onClick={() => {
@@ -851,9 +629,9 @@ export function DepartmentSetupWizard() {
             </button>
             <button
               className={styles.btnSecondary}
-              onClick={() => { setStep(STEP_LIST); setServices([]); setDeptId(''); setDeptName(''); setArchetypeIds(new Set()); setExpandedDeptId(null); }}
+              onClick={() => navigate(`/departments/${deptId}`)}
             >
-              Set up another department
+              Back to {deptName}
             </button>
           </div>
         </div>

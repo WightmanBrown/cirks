@@ -74,10 +74,12 @@ async function systemSecurity(systemId) {
                          FROM membership_group_members m JOIN control_components cc ON cc.id = m.component_id
                         WHERE m.group_id = g.id), '[]') AS members
         FROM membership_groups g JOIN control_components doc ON doc.id = g.standard_id
-       WHERE NOT EXISTS (SELECT 1 FROM membership_group_triggers t WHERE t.group_id = g.id)
-          OR EXISTS (SELECT 1 FROM membership_group_triggers t
-                       JOIN system_components x ON x.component_id = t.component_id AND x.system_id = $1
-                      WHERE t.group_id = g.id)
+       -- v165: a group with no members asks nothing yet.
+       WHERE EXISTS (SELECT 1 FROM membership_group_members m0 WHERE m0.group_id = g.id)
+         AND (NOT EXISTS (SELECT 1 FROM membership_group_triggers t WHERE t.group_id = g.id)
+              OR EXISTS (SELECT 1 FROM membership_group_triggers t
+                           JOIN system_components x ON x.component_id = t.component_id AND x.system_id = $1
+                          WHERE t.group_id = g.id))
        ORDER BY g.sort_index, lower(g.name)`, [systemId]),
     // Each wanted solution once, with every reason it is wanted.
     query(`

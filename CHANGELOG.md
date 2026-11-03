@@ -11,6 +11,89 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.2.0
+
+Two-factor sign-in, accounts that start locked until an administrator sets a
+password, and a starter library so a new organisation has threats, policies,
+impact tables and an architecture template to begin from.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. Three
+migrations run by themselves when CIRKS starts (v164 to v166), and CIRKS backs
+up the database before applying them. Then:
+
+- **Turn on two-factor sign-in for your administrator account** (select your
+  email address in the top bar, then *Set up two-factor sign-in*).
+- **Your existing threats, documents and impact tables are not changed.** The
+  starter library loads by itself only into a new installation. To add the
+  starter threats and documents to an existing one (anything already there is
+  skipped): `docker compose exec app node riskapp/db/import.js
+  riskapp/db/seed/starter`. Their links name the CIRKS control objectives, so on
+  an installation whose library is still NIST CSF the links are reported as
+  errors and the rest loads.
+- **Existing accounts are counted as having a password set,** including any
+  loaded with a shared starting password. Only accounts created from now on
+  show *sign-in locked*.
+
+- **Two-factor sign-in.** Each person can turn it on for their own account on
+  the new *My account* page: scan a QR code with an authenticator app (Microsoft
+  Authenticator, Google Authenticator, 1Password and others) and type the code
+  it shows. From then on, signing in needs the password and a code. Turning it
+  off needs both the password and a code. If someone loses their phone, an
+  administrator clears it with *Reset 2FA* on Account Management; that now asks
+  first and is recorded in the audit log. The secret never leaves the
+  database: codes are checked there, so the application itself cannot read
+  anyone's second factor, and a code that has been used once is refused.
+  Turning it on signs the account out of its other sessions.
+- **New accounts start with sign-in locked.** An account created on Account
+  Management, or loaded from the capture workbook without a password, gets its
+  own random password that nobody is told. It is active, so the person owns
+  their risks and actions straight away, but nobody can sign in until an
+  administrator chooses *Set password* on their row. The *New account* form no
+  longer asks for a password, and the import no longer needs `--password`: it
+  reports how many accounts it locked. (For scripts: `POST
+  /api/v1/admin/users` now refuses a `password` field.)
+- **A starter library for new installations.**
+  - **20 threats**, each linked to the CIRKS control objectives that counter it
+    (157 links), loaded when CIRKS first starts. The links are what let a
+    deployed objective reduce a risk. Each threat's likelihood is a starting
+    estimate with a note on where it comes from: review them for your
+    organisation before you assess risks.
+  - **25 policies, standards and procedures** — information security policy,
+    access control policy, incident response plan and so on — loaded when the
+    first administrator is created. Each is *not published* and linked to the
+    objectives it supports; until you approve and publish one, it counts for
+    nothing.
+  - **Six impact tables** on demand (*Impact Tables → Starter tables…*):
+    financial loss, reputation and trust, legal and regulatory, service
+    delivery, personal data and privacy, and health and safety. Each level is
+    described in words, not figures, and the tables are not published until you
+    have read and adapted them.
+  - **Six systems architecture template groups** on demand (*Systems
+    architecture template → Add the starter groups*): connectivity, hosting,
+    operating system, authentication service, support team and user group,
+    created empty for your own answers.
+- **A template group with no members asks nothing.** Until it has at least one
+  member, a group is no longer reported as a gap on every system, which no
+  system owner could have fixed.
+- **Suppliers show how completely their control objectives are met.** On the
+  Suppliers list, each supplier has a ring of its objectives across its live
+  relationships: met (green), evidence expired (amber) and not evidenced (red),
+  with the percentage met in the centre, and one ring for all suppliers sits
+  beside the summary. Objectives you meet with your own control are not
+  counted, as the supplier assurance finding does not count them.
+- **One page for departments.** *Business Departments* is gone from the Risk
+  Management menu: departments are listed, created, edited and removed under
+  *Business Architecture → Organisation*. A department's page has *Set up
+  services* (the service template walkthrough) and *Remove*. Removing a
+  department is now refused, with what still belongs to it named, while it has
+  active people, systems, assets, services, impact tables or supplier
+  relationships; before, its people and impact tables were silently cut loose
+  from it. Old links to the setup page open Organisation.
+- **Sign-in says when a code is wrong** (it used to clear the code box without
+  a word), and its fields are labelled for screen readers.
+- `docs/templates/starter-threats.csv` is retired: the threats now come with
+  CIRKS.
+
 ## v1.1.1
 
 Two security updates to libraries CIRKS uses, and a sturdier install test.

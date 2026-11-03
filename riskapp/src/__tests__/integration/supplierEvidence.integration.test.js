@@ -178,6 +178,16 @@ describe('the supplier list flags gaps', () => {
     expect(row).toMatchObject({ live_count: 1, gap_count: 1, unanswered_gaps: 0 });
     expect(row.unmet_objectives).toBeGreaterThan(0);
   });
+
+  test('it splits the objectives into met, evidence expired and never evidenced, for the completeness ring', async () => {
+    const res = await api('ciso', 'get', '/suppliers');
+    const row = res.body.suppliers.find((s) => s.id === supplierId);
+    // The contract ended above, so the terms that covered one objective have expired.
+    expect(row.objectives_expired).toBeGreaterThanOrEqual(1);
+    // Amber and red together are exactly what the finding counts as not met.
+    expect(row.objectives_expired + row.objectives_missing).toBe(row.unmet_objectives);
+    expect(row.objectives_met).toBeGreaterThanOrEqual(0);
+  });
 });
 
 describe('deleting evidence', () => {

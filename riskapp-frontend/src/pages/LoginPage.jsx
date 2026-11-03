@@ -6,7 +6,7 @@
  * Login form with optional TOTP step.
  * On success, navigates to the dashboard (the common landing page for every role).
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/cirks-logo-dark.png';
@@ -61,9 +61,12 @@ export function LoginPage() {
       const data = err.response?.data;
 
       if (data?.totp_required) {
-        // Server says TOTP is needed — show TOTP input.
+        // Server says TOTP is needed — show TOTP input. Once the step is showing,
+        // the same answer means the code was wrong: say so.
+        if (totpStep) setError(data.error || 'That code is not right.');
+        else setError('');
         setTotpStep(true);
-        setError('');
+        setTotpCode('');
       } else {
         setError(data?.error || 'Login failed. Please try again.');
       }
@@ -184,10 +187,13 @@ export function LoginPage() {
 // ── Small form field component ────────────────────────────────────────────────
 
 function Field({ label, type, value, onChange, disabled, autoFocus, ...rest }) {
+  // The label is tied to its input, so a screen reader names the field.
+  const id = useId();
   return (
     <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
+      <label className={styles.label} htmlFor={id}>{label}</label>
       <input
+        id={id}
         className={styles.input}
         type={type}
         value={value}

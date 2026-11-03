@@ -76,19 +76,20 @@ async function login(req, res, next) {
     }
 
     if (user.totp_enabled) {
-      // TOTP verification has NOT moved into the database, and the secret is no
-      // longer readable from here. That is deliberate rather than an oversight:
-      // MFA cannot be enrolled at all today (H-05 — nothing ever writes
-      // totp_secret, so no account can legitimately be in this state), and
-      // implementing base32 + HMAC-SHA1 + dynamic truncation in PL/pgSQL to
-      // support a feature that does not work would be the wrong order of
-      // events. When H-05 makes enrolment real, verification gets its own
-      // definer function alongside this one. Until then this fails CLOSED and
-      // says so, rather than silently admitting anyone.
-      return res.status(401).json({
-        error: 'This account requires a second factor, which is not yet available. An administrator can clear it.',
-        totp_required: true,
-      });
+      // The second factor (H-05, v166). The code is checked INSIDE the database,
+      // like the password: the app role cannot read the secret (H-17). A code
+      // already used is refused, so one seen over a shoulder cannot be replayed.
+      // No code yet → ask for one; the login page then shows its code step.
+      if (!totp_code) {
+        return res.status(401).json({ error: 'Enter the code from your authenticator app.', totp_required: true });
+      }
+      const { rows: [t] } = await query('SELECT verify_user_totp($1, $2) AS ok', [user.id, String(totp_code)]);
+      if (!t.ok) {
+        return res.status(401).json({
+          error: 'That code is not right. Use the newest code from your authenticator app.',
+          totp_required: true,
+        });
+      }
     }
 
     const { rows: roleRows } = await query(

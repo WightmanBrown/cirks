@@ -42,6 +42,7 @@ function prompt(question) {
 }
 
 const { resolvePassword } = require('./promptPassword');
+const { loadStarterDocuments } = require('./seed/starterLibrary');
 
 async function main() {
   const args = parseArgs(process.argv);
@@ -67,11 +68,23 @@ async function main() {
 
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
   const { rows } = await pool.query(
-    `INSERT INTO users (email, full_name, password_hash, role, department_id, is_active)
-     VALUES ($1, $2, $3, 'admin', NULL, TRUE) RETURNING id`,
+    `INSERT INTO users (email, full_name, password_hash, role, department_id, is_active, password_set_at)
+     VALUES ($1, $2, $3, 'admin', NULL, TRUE, now()) RETURNING id`,
     [email, name, hash]);
 
   console.log(`[create-admin] Created admin "${name}" <${email}> (id ${rows[0].id}).`);
+
+  // The starter policies, standards and procedures (db/seed/starterLibrary.js):
+  // they need a creating user, which a new installation has only now. Loaded
+  // only while there are no policies or documents at all.
+  const client = await pool.connect();
+  try {
+    const docs = await loadStarterDocuments(client, rows[0].id);
+    if (docs) {
+      console.log(`[create-admin] Starter documents loaded: ${docs.documents} policies, standards and procedures,`
+        + ` NOT PUBLISHED, linked to ${docs.links} control objectives. Replace each with your own on Policies & documents.`);
+    }
+  } finally { client.release(); }
   console.log('[create-admin] Log in at the app URL with this email and the password you set.');
 }
 

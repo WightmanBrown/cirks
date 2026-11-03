@@ -3,7 +3,7 @@
 import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getDepartment, updateDepartment } from '../api';
+import { getDepartment, updateDepartment, deleteDepartment } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
 import { personLabel } from '../utils/roles';
@@ -87,6 +87,8 @@ export function DepartmentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
   const [editing, setEditing] = useState(false);
+  const [removeError, setRemoveError] = useState('');
+  const [removing, setRemoving] = useState(false);
 
   const canManage = hasCapability('departments.write');
 
@@ -98,6 +100,21 @@ export function DepartmentDetailPage() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Refused by the server while people, systems, assets, services, impact
+  // tables or supplier relationships still belong to the department; its
+  // message names them.
+  async function handleRemove() {
+    if (!window.confirm(`Remove the department "${dept.name}"? This cannot be undone.`)) return;
+    setRemoving(true); setRemoveError('');
+    try {
+      await deleteDepartment(dept.id);
+      navigate('/departments');
+    } catch (err) {
+      setRemoveError(err.response?.data?.error || 'Failed to remove the department.');
+      setRemoving(false);
+    }
+  }
 
   if (loading) return <Shell><div className={styles.page}><BackButton /><p className={styles.muted}>Loading…</p></div></Shell>;
   if (error || !dept) return <Shell><div className={styles.page}><BackButton /><p className={styles.errorMsg}>{error || 'Not found.'}</p></div></Shell>;
@@ -123,9 +140,18 @@ export function DepartmentDetailPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>{dept.name}<EntityKind kind="department" /> <HelpDot k="department_detail.title" placement="bottom" /></h1>
           {canManage && (
-            <button className={styles.btnSecondary} onClick={() => setEditing(true)}>Edit</button>
+            <div className={styles.headerActions}>
+              <button className={styles.btnSecondary} onClick={() => navigate(`/departments/${dept.id}/services`)}>
+                Set up services
+              </button>
+              <button className={styles.btnSecondary} onClick={() => setEditing(true)}>Edit</button>
+              <button className={styles.btnDanger} onClick={handleRemove} disabled={removing}>
+                {removing ? 'Removing…' : 'Remove'}
+              </button>
+            </div>
           )}
         </div>
+        {removeError && <p className={styles.errorMsg}>{removeError}</p>}
 
         {dept.description
           ? <p className={styles.desc}>{dept.description}</p>

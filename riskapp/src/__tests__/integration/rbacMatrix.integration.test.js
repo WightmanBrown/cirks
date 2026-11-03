@@ -200,6 +200,7 @@ const MATRIX = [
   ['post',  '/api/v1/architecture/rules', ['admin', 'ciso', 'analyst']],
   ['delete',`/api/v1/architecture/rules/${U}`, ['admin', 'ciso', 'analyst']],
   ['post',  `/api/v1/architecture/groups/${U}/members`, ['admin', 'ciso', 'analyst']],
+  ['post',  '/api/v1/architecture/groups/starter', ['admin', 'ciso', 'analyst']],   // {} → 400 (no document), nothing created
   ['post',  '/api/v1/architecture/builds', ['admin', 'ciso', 'analyst']],
   // …while choosing a solution and applying a build are edits to the system.
   ['get',   `/api/v1/systems/${U}/security`, ['admin', 'ciso', 'analyst', 'iam', 'owner', 'consultant', 'secretary', 'soc']],
