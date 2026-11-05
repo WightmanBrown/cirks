@@ -983,7 +983,10 @@ export function SystemDetailPage() {
         <div className={styles.breadcrumb}>
           <BackButton fallback="/systems" />
           {!canEdit && <ReadOnlyBadge reason={canLinkAssets ? "System details are read-only — you can manage information assets on the Assets tab." : "Your role has view-only access to systems."} />}
-          <span className={styles.viewModeSlot}><ViewModeToggle {...viewMode} /></span>
+          <span className={styles.viewModeSlot}>
+            {hasCapability('reports.department') && <Link to={`/reporting/systems/${system.id}`} className={styles.reportLink}>System report →</Link>}
+            <ViewModeToggle {...viewMode} />
+          </span>
         </div>
 
         <SystemSummaryCard system={system} isExpert={isExpert} showRiskPath={false} />

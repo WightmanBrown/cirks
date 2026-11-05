@@ -11,6 +11,110 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.3.0
+
+Insights: reports for each role. Each shows what has been decided, what is in
+hand and what still needs someone, and links to the place to act. The
+organisation can also now set its own risk appetite.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. Eight
+migrations run by themselves when CIRKS starts (v167 to v174), and CIRKS backs
+up the database before applying them. Then:
+
+- **Your risk appetite is unchanged.** The action threshold and the two
+  acceptance limits keep the values you had (12, 11 and 19 unless you changed
+  them). Check them on *Admin → Risk Appetite*.
+- **Trends start from your upgrade.** CIRKS records the headline figures once a
+  month from now on, so the trend lines on the board summary and the
+  department and system reports fill in over time. Nothing is back-filled.
+- **No tolerances are set.** Until the SIRO sets green and amber limits for a
+  board headline, that figure is not rated.
+- **No impact table is marked reputational.** Until the CISO or an
+  administrator marks one (open the table on *Impact Tables*, then *Mark as
+  reputational*), the department report's reputational risk section is empty.
+
+- **Insights** (the menu was *Metrics & Reporting*) lists the reports you may
+  read:
+  - **Board summary**: one printable page in pictures. It shows heat maps of
+    risk now and after the work in hand, how much risk has been answered, the
+    trend, compliance with each standard you have switched on, the Statement
+    of Applicability, control coverage, quality of the record, remediation and
+    departments.
+  - **SIRO report** (printable): the decisions waiting for the SIRO, and
+    exposure against the thresholds by department. The decisions are those
+    decided and not delivered, accepted and not recorded, with no decision,
+    above the risk owner's limit, or whose acceptance has expired.
+  - **CISO report**:
+    - whether the business has agreed each risk at or above the threshold,
+      with the minuted decision or the owner's act;
+    - where investment removes the most risk, ranked by risk points removed
+      and, where a security solution has an estimated cost, by points per
+      1,000;
+    - the risk departments share through common systems, with the fixes that
+      would help them together.
+  - **My department** (Information Asset Owners):
+    - how much of the department's risk has been answered, and the obligations
+      met;
+    - the actions, grouped into those needing you, those in hand and those
+      done;
+    - the risk from shared systems owned elsewhere (read only, with each
+      owner named);
+    - reputational risk, improvement with its evidence, and what nobody has
+      looked at yet.
+
+    Administrators, the CISO, the SIRO and risk analysts choose a department.
+  - **My systems** and a **system report** (Information Asset Managers). For
+    each system it shows:
+    - its risks, assets, services and actions;
+    - compliance with each standard on that system;
+    - the value the system holds and the decisions about it;
+    - the people needed to run its security solutions.
+
+    Each system's page links to its report.
+  - **My work** (risk analysts):
+    - what to do next, and the actions in hand;
+    - the quality of your record: completeness, first-time acceptance,
+      timeliness and consistency;
+    - the risk your work has removed, and the departments you work with.
+
+    The CISO and administrators can see the whole team or one analyst.
+  - **Where unknown risk is hiding** (risk analysts and the CISO). Each group
+    says who can put it right. The groups are:
+    - objectives nobody has judged;
+    - threats identified and not assessed;
+    - systems with no threat or no assets;
+    - missing ratings and unrated controls;
+    - components whose scope is not stated;
+    - risks past review and risks waiting.
+- **Set your own risk appetite.** The SIRO or an administrator sets the action
+  threshold and the analyst and risk-owner acceptance limits on the new *Risk
+  Appetite* page.
+  - Each change needs a reason and is recorded in the audit log.
+  - The three must stay in order, and the page shows how many risks sit at
+    each score before you change them.
+  - A change that would put a risk marked *no action required* at or above the
+    threshold is refused, naming the risks.
+
+  Every report and page that mentions the threshold now reads it from here
+  ("scoring 12 or more").
+- **Tolerances for the board's headlines.** The SIRO can give each headline
+  figure a green and an amber limit, with a reason, and the board summary rates
+  it to match.
+- **Estimated cost and effort on a security solution.** A solution's page can
+  record an optional one-off and annual cost, and the hours a month it takes
+  to run, each for the organisation or per system. Nothing is filled in for
+  you. The CISO report uses the cost, and the system report the effort. Both
+  are in the data export and import.
+- **Record your view on a decision.** On a risk's page, the department's
+  Information Asset Owner and Manager can record their view on a decision about
+  the risk: its validation, a minuted decision, an acceptance or an accepted
+  action. A recorded view is never changed or removed.
+- **One probability and impact grid everywhere.** The risk register, the
+  dashboard heat maps, a risk's page and the reports all draw the same grid,
+  with every square coloured by its band.
+- **The development control statement** (`CONTROL_STATEMENT.md`) sets out the
+  rules every contribution to CIRKS follows.
+
 ## v1.2.0
 
 Two-factor sign-in, accounts that start locked until an administrator sets a

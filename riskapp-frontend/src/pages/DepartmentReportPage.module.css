@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+/* My department: the board and CISO pages' styles plus these. */
+.controls { display: flex; gap: 10px; align-items: flex-end; }
+.controls select { background: var(--bg-inset); border: 1px solid var(--border); color: var(--text-primary); border-radius: 5px; padding: 6px 10px; font-size: 13px; }
+.list { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-primary); }
+.obligations { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.obligationHead { display: flex; gap: 10px; align-items: center; font-size: 13px; color: var(--text-primary); }
+.count { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+.group + .group { margin-top: 12px; }
+.groupTitle { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.view { margin-top: 6px; padding: 6px 10px; border-left: 3px solid var(--border-accent); background: color-mix(in srgb, var(--ink) 4%, transparent); font-size: 12.5px; color: var(--text-primary); }

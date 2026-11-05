@@ -29,6 +29,7 @@ const scopesRouter         = require('./scopes/index');
 const helpRouter           = require('./help/index');
 const findingsRouter       = require('./findings/index');
 const suppliersRouter      = require('./suppliers/index');
+const reportsRouter        = require('./reports/index');
 const architectureRouter   = require('./architecture/index');
 
 const router = Router();
@@ -59,6 +60,7 @@ router.use('/scopes',      scopesRouter);
 router.use('/help',        helpRouter);
 router.use('/findings',    findingsRouter);
 router.use('/suppliers',   suppliersRouter);
+router.use('/reports',     reportsRouter);
 router.use('/architecture', architectureRouter);
 
 module.exports = router;

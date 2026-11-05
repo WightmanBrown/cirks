@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Wightman Brown Limited
 // Draft help text — see index.js.
 export default {
+  'risk.recorded_views': { title: 'Recorded views on decisions', body: "Views the department's information asset owner or manager recorded on decisions about this risk: dated and signed. A view never changes the decision, and cannot be edited or removed once recorded; a correction is a new view. Views are recorded from the system report's decision record." },
   // PendingRisksPage
   'pending_risks.title': { title: 'Pending validation', body: 'Risks that have been identified or edited and are waiting for the CISO to validate them, plus any the CISO has returned for rework. Open a risk to validate it or return it with notes.' },
   'pending_risks.col.status': { title: 'Validation status', body: 'Pending: waiting for the CISO’s review. Returned: the CISO sent it back with notes, and it needs correcting before it is validated.' },

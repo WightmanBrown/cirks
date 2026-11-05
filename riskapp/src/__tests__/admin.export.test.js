@@ -295,7 +295,7 @@ describe('GET /api/v1/admin/export', () => {
   test.each([
     ['components', 'name,component_type,status,description,notes,created_by_email,instantiation,is_host,hostname,document_kind,document_version,document_owner_email,document_approved_by_email,document_approved_on,document_next_review,document_url'],
     ['component-ip-addresses', 'component_name,component_type,ip_address,label'],
-    ['delivery-patterns', 'name,kind,notes'],
+    ['delivery-patterns', 'name,kind,notes,cost_one_off,cost_annual,cost_basis,cost_note,effort_hours_month,effort_basis,effort_note'],
     ['delivery-pattern-objectives', 'pattern_name,control_title'],
     ['delivery-pattern-parts', 'pattern_name,component_name,component_type,location,service_system_name'],
     ['architecture-rules', 'pattern_name,standard_name,notes,trigger_component_name,trigger_component_type'],

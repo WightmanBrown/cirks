@@ -44,6 +44,12 @@ async function start() {
   await safeExceptionSweep('startup');
   startExceptionSweepTimer();
 
+  // Keep this month's board figures for the trend (v168): at boot, then daily;
+  // a month already held is left alone.
+  const { safeCapture, startMetricCaptureTimer } = require('./jobs/metricCapture');
+  await safeCapture('startup');
+  startMetricCaptureTimer();
+
   app.listen(PORT, () => {
     console.info(`[startup] riskapp listening on http://localhost:${PORT}`);
     console.info(`[startup] Environment: ${process.env.NODE_ENV || 'development'}`);

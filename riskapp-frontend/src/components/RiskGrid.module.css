@@ -1,0 +1,29 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.wrap { margin: 0; display: inline-flex; flex-direction: column; gap: 6px; --cell: 34px; --cellH: 30px; }
+.small  { --cell: 26px; --cellH: 22px; }
+.large  { --cell: 44px; --cellH: 38px; }
+.clickable { background: transparent; border: none; padding: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.clickable:hover .grid { outline: 1px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+.label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.body { display: flex; align-items: center; gap: 6px; }
+.yAxis { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; }
+.grid { display: flex; flex-direction: column; gap: 2px; }
+.row { display: flex; gap: 2px; }
+.tick { width: var(--cell); font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+.row .tick:first-child { width: 14px; }
+.cell { width: var(--cell); height: var(--cellH); border-radius: 3px; display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-mono); font-size: 13px; font-weight: 700; border: none; padding: 0; }
+.small .cell { font-size: 11px; }
+button.cell { cursor: pointer; }
+button.cell:hover { filter: brightness(1.25); }
+.empty { opacity: 0.35; }
+.selected { outline: 2px solid var(--accent); outline-offset: 1px; opacity: 1; }
+.marked { outline: 2px solid var(--text-primary); outline-offset: 1px; }
+.band_low          { background: var(--band-low-bg);          color: var(--band-low-fg); }
+.band_medium       { background: var(--band-medium-bg);       color: var(--band-medium-fg); }
+.band_high         { background: var(--band-high-bg);         color: var(--band-high-fg); }
+.band_critical     { background: var(--band-critical-bg);     color: var(--band-critical-fg); }
+.band_catastrophic { background: var(--band-catastrophic-bg); color: var(--band-catastrophic-fg); }
+.caption { font-size: 11px; color: var(--text-muted); padding-left: 22px; }

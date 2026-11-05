@@ -8,6 +8,7 @@ import {
   getImpactTable,
   publishImpactTable,
   setImpactTableMandatory,
+  setImpactTableReputational,
   unpublishImpactTable,
   deleteImpactTable,
   getDepartments,
@@ -114,6 +115,17 @@ export function TableDetail({ tableId, canEdit, canOrg, onChanged, onDeleted }) 
     }
   }
 
+  async function handleToggleReputational() {
+    setActionError('');
+    try {
+      await setImpactTableReputational(tableId, !detail.is_reputational);
+      await load();
+      onChanged();
+    } catch (err) {
+      setActionError(err.response?.data?.error || 'Update failed');
+    }
+  }
+
   async function handleToggleMandatory() {
     setActionError('');
     try {
@@ -145,6 +157,7 @@ export function TableDetail({ tableId, canEdit, canOrg, onChanged, onDeleted }) 
   const canPublish        = effectiveCanEdit && !published;
   const canUnpublish      = effectiveCanEdit && published && !detail.mandatory;
   const canMandatory      = hasCapability('bil.mandatory') && published && isOrgTable;
+  const canReputational   = hasCapability('bil.reputational');
 
   // Build lookup maps
   const bilMap = {};
@@ -175,6 +188,7 @@ export function TableDetail({ tableId, canEdit, canOrg, onChanged, onDeleted }) 
               : <span className={styles.draftChip}>Draft</span>
             }
             {detail.mandatory && <span className={styles.mandatoryChip}>Mandatory</span>}
+            {detail.is_reputational && <span className={styles.mandatoryChip}>Reputational</span>}
           </div>
           {detail.description && (
             <p className={styles.detailDescription}>{detail.description}</p>
@@ -222,6 +236,15 @@ export function TableDetail({ tableId, canEdit, canOrg, onChanged, onDeleted }) 
               onClick={handleToggleMandatory}
             >
               {detail.mandatory ? 'Make voluntary' : 'Make mandatory'}
+            </button>
+          )}
+          {canReputational && (
+            <button
+              className={styles.btnSecondary}
+              onClick={handleToggleReputational}
+              title="Whether the organisation counts this table as reputational: the department report shows the risks whose impact comes from information rated on it."
+            >
+              {detail.is_reputational ? 'Not reputational' : 'Mark as reputational'}
             </button>
           )}
           {effectiveCanEdit && !detail.mandatory && (
@@ -613,6 +636,7 @@ export function ImpactTablesPage() {
                         </td>
                         <td className={styles.tdAttrs}>
                           {t.mandatory && <span className={styles.badgeMandatory}>Mandatory</span>}
+                          {t.is_reputational && <span className={styles.badgeMandatory}>Reputational</span>}
                         </td>
                       </tr>
                       {isSelected && (

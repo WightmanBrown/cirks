@@ -979,3 +979,7 @@ router.get('/coverage', canRead, async (req, res, next) => {
 
 module.exports = router;
 module.exports.deriveRequirement = deriveRequirement;
+// The board summary counts each standard's requirements by state with the SoA's
+// own derivation, so the two cannot disagree (src/reports/board.js).
+module.exports.fetchSoaRows = fetchSoaRows;
+module.exports.resolveView = resolveView;

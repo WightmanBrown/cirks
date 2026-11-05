@@ -87,6 +87,7 @@ const NAV_GROUPS = [
   {
     label: 'Admin', dropdown: true,
     items: [
+      { label: 'Risk Appetite',      path: '/admin/risk-appetite', cap: 'risk_appetite.write' },
       { label: 'Account Management', path: '/admin/users',  cap: 'admin.manage' },
       { label: 'Access Control',     path: '/admin/rbac',   cap: 'admin.manage' },
       { label: 'Data Export',        path: '/admin/export', cap: 'admin.manage' },
@@ -105,9 +106,16 @@ const NAV_GROUPS = [
   },
 
   {
-    label: 'Metrics & Reporting', dropdown: true,
+    label: 'Insights', dropdown: true,
     items: [
-      { label: 'Metrics & Reporting', path: '/reporting', roles: null },
+      { label: 'Insights', path: '/reporting', roles: null },
+      { label: 'My department',       path: '/reporting/department', cap: 'reports.department' },
+      { label: 'My systems',          path: '/reporting/systems', cap: 'reports.department' },
+      { label: 'Board summary',       path: '/reporting/board', cap: 'reports.read' },
+      { label: 'SIRO report',         path: '/reporting/siro', cap: 'reports.read' },
+      { label: 'CISO report',         path: '/reporting/ciso', cap: 'reports.read' },
+      { label: 'My work',             path: '/reporting/analyst', cap: 'risks.write' },
+      { label: 'Unknown risk',        path: '/reporting/unknown', cap: 'reports.read' },
     ],
   },
 

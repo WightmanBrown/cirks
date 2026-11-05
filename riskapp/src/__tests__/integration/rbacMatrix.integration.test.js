@@ -178,6 +178,18 @@ const MATRIX = [
   // Read = suppliers.read (the exceptions.read audience); write = suppliers.write
   // (governance + analyst roles org-wide, IAM/IAO for their own department).
   ['get',  '/api/v1/suppliers', ALL],
+  // Reports (v167): organisation-wide figures, admin + CISO + SIRO only.
+  ['get',  '/api/v1/reports/siro', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/board', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/ciso', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/department', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/systems', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/unknown', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/analyst', ['admin', 'ciso', 'analyst']],
+  ['get',  '/api/v1/org/risk-appetite', ['admin', 'siro']],
+  // Tolerances the board's figures are rated against (v169): the SIRO's alone.
+  ['put',    '/api/v1/reports/tolerances/exposure.above_owner_max', ['siro']],
+  ['delete', '/api/v1/reports/tolerances/exposure.above_owner_max', ['siro']],
   ['get',  `/api/v1/suppliers/${U}`, ALL],
   ['get',  `/api/v1/suppliers/relationships?system_id=${U}`, ALL],
   ['post', '/api/v1/suppliers', ['admin', 'ciso', 'analyst', 'iam', 'owner', 'consultant', 'siro']],

@@ -5,7 +5,9 @@
 .page { display: flex; flex-direction: column; gap: 20px; }
 
 .breadcrumb { display: flex; align-items: center; gap: 10px; font-size: 12px; }
-.viewModeSlot { margin-left: auto; }
+.viewModeSlot { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.reportLink { font-size: 13px; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.reportLink:hover { text-decoration: underline; }
 /* ── Header ─────────────────────────────────────────────────────────────── */
 
 .header {

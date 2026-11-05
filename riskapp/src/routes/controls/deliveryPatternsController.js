@@ -21,6 +21,71 @@ const { CIRKS_NAME, CIRKS_COMPONENT_DESCRIPTION, CIRKS_SOLUTION_NOTES, cirksReas
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const LOCATIONS = ['on_system', 'service', 'organisation'];
+const COST_BASES = ['organisation', 'per_system'];
+
+// "5000 one-off, 1200 a year, per system" — or "not known".
+function describeCost(c) {
+  if (!c) return 'not known';
+  const parts = [];
+  if (c.oneOff != null) parts.push(`${c.oneOff} one-off`);
+  if (c.annual != null) parts.push(`${c.annual} a year`);
+  return `${parts.join(', ')}, ${c.basis === 'per_system' ? 'per system' : 'for the organisation'}`;
+}
+
+// "8 hours a month, per system" — or "not known".
+function describeEffort(e) {
+  if (!e) return 'not known';
+  return `${e.hours} hour${Number(e.hours) === 1 ? '' : 's'} a month, ${e.basis === 'per_system' ? 'per system' : 'for the organisation'}`;
+}
+
+// Reads the optional estimates from a solution PATCH body into SET clauses.
+// The estimated cost (v170): { cost_one_off, cost_annual, cost_basis, cost_note }.
+// The estimated effort to operate (v173, docs/reporting-iam.md decision 3):
+// { effort_hours_month, effort_basis, effort_note }. Each is given or cleared
+// as a whole, records who set it and when, and is never defaulted.
+function estimateSets(b, userId, sets, params) {
+  const amount = (v) => (v === null || v === undefined || v === '' ? null : Number(v));
+  let costChange = null, effortChange = null;
+  if ('cost_basis' in b || 'cost_one_off' in b || 'cost_annual' in b) {
+    const oneOff = amount(b.cost_one_off), annual = amount(b.cost_annual);
+    for (const v of [oneOff, annual]) {
+      if (v !== null && (!Number.isInteger(v) || v < 0)) return { error: 'A cost is a whole number, 0 or more.' };
+    }
+    const basis = b.cost_basis || null;
+    if (oneOff === null && annual === null) {
+      if (basis) return { error: 'Give a one-off or an annual cost, or clear the estimate.' };
+    } else if (!COST_BASES.includes(basis)) {
+      return { error: 'Say what the cost is for: "organisation" (bought once) or "per_system" (for each system it is put on).' };
+    }
+    const note = typeof b.cost_note === 'string' && b.cost_note.trim() && basis ? b.cost_note.trim() : null;
+    costChange = { oneOff, annual, basis };
+    for (const [col, v] of [['cost_one_off', oneOff], ['cost_annual', annual], ['cost_basis', basis], ['cost_note', note]]) {
+      params.push(v); sets.push(`${col} = $${params.length}`);
+    }
+    params.push(basis ? userId : null); sets.push(`cost_set_by = $${params.length}`);
+    sets.push(basis ? 'cost_set_at = now()' : 'cost_set_at = NULL');
+  }
+  if ('effort_basis' in b || 'effort_hours_month' in b) {
+    const hours = amount(b.effort_hours_month);
+    if (hours !== null && (!Number.isFinite(hours) || hours < 0 || Math.round(hours * 10) !== hours * 10)) {
+      return { error: 'Effort is hours a month, 0 or more, to one decimal place.' };
+    }
+    const basis = b.effort_basis || null;
+    if (hours === null) {
+      if (basis) return { error: 'Give the hours a month, or clear the estimate.' };
+    } else if (!COST_BASES.includes(basis)) {
+      return { error: 'Say what the effort is for: "organisation" (once for everyone) or "per_system" (for each system it is on).' };
+    }
+    const note = typeof b.effort_note === 'string' && b.effort_note.trim() && basis ? b.effort_note.trim() : null;
+    effortChange = { hours, basis };
+    for (const [col, v] of [['effort_hours_month', hours], ['effort_basis', basis], ['effort_note', note]]) {
+      params.push(v); sets.push(`${col} = $${params.length}`);
+    }
+    params.push(basis ? userId : null); sets.push(`effort_set_by = $${params.length}`);
+    sets.push(basis ? 'effort_set_at = now()' : 'effort_set_at = NULL');
+  }
+  return { costChange, effortChange };
+}
 
 async function audit(db, userId, action, controlId, label, narrative) {
   await db.query(
@@ -31,6 +96,10 @@ async function audit(db, userId, action, controlId, label, narrative) {
 // A solution with its parts and every objective it delivers.
 const SOLUTION_SQL = `
   SELECT p.id, p.name, p.kind, p.notes,
+         p.cost_one_off::float AS cost_one_off, p.cost_annual::float AS cost_annual, p.cost_basis, p.cost_note,
+         p.cost_set_at, (SELECT full_name FROM users WHERE id = p.cost_set_by) AS cost_set_by_name,
+         p.effort_hours_month::float AS effort_hours_month, p.effort_basis, p.effort_note,
+         p.effort_set_at, (SELECT full_name FROM users WHERE id = p.effort_set_by) AS effort_set_by_name,
          COALESCE((SELECT json_agg(json_build_object(
                     'id', pp.id, 'component_id', cc.id, 'component_name', cc.name, 'component_type', cc.component_type,
                     'location', pp.location, 'service_system_id', pp.service_system_id, 'service_system_name', s.name)
@@ -212,6 +281,10 @@ async function updatePattern(req, res, next) {
     params.push(b.name.trim()); sets.push(`name = $${params.length}`);
   }
   if ('notes' in b) { params.push(typeof b.notes === 'string' && b.notes.trim() ? b.notes.trim() : null); sets.push(`notes = $${params.length}`); }
+  // The estimates (v170 cost, v173 effort): each set together, all null to
+  // clear it. Never defaulted.
+  const est = estimateSets(b, req.user.id, sets, params);
+  if (est.error) return res.status(400).json({ error: est.error });
   if (!sets.length) return res.status(400).json({ error: 'Nothing to change.' });
   try {
     const done = await withActor(req.user.id, async (db) => {
@@ -383,15 +456,30 @@ async function updateSolution(req, res, next) {
     params.push(b.name.trim()); sets.push(`name = $${params.length}`);
   }
   if ('notes' in b) { params.push(typeof b.notes === 'string' && b.notes.trim() ? b.notes.trim() : null); sets.push(`notes = $${params.length}`); }
+  // The estimates (v170 cost, v173 effort): each set together, all null to
+  // clear it. Never defaulted.
+  const est = estimateSets(b, req.user.id, sets, params);
+  if (est.error) return res.status(400).json({ error: est.error });
+  const { costChange, effortChange } = est;
   if (!sets.length) return res.status(400).json({ error: 'Nothing to change.' });
   try {
     const found = await withActor(req.user.id, async (db) => {
-      const before = await db.query('SELECT name FROM delivery_patterns WHERE id = $1', [req.params.patternId]);
+      const before = await db.query(
+        `SELECT name, cost_one_off::float AS one_off, cost_annual::float AS annual, cost_basis AS basis,
+                effort_hours_month::float AS hours, effort_basis
+           FROM delivery_patterns WHERE id = $1`, [req.params.patternId]);
       if (!before.rows.length) return false;
       const { rows: [r] } = await db.query(
         `UPDATE delivery_patterns SET ${sets.join(', ')}, updated_at = now() WHERE id = $1 RETURNING name`, params);
+      const was = before.rows[0];
+      const cost = costChange
+        ? `; estimated cost ${describeCost(was.basis && { oneOff: was.one_off, annual: was.annual, basis: was.basis })} → ${describeCost(costChange.basis && costChange)}`
+        : '';
+      const effort = effortChange
+        ? `; estimated effort ${describeEffort(was.effort_basis && { hours: was.hours, basis: was.effort_basis })} → ${describeEffort(effortChange.basis && effortChange)}`
+        : '';
       await solutionAudit(db, req.user.id, 'update', req.params.patternId, r.name,
-        `Security solution "${before.rows[0].name}" changed${before.rows[0].name !== r.name ? ` — now "${r.name}"` : ''}`);
+        `Security solution "${was.name}" changed${was.name !== r.name ? ` — now "${r.name}"` : ''}${cost}${effort}`);
       return true;
     });
     if (!found) return res.status(404).json({ error: 'Security solution not found.' });

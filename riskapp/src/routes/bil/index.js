@@ -116,7 +116,7 @@ router.get('/reference', canView, async (req, res, next) => {
 router.get('/impact-tables', canView, async (req, res, next) => {
   try {
     const BASE = `SELECT it.id, it.name, it.scope, it.department_id,
-                         it.published_at, it.mandatory,
+                         it.published_at, it.mandatory, it.is_reputational,
                          d.name AS department_name,
                          it.created_at, it.updated_at
                   FROM impact_tables it
@@ -600,6 +600,28 @@ router.patch('/impact-tables/:id/mandatory', requireCapability('bil.mandatory'),
     await query('ROLLBACK').catch(() => {});
     next(err);
   }
+});
+
+// ── PATCH /bil/impact-tables/:id/reputational ───────────────────────────────
+// Whether the organisation counts this table as reputational (v172), so the IAO
+// report can show the risks whose impact comes from information rated on it.
+// The CISO's or admin's (bil.reputational); never inferred from the name; audited.
+router.patch('/impact-tables/:id/reputational', requireCapability('bil.reputational'), async (req, res, next) => {
+  try {
+    const { is_reputational } = req.body || {};
+    if (typeof is_reputational !== 'boolean')
+      return res.status(400).json({ error: 'is_reputational must be true or false' });
+    const tableId = parseInt(req.params.id, 10);
+    const { rows: [t] } = await query(
+      `UPDATE impact_tables SET is_reputational = $1 WHERE id = $2
+       RETURNING id, name, is_reputational`, [is_reputational, tableId]);
+    if (!t) return res.status(404).json({ error: 'Not found' });
+    await query(
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_label, human_narrative)
+       VALUES ($1, 'update', 'impact_tables', $2, $3)`,
+      [req.user.id, t.name, `Impact table "${t.name}" ${is_reputational ? 'marked as reputational' : 'no longer counted as reputational'}.`]);
+    res.json(t);
+  } catch (err) { next(err); }
 });
 
 module.exports = router;

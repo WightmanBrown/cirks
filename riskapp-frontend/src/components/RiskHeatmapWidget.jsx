@@ -16,47 +16,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate }         from 'react-router-dom';
 import { getCurrentRisks, getFutureRisks } from '../api';
-import { buildCurrentRiskMatrix, severityKey } from '../utils/heatmapUtils';
+import { buildCurrentRiskMatrix } from '../utils/heatmapUtils';
+import { RiskGrid } from './RiskGrid';
 import styles from './RiskHeatmapWidget.module.css';
 import { HelpDot } from './HelpDot';
 
 // ── small reusable grid ───────────────────────────────────────────────────────
 
 function MiniGrid({ matrix, onClick, ariaLabel }) {
-  return (
-    <button
-      className={styles.gridWrapper}
-      onClick={onClick}
-      aria-label={ariaLabel}
-    >
-      <span className={styles.axisLabelY}>PROBABILITY →</span>
-      <div className={styles.gridArea}>
-        <div className={styles.grid}>
-          {[5, 4, 3, 2, 1].map(p =>
-            [1, 2, 3, 4, 5].map(i => {
-              const count = matrix[p]?.[i] ?? 0;
-              const key   = severityKey(i, p, count);
-              return (
-                <div
-                  key={`${p}-${i}`}
-                  className={`${styles.cell} ${styles[key]}`}
-                  title={`Impact ${i}, Probability ${p}: ${count} risk${count !== 1 ? 's' : ''}`}
-                >
-                  {count > 0 && <span className={styles.cellCount}>{count}</span>}
-                </div>
-              );
-            })
-          )}
-        </div>
-        <div className={styles.xAxis}>
-          {[1, 2, 3, 4, 5].map(i => (
-            <span key={i} className={styles.axisTickX}>{i}</span>
-          ))}
-        </div>
-      </div>
-      <span className={styles.axisLabelX}>IMPACT →</span>
-    </button>
-  );
+  return <RiskGrid size="small" countAt={(i, p) => matrix[p]?.[i] ?? 0} onClick={onClick} ariaLabel={ariaLabel} />;
 }
 
 // ── main widget ───────────────────────────────────────────────────────────────
@@ -149,6 +117,8 @@ export function RiskHeatmapWidget() {
               <span className={styles.legendLabel}>High</span>
               <span className={`${styles.legendDot} ${styles.cellCritical}`} />
               <span className={styles.legendLabel}>Critical</span>
+              <span className={`${styles.legendDot} ${styles.cellCatastrophic}`} />
+              <span className={styles.legendLabel}>Catastrophic</span>
             </div>
           </>
         )}

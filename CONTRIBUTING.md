@@ -8,6 +8,8 @@ ideas are all welcome.
 
 ## Before you start
 
+- **Read the [development control statement](CONTROL_STATEMENT.md) first.** It
+  governs every contribution, and takes precedence over anything else here.
 - **Small fixes** (a typo, a clear bug with an obvious fix): open a pull request.
 - **Anything larger** (a new feature, a change to how risk is calculated, a
   schema change): start a [discussion](https://github.com/WightmanBrown/cirks/discussions)

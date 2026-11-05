@@ -72,6 +72,15 @@ import { HelpContentPage }             from './pages/HelpContentPage';
 import { StyleSheetPage }              from './pages/StyleSheetPage';
 import { ApiKeysPage }                 from './pages/ApiKeysPage';
 import { MetricsPage }                 from './pages/MetricsPage';
+import { SiroReportPage }            from './pages/SiroReportPage';
+import { BoardSummaryPage }          from './pages/BoardSummaryPage';
+import { CisoReportPage }          from './pages/CisoReportPage';
+import { DepartmentReportPage }    from './pages/DepartmentReportPage';
+import { SystemsReportPage }       from './pages/SystemsReportPage';
+import { AnalystReportPage }       from './pages/AnalystReportPage';
+import { UnknownRiskPage }         from './pages/UnknownRiskPage';
+import { SystemReportPage }        from './pages/SystemReportPage';
+import { RiskAppetitePage }        from './pages/RiskAppetitePage';
 
 export default function App() {
   return (
@@ -86,6 +95,17 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/select-role"   element={<SelectRolePage />} />
             <Route path="/account"       element={<MyAccountPage />} />
+            {/* Insights: the hub lists what you may read; each report gates itself (reports.read). */}
+            <Route path="/reporting"      element={<MetricsPage />} />
+            <Route path="/reporting/siro" element={<SiroReportPage />} />
+            <Route path="/reporting/board" element={<BoardSummaryPage />} />
+            <Route path="/reporting/ciso" element={<CisoReportPage />} />
+            <Route path="/reporting/department" element={<DepartmentReportPage />} />
+            <Route path="/reporting/systems" element={<SystemsReportPage />} />
+            <Route path="/reporting/analyst" element={<AnalystReportPage />} />
+            <Route path="/reporting/unknown" element={<UnknownRiskPage />} />
+            <Route path="/reporting/systems/:id" element={<SystemReportPage />} />
+            <Route path="/admin/risk-appetite" element={<RiskAppetitePage />} />
             <Route path="/dashboard"     element={<DashboardPage />} />
             <Route path="/risks/current" element={<RiskSummaryPage view="current" />} />
             <Route path="/risks/future"  element={<RiskSummaryPage view="future" />} />
@@ -202,7 +222,6 @@ export default function App() {
           <Route element={<ProtectedRoute capability="admin.manage" />}>
             <Route path="/admin/users"  element={<AccountManagementPage />} />
             <Route path="/admin/rbac"   element={<AdminRbacPage />} />
-            <Route path="/reporting"    element={<MetricsPage />} />
             <Route path="/admin/export" element={<DataExportPage />} />
             <Route path="/admin/audit"  element={<AuditLogPage />} />
             <Route path="/admin/api-keys" element={<ApiKeysPage />} />

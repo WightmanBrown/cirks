@@ -17,6 +17,22 @@
 module.exports = {
   "admin": [
     {
+      "key": "bil.reputational",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.department",
+      "scope": "all_depts"
+    },
+    {
+      "key": "risk_appetite.write",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.read",
+      "scope": "all_depts"
+    },
+    {
       "key": "findings.read",
       "scope": "all_depts"
     },
@@ -222,6 +238,18 @@ module.exports = {
     }
   ],
   "ciso": [
+    {
+      "key": "bil.reputational",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.department",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.read",
+      "scope": "all_depts"
+    },
     {
       "key": "findings.read",
       "scope": "all_depts"
@@ -429,6 +457,14 @@ module.exports = {
   ],
   "information_asset_manager": [
     {
+      "key": "decisions.record_view",
+      "scope": "own_dept"
+    },
+    {
+      "key": "reports.department",
+      "scope": "own_dept"
+    },
+    {
       "key": "findings.read",
       "scope": "own_dept"
     },
@@ -546,6 +582,14 @@ module.exports = {
     }
   ],
   "information_asset_owner": [
+    {
+      "key": "decisions.record_view",
+      "scope": "own_dept"
+    },
+    {
+      "key": "reports.department",
+      "scope": "own_dept"
+    },
     {
       "key": "findings.read",
       "scope": "own_dept"
@@ -686,6 +730,14 @@ module.exports = {
     }
   ],
   "risk_analyst": [
+    {
+      "key": "reports.department",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.read",
+      "scope": "all_depts"
+    },
     {
       "key": "findings.read",
       "scope": "all_depts"
@@ -918,6 +970,22 @@ module.exports = {
     }
   ],
   "siro": [
+    {
+      "key": "reports.department",
+      "scope": "all_depts"
+    },
+    {
+      "key": "risk_appetite.write",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.tolerances",
+      "scope": "all_depts"
+    },
+    {
+      "key": "reports.read",
+      "scope": "all_depts"
+    },
     {
       "key": "findings.read",
       "scope": "all_depts"

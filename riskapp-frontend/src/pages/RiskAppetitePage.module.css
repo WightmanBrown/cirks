@@ -1,0 +1,6 @@
+/* Risk appetite page: the board page's styles plus these. */
+.conflicts { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-secondary); }
+.conflicts a { color: var(--text-primary); }
+.current td { color: var(--text-primary); font-weight: 600; background: color-mix(in srgb, var(--blue) 10%, transparent); }
+.steps { max-width: 420px; }
+.form { max-width: 560px; }

@@ -279,6 +279,12 @@ INSERT INTO public.capabilities VALUES ('components.write', 'components', 'write
 INSERT INTO public.capabilities VALUES ('controls.read', 'controls', 'read', false, 'View control catalogue');
 INSERT INTO public.capabilities VALUES ('controls.write', 'controls', 'write', false, 'Create/edit controls and linkages');
 INSERT INTO public.capabilities VALUES ('architecture.write', 'architecture', 'write', false, 'Edit the systems architecture template (which components answer each group) and the system architecture patterns');
+INSERT INTO public.capabilities VALUES ('reports.tolerances', 'reports', 'tolerances', false, 'Set the tolerances the board summary''s headline figures are rated against (red, amber, green)');
+INSERT INTO public.capabilities VALUES ('reports.read', 'reports', 'read', false, 'Read the reports under Metrics & Reporting, such as the SIRO''s report: organisation-wide figures across every department');
+INSERT INTO public.capabilities VALUES ('decisions.record_view', 'decisions', 'record_view', true, 'Record a view on a decision about a risk in your department (it never changes the decision)');
+INSERT INTO public.capabilities VALUES ('reports.department', 'reports', 'department', true, 'Read the My department report: a department''s risk, actions, obligations and the shared systems it depends on');
+INSERT INTO public.capabilities VALUES ('bil.reputational', 'bil', 'reputational', false, 'Mark which impact tables the organisation counts as reputational');
+INSERT INTO public.capabilities VALUES ('risk_appetite.write', 'risk_appetite', 'write', false, 'Set the organisation''s risk appetite: the score at which a risk must be treated, and how high a risk analyst and a risk owner may accept');
 INSERT INTO public.capabilities VALUES ('controls.import', 'controls', 'import', false, 'Bulk-import controls');
 INSERT INTO public.capabilities VALUES ('scopes.manage', 'scopes', 'manage', false, 'Create scopes and decide which systems are in them');
 INSERT INTO public.capabilities VALUES ('findings.act', 'findings', 'act', true, 'Raise a security action against an assurance finding (own department for IAM/IAO)');
@@ -390,6 +396,12 @@ INSERT INTO public.role_permissions VALUES ('admin', 'controls.write', 'all_dept
 INSERT INTO public.role_permissions VALUES ('admin', 'architecture.write', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('ciso', 'architecture.write', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('risk_analyst', 'architecture.write', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('admin', 'reports.read', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('admin', 'risk_appetite.write', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('ciso', 'reports.read', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('siro', 'reports.read', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('siro', 'risk_appetite.write', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('siro', 'reports.tolerances', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('ciso', 'controls.write', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('risk_analyst', 'controls.write', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('admin', 'controls.import', 'all_depts');
@@ -596,6 +608,17 @@ INSERT INTO public.role_permissions VALUES ('security_consultant', 'users.read',
 INSERT INTO public.role_permissions VALUES ('admin', 'users.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('ciso', 'users.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('admin', 'admin.manage', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('information_asset_owner', 'reports.department', 'own_dept');
+INSERT INTO public.role_permissions VALUES ('information_asset_manager', 'reports.department', 'own_dept');
+INSERT INTO public.role_permissions VALUES ('admin', 'reports.department', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('ciso', 'reports.department', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('siro', 'reports.department', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('admin', 'bil.reputational', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('ciso', 'bil.reputational', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('information_asset_owner', 'decisions.record_view', 'own_dept');
+INSERT INTO public.role_permissions VALUES ('information_asset_manager', 'decisions.record_view', 'own_dept');
+INSERT INTO public.role_permissions VALUES ('risk_analyst', 'reports.read', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('risk_analyst', 'reports.department', 'all_depts');
 
 -- ── SoD rules (v65; all disabled by default) ──
 INSERT INTO public.sod_rules VALUES ('risk.validate', 'A risk may not be validated by the person who identified it', false);

@@ -17,6 +17,7 @@ const RISK_DEPT_VIA = {
          WHERE r.id = $1`,
 };
 const { query, pool }   = require('../../db/pool');
+const { canAcceptRiskAtScore } = require('../../auth/acceptanceAuthority');
 
 const router = Router();
 router.use(authenticate);
@@ -38,34 +39,6 @@ async function getUserDept(userId) {
 // implicitly 'mitigate' (gap-driven actions only ever add or improve controls).
 const VALID_TREATMENTS = new Set(['avoid', 'mitigate', 'transfer', 'accept']);
 const VALID_CADENCES   = new Set(['monthly', 'quarterly', 'annual']);
-
-// Authority ladder for accepting a risk at a given score. Roles not listed
-// cannot accept at all. Numeric acceptance authority (numbers-only banding):
-// ciso/siro/admin may accept any risk; information_asset_owner up to
-// exception_accept_owner_max; risk_analyst up to exception_accept_analyst_max.
-// Caps are scores (1–25) read from org_config.
-//
-// security_consultant is phase-dependent (v75): while the org is in SETUP
-// (org_config.setup_phase_active), the consultant stands up the initial risk
-// picture and may accept any risk; once a consultant moves the org to
-// OPERATIONAL (one-way), the consultant is capped at the same authority as a
-// risk_analyst. See [[project-risk-treatment-policy]].
-function canAcceptRiskAtScore(score, role, analystMax, ownerMax, setupPhaseActive = false) {
-  switch (role) {
-    case 'ciso':
-    case 'siro':
-    case 'admin':
-      return true;
-    case 'security_consultant':
-      return setupPhaseActive ? true : score <= analystMax;
-    case 'information_asset_owner':
-      return score <= ownerMax;
-    case 'risk_analyst':
-      return score <= analystMax;
-    default:
-      return false;
-  }
-}
 
 // Human-readable audit narrative for an exception revoke.
 function format_revoke_narrative(actorName, threatName, systemName, notes) {
@@ -2053,6 +2026,71 @@ router.post('/:id/retire', canDelete, async (req, res, next) => {
     );
     res.status(204).end();
   } catch (err) { next(err); }
+});
+
+// ── Recorded views on decisions (v173, docs/reporting-iam.md decision 5) ─────
+// The department's IAO or IAM may attach a dated, signed note to a decision on
+// one of its risks. It never changes the decision, and it cannot be edited or
+// removed afterwards (the table refuses it): a correction is a new view.
+const VIEW_KINDS = {
+  validated:       null,
+  minuted:         `SELECT 1 FROM meeting_agenda_items ai
+                     WHERE ai.id = $2 AND ai.decision_text IS NOT NULL AND btrim(ai.decision_text) <> ''
+                       AND ((ai.entity_type = 'risk' AND ai.entity_id = $1)
+                         OR (ai.entity_type = 'security_action'
+                             AND ai.entity_id IN (SELECT action_id FROM security_action_risks WHERE risk_id = $1)))`,
+  accepted:        `SELECT 1 FROM exceptions WHERE id = $2 AND risk_id = $1`,
+  action_accepted: `SELECT 1 FROM security_actions a JOIN security_action_risks sar ON sar.action_id = a.id
+                     WHERE a.id = $2 AND sar.risk_id = $1 AND a.accepted_at IS NOT NULL`,
+};
+const VIEWS_SQL = `
+  SELECT v.id, v.risk_id, v.decision_kind, v.decision_ref, v.body, v.written_at, v.written_role,
+         u.full_name AS written_by_name
+    FROM risk_decision_views v JOIN users u ON u.id = v.written_by
+   WHERE v.risk_id = $1 ORDER BY v.written_at`;
+
+router.get('/:id/decision-views', canRead, async (req, res, next) => {
+  try {
+    const { rows: [risk] } = await query(
+      `SELECT sys.department_id, sys.is_shared FROM risks r JOIN systems sys ON sys.id = r.system_id WHERE r.id = $1`,
+      [req.params.id]);
+    if (!risk) return res.status(404).json({ error: 'Risk not found.' });
+    if (isDepartmentIsolationEnabled() && DEPT_ROLES.has(req.user.role)) {
+      const deptId = await getUserDept(req.user.id);
+      if (risk.department_id !== deptId && !risk.is_shared) return res.status(403).json({ error: 'Forbidden.' });
+    }
+    const { rows } = await query(VIEWS_SQL, [req.params.id]);
+    res.json({ views: rows });
+  } catch (err) { next(err); }
+});
+
+router.post('/:id/decision-views', requireCapability('decisions.record_view'), async (req, res, next) => {
+  try {
+    const { decision_kind: kind, decision_ref: ref = null, body } = req.body || {};
+    if (!(kind in VIEW_KINDS)) {
+      return res.status(400).json({ error: 'Say which decision this view is on: validated, minuted, accepted or action_accepted.' });
+    }
+    if (!body || !String(body).trim()) return res.status(400).json({ error: 'Write your view.' });
+    if (kind !== 'validated' && !ref) return res.status(400).json({ error: 'Say which decision this view is on.' });
+    await assertWriteScope(req, { id: req.params.id, via: RISK_DEPT_VIA });
+    const exists = kind === 'validated'
+      ? await query('SELECT 1 FROM risks WHERE id = $1 AND validated_at IS NOT NULL', [req.params.id])
+      : await query(VIEW_KINDS[kind], [req.params.id, ref]);
+    if (!exists.rows.length) return res.status(404).json({ error: 'That decision was not found on this risk.' });
+    const { rows: [view] } = await query(
+      `INSERT INTO risk_decision_views (risk_id, decision_kind, decision_ref, body, written_by, written_role)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [req.params.id, kind, kind === 'validated' ? null : ref, String(body).trim(), req.user.id, req.user.role]);
+    await query(
+      `INSERT INTO audit_log (user_id, action, entity_type, entity_id, entity_label, human_narrative)
+       VALUES ($1, 'create', 'risk_decision_views', $2, $3, $4)`,
+      [req.user.id, req.params.id, kind, `Recorded a view on the ${kind.replace('_', ' ')} decision: ${String(body).trim()}`]);
+    const { rows } = await query(VIEWS_SQL, [req.params.id]);
+    res.status(201).json({ id: view.id, views: rows });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(400).json({ error: 'That is not a valid id.' });
+    next(err);
+  }
 });
 
 module.exports = router;

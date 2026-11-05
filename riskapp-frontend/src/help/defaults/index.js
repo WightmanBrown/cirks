@@ -14,8 +14,9 @@ import architecture from './architecture';
 import controls from './controls';
 import meetings from './meetings';
 import admin from './admin';
+import reports from './reports';
 
-const SOURCES = { shared, risk, architecture, controls, meetings, admin };
+const SOURCES = { shared, risk, architecture, controls, meetings, admin, reports };
 
 export function mergeDefaults(sources) {
   const out = {};

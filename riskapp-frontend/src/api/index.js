@@ -680,6 +680,12 @@ export async function publishImpactTable(tableId) {
   return data;
 }
 
+// Whether the organisation counts this table as reputational (v172, bil.reputational).
+export async function setImpactTableReputational(tableId, isReputational) {
+  const { data } = await client.patch(`/bil/impact-tables/${tableId}/reputational`, { is_reputational: isReputational });
+  return data;
+}
+
 export async function setImpactTableMandatory(tableId, mandatory) {
   const { data } = await client.patch(`/bil/impact-tables/${tableId}/mandatory`, { mandatory });
   return data;
@@ -1281,6 +1287,66 @@ export async function getHelpCoverage() {
 }
 
 // ── Suppliers (v142): who they are, and what each relationship touches ─────────
+// Reports (v167) — admin, CISO, SIRO
+export async function getBoardSummary() {
+  const { data } = await client.get('/reports/board');
+  return data;
+}
+// The organisation's risk appetite (v171, risk_appetite.write — SIRO and admin)
+export async function getRiskAppetite() {
+  const { data } = await client.get('/org/risk-appetite');
+  return data;
+}
+export async function setRiskAppetite(body) {
+  const { data } = await client.put('/org/risk-appetite', body);
+  return data;
+}
+
+// Tolerances for the board's tiles (v169, reports.tolerances — the SIRO)
+export async function setTolerance(key, body) {
+  const { data } = await client.put(`/reports/tolerances/${encodeURIComponent(key)}`, body);
+  return data;
+}
+export async function clearTolerance(key) {
+  await client.delete(`/reports/tolerances/${encodeURIComponent(key)}`);
+}
+export async function getAnalystReport(analyst) {
+  const { data } = await client.get('/reports/analyst', { params: analyst && analyst !== 'team' ? { analyst } : {} });
+  return data;
+}
+export async function getUnknownRisk() {
+  const { data } = await client.get('/reports/unknown');
+  return data;
+}
+export async function getSystemsReport(departmentId) {
+  const { data } = await client.get('/reports/systems', { params: departmentId ? { department_id: departmentId } : {} });
+  return data;
+}
+// A recorded view on a decision about a risk (v173): never edited or removed.
+export async function recordDecisionView(riskId, body) {
+  const { data } = await client.post(`/risks/${riskId}/decision-views`, body);
+  return data;
+}
+export async function getDecisionViews(riskId) {
+  const { data } = await client.get(`/risks/${riskId}/decision-views`);
+  return data;
+}
+export async function getSystemReport(systemId) {
+  const { data } = await client.get(`/reports/systems/${systemId}`);
+  return data;
+}
+export async function getDepartmentReport(departmentId) {
+  const { data } = await client.get('/reports/department', { params: departmentId ? { department_id: departmentId } : {} });
+  return data;
+}
+export async function getCisoReport() {
+  const { data } = await client.get('/reports/ciso');
+  return data;
+}
+export async function getSiroReport() {
+  const { data } = await client.get('/reports/siro');
+  return data;
+}
 export async function getSuppliers() {
   const { data } = await client.get('/suppliers');
   return data.suppliers || [];

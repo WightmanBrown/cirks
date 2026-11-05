@@ -232,3 +232,30 @@ textarea:disabled {
 th:has([data-help-dot]) {
   white-space: nowrap;
 }
+
+/* ── Print ──────────────────────────────────────────────────────────────────────
+   Any page prints on paper colours, without the top bar, the help dots or
+   anything marked data-print="hide" (buttons, toggles). Written for the SIRO's
+   report (docs/reporting-siro.md), which is printed for the board; it applies
+   to every page. */
+@media print {
+  :root {
+    --bg-base:        #ffffff;
+    --bg-inset:       #ffffff;
+    --bg-surface:     #ffffff;
+    --bg-elevated:    #ffffff;
+    --border:         #c8ccd4;
+    --border-accent:  #c8ccd4;
+    --text-primary:   #111318;
+    --text-secondary: #333844;
+    --text-muted:     #555c6b;
+    --amber-light:    #8a5a00;
+    --red-light:      #a32a1a;
+  }
+  body { background: #ffffff; }
+  header, [data-help-dot], [data-print="hide"] { display: none !important; }
+  main { padding: 0 !important; overflow: visible !important; }
+  a { color: inherit !important; text-decoration: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+

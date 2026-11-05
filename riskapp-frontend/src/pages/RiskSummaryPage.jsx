@@ -27,7 +27,7 @@ import { getCurrentRisks, getFutureRisks, getRisk } from '../api';
 import { RiskCreateModal }               from '../components/RiskCreateModal';
 import {
   buildCurrentRiskMatrix, buildConfMatrix, buildIntMatrix, buildAvailMatrix,
-  currentProb, currentImpact, severityKey, filterByCell,
+  currentProb, currentImpact, filterByCell,
 } from '../utils/heatmapUtils';
 import { Shell }  from '../components/Shell';
 import { BackButton } from '../components/BackButton';
@@ -38,49 +38,18 @@ import { HelpDot } from '../components/HelpDot';
 import { useViewMode } from '../hooks/useViewMode';
 import { DepartmentScopeFilter, useDepartmentScope } from '../components/DepartmentScopeFilter';
 import { applyDepartmentScope, CROSS_DEPT_ROLES }    from '../utils/departmentScope';
+import { RiskGrid } from '../components/RiskGrid';
 import styles from './RiskSummaryPage.module.css';
 
-// ── mini grid (interactive — cells are individually clickable) ────────────────
+// ── grid (interactive — each square filters the list): the shared RiskGrid ────
 
-function MiniGrid({ label, helpKey, helpPlacement = 'bottom', matrix, selectedP, selectedI, onCellClick }) {
+function MiniGrid({ label, helpKey, matrix, selectedP, selectedI, onCellClick }) {
   return (
     <div className={styles.gridCard}>
-      <span className={styles.gridLabel}>{label}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</span>
-      <div className={styles.gridWrapper}>
-        <span className={styles.axisLabelY}>PROB →</span>
-        <div className={styles.gridArea}>
-          <div className={styles.grid}>
-            {[5, 4, 3, 2, 1].map(p =>
-              [1, 2, 3, 4, 5].map(i => {
-                const count    = matrix[p]?.[i] ?? 0;
-                const sk       = severityKey(i, p, count);
-                const selected = selectedP === p && selectedI === i;
-                return (
-                  <button
-                    key={`${p}-${i}`}
-                    className={[
-                      styles.cell,
-                      styles[sk],
-                      selected ? styles.cellSelected : '',
-                    ].join(' ')}
-                    title={`Impact ${i}, Probability ${p}: ${count} risk${count !== 1 ? 's' : ''}`}
-                    onClick={() => onCellClick(p, i)}
-                    aria-pressed={selected}
-                  >
-                    {count > 0 && <span className={styles.cellCount}>{count}</span>}
-                  </button>
-                );
-              })
-            )}
-          </div>
-          <div className={styles.xAxis}>
-            {[1, 2, 3, 4, 5].map(i => (
-              <span key={i} className={styles.axisTickX}>{i}</span>
-            ))}
-          </div>
-        </div>
-        <span className={styles.axisLabelX}>IMPACT →</span>
-      </div>
+      <RiskGrid label={label} helpKey={helpKey}
+        countAt={(i, p) => matrix[p]?.[i] ?? 0}
+        selected={selectedP != null ? { likelihood: selectedP, impact: selectedI } : null}
+        onCellClick={onCellClick} />
     </div>
   );
 }

@@ -98,23 +98,6 @@ export function buildAvailMatrix(risks) {
 }
 
 /**
- * Return the CSS module class key for a cell based on impact × probability.
- *
- * @param {number} impact       1–5
- * @param {number} probability  1–5
- * @param {number} count        number of risks in this cell
- * @returns {string}            key into the CSS module
- */
-export function severityKey(impact, probability, count) {
-  if (count === 0) return 'cellEmpty';
-  const score = impact * probability;
-  if (score >= 20) return 'cellCritical';
-  if (score >= 12) return 'cellHigh';
-  if (score >= 6)  return 'cellMedium';
-  return 'cellLow';
-}
-
-/**
  * Map a DB mitigation_status value to a human-readable display label.
  *
  * @param {string|null} status

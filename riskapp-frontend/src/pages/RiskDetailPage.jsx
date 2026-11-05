@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 import { PatternChip } from '../components/PatternChip';
+import { RecordedViews } from '../components/RecordedViews';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import DeliveredControlChip, { isDeliveredOnce } from '../components/DeliveredControlChip';
@@ -507,6 +508,7 @@ export function RiskDetailPage() {
               onActionChange={load}
               simpleMode={simpleMode}
             />
+            <RecordedViews riskId={risk.id} />
 
             {/* ── Panel 6: Risk context graph (graph.read capability) ──
                 OPEN by default (owner, 2026-09-18). It was folded, which is why

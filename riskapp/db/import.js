@@ -440,13 +440,22 @@ const DATASETS = [
   // Also reads exports made before v147, when each pattern row and part row
   // carried its control_title: the same name becomes one solution, and the
   // row's objective is linked to it.
-  { slug: 'delivery-patterns', columns: ['name', 'kind', 'notes'],
+  // The estimates (cost v170, effort v173) come with a new solution only, and
+  // keep their basis; an export made before them simply has none.
+  { slug: 'delivery-patterns', columns: ['name', 'kind', 'notes', 'cost_one_off', 'cost_annual', 'cost_basis', 'cost_note',
+                                         'effort_hours_month', 'effort_basis', 'effort_note'],
     handle: async (r, c) => {
       const name = req(r.name, 'name');
       let id = await c.patternId(name, { optional: true });
       let made = false;
       if (!id) {
-        await insertRow(c, 'delivery_patterns', { name, kind: defOpt(r.kind), notes: txt(r.notes), created_by: await c.actor() });
+        const actor = await c.actor();
+        const num = (v) => (txt(v) == null ? null : Number(v));
+        const cost = txt(r.cost_basis) ? { cost_one_off: num(r.cost_one_off), cost_annual: num(r.cost_annual), cost_basis: txt(r.cost_basis),
+          cost_note: txt(r.cost_note), cost_set_by: actor, cost_set_at: new Date() } : {};
+        const effort = txt(r.effort_basis) ? { effort_hours_month: num(r.effort_hours_month), effort_basis: txt(r.effort_basis),
+          effort_note: txt(r.effort_note), effort_set_by: actor, effort_set_at: new Date() } : {};
+        await insertRow(c, 'delivery_patterns', { name, kind: defOpt(r.kind), notes: txt(r.notes), created_by: actor, ...cost, ...effort });
         id = await c.patternId(name);
         made = true;
       }

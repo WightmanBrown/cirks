@@ -139,6 +139,9 @@ export function SecuritySolutionDetailPage() {
             )}
           </section>
 
+          <CostSection s={s} canEdit={canEdit} onSave={(body) => run(() => updateSecuritySolution(id, body))} />
+          <EffortSection s={s} canEdit={canEdit} onSave={(body) => run(() => updateSecuritySolution(id, body))} />
+
           {s.kind === 'parts' && (
             <section className={shared.section}>
               <h2 className={shared.sectionTitle}>Component parts <span className={shared.count}>{s.parts.length}</span> <HelpDot k="security_solution.parts" placement="bottom" /></h2>
@@ -202,5 +205,118 @@ export function SecuritySolutionDetailPage() {
         </>)}
       </div>
     </Shell>
+  );
+}
+
+const BASIS_LABEL = { organisation: 'for the organisation, bought once', per_system: 'for each system it is put on' };
+const amount = (v) => (v == null ? null : Number(v).toLocaleString());
+
+// The estimated effort to operate (v173, docs/reporting-iam.md decision 3):
+// hours a month, optional and never defaulted, like the cost above. The IAM's
+// system report sums it for the people needed to run a system.
+function EffortSection({ s, canEdit, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({});
+  const known = s.effort_basis != null;
+  const start = () => {
+    setDraft({ effort_hours_month: s.effort_hours_month ?? '', effort_basis: s.effort_basis || '', effort_note: s.effort_note || '' });
+    setEditing(true);
+  };
+  const set = (k) => (e) => setDraft(d => ({ ...d, [k]: e.target.value }));
+  return (
+    <section className={shared.section}>
+      <h2 className={shared.sectionTitle}>Estimated effort to operate <HelpDot k="security_solution.effort" placement="bottom" /></h2>
+      {editing ? (
+        <form className={shared.create} onSubmit={async (e) => {
+          e.preventDefault();
+          if (await onSave(draft)) setEditing(false);
+        }}>
+          <input className={shared.input} inputMode="decimal" aria-label="Hours a month" placeholder="Hours a month"
+            value={draft.effort_hours_month} onChange={set('effort_hours_month')} />
+          <select className={shared.input} aria-label="What the effort is for" value={draft.effort_basis} onChange={set('effort_basis')}>
+            <option value="">What is the effort for?</option>
+            <option value="organisation">For the organisation, once for everyone</option>
+            <option value="per_system">For each system it is on</option>
+          </select>
+          <input className={shared.input} aria-label="Where the estimate comes from" placeholder="Where the estimate comes from (optional)"
+            value={draft.effort_note} onChange={set('effort_note')} />
+          <button className={shared.primary} type="submit">Save</button>
+          {known && (
+            <button className={shared.secondary} type="button" onClick={async () => {
+              if (await onSave({ effort_hours_month: null, effort_basis: null })) setEditing(false);
+            }}>Clear the estimate</button>
+          )}
+          <button className={shared.secondary} type="button" onClick={() => setEditing(false)}>Cancel</button>
+        </form>
+      ) : (<>
+        {known ? (
+          <p>
+            {s.effort_hours_month} hour{Number(s.effort_hours_month) === 1 ? '' : 's'} a month — {s.effort_basis === 'per_system' ? 'for each system it is on' : 'for the organisation, once for everyone'}.
+            {s.effort_note && <> {s.effort_note}.</>}
+            {s.effort_set_by_name && <span className={shared.muted}> Estimated by {s.effort_set_by_name}{s.effort_set_at ? `, ${new Date(s.effort_set_at).toLocaleDateString('en-GB')}` : ''}.</span>}
+          </p>
+        ) : (
+          <p className={shared.muted}>Not known. A system&apos;s report says the people needed to run this solution are not known until an estimate is given.</p>
+        )}
+        {canEdit && <div className={shared.actions}><button className={shared.secondary} onClick={start}>{known ? 'Change the estimate' : 'Give an estimate'}</button></div>}
+      </>)}
+    </section>
+  );
+}
+
+// The estimated cost (v170, docs/reporting-ciso.md): optional, never defaulted.
+// The CISO's investment report divides the risk a solution removes by it; left
+// blank, the report says the cost is not known rather than treating it as free.
+function CostSection({ s, canEdit, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({});
+  const known = s.cost_basis != null;
+  const start = () => {
+    setDraft({ cost_one_off: s.cost_one_off ?? '', cost_annual: s.cost_annual ?? '',
+               cost_basis: s.cost_basis || '', cost_note: s.cost_note || '' });
+    setEditing(true);
+  };
+  const set = (k) => (e) => setDraft(d => ({ ...d, [k]: e.target.value }));
+  return (
+    <section className={shared.section}>
+      <h2 className={shared.sectionTitle}>Estimated cost <HelpDot k="security_solution.cost" placement="bottom" /></h2>
+      {editing ? (
+        <form className={shared.create} onSubmit={async (e) => {
+          e.preventDefault();
+          if (await onSave(draft)) setEditing(false);
+        }}>
+          <input className={shared.input} inputMode="numeric" aria-label="One-off cost" placeholder="One-off"
+            value={draft.cost_one_off} onChange={set('cost_one_off')} />
+          <input className={shared.input} inputMode="numeric" aria-label="Annual cost" placeholder="Each year"
+            value={draft.cost_annual} onChange={set('cost_annual')} />
+          <select className={shared.input} aria-label="What the cost is for" value={draft.cost_basis} onChange={set('cost_basis')}>
+            <option value="">What is the cost for?</option>
+            <option value="organisation">For the organisation, bought once</option>
+            <option value="per_system">For each system it is put on</option>
+          </select>
+          <input className={shared.input} aria-label="Where the estimate comes from" placeholder="Where the estimate comes from (optional)"
+            value={draft.cost_note} onChange={set('cost_note')} />
+          <button className={shared.primary} type="submit">Save</button>
+          {known && (
+            <button className={shared.secondary} type="button" onClick={async () => {
+              if (await onSave({ cost_one_off: null, cost_annual: null, cost_basis: null })) setEditing(false);
+            }}>Clear the estimate</button>
+          )}
+          <button className={shared.secondary} type="button" onClick={() => setEditing(false)}>Cancel</button>
+        </form>
+      ) : (<>
+        {known ? (
+          <p>
+            {[s.cost_one_off != null && `${amount(s.cost_one_off)} one-off`, s.cost_annual != null && `${amount(s.cost_annual)} each year`]
+              .filter(Boolean).join(' and ')} — {BASIS_LABEL[s.cost_basis]}.
+            {s.cost_note && <> {s.cost_note}.</>}
+            {s.cost_set_by_name && <span className={shared.muted}> Estimated by {s.cost_set_by_name}{s.cost_set_at ? `, ${new Date(s.cost_set_at).toLocaleDateString('en-GB')}` : ''}.</span>}
+          </p>
+        ) : (
+          <p className={shared.muted}>Not known. The CISO&apos;s investment report ranks this solution by risk removed per system until a cost is given.</p>
+        )}
+        {canEdit && <div className={shared.actions}><button className={shared.secondary} onClick={start}>{known ? 'Change the estimate' : 'Give an estimate'}</button></div>}
+      </>)}
+    </section>
   );
 }

@@ -3,11 +3,12 @@
 import { useState, useEffect, useMemo }                   from 'react';
 import { useNavigate }                                    from 'react-router-dom';
 import { getCurrentRisks, getFutureRisks, getMyRiskTrends } from '../api';
-import { buildCurrentRiskMatrix, severityKey }            from '../utils/heatmapUtils';
+import { buildCurrentRiskMatrix }            from '../utils/heatmapUtils';
 import { RatingChip }                                     from './RatingChip';
 import { useAuth }                                        from '../context/AuthContext';
 import { inDepartment, departmentsIn }                    from '../utils/departmentScope';
 
+import { RiskGrid } from './RiskGrid';
 import grid       from './RiskHeatmapWidget.module.css';
 import listStyles from './WidgetShared.module.css';
 import styles     from './MyRisksWidget.module.css';
@@ -52,36 +53,7 @@ function riskScore(r) {
 }
 
 function MiniGrid({ matrix, onClick, ariaLabel }) {
-  return (
-    <button className={grid.gridWrapper} onClick={onClick} aria-label={ariaLabel}>
-      <span className={grid.axisLabelY}>PROBABILITY →</span>
-      <div className={grid.gridArea}>
-        <div className={grid.grid}>
-          {[5, 4, 3, 2, 1].map(p =>
-            [1, 2, 3, 4, 5].map(i => {
-              const count = matrix[p]?.[i] ?? 0;
-              const key   = severityKey(i, p, count);
-              return (
-                <div
-                  key={`${p}-${i}`}
-                  className={`${grid.cell} ${grid[key]}`}
-                  title={`Impact ${i}, Probability ${p}: ${count} risk${count !== 1 ? 's' : ''}`}
-                >
-                  {count > 0 && <span className={grid.cellCount}>{count}</span>}
-                </div>
-              );
-            })
-          )}
-        </div>
-        <div className={grid.xAxis}>
-          {[1, 2, 3, 4, 5].map(i => (
-            <span key={i} className={grid.axisTickX}>{i}</span>
-          ))}
-        </div>
-      </div>
-      <span className={grid.axisLabelX}>IMPACT →</span>
-    </button>
-  );
+  return <RiskGrid size="small" countAt={(i, p) => matrix[p]?.[i] ?? 0} onClick={onClick} ariaLabel={ariaLabel} />;
 }
 
 function TrendSection({ trends }) {
@@ -277,6 +249,8 @@ export function MyRisksWidget() {
               <span className={grid.legendLabel}>High</span>
               <span className={`${grid.legendDot} ${grid.cellCritical}`} />
               <span className={grid.legendLabel}>Critical</span>
+              <span className={`${grid.legendDot} ${grid.cellCatastrophic}`} />
+              <span className={grid.legendLabel}>Catastrophic</span>
             </div>
 
             {activeDept && allRisks.length === 0 && (

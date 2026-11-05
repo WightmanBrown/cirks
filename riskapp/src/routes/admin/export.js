@@ -244,9 +244,13 @@ const DATASETS = [
   // ── Security solutions (v145 delivery patterns; shared since v147) ──────────
   {
     slug: 'delivery-patterns',
-    columns: ['name', 'kind', 'notes'],
+    // With the optional estimates: cost (v170) and effort to operate (v173).
+    columns: ['name', 'kind', 'notes', 'cost_one_off', 'cost_annual', 'cost_basis', 'cost_note',
+              'effort_hours_month', 'effort_basis', 'effort_note'],
     fetch: () => query(`
-      SELECT p.name, p.kind, p.notes FROM delivery_patterns p ORDER BY p.kind, lower(p.name)`).then(r => r.rows),
+      SELECT p.name, p.kind, p.notes, p.cost_one_off, p.cost_annual, p.cost_basis, p.cost_note,
+             p.effort_hours_month, p.effort_basis, p.effort_note
+        FROM delivery_patterns p ORDER BY p.kind, lower(p.name)`).then(r => r.rows),
   },
   {
     slug: 'delivery-pattern-objectives',
