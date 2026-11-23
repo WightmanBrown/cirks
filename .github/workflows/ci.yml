@@ -160,6 +160,9 @@ jobs:
       PGPASSWORD: postgres
     steps:
       - name: Use this job's own database, on the port the runner gave it
+        # Runs before the checkout, so not in the job's default riskapp/: on a
+        # fresh runner (the public repository's) that folder does not exist yet.
+        working-directory: .
         run: |
           port=${{ job.services.postgres.ports['5432'] }}
           echo "PGPORT=$port" >> "$GITHUB_ENV"
@@ -226,6 +229,9 @@ jobs:
       PGPASSWORD: postgres
     steps:
       - name: Use this job's own database, on the port the runner gave it
+        # Runs before the checkout, so not in the job's default riskapp/: on a
+        # fresh runner (the public repository's) that folder does not exist yet.
+        working-directory: .
         run: |
           port=${{ job.services.postgres.ports['5432'] }}
           echo "PGPORT=$port" >> "$GITHUB_ENV"
@@ -285,6 +291,9 @@ jobs:
       ADMIN_PASSWORD: Story-Check-Pass-2026
     steps:
       - name: Use this job's own database, on the port the runner gave it
+        # Runs before the checkout, so not in the job's default riskapp/: on a
+        # fresh runner (the public repository's) that folder does not exist yet.
+        working-directory: .
         run: |
           port=${{ job.services.postgres.ports['5432'] }}
           echo "PGPORT=$port" >> "$GITHUB_ENV"

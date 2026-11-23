@@ -11,6 +11,20 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.4.1
+
+No change to CIRKS itself: a fix to the automated tests that run on every
+release.
+
+**To upgrade:** nothing to do. If you are on v1.4.0 you are running the same
+application; `git pull` brings the test fix with it. There is no migration.
+
+- **Tests:** the three test jobs that use their own database failed on GitHub's
+  machines for v1.4.0, before any test ran: the step that sets the database's
+  port started in a folder that only exists after the code is downloaded. It
+  now starts from the top folder. The application tests, front end and
+  dependency check had passed.
+
 ## v1.4.0
 
 Patterns: a system follows a pattern, and the pattern decides which security
