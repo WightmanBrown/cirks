@@ -211,7 +211,7 @@ function Relationships({ r }) {
         <thead>
           <tr>
             <th>Department <HelpDot k="analyst.col.department" placement="bottom" /></th>
-            <th className={styles.num}>Unanswered, scoring {t} or more <HelpDot k="analyst.col.unanswered" placement="bottom" /></th>
+            <th className={styles.num}>No security action planned, scoring {t} or higher <HelpDot k="analyst.col.unanswered" placement="bottom" /></th>
             <th className={styles.num}>Unknown <HelpDot k="analyst.col.unknown" placement="bottom" /></th>
             <th className={styles.num}>Others&apos; systems used <HelpDot k="analyst.col.shared" placement="bottom" /></th>
             <th>People to work with <HelpDot k="analyst.col.people" placement="bottom" /></th>
@@ -282,7 +282,7 @@ export function AnalystReportPage() {
             <Tile value={r.headline.to_do} label="risks waiting on this work" detail="Returned, waiting for validation, past review, or with an objective nobody has judged." />
             <Tile value={r.headline.first_time} of={r.headline.validated} label="validated risks were accepted first time" detail="The rest were returned for rework before the CISO validated them." />
             <Tile value={r.record.points_removed} label="points taken off risk scores in the last year" detail={`From ${plural(r.record.scores_lowered, 'assessment')} recorded under this name.`} />
-            <Tile value={r.headline.risks_identified} label="risks identified and still active" detail={`${r.headline.at_or_above_action} of them score ${r.thresholds.action} or more.`} />
+            <Tile value={r.headline.risks_identified} label="risks identified and still active" detail={`${r.headline.at_or_above_action} of them score ${r.thresholds.action} or higher.`} />
           </div>
           <div className={rep.stack}>
             <Work r={r} />

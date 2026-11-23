@@ -26,7 +26,7 @@ beforeEach(() => { caps = ['risk_appetite.write']; setRiskAppetite.mockReset(); 
 describe('Risk appetite', () => {
   test('says the current numbers in words, and that they were never changed', async () => {
     show();
-    expect(await screen.findByText(/a risk scoring this or more must be treated \(10 risks of 20 today\)/)).toBeInTheDocument();
+    expect(await screen.findByText(/a risk scoring this or higher must be treated \(10 risks of 20 today\)/)).toBeInTheDocument();
     expect(screen.getByText('The values CIRKS ships with; never changed.')).toBeInTheDocument();
   });
 

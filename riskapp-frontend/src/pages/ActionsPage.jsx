@@ -195,7 +195,6 @@ export function ActionsPage() {
                     <Th helpKey="actions.col.title">Title</Th>
                     <Th helpKey="actions.col.items">Items</Th>
                     <Th helpKey="actions.col.owner">Owner</Th>
-                    <Th helpKey="actions.col.plan">Plan</Th>
                     <Th helpKey="actions.col.target_date">Target Date</Th>
                   </tr>
                 </thead>
@@ -278,7 +277,6 @@ function ActionRow({ action, isSelected, onToggle, detail, rowRef }) {
             : '—'}
         </td>
         <td className={styles.td}>{action.owner_name}</td>
-        <td className={`${styles.td} ${styles.tdPlan}`}>{action.plan_title || '—'}</td>
         <td className={`${styles.td} ${styles.tdMono}`}>
           {date ? (
             <span className={styles.dateCell}>
@@ -294,7 +292,7 @@ function ActionRow({ action, isSelected, onToggle, detail, rowRef }) {
       </tr>
       {isSelected && (
         <tr className={styles.expandRow}>
-          <td colSpan={6} className={styles.expandCell}>
+          <td colSpan={5} className={styles.expandCell}>
             <ActionSummaryCard action={action} detail={detail} />
           </td>
         </tr>

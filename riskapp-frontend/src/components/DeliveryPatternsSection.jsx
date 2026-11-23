@@ -7,7 +7,7 @@ import {
   createDeliveryPattern, deleteDeliveryPattern, chooseCirksForControl, addDeliveryPatternPart, removeDeliveryPatternPart,
   listComponents, listSecuritySolutions,
 } from '../api';
-import { COMPONENT_TYPE_LABEL } from '../utils/componentTypes';
+import { TypeBadge } from './ComponentPill';
 import { partWhere } from '../utils/deliveryPatterns';
 import { SolutionPartForm } from './SolutionPartForm';
 import styles from './DeliveryPatternsSection.module.css';
@@ -193,7 +193,7 @@ function PatternCard({ controlId, pattern: p, canEdit, components, onScopeStated
           <ul className={styles.parts}>
             {p.parts.map(part => (
               <li key={part.id}>
-                <span className={styles.type}>{COMPONENT_TYPE_LABEL[part.component_type] || part.component_type}</span>
+                <span className={styles.type}><TypeBadge type={part.component_type} small label="long" /></span>
                 <Link to={`/components/${part.component_id}`}>{part.component_name}</Link>
                 <span className={styles.where}>{partWhere(part)}</span>
                 {canEdit && <button className={styles.linkBtn} aria-label={`Remove ${part.component_name}`}

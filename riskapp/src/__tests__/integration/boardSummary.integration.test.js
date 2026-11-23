@@ -9,7 +9,7 @@
 // up; each standard's requirements are counted by the SoA's own derivation; and
 // a month is captured once however often the capture runs.
 
-const { app, request, tokenFor, query } = require('./helpers');
+const { app, request, tokenFor, query, USERS } = require('./helpers');
 const { captureBoard, METRIC_KEY } = require('../../jobs/metricCapture');
 const { heatCell } = require('../../reports/board');
 
@@ -111,9 +111,13 @@ describe('tolerances (v169)', () => {
     }
   });
 
-  test('only the SIRO sets one; the CISO reports against it', async () => {
+  test('the SIRO or an administrator sets one (v175); the CISO reports against it', async () => {
     expect((await put('ciso', { green_max: 0, amber_max: 1, reason: 'x' })).status).toBe(403);
-    expect((await put('admin', { green_max: 0, amber_max: 1, reason: 'x' })).status).toBe(403);
+    const byAdmin = await put('admin', { green_max: 30, amber_max: 50, reason: 'Set by the administrator for the board.' });
+    expect(byAdmin.status).toBe(200);
+    const { rows: [row] } = await query('SELECT set_by FROM metric_tolerances WHERE metric_key = $1', [KEY]);
+    expect(row.set_by).toBe(USERS.admin.id);
+    await query('DELETE FROM metric_tolerances WHERE metric_key = $1', [KEY]);
   });
 
   test('it needs whole numbers, green at the better end, and a reason', async () => {

@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 // The component-record finding's reasons (v138, v148), in the words the findings
-// API uses. A membership not answered comes first: without it the security
-// architecture cannot apply to the system at all (docs/system-security-view.md §8).
+// API uses. No system pattern, then a question of the pattern nobody has
+// answered, come first: without them the security architecture cannot tell what
+// the system needs (docs/system-security-view.md §8; v178 replaced the system
+// profile's groups with the pattern's slots).
 export const objectiveName = (o) => (o.reference_code ? `${o.reference_code} ${o.title}` : o.title);
 
 // Each reason with the kind of pattern it is about (for PatternChip), or null.
@@ -10,6 +12,7 @@ export function componentRecordReasonItems(f) {
   if (!f) return [];
   const out = [];
   const push = (pattern, text, objectives) => out.push({ pattern, text, objectives });
+  if (f.pattern_not_stated) push('template', 'No system pattern stated, so CIRKS cannot say what it should record');
   for (const g of f.missing_membership_names || []) push('template', `Nothing recorded for ${g}`);
   if (f.missing_count > 0) {
     push(null, `Not recorded, though its controls need ${f.missing_count === 1 ? 'it' : 'them'}: ${f.missing_component_names.join(', ')}`);

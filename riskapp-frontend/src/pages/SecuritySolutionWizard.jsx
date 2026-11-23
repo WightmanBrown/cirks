@@ -13,9 +13,9 @@ import { BackButton } from '../components/BackButton';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { PatternChip } from '../components/PatternChip';
 import { ComponentModal } from '../components/ComponentModal';
-import { componentTypeShort } from '../utils/componentTypes';
 import styles from './SystemCreateWizard.module.css';
 import { HelpDot } from '../components/HelpDot';
+import { TypeBadge } from '../components/ComponentPill';
 
 // Creating a security solution (owner, 2026-10-09). Most of the library's
 // solutions are really SYSTEMS — a console, a service, a monitoring team's
@@ -25,7 +25,7 @@ import { HelpDot } from '../components/HelpDot';
 // and what it delivers. A solution that is only documents, processes and people
 // is still built by hand on its own page.
 
-const STEPS = ['What delivers it', 'Which system', 'What provides it', 'On each protected system', 'What it delivers'];
+const STEPS = ['What delivers it', 'Which security system runs it', 'What provides it', 'On each protected system', 'What it delivers'];
 
 // A component of the security system can be a part "on" it only if it exists
 // once (v137/v145). One that exists on each system is what the security system
@@ -200,7 +200,9 @@ export function SecuritySolutionWizard() {
           </>)}
 
           {step === 1 && (<>
-            <label className={styles.field}>Which security system delivers it?
+            <p className={styles.lead}>The security system that runs this protection: the console, service or tooling you
+              chose &ldquo;something is run&rdquo; for. Not the system it protects; those come in step 4.</p>
+            <label className={styles.field}>Which security system runs it?
               <select className={styles.input} value={systemId} onChange={e => setSystemId(e.target.value)}>
                 <option value="">Choose a security system…</option>
                 {systems.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -223,7 +225,7 @@ export function SecuritySolutionWizard() {
                   <input type="checkbox" checked={!!ticks[c.id] && l.ok} disabled={!l.ok}
                     onChange={e => setTicks(t => ({ ...t, [c.id]: e.target.checked }))} aria-label={c.name} />
                   <span>{c.name}
-                    <small>{componentTypeShort(c.component_type)}{!l.ok && ` · ${l.why}`}
+                    <small><TypeBadge type={c.component_type} variant="text" />{!l.ok && ` · ${l.why}`}
                       {l.ask && hasCapability('components.write') && (<>{' '}
                         <button type="button" className={styles.linkBtn} onClick={() => stateScope(c)}>It exists once, as part of this system</button></>)}
                     </small>

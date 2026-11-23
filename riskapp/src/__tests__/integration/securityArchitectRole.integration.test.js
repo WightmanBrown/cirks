@@ -33,7 +33,6 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await query(`DELETE FROM user_roles WHERE role = 'security_architect'`);
-  await query(`DELETE FROM membership_groups WHERE name LIKE 'SAR%'`);
   await query(`DELETE FROM system_builds WHERE name LIKE 'SAR%'`);
   await query(`DELETE FROM delivery_patterns WHERE id = $1`, [ids.pattern]);
   await query(`DELETE FROM systems WHERE name LIKE 'SAR%'`);
@@ -78,21 +77,39 @@ describe('the architect reads the whole picture', () => {
 });
 
 describe('the architect does the architecture', () => {
-  test('creates a component, a template group and a pattern', async () => {
+  test('creates a component, says which question it answers, and makes a pattern', async () => {
     const c = await api('architect', 'post', '/components')
       .send({ name: 'SAR hypervisor', component_type: 'technology', instantiation: 'per_system' });
     expect(c.status).toBe(201);
     ids.comp = c.body.id || c.body.component?.id;
 
-    const g = await api('architect', 'post', '/architecture/groups').send({ name: 'SAR Virtualisation', standard_id: ids.std });
-    expect(g.status).toBe(201);
-    const groupId = g.body.group?.id || g.body.id;
-    expect((await api('architect', 'post', `/architecture/groups/${groupId}/members`).send({ component_id: ids.comp })).status).toBe(201);
+    // v178: the template is the roles a component can answer.
+    expect((await api('architect', 'put', `/architecture/components/${ids.comp}/roles`).send({ roles: ['hosting'] })).status).toBe(200);
 
     const b = await api('architect', 'post', '/architecture/builds').send({ name: 'SAR virtual server' });
     expect(b.status).toBe(201);
     const buildId = b.body.build?.id || b.body.id;
     expect((await api('architect', 'post', `/architecture/builds/${buildId}/components`).send({ component_id: ids.comp })).status).toBe(201);
+    ids.build = buildId;
+  });
+
+  test('says which system pattern a standard build follows (v182): never defaulted, audited', async () => {
+    const { rows: [before] } = await query('SELECT system_pattern FROM system_builds WHERE id = $1', [ids.build]);
+    expect(before.system_pattern).toBeNull();                                   // not stated, never defaulted
+    const res = await api('architect', 'patch', `/architecture/builds/${ids.build}`).send({ system_pattern: 'S7' });
+    expect(res.status).toBe(200);
+    expect(res.body.build.system_pattern).toBe('S7');
+    expect((await api('architect', 'patch', `/architecture/builds/${ids.build}`).send({ system_pattern: 'S9' })).status).toBe(400);
+    const { rows: [a] } = await query(
+      `SELECT human_narrative FROM audit_log WHERE entity_id = $1 ORDER BY created_at DESC LIMIT 1`, [ids.build]);
+    expect(a.human_narrative).toMatch(/now follows S7 Application on cloud infrastructure \(IaaS\)/);
+    // A new build can state its pattern at once; null clears it.
+    const made = await api('architect', 'post', '/architecture/builds').send({ name: 'SAR SaaS', system_pattern: 'S2' });
+    expect(made.status).toBe(201);
+    expect(made.body.build.system_pattern).toBe('S2');
+    const cleared = await api('architect', 'patch', `/architecture/builds/${made.body.build.id}`).send({ system_pattern: null });
+    expect(cleared.body.build.system_pattern).toBeNull();
+    await api('architect', 'delete', `/architecture/builds/${made.body.build.id}`);
   });
 
   test('and it is audited to them', async () => {
@@ -135,7 +152,7 @@ describe('it is granted to a named person, not to a role', () => {
   });
 
   test('acting as IAM they still cannot edit the template: the role has to be switched into', async () => {
-    const res = await api('iam', 'post', '/architecture/groups').send({ name: 'SAR as IAM', standard_id: ids.std });
+    const res = await api('iam', 'put', `/architecture/components/${ids.comp}/roles`).send({ roles: [] });
     expect(res.status).toBe(403);
   });
 

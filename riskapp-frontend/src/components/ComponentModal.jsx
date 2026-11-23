@@ -2,7 +2,8 @@
 // Copyright (C) 2026 Wightman Brown Limited
 import { HelpDot } from './HelpDot';
 import { useState, useEffect } from 'react';
-import { createComponent, updateComponent, addComponentIp, removeComponentIp, getArchitecture, addArchitectureComponent } from '../api';
+import { createComponent, updateComponent, addComponentIp, removeComponentIp, getArchitecture } from '../api';
+import { RoleChangeDialog } from './RoleChangeDialog';
 import { useAuth } from '../context/AuthContext';
 import { COMPONENT_TYPE_OPTIONS, componentStatusOptions } from '../utils/componentTypes';
 import { DateField } from './DateField';
@@ -26,10 +27,15 @@ function looksLikeInet(v) {
 // THE one panel a component is created from (owner, 2026-10-09) — the library
 // pages, a system's Components tab and a risk's coverage panel all open this, so
 // the two questions that are expensive to leave blank are asked every time:
-// does it exist once or on each system (v137), and does it answer one of the
-// systems architecture template groups (v148). Also edits a component, from the
-// library; the two questions are asked only at creation.
-export function ComponentModal({ componentType = 'technology', singular, existing, defaultName = '', onClose, onSaved }) {
+// does it exist once or on each system (v137), and what can it answer on a
+// system (its roles, v178: an operating system, where it runs, a sign-in …).
+// Also edits a component, from the library: there its roles are changed through
+// a preview of what the change does to every system recording it.
+// `defaultRoles` starts a new component already answering those roles (a system's
+// unanswered question opens it so). Only someone who may say what a component
+// answers (architecture.write) is asked; anyone else leaves it unstated for an
+// architect, never "none of these" by default.
+export function ComponentModal({ componentType = 'technology', singular, existing, defaultName = '', defaultRoles, onClose, onSaved }) {
   const isEdit = !!existing;
   const { hasCapability } = useAuth();
   const canArchitect = hasCapability('architecture.write');
@@ -52,22 +58,23 @@ export function ComponentModal({ componentType = 'technology', singular, existin
   const [docUrl, setDocUrl]               = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
-  // The two questions. undefined = not answered yet; '' = answered "neither".
+  // The two questions. undefined = not answered yet.
   const [scope, setScope]   = useState(undefined);   // 'organisational' | 'per_system' | '' (not sure yet)
-  const [groupId, setGroupId] = useState(undefined); // a template group's id | '' (none of these)
-  const [groups, setGroups] = useState(null);        // null = could not be read: the question is not asked
+  const [roles, setRoles]   = useState(isEdit ? (existing.roles || []) : (canArchitect && defaultRoles?.length ? defaultRoles : undefined));   // [] = none of these
+  const [savedRoles, setSavedRoles] = useState(existing?.roles || []);
+  const [roleList, setRoleList] = useState(null);    // null = could not be read: the question is not asked
 
   useEffect(() => {
-    if (isEdit) return;
-    getArchitecture().then(a => setGroups(a.groups || [])).catch(() => setGroups(null));
-  }, [isEdit]);
+    getArchitecture().then(a => setRoleList(a.roles || [])).catch(() => setRoleList(null));
+  }, []);
 
   const label = singular || 'component';
-  // Documents answer no template group; and without the template there is nothing to ask.
-  const askGroup = !isEdit && type !== 'information' && Array.isArray(groups) && groups.length > 0;
-  // A group most of whose members are of this type is the likely home.
-  const likely = (g) => g.members.length > 0 && g.members.filter(m => m.component_type === type).length * 2 > g.members.length;
-  const answered = isEdit || (scope !== undefined && (!askGroup || groupId !== undefined));
+  // Documents answer no system pattern slot; and without the list there is nothing to ask.
+  const askRoles = type !== 'information' && Array.isArray(roleList) && roleList.length > 0;
+  const roleLabel = (k) => roleList?.find(r => r.key === k)?.labels[0] || k;
+  const toggleRole = (k) => setRoles(r => ((r || []).includes(k) ? r.filter(x => x !== k) : [...(r || []), k]));
+  const rolesChanged = isEdit && [...(roles || [])].sort().join() !== [...savedRoles].sort().join();
+  const answered = isEdit || (scope !== undefined && (!askRoles || !canArchitect || roles !== undefined));
 
   const originalIps = existing?.ip_addresses || [];
   const canBeHost   = type === 'technology';
@@ -100,12 +107,13 @@ export function ComponentModal({ componentType = 'technology', singular, existin
         document_approved_on: docApprovedOn || undefined, document_next_review: docNextReview || undefined,
         document_url: docUrl.trim() || undefined,
       } : {};
-      const body = { component_type: type, name: name.trim(), description: desc.trim() || undefined, status, ...hostFields, ...docFields };
+      const body = { component_type: type, name: name.trim(), description: desc.trim() || undefined, status, ...hostFields, ...docFields,
+        // A new component is on no system, so its roles need no preview (v178).
+        ...(!isEdit && canArchitect && roles?.length ? { roles } : {}) };
       const saved = isEdit ? await updateComponent(existing.id, body) : await createComponent(body);
       const compId = isEdit ? existing.id : saved.id;
       if (!isEdit) {
         if (scope) { await updateComponent(compId, { instantiation: scope }); saved.instantiation = scope; }
-        if (groupId) await addArchitectureComponent('groups', groupId, 'members', compId);
       }
 
       // Reconcile IPs. If the component is (still) a host, add the new ones and
@@ -264,27 +272,46 @@ export function ComponentModal({ componentType = 'technology', singular, existin
                 {scope === '' && <p className={own.warn}>Left unstated. It cannot be used in a security solution until someone answers this on the component&rsquo;s page.</p>}
               </div>
 
-              {askGroup && (
+              {askRoles && (
                 <div className={own.question}>
-                  <span>Does it answer one of the systems architecture template groups?</span>
+                  <span>What can it answer on a system?</span>
                   <div className={own.options}>
-                    {groups.map(g => (
-                      <button type="button" key={g.id} className={own.chip} aria-pressed={groupId === g.id} disabled={!canArchitect}
-                        onClick={() => setGroupId(g.id)}>
-                        {g.name}{likely(g) && <em> · likely</em>}
+                    {roleList.map(r => (
+                      <button type="button" key={r.key} className={own.chip} aria-pressed={(roles || []).includes(r.key)} disabled={!canArchitect}
+                        onClick={() => toggleRole(r.key)}>
+                        {r.labels.join(' / ')}
                       </button>
                     ))}
-                    <button type="button" className={own.chip} aria-pressed={groupId === ''} onClick={() => setGroupId('')}>None of these</button>
+                    {canArchitect && <button type="button" className={own.chip} aria-pressed={Array.isArray(roles) && roles.length === 0} onClick={() => setRoles([])}>None of these</button>}
                   </div>
                   <p className={own.hint}>
-                    Every system should record one component from each group: a network answers Connectivity, an operating
-                    system answers Operating system.
-                    {!canArchitect && ' Adding a component to a group needs the architecture permission; if it belongs in one, ask an architect.'}
+                    A system pattern asks each system these questions. A network answers Network, an operating system answers
+                    Operating system, a team can answer Support team and Who uses it.
+                    {!canArchitect && ' Saying what a component answers needs the architecture permission, so this is left for an architect: if it is one of these, ask one to say so on the component.'}
                   </p>
-                  {groupId && <p className={own.say}><b>{name.trim() || 'It'}</b> becomes an allowed answer for <b>{groups.find(g => g.id === groupId)?.name}</b> on every system.</p>}
-                  {groupId === '' && <p className={own.say}>It answers no template group. That is normal for software, agents, processes and documents.</p>}
-                  {groupId === undefined && <p className={own.warn}>If it is a network, a host, an operating system, a sign-in, a team or a user group and this is skipped, a system that records it will still show that group as blank.</p>}
+                  {roles?.length > 0 && <p className={own.say}><b>{name.trim() || 'It'}</b> will answer <b>{roles.map(roleLabel).join(', ')}</b> on every system that records it.</p>}
+                  {Array.isArray(roles) && roles.length === 0 && <p className={own.say}>It answers none of them. That is normal for software, agents and processes.</p>}
+                  {roles === undefined && canArchitect && <p className={own.warn}>If it is a network, a place, an operating system, a sign-in or a team and this is skipped, a system that records it will still show that question unanswered.</p>}
                 </div>
+              )}
+            </div>
+          )}
+
+          {isEdit && askRoles && (
+            <div className={own.question}>
+              <span>What it can answer on a system</span>
+              <div className={own.options}>
+                {roleList.map(r => (
+                  <button type="button" key={r.key} className={own.chip} aria-pressed={(roles || []).includes(r.key)} disabled={!canArchitect}
+                    onClick={() => toggleRole(r.key)}>
+                    {r.labels.join(' / ')}
+                  </button>
+                ))}
+              </div>
+              {!canArchitect && <p className={own.hint}>Changing what a component answers needs the architecture permission.</p>}
+              {rolesChanged && (
+                <RoleChangeDialog component={{ id: existing.id, name: existing.name, roles: savedRoles }} roles={roles} roleLabel={roleLabel}
+                  onClose={() => setRoles(savedRoles)} onDone={() => setSavedRoles(roles)} />
               )}
             </div>
           )}

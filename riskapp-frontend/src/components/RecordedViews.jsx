@@ -9,7 +9,7 @@ import styles from './RecordedViews.module.css';
 // (v173, docs/reporting-iam.md decision 5): dated, signed, never changing the
 // decision, never edited or removed. Recorded from the system report's decision
 // record; shown here so they travel with the risk. Renders nothing when none.
-const KIND = { validated: 'the validation', minuted: 'a minuted decision', accepted: 'the acceptance', action_accepted: 'an accepted action' };
+const KIND = { validated: 'the validation', minuted: 'a minuted decision', accepted: 'the exception', action_accepted: 'an accepted action' };
 const day = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export function RecordedViews({ riskId }) {

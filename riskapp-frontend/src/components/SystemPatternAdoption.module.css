@@ -77,3 +77,12 @@
 .state.would { --tone: var(--violet); }
 .lead a { color: var(--accent); text-decoration: none; }
 .lead a:hover, .lead a:focus-visible { text-decoration: underline; }
+/* A second answer to a once-only question (decision 24): amber, confirmed by a tick. */
+.overlap { border: 1px solid var(--amber); background: color-mix(in srgb, var(--amber) 10%, transparent);
+  border-radius: 6px; padding: 10px 12px; font-size: var(--text-body); }
+.overlap p { margin: 0 0 6px; }
+.overlap ul { margin: 0 0 6px; padding-left: 20px; }
+.check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; }
+.mismatch { border: 1px solid var(--red); background: color-mix(in srgb, var(--red) 10%, transparent);
+  border-radius: 6px; padding: 10px 12px; font-size: var(--text-body); }
+.mismatch p { margin: 0 0 6px; }

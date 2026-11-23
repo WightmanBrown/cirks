@@ -51,7 +51,7 @@ export function SupplierRelationshipCard({ relationship: r, isExpert, canEdit, o
           </div>
           <div>
             <dt>Criticality</dt>
-            <dd title={`The highest impact of the ${r.systems_touched} system${r.systems_touched === 1 ? '' : 's'} it touches`}>
+            <dd title={`The highest impact of the ${r.systems_touched} ${r.figures_narrowed ? 'of your department’s ' : ''}system${r.systems_touched === 1 ? '' : 's'} it touches`}>
               <RatingChip value={r.max_impact} scale="impact" variant={isExpert ? 'number' : 'word'} />
               {r.criticality_systems?.length === 1 && <span className={styles.sub}>from {r.criticality_systems[0].name}</span>}
               {r.criticality_systems?.length > 1 && <span className={styles.sub}>from {r.criticality_systems.length} systems at that level</span>}

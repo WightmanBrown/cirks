@@ -32,22 +32,16 @@ Backup policy,Ransomware,CIRKS starter library
 Backups are protected,Ransomware,CIRKS starter library
 Restores are tested,Ransomware,CIRKS starter library
 Configuration monitoring,Exploitation of an unpatched vulnerability,CIRKS starter library
-Detection of malware and viruses,Exploitation of an unpatched vulnerability,CIRKS starter library
 Detection and prevention of malicious activity,Exploitation of an unpatched vulnerability,CIRKS starter library
 Configuration monitoring,Malware infection,CIRKS starter library
-Detection of malware and viruses,Malware infection,CIRKS starter library
 Detection and prevention of malicious activity,Malware infection,CIRKS starter library
 Configuration monitoring,Ransomware,CIRKS starter library
-Detection of malware and viruses,Ransomware,CIRKS starter library
 Detection and prevention of malicious activity,Ransomware,CIRKS starter library
 Configuration monitoring,Security misconfiguration,CIRKS starter library
-Detection of malware and viruses,Security misconfiguration,CIRKS starter library
 Detection and prevention of malicious activity,Security misconfiguration,CIRKS starter library
 Configuration monitoring,Unauthorised data modification,CIRKS starter library
-Detection of malware and viruses,Unauthorised data modification,CIRKS starter library
 Detection and prevention of malicious activity,Unauthorised data modification,CIRKS starter library
 Configuration monitoring,Zero-day exploitation,CIRKS starter library
-Detection of malware and viruses,Zero-day exploitation,CIRKS starter library
 Detection and prevention of malicious activity,Zero-day exploitation,CIRKS starter library
 Device hardening policy and standard,Exploitation of an unpatched vulnerability,CIRKS starter library
 Device hardening policy and standard,Privilege escalation,CIRKS starter library
@@ -68,11 +62,11 @@ Service and system accounts,Stolen or compromised credentials,CIRKS starter libr
 Device identification and network access (802.1X),Stolen or compromised credentials,CIRKS starter library
 Authentication information is protected,Interception of internal network traffic,CIRKS starter library
 Containment and recovery,Denial of service (DoS/DDoS),CIRKS starter library
-Containment and recovery,Ransomware,CIRKS starter library
-Containment and recovery,Zero-day exploitation,CIRKS starter library
-Containment and recovery,Malware infection,CIRKS starter library
+Devices can be contained,Ransomware,CIRKS starter library
+Devices can be contained,Zero-day exploitation,CIRKS starter library
+Devices can be contained,Malware infection,CIRKS starter library
 Role-based training,Phishing targeting user credentials,CIRKS starter library
-Central monitoring team,Malicious insider misuse,CIRKS starter library
+Central monitoring capability,Malicious insider misuse,CIRKS starter library
 Software installation is controlled,Malware infection,CIRKS starter library
 Software installation is controlled,Phishing targeting user credentials,CIRKS starter library
 Software installation is controlled,Ransomware,CIRKS starter library
@@ -120,7 +114,7 @@ Physical entry is controlled,Malicious insider misuse,CIRKS starter library
 Physical security monitoring,Malicious insider misuse,CIRKS starter library
 Physical entry is controlled,Physical intrusion or theft,CIRKS starter library
 Physical security monitoring,Physical intrusion or theft,CIRKS starter library
-Central monitoring team,Data exfiltration,CIRKS starter library
+Central monitoring capability,Data exfiltration,CIRKS starter library
 Vulnerability reports are handled,Exploitation of an unpatched vulnerability,CIRKS starter library
 Recovery objectives,Natural disaster or environmental event,CIRKS starter library
 Recovery is managed,Natural disaster or environmental event,CIRKS starter library
@@ -151,8 +145,9 @@ Continuity and recovery plans,Ransomware,CIRKS starter library
 Strong authentication,Phishing targeting user credentials,CIRKS starter library
 Device identification and network access (802.1X),Phishing targeting user credentials,CIRKS starter library
 Strong authentication,Stolen or compromised credentials,CIRKS starter library
-Vulnerabilities are identified,Exploitation of an unpatched vulnerability,CIRKS starter library
-Vulnerabilities are identified,Exploitation of a public-facing application,CIRKS starter library
-Vulnerabilities are identified,Security misconfiguration,CIRKS starter library
+Software vulnerability scanning,Exploitation of an unpatched vulnerability,CIRKS starter library
+Software vulnerability scanning,Exploitation of a public-facing application,CIRKS starter library
+Network vulnerability scanning,Security misconfiguration,CIRKS starter library
 Malware protection,Malware infection,CIRKS starter library
 Malware protection,Ransomware,CIRKS starter library
+Network vulnerability scanning,Exploitation of a public-facing application,CIRKS starter library

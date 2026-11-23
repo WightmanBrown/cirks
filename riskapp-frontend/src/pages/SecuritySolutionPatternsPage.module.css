@@ -1,0 +1,132 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.tile:hover { border-color: var(--accent); }
+
+.code { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-secondary); }
+.tileText { font-size: var(--text-body); color: var(--text-secondary); }
+
+.pattern { scroll-margin-top: 80px; }
+
+.patternHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.lead { color: var(--text-secondary); max-width: 860px; }
+.lead b { color: var(--text-primary); }
+
+/* A pattern's explanatory example (written in lib/solutionPatterns.js, not data). */
+.example { margin-top: 12px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 5%, transparent); max-width: 860px; }
+.exampleHead { margin: 0 0 8px; color: var(--text-primary); }
+.exampleParts { margin: 0; display: grid; gap: 6px; }
+.exampleParts > div { display: grid; grid-template-columns: minmax(120px, 180px) 1fr; gap: 12px; }
+.exampleParts dt { color: var(--text-secondary); font-size: var(--text-sm); }
+.exampleParts dd { margin: 0; color: var(--text-primary); }
+@media (max-width: 560px) { .exampleParts > div { grid-template-columns: 1fr; gap: 0; } }
+
+/* The system patterns page (v177, SystemPatternsPage.jsx) shares this file. */
+.tileGap { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--red-light); }
+.tileOk { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--green-light); }
+.tableWrap { overflow-x: auto; margin-top: 8px; }
+.unstated {
+  columns: 3 220px;
+  column-gap: 24px;
+  padding-left: 18px;
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+}
+.unstated li { break-inside: avoid; padding: 2px 0; }
+.role {
+  --role-colour: var(--ppitf-technology);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--role-colour);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--role-colour) 6%, var(--bg-surface));
+}
+/* A role is coloured by the component type that answers it (the PPITF colours). */
+.role_technology { --role-colour: var(--ppitf-technology); }
+.role_people { --role-colour: var(--ppitf-people); }
+.role_facility { --role-colour: var(--ppitf-facility); }
+.role_process { --role-colour: var(--ppitf-process); }
+.role_information { --role-colour: var(--ppitf-information); }
+/* The reminder under the page description: patterns serve security questions only. */
+.reminder {
+  max-width: 860px;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--text-secondary);
+}
+.reminder b { color: var(--text-primary); }
+.roleHead { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+
+/* A heading inside a section: the business and security systems with no pattern. */
+.sub { composes: sub from '../components/SolutionPatternSection.module.css'; }
+
+/* A fold: a count the reader can open (a pattern's systems; security systems with no pattern).
+   A bar with a turning chevron, so it reads as something to open, not a line of text. */
+.fold { margin-top: 16px; }
+.fold > summary {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  cursor: pointer;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before {
+  content: '▸';
+  color: var(--accent);
+  font-size: 1.1em;
+  transition: transform 0.15s;
+}
+.fold[open] > summary::before { transform: rotate(90deg); }
+.fold > summary:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.fold > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fold[open] > summary { margin-bottom: 10px; }
+.fold > summary .tileGap, .fold > summary .tileOk { font-size: var(--text-sm); font-weight: 400; }
+
+/* Pattern not stated: green when no business system is left to place; security systems boxed in blue (optional). */
+.tileClear { border-color: var(--green); }
+.boxClear { border: 1px solid var(--green); border-radius: var(--radius-md); padding: 4px 14px 10px; }
+.boxSecurity { border: 1px solid var(--blue); border-radius: var(--radius-md); padding: 4px 14px 10px; }
+
+/* The page's key message, and the rest folded away (System patterns, 2026-11-18). */
+.keyMessage { font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); margin: 4px 0 8px; max-width: 860px; }
+.keyMessage a { color: var(--accent); text-decoration: none; }
+.more { margin: 8px 0 0; max-width: 860px; }
+.more > summary { cursor: pointer; color: var(--accent); font-size: var(--text-body); padding: 4px 0; }

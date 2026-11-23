@@ -40,3 +40,8 @@
 
 .error { color: var(--red-light); }
 .ok { color: var(--green-light); }
+
+/* Menu: simple or full (v183). */
+.menuOption { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; cursor: pointer; }
+.menuOption input { margin-top: 3px; }
+.linkBtn { background: none; border: none; padding: 0; margin-top: 6px; color: var(--accent); cursor: pointer; font-size: var(--text-hint); }

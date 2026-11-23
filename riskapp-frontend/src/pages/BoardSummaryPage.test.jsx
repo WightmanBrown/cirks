@@ -59,9 +59,11 @@ beforeEach(() => { vi.clearAllMocks(); board = make([]); caps = ['reports.read']
 describe('Board summary', () => {
   test('leads with the four headline numbers', async () => {
     show();
-    expect(await screen.findByText('decided, with nothing carrying it out')).toBeInTheDocument();
+    expect(await screen.findByText('treatment decided, but no security action →')).toBeInTheDocument();
+    // Each headline tile opens the list of what it counts.
+    expect(screen.getByRole('link', { name: /treatment decided, but no security action/ })).toHaveAttribute('href', '/reporting/exposure?by=risks&only=decided_not_delivered');
     expect(screen.getByText('56')).toBeInTheDocument();
-    expect(screen.getByText(/risks scoring 12 or more, which must be treated/)).toBeInTheDocument();
+    expect(screen.getByText(/risks scoring 12 or higher, which must be treated/)).toBeInTheDocument();
   });
 
   test('places risks on the heat map, saying each square\'s count', async () => {
@@ -89,7 +91,7 @@ describe('Board summary', () => {
   test('draws the trend and the direction of travel once a previous month is held', async () => {
     board = make([{ period: '2026-10', definition_ver: 1, summary: { exposure: { ...exposure, at_or_above_action: 70, above_owner_max: 10, decided_not_delivered: 56, acceptances_expired: 0 } } }]);
     show();
-    expect(await screen.findByRole('img', { name: /scoring 12 or more: Oct 26 70, Nov 26 64/ })).toBeInTheDocument();
+    expect(await screen.findByRole('img', { name: /scoring 12 or higher: Oct 26 70, Nov 26 64/ })).toBeInTheDocument();
     expect(screen.getByText('▼ 6 since last month')).toBeInTheDocument();
     expect(screen.getAllByText('no change since last month').length).toBeGreaterThan(0);
   });

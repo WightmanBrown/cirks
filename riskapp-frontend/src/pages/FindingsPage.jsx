@@ -22,7 +22,7 @@ import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
 import { HelpDot } from '../components/HelpDot';
 import styles from './FindingsPage.module.css';
-import { componentTypeShort } from '../utils/componentTypes';
+import { TypeBadge } from '../components/ComponentPill';
 
 const SOA_TYPE_LABEL = {
   deployed_where_not_applicable:  'deployed on a system where it was ruled not applicable',
@@ -59,7 +59,7 @@ function InstantiationSection({ data, canAnswer, onAnswered }) {
   const row = (c) => (
     <tr key={c.component_id}>
       <td><Link to={`/components/${c.component_id}`}>{c.name}</Link></td>
-      <td className={styles.mono}>{componentTypeShort(c.component_type)}</td>
+      <td className={styles.mono}><TypeBadge type={c.component_type} variant="text" /></td>
       <td>{c.implied_on} systems in {c.departments} department{c.departments !== 1 ? 's' : ''}
         <span className={styles.muted}> · recorded on {c.recorded_on}</span></td>
       <td>

@@ -57,6 +57,11 @@ export function criticalityNarrative(supplierName, relationships) {
       text = `It comes from ${listWords(names)}, which ${accessPhrase(r, supplierName, true)}. `
         + `Each holds information rated ${impactLabel(level)} on the dimension shown.`;
     }
+    // Another department's contract, seen by a department-scoped reader, is
+    // counted over the reader's own systems only (roadmap 9).
+    if (r.figures_narrowed) {
+      text += ` ${r.department_name || 'Another department'} holds the contract; only your department's systems are counted.`;
+    }
     return { relationship: r, systems, text };
   });
   return { level, reasons };

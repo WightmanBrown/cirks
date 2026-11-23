@@ -64,7 +64,7 @@ const RELATIONSHIP_FIELDS = ['relationship_type', 'department_id', 'system_id', 
 // One place that says what a relationship row looks like on the wire. DATE
 // columns go out as text: node-pg turns a DATE into local midnight, which
 // serialises as the day before during BST.
-const RELATIONSHIP_SELECT = `
+const relationshipSelect = (crit) => `
   SELECT sr.id, sr.supplier_id, sp.name AS supplier_name, sr.relationship_type,
          sr.department_id, d.name AS department_name,
          sr.system_id, sys.name AS system_name,
@@ -74,25 +74,58 @@ const RELATIONSHIP_SELECT = `
          sr.status, sr.created_at, sr.updated_at,
          o.owner_user_ids, o.owner_names, COALESCE(o.is_siro_fallback, FALSE) AS owner_is_siro_fallback,
          COALESCE(c.systems_touched, 0) AS systems_touched,
-         c.impact_c, c.impact_i, c.impact_a, c.max_impact
+         c.impact_c, c.impact_i, c.impact_a, c.max_impact, COALESCE(c.figures_narrowed, FALSE) AS figures_narrowed
     FROM supplier_relationships sr
     JOIN suppliers sp               ON sp.id = sr.supplier_id
     LEFT JOIN departments d         ON d.id = sr.department_id
     LEFT JOIN systems sys           ON sys.id = sr.system_id
     LEFT JOIN control_components cc ON cc.id = sr.component_id
     LEFT JOIN v_department_risk_owner o ON o.department_id = sr.department_id
-    LEFT JOIN v_supplier_relationship_criticality c ON c.relationship_id = sr.id`;
+    ${crit}`;
+const FULL_FIGURES = (alias) => `LEFT JOIN (SELECT vc.*, FALSE AS figures_narrowed FROM v_supplier_relationship_criticality vc) c
+               ON c.relationship_id = ${alias}.id`;
+// After a write: the writer's own department's relationship, so its whole figures.
+const RELATIONSHIP_SELECT = relationshipSelect(FULL_FIGURES('sr'));
 
 // A department-scoped reader sees relationships its department contracts, and
 // those touching its department's systems — an IAO looking at their SaaS system
 // needs to see who hosts it even when another department holds the contract.
-async function readScope(req, params) {
-  if (!isDepartmentIsolationEnabled() || !isDeptScoped(req.user.role)) return 'TRUE';
-  params.push(await getUserDepartment(req.user.id));
+//
+// What such a reader is shown of a relationship ANOTHER department contracts is
+// its reach into their own department (roadmap 9, owner 2026-11-19): the systems
+// touched, the impact and so the criticality are counted over their department's
+// systems only, so the supplier reads as critical "to your department" and other
+// departments' systems are not named. A relationship their own department
+// contracts keeps its whole figures — the department is accountable for all of
+// it. Objectives and evidence belong to the contract and are not narrowed.
+//
+// Returns the WHERE clause, the criticality join for a relationship aliased
+// `alias` (columns systems_touched, impact_c/i/a, max_impact, figures_narrowed),
+// and the reader's department (null when unscoped).
+async function readerScope(req, params, alias = 'sr') {
+  if (!isDepartmentIsolationEnabled() || !isDeptScoped(req.user.role)) {
+    return { where: 'TRUE', dept: null, crit: FULL_FIGURES(alias) };
+  }
+  const dept = await getUserDepartment(req.user.id);
+  params.push(dept);
   const p = `$${params.length}`;
-  return `(sr.department_id = ${p} OR EXISTS (
+  return {
+    dept,
+    where: `(sr.department_id = ${p} OR EXISTS (
             SELECT 1 FROM v_supplier_relationship_systems rs JOIN systems x ON x.id = rs.system_id
-             WHERE rs.relationship_id = sr.id AND x.department_id = ${p}))`;
+             WHERE rs.relationship_id = sr.id AND x.department_id = ${p}))`,
+    // As v_supplier_relationship_criticality, over the reader's department's
+    // systems when another department contracts the relationship.
+    crit: `LEFT JOIN LATERAL (
+             SELECT count(s.id)::int AS systems_touched,
+                    max(s.impact_c) AS impact_c, max(s.impact_i) AS impact_i, max(s.impact_a) AS impact_a,
+                    GREATEST(max(s.impact_c), max(s.impact_i), max(s.impact_a)) AS max_impact,
+                    ${alias}.department_id IS DISTINCT FROM ${p} AS figures_narrowed
+               FROM v_supplier_relationship_systems rs
+               JOIN systems s ON s.id = rs.system_id AND s.is_active
+              WHERE rs.relationship_id = ${alias}.id
+                AND (${alias}.department_id = ${p} OR s.department_id = ${p})) c ON TRUE`,
+  };
 }
 
 function nameConflict(err, name) {
@@ -129,7 +162,7 @@ async function auditRow(db, userId, action, entityType, id, label, narrative) {
 router.get('/', canRead, async (req, res, next) => {
   try {
     const params = [];
-    const scope = await readScope(req, params);
+    const { where: scope, crit } = await readerScope(req, params, 'r');
     const { rows } = await query(`
       SELECT sp.id, sp.name, sp.notes, sp.created_at,
              COUNT(r.id)::int AS relationship_count,
@@ -160,7 +193,7 @@ router.get('/', canRead, async (req, res, next) => {
         FROM suppliers sp
         LEFT JOIN (SELECT sr.* FROM supplier_relationships sr WHERE ${scope}) r ON r.supplier_id = sp.id
         LEFT JOIN departments d ON d.id = r.department_id
-        LEFT JOIN v_supplier_relationship_criticality c ON c.relationship_id = r.id
+        ${crit}
         LEFT JOIN v_supplier_assurance_findings f ON f.relationship_id = r.id
         LEFT JOIN (SELECT relationship_id,
                           COUNT(*) FILTER (WHERE met)                          AS met_count,
@@ -194,8 +227,9 @@ router.get('/relationships', canRead, async (req, res, next) => {
       where.push(`sr.component_id = $${params.length}`);
     }
     if (!where.length) return res.status(400).json({ error: 'Give a system_id or a component_id.' });
-    where.push(await readScope(req, params));
-    const { rows } = await query(`${RELATIONSHIP_SELECT}
+    const { where: scope, crit } = await readerScope(req, params);
+    where.push(scope);
+    const { rows } = await query(`${relationshipSelect(crit)}
        WHERE ${where.join(' AND ')}
        ORDER BY lower(sp.name), sr.relationship_type`, params);
     res.json({ relationships: rows });
@@ -267,8 +301,8 @@ router.get('/:id', canRead, async (req, res, next) => {
     const sp = await query(`SELECT id, name, notes, created_at, updated_at FROM suppliers WHERE id = $1`, [req.params.id]);
     if (!sp.rows.length) return res.status(404).json({ error: 'Supplier not found.' });
     const params = [req.params.id];
-    const scope = await readScope(req, params);
-    const { rows } = await query(`${RELATIONSHIP_SELECT}
+    const { where: scope, crit, dept } = await readerScope(req, params);
+    const { rows } = await query(`${relationshipSelect(crit)}
        WHERE sr.supplier_id = $1 AND ${scope}
        ORDER BY (sr.status = 'ended'), sr.relationship_type, lower(d.name)`, params);
     // Each relationship's expected objectives (v143): every-supplier + its type's.
@@ -318,9 +352,12 @@ router.get('/:id', canRead, async (req, res, next) => {
       SELECT rs.relationship_id, s.id, s.name, s.impact_c, s.impact_i, s.impact_a,
              GREATEST(s.impact_c, s.impact_i, s.impact_a) AS impact
         FROM v_supplier_relationship_systems rs
+        JOIN supplier_relationships sr ON sr.id = rs.relationship_id
         JOIN systems s ON s.id = rs.system_id AND s.is_active
        WHERE rs.relationship_id = ANY($1)
-       ORDER BY lower(s.name)`, [ids])).rows : [];
+         -- Narrowed as the figures are (readerScope).
+         AND ($2::uuid IS NULL OR sr.department_id = $2 OR s.department_id = $2)
+       ORDER BY lower(s.name)`, [ids, dept])).rows : [];
     for (const r of rows) {
       r.criticality_systems = r.max_impact == null ? []
         : touched.filter((t) => t.relationship_id === r.id && t.impact === r.max_impact)

@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
+import { PanelQuestions } from '../components/PanelQuestions';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { CompletenessRing } from '../components/CompletenessRing';
 import { scoreLevel } from '../utils/riskColors';
@@ -53,7 +54,7 @@ function SystemsTable({ r, mineOnly }) {
         <tr>
           <th>System <HelpDot k="iam.systems.col.system" placement="bottom" /></th>
           <th className={styles.num}>Highest <HelpDot k="iam.systems.col.highest" placement="bottom" /></th>
-          <th className={styles.num}>Scoring {t} or more <HelpDot k="iam.systems.col.at_or_above" placement="bottom" /></th>
+          <th className={styles.num}>Scoring {t} or higher <HelpDot k="iam.systems.col.at_or_above" placement="bottom" /></th>
           <th>Objectives in place <HelpDot k="iam.systems.col.objectives" placement="bottom" /></th>
           <th>Record <HelpDot k="iam.systems.col.record" placement="bottom" /></th>
           <th>Compliance <HelpDot k="iam.systems.col.compliance" placement="bottom" /></th>
@@ -137,6 +138,7 @@ function Shared({ r }) {
               <th>System <HelpDot k="iam.systems.col.system" placement="bottom" /></th>
               <th>Relied on by <HelpDot k="iam.systems.col.relied_on" placement="bottom" /></th>
               <th>Their services <HelpDot k="iam.systems.col.their_services" placement="bottom" /></th>
+              <th>Their information assets <HelpDot k="iam.systems.col.their_assets" placement="bottom" /></th>
             </tr>
           </thead>
           <tbody>
@@ -145,6 +147,10 @@ function Shared({ r }) {
                 <td>{x.system_name}</td>
                 <td>{x.department_name}<div className={styles.note}>{x.owner_names || 'no IAO named'}</div></td>
                 <td className={styles.note}>{x.services.join(', ')}</td>
+                <td className={styles.note}>
+                  {(x.assets || []).length === 0 ? 'None held here'
+                    : x.assets.map((a) => `${a.name}${a.level ? ` (impact ${a.level})` : ''}`).join(', ')}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -186,10 +192,10 @@ export function SystemsReportPage() {
         <div data-print="hide"><BackButton /></div>
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>{r?.can_choose ? 'Systems report' : 'My systems'} <HelpDot k="iam.systems.title" placement="bottom" /></h1>
+            <h1 className={styles.title}>{r?.can_choose ? 'Systems report' : 'My systems'}: control objectives, system by system <HelpDot k="iam.systems.title" placement="bottom" /></h1>
             <p className={styles.desc}>
-              {r ? <>{r.department.name}: {plural(r.systems.length, 'system')}. As at {new Date(r.generated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, from the live register. Open a system for its full report.</>
-                : 'The state of the department’s systems, and your own record.'}
+              The control objectives recorded on each of the department&apos;s systems, system by system: what is in place, degraded or missing, with each system&apos;s risks and compliance.
+              {r ? <> {r.department.name}: {plural(r.systems.length, 'system')}. As at {new Date(r.generated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, from the live register. Open a system for its full report.</> : null}
             </p>
           </div>
           <div className={own.controls} data-print="hide">
@@ -216,6 +222,11 @@ export function SystemsReportPage() {
                 </div>
               )}
               <SystemsTable r={r} mineOnly={mineOnly} />
+              <PanelQuestions questions={[
+                { label: 'Which of these systems is weakest, and why?', to: `/reporting/coverage?by=system&dept=${r.department.id}` },
+                { label: 'Which degraded controls should be fixed first?', to: `/reporting/coverage?by=degraded&dept=${r.department.id}` },
+                { label: 'Which risks need a decision, and from whom?', to: `/reporting/decisions?dept=${r.department.id}` },
+              ]} />
             </Panel>
             {!r.can_choose && <Record rec={r.record} />}
             <Shared r={r} />

@@ -328,6 +328,9 @@
 
 .btnPrimary   { composes: btnPrimary   from '../components/buttons.module.css'; }
 .btnSecondary { composes: btnSecondary from '../components/buttons.module.css'; }
+.btnDanger { composes: btnDanger from '../components/buttons.module.css'; }
+.headerActions { display: flex; gap: 8px; align-items: center; }
+.deleteError { margin: 8px 0 0; color: var(--red-light); font-size: 13px; }
 
 /* Named-as-a-vulnerability section — the direct signal, sitting above the
    systems list because it is a judgement about this component rather than

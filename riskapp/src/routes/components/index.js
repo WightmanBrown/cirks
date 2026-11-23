@@ -10,7 +10,8 @@ const { searchComponents,
         updateComponent,
         getComponentDetail,
         addComponentIp,
-        removeComponentIp }    = require('./componentController');
+        removeComponentIp,
+        deleteComponent }      = require('./componentController');
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get('/',                                          canView, searchComponen
 router.post('/',                                         canEdit, createComponent);
 router.get('/:id',                                       canView, getComponentDetail);
 router.patch('/:id',                                     canEdit, updateComponent);
+router.delete('/:id',                                    canEdit, deleteComponent);
 router.post('/:id/ips',                                  canEdit, addComponentIp);
 router.delete('/:id/ips/:ipId',                          canEdit, removeComponentIp);
 

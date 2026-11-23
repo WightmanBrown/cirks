@@ -278,7 +278,7 @@ the solution as *once for the organisation*.
 
 - *A recorded component that does not answer the template.* The new system's
   **Connectivity** slot stayed blank although *MIG CCTV Network* was recorded on
-  it. A template group accepts only its **members**; a new network has to be
+  it. A system profile group accepts only its **members**; a new network has to be
   added to the Connectivity group (Security Controls → Systems architecture
   template) before it counts as an answer. The same went for its operating
   system.
@@ -376,7 +376,7 @@ template asks every system for its operating system. Which one is it?
 
 **What works today.** Record both.
 
-- A template group is *answered* by one of its components, and nothing stops a
+- A system profile group is *answered* by one of its components, and nothing stops a
   second. Two Misty Isles systems already do this: *Bus Information Displays*
   (AlmaLinux 9 + Windows Server 2025) and *Risk Management System* (Raspberry
   Pi 5 + Ubuntu Server 24.04 LTS).
@@ -420,7 +420,7 @@ agent and an internal network connection. It is really two things:
 
 As one system its template can never be answered truthfully: *where is it
 hosted?* has two answers, and so do *what does it run?* and *who uses it?* On
-2026-10-13 it still had four template groups blank — hosting, authentication
+2026-10-13 it still had four system profile groups blank — hosting, authentication
 service, support team and user group — the questions with two answers. As two
 systems each answers the template once, each is implied the
 security solutions its own stack calls for, each has its own state, and the

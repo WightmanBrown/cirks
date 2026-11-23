@@ -8,7 +8,12 @@ describe('componentRecordReasons', () => {
       .toEqual(['Not recorded, though its controls need it: OSSEC agent']);
   });
 
-  test('memberships come first, then parts, objectives and choices', () => {
+  test('no pattern comes first of all (v178)', () => {
+    expect(componentRecordReasons({ pattern_not_stated: true, missing_count: 1, missing_component_names: ['OSSEC agent'] })[0])
+      .toBe('No system pattern stated, so CIRKS cannot say what it should record');
+  });
+
+  test('unanswered questions of the pattern come first, then parts, objectives and choices', () => {
     expect(componentRecordReasons({
       missing_membership_names: ['Connectivity'], missing_count: 0, missing_component_names: [],
       unrecorded_objective_names: ['DE.CM-01 Networks are monitored'], needs_solution_count: 2, conflict_count: 1,

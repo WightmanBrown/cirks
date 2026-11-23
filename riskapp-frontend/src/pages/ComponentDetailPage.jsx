@@ -4,7 +4,7 @@ import { HelpDot } from '../components/HelpDot';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth }               from '../context/AuthContext';
-import { getComponent, updateComponent } from '../api';
+import { getComponent, updateComponent, deleteComponent } from '../api';
 import { Shell }                 from '../components/Shell';
 import { BackButton }            from '../components/BackButton';
 import { EntityKind }            from '../components/EntityKind';
@@ -102,6 +102,12 @@ function EditModal({ component, onClose, onSaved }) {
 }
 
 // One system card — shows the system's max risk and its active risks with threats.
+// Where each kind of component is listed, to return to after deleting one.
+const LIBRARY_OF = {
+  technology: '/technology', people: '/people-groups', process: '/processes',
+  facility: '/facilities', information: '/policies-documents',
+};
+
 function SystemCard({ system, navigate }) {
   const [expanded, setExpanded] = useState(false);
   const hasRisks = system.risks && system.risks.length > 0;
@@ -219,6 +225,7 @@ export function ComponentDetailPage() {
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
   const [editing, setEditing]     = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   function load() {
     setLoading(true);
@@ -268,6 +275,19 @@ export function ComponentDetailPage() {
   // department — see docs/component-ownership.md.
   const canEdit    = hasCapability('components.write');
 
+  // A component created by mistake (a duplicate) is deleted; one anything uses is
+  // refused by the API, which names where, so it is taken out there first.
+  async function handleDelete() {
+    if (!window.confirm(`Delete "${component.name}"? This cannot be undone. It is only allowed when nothing uses it.`)) return;
+    setDeleteError('');
+    try {
+      await deleteComponent(component.id);
+      navigate(LIBRARY_OF[component.component_type] || '/technology', { replace: true });
+    } catch (err) {
+      setDeleteError(err.response?.data?.error || 'Could not delete this component.');
+    }
+  }
+
   // Sort systems: highest max risk first, then alphabetical.
   const sortedSystems = [...systems].sort((a, b) => {
     const ra = a.max_risk_score ?? 0;
@@ -301,11 +321,18 @@ export function ComponentDetailPage() {
           <div className={styles.headerRow}>
             <h1 className={styles.title}>{component.name}<EntityKind kind="component" /> <HelpDot k="component_detail.title" placement="bottom" /></h1>
             {canEdit && (
-              <button className={styles.btnSecondary} onClick={() => setEditing(true)}>
-                Edit
-              </button>
+              <span className={styles.headerActions}>
+                <button className={styles.btnSecondary} onClick={() => setEditing(true)}>
+                  Edit
+                </button>
+                <button className={styles.btnDanger} onClick={handleDelete}
+                  title="For a component created by mistake, such as a duplicate. Only allowed when nothing uses it.">
+                  Delete
+                </button>
+              </span>
             )}
           </div>
+          {deleteError && <p className={styles.deleteError} role="alert">{deleteError}</p>}
           {component.description && (
             <p className={styles.description}>{component.description}</p>
           )}

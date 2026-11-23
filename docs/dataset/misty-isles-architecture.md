@@ -49,7 +49,7 @@ a reason.
 | Class | Endpoint protection | Backup | Data in transit | Notes |
 |---|---|---|---|---|
 | **IT on-premises** (Windows/Linux servers, desktops) | **CrowdStrike EDR**: Falcon agent → *Host Intrusion Detection System* | **Veeam** → *MIG Backup* | **TLS 1.2+** on every service; **VPN** for remote users | The default MIG estate |
-| **Azure-hosted** (new, small) | **Microsoft Defender for Servers** → *Microsoft Defender for Cloud* | **Azure Backup** (supplier) | TLS | The owner's "second stack" example: GIS Land Register, Electoral Roll |
+| **Azure-hosted** (new, small) | **Microsoft Defender for Servers** → *Microsoft Defender for Cloud* | **Azure Backup** (supplier) | TLS | The owner's "second stack" example: GIS Land Register, Electoral Roll. Both follow S7, application on cloud infrastructure (IaaS), since v181 |
 | **SaaS** | *provided by the supplier*, met by its evidence | supplier | supplier (TLS) | Each has a service-provider relationship |
 | **Operational technology** (radar, power, water, fuel) | **Wazuh agent** on the Linux/Windows historians and HMIs → *Security monitoring platform*. CrowdStrike is not certified on the vendors' OT builds | Veeam for the historian/config servers | Segmented network; **NIDS** watches it | Vendors maintain the controllers under contract |
 | **Infrastructure / security services** | as IT on-premises, where the device can run an agent; **network appliances send syslog to Wazuh** → *Security monitoring platform* | configuration backups | management plane over TLS/SSH | These *are* the services the patterns rely on |
@@ -117,7 +117,7 @@ Class key: **IT** on-premises · **AZ** Azure · **SaaS** · **OT** · **INF** i
 | Roads & Airports | Flight operations system | SaaS | *SkyPlan Ops* (fictional) |
 | Roads & Airports | Maritime and Aviation Radio Communications System | OT | Encrypted by secure radio; endpoint controls not applicable to the radios |
 | Disaster & Emergency | Emergency Communications System | IT | Secure radio |
-| Maritime | Costal Radar and Ship Tracking | OT | Radar back-end on Windows: Wazuh |
+| Maritime | Coastal Radar and Ship Tracking | OT | Radar back-end on Windows: Wazuh |
 | Maritime | Port operations system | IT | |
 | Justice | Case Management System | IT | |
 | Justice | Court Management System | IT | |

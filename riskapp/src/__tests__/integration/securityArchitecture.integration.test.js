@@ -3,7 +3,7 @@
 // Copyright (C) 2026 Wightman Brown Limited
 
 // The security architecture (v148, docs/system-security-view.md step 2):
-// rules on single components, membership groups, builds applied as copies,
+// rules on single components, component roles (v178; membership groups until then), builds applied as copies,
 // and choices per objective — all report only, all feeding the one
 // component-record finding.
 //
@@ -19,6 +19,13 @@ const { app, request, tokenFor, query, USERS, IT_DEPT } = require('./helpers');
 const as = (role) => ({ Authorization: `Bearer ${tokenFor(role)}` });
 const api = (role, method, path) => request(app)[method](`/api/v1${path}`).set(as(role));
 const finding = async (sys) => (await query('SELECT * FROM v_system_component_findings WHERE system_id = $1', [sys])).rows[0];
+// The finding's reasons other than "no system pattern stated" (v178): the fixture
+// systems have no pattern, and these tests are about the other reasons.
+async function otherReasons(f) {
+  if (!f) return null;
+  const { rows: [r] } = await query('SELECT fn_component_record_outstanding($1) AS o', [f.system_id]);
+  return (r.o || '').replace(/^no system pattern stated(; )?/, '') || null;
+}
 const security = async (sys) => (await api('ciso', 'get', `/systems/${sys}/security`)).body;
 
 const ids = {};
@@ -66,7 +73,6 @@ afterAll(async () => {
   await query(`DELETE FROM security_actions WHERE subject_id = ANY($1)`, [systems]);
   await query(`DELETE FROM system_solution_choices WHERE system_id = ANY($1)`, [systems]);
   await query(`DELETE FROM architecture_rules WHERE standard_id = $1`, [ids.STD]);
-  await query(`DELETE FROM membership_groups WHERE standard_id = $1`, [ids.STD]);
   await query(`DELETE FROM system_builds WHERE name LIKE 'ARCH%'`);
   await query(`DELETE FROM system_threats WHERE system_id = ANY($1)`, [systems]);
   await query(`DELETE FROM system_components WHERE system_id = ANY($1)`, [systems]);
@@ -104,7 +110,7 @@ describe('a threat makes an objective wanted; a person chooses its solution', ()
     const row = listed.body.findings.find((r) => r.system_id === ids.A);
     expect(row.needs_solution_objectives.map((o) => o.id)).toEqual([ids.O3]);
     // A system with no threat and no architecture wants nothing — and has no finding.
-    expect(await finding(ids.B)).toBeUndefined();
+    expect(await otherReasons(await finding(ids.B))).toBeNull();
   });
 
   test('a solution that does not deliver the objective cannot be chosen for it', async () => {
@@ -133,7 +139,7 @@ describe('a threat makes an objective wanted; a person chooses its solution', ()
   // v152: they used to sit "implied but not recorded" until someone recorded
   // each by hand. Now the choice records them, in the state the solution is in.
   test('the objectives the choice brings in are recorded on the system, in the solution\'s state', async () => {
-    expect(await finding(ids.A)).toBeUndefined();
+    expect(await otherReasons(await finding(ids.A))).toBeNull();
     const { rows } = await query(
       `SELECT control_id, status, created_by FROM system_controls WHERE system_id = $1 AND control_id = ANY($2)`, [ids.A, [ids.O3, ids.O4]]);
     expect(rows).toHaveLength(2);
@@ -257,30 +263,76 @@ describe('recording an objective that has security solutions', () => {
   });
 });
 
-describe('membership groups — a blank must read as a blank', () => {
-  test('a group with members applies to every system; one not answered is a finding reason', async () => {
-    const g = await api('ciso', 'post', '/architecture/groups').send({ name: 'ARCH Network zone', standard_id: ids.STD });
-    expect(g.status).toBe(201);
-    ids.group = g.body.group.id;
+describe('component roles (v178) — a blank must read as a blank', () => {
+  const sysApi = (method, path) => request(app)[method](`/api/v1/systems${path}`).set(as('ciso'));
+  test('a role says what a component can answer; a pattern slot nobody answers is a finding reason', async () => {
     for (const z of [ids.ZONE1, ids.ZONE2]) {
-      expect((await api('ciso', 'post', `/architecture/groups/${ids.group}/members`).send({ component_id: z })).status).toBe(201);
+      expect((await api('ciso', 'put', `/architecture/components/${z}/roles`).send({ roles: ['network'] })).status).toBe(200);
     }
-    expect((await finding(ids.B)).missing_membership_names).toContain('ARCH Network zone');
+    expect((await sysApi('patch', `/${ids.B}/pattern`).send({ system_pattern: 'S2' })).status).toBe(200);
+    expect((await finding(ids.B)).missing_membership_names).toContain('Reached over');
     const lib = (await api('ciso', 'get', '/architecture')).body;
-    expect(lib.groups.find((x) => x.id === ids.group).members.map((m) => m.name)).toEqual(['ARCH Zone DMZ', 'ARCH Zone internal']);
+    expect(lib.roles.find((r) => r.key === 'network').members.map((m) => m.name))
+      .toEqual(expect.arrayContaining(['ARCH Zone DMZ', 'ARCH Zone internal']));
   });
 
-  test('recording any one member answers it', async () => {
+  test('recording any component that can play the role answers it', async () => {
     await query(`INSERT INTO system_components (system_id, component_id, status) VALUES ($1, $2, 'operational')`, [ids.B, ids.ZONE2]);
-    expect((await finding(ids.B)).missing_membership_names).not.toContain('ARCH Network zone');
-    const m = (await security(ids.B)).memberships.find((x) => x.id === ids.group);
-    expect(m).toMatchObject({ answered: true, recorded: [{ id: ids.ZONE2, name: 'ARCH Zone DMZ' }] });
+    expect((await finding(ids.B)).missing_membership_names).not.toContain('Reached over');
+    const fit = (await sysApi('get', `/${ids.B}`)).body.pattern_fit;
+    expect(fit.slots.find((x) => x.key === 'network')).toMatchObject({ state: 'recorded', parts: [expect.objectContaining({ name: 'ARCH Zone DMZ' })] });
   });
 
-  test('with a trigger, the group applies only where the trigger is recorded', async () => {
-    expect((await api('ciso', 'post', `/architecture/groups/${ids.group}/triggers`).send({ component_id: ids.WIN })).status).toBe(201);
-    const { rows } = await query(`SELECT system_id FROM v_system_membership_gaps WHERE group_id = $1`, [ids.group]);
-    expect(rows.map((r) => r.system_id)).toEqual([ids.A]);       // A records Windows, no zone; B answered; X has no Windows
+  test('changing a role shows what it would do first, and a new gap needs confirming', async () => {
+    const preview = await api('ciso', 'get', `/architecture/components/${ids.ZONE2}/roles?roles=`);
+    expect(preview.status).toBe(200);
+    expect(preview.body.systems.find((x) => x.id === ids.B).new_gaps).toEqual(['Reached over']);
+    expect((await query('SELECT roles FROM control_components WHERE id = $1', [ids.ZONE2])).rows[0].roles).toEqual(['network']);   // rolled back
+    const refused = await api('ciso', 'put', `/architecture/components/${ids.ZONE2}/roles`).send({ roles: [] });
+    expect(refused.status).toBe(409);
+    expect(refused.body.code).toBe('role_change_leaves_gaps');
+    expect((await finding(ids.B)).missing_membership_names).not.toContain('Reached over');               // nothing saved
+    expect((await api('ciso', 'put', `/architecture/components/${ids.ZONE2}/roles`).send({ roles: [], confirm_gaps: true })).status).toBe(200);
+    expect((await finding(ids.B)).missing_membership_names).toContain('Reached over');
+    const { rows } = await query(`SELECT human_narrative FROM audit_log WHERE entity_id = $1 ORDER BY created_at DESC LIMIT 1`, [ids.ZONE2]);
+    expect(rows[0].human_narrative).toMatch(/can answer: Network → none.*ARCH Sys B now lacks Reached over/);
+    await api('ciso', 'put', `/architecture/components/${ids.ZONE2}/roles`).send({ roles: ['network'] });
+  });
+
+  test('only a known role, and only an architect', async () => {
+    expect((await api('ciso', 'put', `/architecture/components/${ids.ZONE2}/roles`).send({ roles: ['firewall'] })).status).toBe(400);
+    expect((await api('iam', 'put', `/architecture/components/${ids.ZONE2}/roles`).send({ roles: [] })).status).toBe(403);
+  });
+
+  test('a business system with no pattern is asked nothing and is named in the finding; a security system is not', async () => {
+    await sysApi('patch', `/${ids.B}/pattern`).send({ system_pattern: null });
+    const f = await finding(ids.B);
+    expect(f.pattern_not_stated).toBe(true);
+    expect(f.missing_membership_names).toEqual([]);
+    expect((await query(`SELECT fn_component_record_outstanding($1) AS o`, [ids.B])).rows[0].o).toMatch(/^no system pattern stated/);
+    await query(`UPDATE systems SET is_security_system = TRUE WHERE id = $1`, [ids.B]);
+    expect((await finding(ids.B))?.pattern_not_stated ?? false).toBe(false);
+    await query(`UPDATE systems SET is_security_system = FALSE WHERE id = $1`, [ids.B]);
+  });
+});
+
+describe('a system pattern as a security pattern trigger (v178)', () => {
+  test('every system following the pattern is required to have the solution', async () => {
+    const rule = (await api('ciso', 'post', '/architecture/rules').send({ pattern_id: ids.EDR2, standard_id: ids.STD })).body.rule;
+    expect((await api('ciso', 'post', `/architecture/rules/${rule.id}/patterns`).send({ system_pattern: 'S9' })).status).toBe(400);
+    expect((await api('ciso', 'post', `/architecture/rules/${rule.id}/patterns`).send({ system_pattern: 'S4' })).status).toBe(201);
+    expect((await api('ciso', 'post', `/architecture/rules/${rule.id}/patterns`).send({ system_pattern: 'S4' })).status).toBe(409);
+    await query(`UPDATE systems SET system_pattern = 'S4' WHERE id = $1`, [ids.X]);
+    const wanted = await query(
+      `SELECT trigger_pattern FROM v_system_wanted_solutions WHERE system_id = $1 AND rule_id = $2`, [ids.X, rule.id]);
+    expect(wanted.rows).toEqual([{ trigger_pattern: 'S4' }]);
+    const lib = (await api('ciso', 'get', '/architecture')).body;
+    expect(lib.rules.find((r) => r.id === rule.id).pattern_triggers).toEqual(['S4']);
+    expect((await api('iam', 'post', `/architecture/rules/${rule.id}/patterns`).send({ system_pattern: 'S1' })).status).toBe(403);
+    expect((await api('ciso', 'delete', `/architecture/rules/${rule.id}/patterns/S4`)).status).toBe(204);
+    expect((await query(`SELECT 1 FROM v_system_wanted_solutions WHERE system_id = $1 AND rule_id = $2`, [ids.X, rule.id])).rowCount).toBe(0);
+    await query(`UPDATE systems SET system_pattern = NULL WHERE id = $1`, [ids.X]);
+    await api('ciso', 'delete', `/architecture/rules/${rule.id}`);
   });
 });
 

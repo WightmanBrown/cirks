@@ -223,25 +223,25 @@ async function computeDepartment(departmentId) {
   const unanswered = at.filter((r) => answerOf(r) === 'nothing');
   const obligation = (key, label, total, open) => ({ key, label, total, met: Math.max(0, total - open.length), open });
   const obligations = [
-    obligation('assets_rated', 'Every information asset rated against every mandatory impact table',
+    obligation('assets_rated', 'Every information asset should be rated against every mandatory impact table',
       assetCount.n, ratingFindings.map((f) => ({ link: `/assets/${f.asset_id}`, label: f.asset_name,
         why: `not rated on ${f.missing_table_names?.join(', ') || `${f.missing_count} mandatory tables`}` }))),
-    obligation('component_record', 'Every system’s component record complete',
+    obligation('component_record', 'Every system’s component record should be completed',
       systemCount.n, componentFindings.map((f) => ({ link: `/systems/${f.system_id}`, label: f.system_name,
         why: f.missing_count ? `${f.missing_count} component${f.missing_count === 1 ? '' : 's'} not recorded` : 'record incomplete' }))),
-    obligation('threats_assessed', 'Every threat identified on your systems assessed',
+    obligation('threats_assessed', 'Every threat identified on your systems should be assessed',
       threatCount.n, unassessed.map((u) => ({ link: `/systems/${u.system_id}`, label: `${u.system_name} — ${u.threat_name}`, why: 'identified, not assessed' }))),
-    obligation('risks_answered', `Every risk scoring ${action} or more being treated or accepted`,
-      at.length, unanswered.map((r) => ({ link: `/risks/${r.id}`, label: `${r.system_name} — ${r.threat_name}`, why: `scores ${r.score}; nothing answering it` }))),
-    obligation('acceptances_in_date', 'Every acceptance in date and within the accepter’s authority',
+    obligation('risks_answered', `Every risk scoring ${action} or higher should have treatment recorded or have been formally accepted`,
+      at.length, unanswered.map((r) => ({ link: `/risks/${r.id}`, label: `${r.system_name} — ${r.threat_name}`, why: `scores ${r.score}; no security action planned and not accepted` }))),
+    obligation('acceptances_in_date', 'All accepted risks should be within date and accepted by the right person',
       exceptions.length + expired.length, [
-        ...expired.map((e) => ({ link: `/risks/${e.risk_id}`, label: `${e.system_name} — ${e.threat_name}`, why: `acceptance expired ${e.days_overdue} days ago` })),
+        ...expired.map((e) => ({ link: `/risks/${e.risk_id}`, label: `${e.system_name} — ${e.threat_name}`, why: `exception expired ${e.days_overdue} days ago` })),
         ...outside.map((e) => ({ link: `/risks/${e.risk_id}`, label: `${e.system_name} — ${e.threat_name}`, why: `scores ${e.score}, above what the accepter may accept` })),
       ]),
-    obligation('suppliers_evidenced', 'Every live supplier relationship evidenced',
+    obligation('suppliers_evidenced', 'Every live supplier relationship should have evidence of compliance',
       supplierCount.n, supplierFindings.map((f) => ({ link: `/suppliers/${f.supplier_id}`, label: f.supplier_name,
         why: f.unmet_count ? `${f.unmet_count} objective${f.unmet_count === 1 ? '' : 's'} not evidenced` : 'not evidenced' }))),
-    obligation('risks_validated', 'Every risk validated',
+    obligation('risks_validated', 'Every risk should be validated',
       risks.length, unvalidated.map((r) => ({ link: `/risks/${r.risk_id}`, label: `${r.system_name} — ${r.threat_name}`, why: 'not yet validated' }))),
   ];
 
@@ -309,6 +309,48 @@ async function computeDepartment(departmentId) {
       days: CHANGES_DAYS,
     },
     gaps: { unassessed, systems_without_threats: noThreats, assets_on_no_system: assetsOff, assets_not_rated: assetsUnrated },
+    compliance_gaps: await complianceGaps(departmentId),
+  };
+}
+
+// Compliance gaps (owner, 2026-11-16): control objectives the Statement of
+// Applicability says apply, with no active implementation either on the
+// department's systems or for the organisation as a whole.
+//   systems:      per-system objectives (delivery 'system' or not stated)
+//                 recorded on a department system but not in place there
+//                 (missing or unknown; degraded is in place, not working well);
+//   organisation: objectives delivered once for the organisation or a group of
+//                 systems whose SoA implementation is not 'implemented' — a gap
+//                 every department's systems share.
+async function complianceGaps(departmentId) {
+  const [{ rows: onSystems }, { rows: org }] = await Promise.all([
+    query(`SELECT s.id AS system_id, s.name AS system_name, c.id AS control_id, c.title, vr.framework_ref, sc.status::text AS status
+             FROM system_controls sc
+             JOIN systems s ON s.id = sc.system_id AND s.department_id = $1 AND s.is_active
+             JOIN controls c ON c.id = sc.control_id AND COALESCE(c.delivery, '') NOT IN ('organisation', 'group')
+             JOIN soa_entries se ON se.control_id = c.id AND se.applicable
+             LEFT JOIN v_control_reference vr ON vr.control_id = c.id
+            WHERE sc.status::text IN ('missing', 'unknown')
+            ORDER BY s.name, vr.framework_ref NULLS LAST, c.title`, [departmentId]),
+    query(`SELECT c.id AS control_id, c.title, vr.framework_ref, c.delivery,
+                  COALESCE(vci.implementation_status, 'not_implemented') AS implementation_status
+             FROM controls c
+             JOIN soa_entries se ON se.control_id = c.id AND se.applicable
+             LEFT JOIN v_control_implementation vci ON vci.control_id = c.id
+             LEFT JOIN v_control_reference vr ON vr.control_id = c.id
+            WHERE c.delivery IN ('organisation', 'group')
+              AND COALESCE(vci.implementation_status, 'not_implemented') <> 'implemented'
+            ORDER BY vr.framework_ref NULLS LAST, c.title`),
+  ]);
+  const bySystem = new Map();
+  for (const r of onSystems) {
+    if (!bySystem.has(r.system_id)) bySystem.set(r.system_id, { system_id: r.system_id, system_name: r.system_name, objectives: [] });
+    bySystem.get(r.system_id).objectives.push({ control_id: r.control_id, ref: r.framework_ref, title: r.title, status: r.status });
+  }
+  return {
+    systems: [...bySystem.values()].sort((a, b) => b.objectives.length - a.objectives.length || a.system_name.localeCompare(b.system_name)),
+    system_gaps: onSystems.length,
+    organisation: org.map((o) => ({ control_id: o.control_id, ref: o.framework_ref, title: o.title, delivery: o.delivery, status: o.implementation_status })),
   };
 }
 

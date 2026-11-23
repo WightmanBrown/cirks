@@ -22,17 +22,18 @@
 //   2. import.js           loads it — every account gets the demo password
 //   3. architecture.js     the security architecture and each system's answers
 //   4. objective-solutions.js   a security solution for every objective that needs one
-//   5. isms-cycle.js       a first risk portfolio, actions, exceptions, a meeting
-//   6. isms-cycle.js --assess-backlog
-//   7. story-cycle.js      the story's problems bite; a year of history
+//   5. solution-library.js the policy library and the solutions built on it (P1–P8)
+//   6. isms-cycle.js       a first risk portfolio, actions, exceptions, a meeting
+//   7. isms-cycle.js --assess-backlog
+//   8. story-cycle.js      the story's problems bite; a year of history
 //
-// The estate is settled (3, 4) BEFORE any risk is assessed (5–7): each control
+// The estate is settled (3–5) BEFORE any risk is assessed (6–8): each control
 // is judged from its status at the time, so judging first and settling after
 // left risks scored against statuses that later changed (24 of them, 2026-10-28).
-//   8. lock every account except the administrator
+//   9. lock every account except the administrator
 //
 // The steps sign in as Misty Isles people (the CISO, the analyst, …), so while
-// they run every account has the password typed. Step 8 then gives each
+// they run every account has the password typed. Step 9 then gives each
 // account except the primary administrator (A.James@mig.local) its own random
 // password that nobody knows, and ends its sessions. The accounts stay ACTIVE —
 // a department's risk owner and the Owner/Manager columns are read from active
@@ -70,7 +71,7 @@ const { resolvePassword } = require(path.join(RISKAPP, 'db/promptPassword'));
 const { assertPassword } = require(path.join(RISKAPP, 'src/auth/passwordPolicy'));
 
 function step(n, label, script, scriptArgs, env = {}) {
-  console.log(`\n[misty-isles] ── step ${n} of 8: ${label}`);
+  console.log(`\n[misty-isles] ── step ${n} of 9: ${label}`);
   const r = spawnSync(process.execPath, [path.join(RISKAPP, script), ...scriptArgs], {
     cwd: RISKAPP, stdio: 'inherit', env: { ...process.env, ...env },
   });
@@ -89,12 +90,12 @@ async function waitForApi() {
   throw new Error(`the CIRKS API is not answering at ${health} — is the app running?`);
 }
 
-// Step 8. Each account but the administrator gets a random password nobody is
+// Step 9. Each account but the administrator gets a random password nobody is
 // told — a valid hash, so a sign-in attempt is simply refused — and its
 // sessions end. Active, so it still owns what it owns. password_set_at is
 // cleared, so Account Management shows the account as locked (v164).
 async function lockPersonas() {
-  console.log('\n[misty-isles] ── step 8 of 8: lock every account except the administrator');
+  console.log('\n[misty-isles] ── step 9 of 9: lock every account except the administrator');
   const { rows } = await query(
     `SELECT id, email FROM users WHERE lower(email) <> lower($1) ORDER BY email`, [ADMIN_EMAIL]);
   for (const u of rows) {
@@ -126,9 +127,10 @@ async function lockPersonas() {
   fs.rmSync(dir, { recursive: true, force: true });
   step(3, 'security architecture', 'db/dataset/misty-isles/architecture.js', ['--base', BASE], pw);
   step(4, 'security solutions for objectives', 'db/dataset/misty-isles/objective-solutions.js', ['--base', BASE], pw);
-  step(5, 'first risk portfolio', 'db/isms-cycle.js', ['--base', BASE], pw);
-  step(6, 'assess the backlog', 'db/isms-cycle.js', ['--base', BASE, '--assess-backlog'], pw);
-  step(7, 'a year of history', 'db/dataset/misty-isles/story-cycle.js', ['--base', BASE], pw);
+  step(5, 'the policy library and its security solutions', 'db/dataset/misty-isles/solution-library.js', ['--base', BASE], pw);
+  step(6, 'first risk portfolio', 'db/isms-cycle.js', ['--base', BASE], pw);
+  step(7, 'assess the backlog', 'db/isms-cycle.js', ['--base', BASE, '--assess-backlog'], pw);
+  step(8, 'a year of history', 'db/dataset/misty-isles/story-cycle.js', ['--base', BASE], pw);
   await lockPersonas();
   await pool.end();
 

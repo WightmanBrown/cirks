@@ -2,6 +2,12 @@
 // Copyright (C) 2026 Wightman Brown Limited
 // Draft help text — see index.js.
 export default {
+  // RiskAnswer — unfolds under a risk in the reports and heads the risk page
+  'risk_answer.score': { title: 'How bad is it?', body: 'The risk score now, and the likelihood and impact on the dimension that sets it (the score is the worst of confidentiality, integrity and availability). Where security work has been committed, the score it will bring the risk to.' },
+  'risk_answer.why': { title: 'Why this score?', body: 'The control objectives that counter this threat on this system and how many are in place. Names the one holding the likelihood down, or says that nothing in place lowers it, so the score is the threat’s own likelihood. Where someone has judged it, the objective whose being put in place would lower the score most.' },
+  'risk_answer.work': { title: 'What is being done?', body: 'The security actions raised for this risk: the first open one, how many of its items are done, when it is due and who is accountable.' },
+  'risk.section.about': { title: 'About this risk', body: 'What the risk is, in words, and what it concerns: the system and its impact, the threat, the information assets exposed, who identified it, the risk owner and the review date.' },
+  'risk_answer.decision': { title: 'Who decided what?', body: 'Validation, the treatment decided, and whether the business has agreed it: a decision minuted at the Security Working Group, or the risk owner accepting the risk or its action. The CISO validating it alone does not count as agreement. Also any exception in force, and whether the score is beyond the risk owner’s authority to accept.' },
   'risk.recorded_views': { title: 'Recorded views on decisions', body: "Views the department's information asset owner or manager recorded on decisions about this risk: dated and signed. A view never changes the decision, and cannot be edited or removed once recorded; a correction is a new view. Views are recorded from the system report's decision record." },
   // PendingRisksPage
   'pending_risks.title': { title: 'Pending validation', body: 'Risks that have been identified or edited and are waiting for the CISO to validate them, plus any the CISO has returned for rework. Open a risk to validate it or return it with notes.' },
@@ -21,7 +27,6 @@ export default {
   'actions.col.title': { title: 'Title', body: 'The action’s name. “Update needed” means no progress note has been logged since the next Security Working Group (SWG) meeting was scheduled; log one to clear it.' },
   'actions.col.items': { title: 'Items', body: 'Items completed out of the action’s total. Each item is one component to add or improve on one system.' },
   'actions.col.owner': { title: 'Owner', body: 'The person accountable for the action as a whole. Each item can also name its own responsible person.' },
-  'actions.col.plan': { title: 'Plan', body: 'The security action plan this action belongs to, if any.' },
   'actions.col.target_date': { title: 'Target date', body: 'The date the action is due to be finished by, with the days remaining or overdue. An action still open after this date counts as overdue.' },
   // ActionDetailPage
   'action_detail.title': { title: 'Security action', body: 'One security action: a piece of work planned to reduce a risk or answer an assurance finding. It is proposed, accepted (which freezes its items, owners and targets), worked on, and completes when its last item is done.' },
@@ -47,28 +52,28 @@ export default {
   // SecurityExceptionsPage
   'exceptions.overview': { title: 'Security exceptions', body: 'Risks the organisation has formally accepted rather than treated, each for a stated reason and until an expiry date. Every role can see them. The CISO, SIRO or an admin accepts, renews or revokes an exception, usually from the risk’s own page.' },
   'exceptions.breach': { title: 'In contravention of policy', body: 'Exceptions that reached their expiry date without being renewed. They are expired automatically and escalated: the risk is still accepted but now breaches policy. Renew to restart the review window, or revoke so the risk must be treated.' },
-  'exceptions.expiry': { title: 'Expires', body: 'The date the acceptance must be reviewed by. It is due soon in the last 30 days and overdue after the date; an unrenewed exception is then expired and listed as in contravention of policy.' },
+  'exceptions.expiry': { title: 'Expires', body: 'The date the exception must be reviewed by. It is due soon in the last 30 days and overdue after the date; an unrenewed exception is then expired and listed as in contravention of policy.' },
   'exceptions.col.level': { title: 'Level', body: 'The accepted risk’s band (low, medium, high or critical), from its current score.' },
   'exceptions.col.accepted_by': { title: 'Accepted by', body: 'The person who accepted the risk. Their role at the time is kept with the record.' },
-  'exceptions.col.cadence': { title: 'Cadence', body: 'How often the acceptance is to be reviewed: monthly, quarterly or annually. It sets the default expiry date when the exception is created or renewed.' },
+  'exceptions.col.cadence': { title: 'Cadence', body: 'How often the exception is to be reviewed: monthly, quarterly or annually. It sets the default expiry date when the exception is created or renewed.' },
   'exceptions.col.days': { title: 'Days', body: 'Days left until the exception expires, or how many days overdue it is.' },
-  'exceptions.col.expired': { title: 'Expired', body: 'The expiry date the acceptance passed without being renewed.' },
+  'exceptions.col.expired': { title: 'Expired', body: 'The expiry date the exception passed without being renewed.' },
   'exceptions.col.overdue': { title: 'Overdue', body: 'How many days have passed since the exception expired.' },
   // ExceptionFormModal
-  'exception_form.create': { title: 'Create acceptance exception', body: 'Accept this risk instead of treating it, for a stated justification, until an expiry date. The review cadence sets a default expiry. Acceptance is time-bounded: once it expires unrenewed the risk is in breach of policy.' },
-  'exception_form.renew': { title: 'Renew exception', body: 'Extend the acceptance with a fresh justification and expiry date. The earlier acceptance is kept in the history.' },
-  'exception_form.revoke': { title: 'Revoke exception', body: 'End the acceptance now. The risk goes back to needing a treatment decision. The revocation is logged.' },
+  'exception_form.create': { title: 'Create exception', body: 'Accept this risk instead of treating it, for a stated justification, until an expiry date. The review cadence sets a default expiry. An exception is time-bounded: once it expires unrenewed the risk is in breach of policy.' },
+  'exception_form.renew': { title: 'Renew exception', body: 'Extend the exception with a fresh justification and expiry date. The earlier exception is kept in the history.' },
+  'exception_form.revoke': { title: 'Revoke exception', body: 'End the exception now. The risk goes back to needing a treatment decision. The revocation is logged.' },
   // FindingsPage
   'findings.title': { title: 'Assurance findings', body: 'Places where the ISMS is not in the state it should be and no risk explains it. Each finding is worked out from the register, so it disappears once the fact behind it is fixed. Answer one by raising a security action, or accept it until a date, for a reason.' },
   'findings.col.owner': { title: 'Owner', body: 'The person recorded as owning the thing the finding is about: the asset’s, system’s, document’s or control objective’s owner. For a supplier relationship, the contracting department’s information asset owner (IAO).' },
   'findings.col.applies_to': { title: 'Applies to', body: 'Who the finding affects. Documents and control objectives belong to the whole organisation, not to one department.' },
-  'findings.col.response': { title: 'Response', body: 'How the finding has been answered: an action raised (with its status), or accepted until a date. A finding with neither can be answered here by those allowed to. When an acceptance expires the finding is unanswered again.' },
+  'findings.col.response': { title: 'Response', body: 'How the finding has been answered: an action raised (with its status), or accepted until a date. A finding with neither can be answered here by those allowed to. When an exception expires the finding is unanswered again.' },
   'findings.rating_incomplete': { title: 'Information assets not fully rated', body: 'Information assets not rated against every mandatory impact table. A missing rating can only understate the asset’s impact, and so every risk score on the systems holding it.' },
   'findings.rating.col.asset': { title: 'Asset', body: 'The information asset with ratings missing. Select it to open the asset and rate it.' },
   'findings.rating.col.missing': { title: 'Missing mandatory tables', body: 'The mandatory impact tables the asset has not been rated against. “Never rated” means it has no rating at all.' },
   'findings.rating.col.last_rated': { title: 'Last rated', body: 'When the asset was last rated against any impact table.' },
-  'findings.component_record': { title: 'Systems with an incomplete record', body: 'Systems whose record is missing something the security architecture needs: a per-system component its control objectives need, an unanswered template group, or an objective that still needs a security solution chosen. Until it is complete, the controls that depend on what is missing read as incomplete on the system’s risks.' },
-  'findings.record.col.to_record': { title: 'To record or decide', body: 'What is missing from the system’s record, in words: components to record with their state, template groups to answer, and control objectives needing a security solution chosen.' },
+  'findings.component_record': { title: 'Systems with an incomplete record', body: 'Systems whose record is missing something the security architecture needs: a per-system component its control objectives need, an unanswered system profile group, or an objective that still needs a security solution chosen. Until it is complete, the controls that depend on what is missing read as incomplete on the system’s risks.' },
+  'findings.record.col.to_record': { title: 'To record or decide', body: 'What is missing from the system’s record, in words: components to record with their state, system profile groups to answer, and control objectives needing a security solution chosen.' },
   'findings.record.col.components': { title: 'Components', body: 'How many of the per-system components the system’s control objectives need are not recorded on it.' },
   'findings.document_review': { title: 'Policies & documents overdue for review', body: 'Published policies, standards and procedures past their review date, or with none set. One past review reads as Under review on every system that relies on it. Guidelines are advisory and are not counted.' },
   'findings.document.col.document': { title: 'Document', body: 'The published policy, standard or procedure. Select it to open it.' },
@@ -139,12 +144,11 @@ export default {
   'risk.detail.coverage_degraded': { title: 'Degraded controls', body: 'Objectives present but not fully effective: marked degraded, or missing one of the components that delivers them. They still count, one rung worse than their judged residual.' },
   'risk.detail.coverage_missing': { title: 'Missing controls', body: 'Objectives not in place on this system, so lowering nothing. Their scores show what each would achieve. One with a security solution is put in place by recording that solution’s parts on the system, which a security action can plan.' },
   'risk.detail.coverage_excluded': { title: 'Excluded controls', body: 'Objectives judged not applicable on this system, with a recorded reason. They are neither a gap nor counted in the score.' },
-  'risk.detail.security_action': { title: 'Security action', body: 'The treatment decision (avoid, mitigate, transfer or accept), any acceptance exception, and the security actions planned against this risk. “No action required” is refused once the risk scores at or above the mandatory action score.' },
-  'risk.detail.active_exception': { title: 'Active acceptance exception', body: 'The current time-bounded acceptance of this risk: the justification, who accepted it and in what role, the review cadence and when it expires. Renew it before it expires, or it lapses into breach of policy.' },
+  'risk.detail.security_action': { title: 'Security action', body: 'The treatment decision (avoid, mitigate, transfer or accept), any exception, and the security actions planned against this risk. “No action required” is refused once the risk scores at or above the mandatory action score.' },
+  'risk.detail.active_exception': { title: 'Active exception', body: 'The current time-bounded exception accepting this risk: the justification, who accepted it and in what role, the review cadence and when it expires. Renew it before it expires, or it lapses into breach of policy.' },
   'risk.detail.actions': { title: 'Security actions', body: 'The actions planned against this risk, each with its items. An action can only be built from the coverage gap, so it always matches what is missing. The CISO accepts it, which freezes its items and records the risk’s score as the baseline.' },
   'risk.detail.builder_components': { title: 'Components to fix', body: 'The components this risk needs fixed on this system: parts of the security solution in use that are missing or not working here. They are included automatically; name who is responsible for each, or leave it to the system owner.' },
   'risk.detail.builder_blocked': { title: 'Not fixable from this risk', body: 'Control objectives not in place that no component on this system can fix, with why: no security solution yet, none chosen for this system, or a part that lives elsewhere and is fixed once, where it lives.' },
-  'risk.detail.risk_graph': { title: 'Risk context', body: 'A picture of how this risk connects: the system, the threat, its information assets, its components and the controls that counter the threat.' },
   // RiskCreateModal
   'risk_create.title': { title: 'Register risk', body: 'Assess a threat against a system to create a risk. A system and threat can carry only one risk. The new risk waits for the CISO to validate it before it appears in the current risk summary.' },
   'risk_create.step_system': { title: 'System', body: 'Choose the system at risk. Its impact (C/I/A) is derived from the information assets it holds, and the risk takes that impact.' },

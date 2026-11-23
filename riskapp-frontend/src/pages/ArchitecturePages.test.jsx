@@ -12,59 +12,49 @@ vi.mock('../context/AuthContext', () => ({ useAuth: () => ({ hasCapability: (c) 
 const LIB = {
   active_systems: 53,
   documents: [{ id: 'd1', name: 'MIG Security Architecture Standard', document_kind: 'standard', status: 'operational' }],
-  groups: [{ id: 'g1', name: 'Network zone', standard_name: 'MIG Security Architecture Standard', systems_unanswered: 22,
-             members: [{ id: 'z1', name: 'MIGNet (internal)', component_type: 'technology', systems: 30 }], triggers: [] }],
+  roles: [],
   rules: [{ id: 'r1', pattern_name: 'CrowdStrike EDR', standard_name: 'MIG Security Architecture Standard', systems: 12,
-            triggers: [{ id: 'w1', name: 'Windows Server 2025', component_type: 'technology', systems: 6 }] }],
-  builds: [{ id: 'b1', name: 'MIG Windows server', components: [] }],
+            triggers: [{ id: 'w1', name: 'Windows Server 2025', component_type: 'technology', systems: 6 }], pattern_triggers: [] },
+          { id: 'r2', pattern_name: 'Provided by the supplier', standard_name: 'MIG Security Architecture Standard', systems: 11,
+            triggers: [], pattern_triggers: ['S2'] }],
+  builds: [{ id: 'b1', name: 'MIG Windows server', components: [] },
+           { id: 'b2', name: 'Supplier SaaS', system_pattern: 'S2', components: [] }],
 };
 vi.mock('../api', () => ({
   getArchitecture: vi.fn(async () => LIB),
   listSecuritySolutions: vi.fn(async () => []),
   listComponents: vi.fn(async () => []),
   createArchitectureItem: vi.fn(), deleteArchitectureItem: vi.fn(), updateArchitectureItem: vi.fn(async () => ({})),
-  createStarterGroups: vi.fn(async () => ({ created: ['Connectivity', 'Hosting'], skipped: [] })),
   addArchitectureComponent: vi.fn(), removeArchitectureComponent: vi.fn(),
+  addRulePatternTrigger: vi.fn(async () => ({})), removeRulePatternTrigger: vi.fn(async () => ({})),
 }));
 
-import { updateArchitectureItem, createStarterGroups } from '../api';
-import { ArchitectureTemplatePage, SecurityPatternTriggersPage, ArchitecturePatternsPage } from './ArchitecturePages';
+import { updateArchitectureItem, addRulePatternTrigger } from '../api';
+import { SecurityPatternTriggersPage, ArchitecturePatternsPage } from './ArchitecturePages';
 
 const renderPage = (Page) => render(<MemoryRouter><Page /></MemoryRouter>);
 
-describe('the security architecture, as three pages', () => {
-  test('Systems architecture template: the groups, with the old heading as its comment', async () => {
-    caps = new Set(['controls.read']);
-    renderPage(ArchitectureTemplatePage);
-    await waitFor(() => expect(screen.getByText('Network zone')).toBeInTheDocument());
-    expect(screen.getByRole('heading', { level: 1, name: 'Systems architecture template' })).toBeInTheDocument();
-    expect(screen.getByText('What every system must record.')).toBeInTheDocument();
-    expect(screen.getByText(/22 systems have not recorded one/)).toBeInTheDocument();
-    expect(screen.getByText(/Each system should include one component from each group/)).toBeInTheDocument();
-    expect(screen.getByText(/applies to all 53 systems/)).toBeInTheDocument();
-    expect(screen.queryByText('CrowdStrike EDR')).toBeNull();
-    expect(screen.getByRole('link', { name: 'Security pattern triggers' })).toHaveAttribute('href', '/security-pattern-triggers');
-    expect(screen.getByRole('link', { name: 'System architecture patterns' })).toHaveAttribute('href', '/architecture-patterns');
-  });
-
+describe('the security architecture pages', () => {
   test('Security pattern triggers: each solution, where it comes from and what triggers it', async () => {
     caps = new Set(['controls.read']);
     renderPage(SecurityPatternTriggersPage);
     await waitFor(() => expect(screen.getByRole('heading', { name: 'CrowdStrike EDR' })).toBeInTheDocument());
     expect(screen.getByText(/Required by MIG Security Architecture Standard · applies to 12 systems today/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Windows Server 2025' })).toHaveAttribute('href', '/components/w1');
-    expect(screen.queryByText('Network zone')).toBeNull();
+    // v178: a system pattern can be the trigger.
+    expect(screen.getByRole('link', { name: 'S2 · Software as a service (SaaS)' })).toHaveAttribute('href', '/system-patterns#S2');
+    expect(screen.getByRole('link', { name: 'System patterns' })).toHaveAttribute('href', '/system-patterns');
   });
 
-  test('System architecture patterns: the builds, now called patterns', async () => {
+  test('Standard builds: the builds, now called standard builds', async () => {
     // v155: patterns and the template are edited with architecture.write
     caps = new Set(['controls.read', 'architecture.write']);
     renderPage(ArchitecturePatternsPage);
     await waitFor(() => expect(screen.getByText('MIG Windows server')).toBeInTheDocument());
-    expect(screen.getByText('Create pattern')).toBeInTheDocument();
+    expect(screen.getByText('Create standard build')).toBeInTheDocument();
   });
 
-  test('System architecture patterns: an editor can rename a pattern', async () => {
+  test('Standard builds: an editor can rename one', async () => {
     caps = new Set(['controls.read', 'architecture.write']);
     renderPage(ArchitecturePatternsPage);
     await waitFor(() => expect(screen.getByText('MIG Windows server')).toBeInTheDocument());
@@ -74,7 +64,27 @@ describe('the security architecture, as three pages', () => {
     await waitFor(() => expect(updateArchitectureItem).toHaveBeenCalledWith('builds', 'b1', { name: 'MIG Windows server 2025' }));
   });
 
-  test('a reader cannot rename a pattern', async () => {
+  test('Standard builds: the key message first, the rest folded; each build says the pattern it follows (v182)', async () => {
+    caps = new Set(['controls.read']);
+    renderPage(ArchitecturePatternsPage);
+    await waitFor(() => expect(screen.getByText('MIG Windows server')).toBeInTheDocument());
+    expect(screen.getByText(/A standard build is a short-hand way of creating a system using repeatable components/)).toBeInTheDocument();
+    expect(screen.getByText('More about standard builds').closest('details').open).toBe(false);
+    // The page title is the only "Standard builds" heading.
+    expect(screen.queryByRole('heading', { level: 2, name: /Standard builds/ })).toBeNull();
+    expect(screen.getByRole('link', { name: 'S2 · Software as a service (SaaS)' })).toHaveAttribute('href', '/system-patterns#S2');
+    // No pattern is allowed, with a warning.
+    expect(screen.getByText(/follows no pattern yet/)).toBeInTheDocument();
+  });
+
+  test('Standard builds: an architect chooses the pattern a build follows', async () => {
+    caps = new Set(['controls.read', 'architecture.write']);
+    renderPage(ArchitecturePatternsPage);
+    fireEvent.change(await screen.findByLabelText('The system pattern MIG Windows server follows'), { target: { value: 'S1' } });
+    await waitFor(() => expect(updateArchitectureItem).toHaveBeenCalledWith('builds', 'b1', { system_pattern: 'S1' }));
+  });
+
+  test('a reader cannot rename a standard build', async () => {
     caps = new Set(['controls.read']);
     renderPage(ArchitecturePatternsPage);
     await waitFor(() => expect(screen.getByText('MIG Windows server')).toBeInTheDocument());
@@ -94,7 +104,7 @@ describe('the security architecture, as three pages', () => {
     caps = new Set(['controls.read', 'controls.write']);
     renderPage(ArchitecturePatternsPage);
     await waitFor(() => expect(screen.getByText('MIG Windows server')).toBeInTheDocument());
-    expect(screen.queryByText('Create pattern')).toBeNull();
+    expect(screen.queryByText('Create standard build')).toBeNull();
     expect(screen.getByText('view only')).toBeInTheDocument();
   });
 
@@ -105,25 +115,12 @@ describe('the security architecture, as three pages', () => {
     expect(screen.getByLabelText('Remove trigger Windows Server 2025')).toBeInTheDocument();
   });
 
-  // The CIRKS starter template (owner, 2026-11-02): six empty groups citing a
-  // document; only the ones not already there are offered.
-  test('the starter template adds the groups not already there, citing the chosen document', async () => {
-    caps = new Set(['controls.read', 'architecture.write']);
-    renderPage(ArchitectureTemplatePage);
-    const offer = await screen.findByText(/Start from the CIRKS template: Connectivity, Hosting, Operating system/);
-    expect(offer).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText('Document the template comes from'), { target: { value: 'd1' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Add the starter groups' }));
-    await waitFor(() => expect(createStarterGroups).toHaveBeenCalledWith({ standard_id: 'd1' }));
-    expect(await screen.findByText('Added Connectivity, Hosting. Add members to each.')).toBeInTheDocument();
-  });
-
-  test('a group with no members says it asks nothing yet', async () => {
-    caps = new Set(['controls.read']);
-    LIB.groups.push({ id: 'g2', name: 'Support team', standard_name: 'MIG Security Architecture Standard',
-                      systems_unanswered: 0, members: [], triggers: [] });
-    renderPage(ArchitectureTemplatePage);
-    expect(await screen.findByText('asks nothing until it has a member')).toBeInTheDocument();
-    LIB.groups.pop();
+  test('the security team can add a system pattern as a trigger', async () => {
+    caps = new Set(['controls.read', 'controls.write']);
+    renderPage(SecurityPatternTriggersPage);
+    const add = await screen.findByLabelText('System pattern to add as a trigger of the CrowdStrike EDR rule');
+    fireEvent.change(add, { target: { value: 'S1' } });
+    await waitFor(() => expect(addRulePatternTrigger).toHaveBeenCalledWith('r1', 'S1'));
+    expect(screen.getByLabelText('Remove trigger S2')).toBeInTheDocument();
   });
 });

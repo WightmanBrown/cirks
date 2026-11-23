@@ -136,6 +136,14 @@ function costFor(solution, systems) {
   };
 }
 
+// agreed → decided, not agreed → not decided. Agreement without a decision
+// still reads as agreed: the business has spoken, the register lags. Shared with
+// the risk answer (riskAnswer.js), so a risk reads the same in both.
+function agreementState({ validated, treatment_decision, minuted, ownerAct }) {
+  if (minuted || ownerAct) return 'agreed';
+  return validated && treatment_decision ? 'decided_not_agreed' : 'not_decided';
+}
+
 async function computeCiso() {
   const [{ rows: [cfg] }, { rows: risks }] = await Promise.all([
     query('SELECT mandatory_action_score FROM org_config LIMIT 1'),
@@ -163,8 +171,6 @@ async function computeCiso() {
     const h = handBy.get(r.id);
     const ownerAct = o?.acceptance || o?.accepted_action || null;
     const validated = v?.validation_status === 'validated';
-    const decided = validated && !!r.treatment_decision;
-    const agreed = !!m || !!ownerAct;
     return {
       risk_id: r.id, system_id: r.system_id, system_name: r.system_name, threat_name: r.threat_name,
       department_id: r.department_id, department_name: r.department_name,
@@ -177,9 +183,7 @@ async function computeCiso() {
                      department_present: m.department_present } : null,
       owner_act: ownerAct,
       in_hand: h?.action ? { kind: 'action', ...h.action } : h?.acceptance ? { kind: 'acceptance', ...h.acceptance } : null,
-      // agreed → decided, not agreed → not decided. Agreement without a decision
-      // still reads as agreed: the business has spoken, the register lags.
-      state: agreed ? 'agreed' : decided ? 'decided_not_agreed' : 'not_decided',
+      state: agreementState({ validated, treatment_decision: r.treatment_decision, minuted: m, ownerAct }),
     };
   }).sort((a, b) => b.score - a.score || a.system_name.localeCompare(b.system_name));
   const agreedIds = new Set(agreement.filter((a) => a.state === 'agreed').map((a) => a.risk_id));
@@ -314,4 +318,7 @@ async function computeCiso() {
   };
 }
 
-module.exports = { computeCiso, costFor, FIX_ROWS_SQL };
+module.exports = {
+  computeCiso, costFor, agreementState,
+  FIX_ROWS_SQL, MINUTED_SQL, OWNER_ACTS_SQL, IN_HAND_SQL,
+};

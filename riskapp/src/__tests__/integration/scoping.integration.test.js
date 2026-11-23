@@ -371,3 +371,19 @@ describe('component catalogue — no departmental ownership', () => {
     expect(ids).toContain(otherComponentId);
   });
 });
+
+// The risk register's department dropdown lists the departments in its rows by
+// department_name, as every other list does; without it each entry read "—".
+describe('risk register names each risk\'s department', () => {
+  test('every risk carries department_name, the same as department', async () => {
+    const res = await request(app)
+      .get('/api/v1/operations/risk-heatmap/current')
+      .set('Authorization', `Bearer ${tokenFor('ciso')}`);
+    expect(res.status).toBe(200);
+    expect(res.body.risks.length).toBeGreaterThan(0);
+    for (const r of res.body.risks) {
+      expect(r.department_name).toBeTruthy();
+      expect(r.department_name).toBe(r.department);
+    }
+  });
+});

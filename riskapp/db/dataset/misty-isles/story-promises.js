@@ -20,7 +20,7 @@ module.exports = {
   counts: {
     departments: { expect: 12, why: 'the twelve departments of the story' },
     people: { expect: 31, why: 'the cast in the walkthrough' },
-    systems: { expect: 52, why: 'README, INSTALL.md and the walkthrough say 52' },
+    systems: { expect: 58, why: 'README, INSTALL.md and the walkthrough say 58 (52, the owner\'s five from CIRKS-dev, and CIRKS itself from CIRKS-test, 2026-11-05)' },
 
     // The risk register
     risks: { expect: 227, why: 'the documents quote 227' },
@@ -30,7 +30,7 @@ module.exports = {
     identifiedNotAssessed: { expect: 16, why: 'identified exposures deliberately left unassessed' },
 
     // Security actions
-    actions: { expect: 8, why: 'the documents quote 8' },
+    actions: { expect: 7, why: 'the documents quote 7' },
     actionsAwaitingAcceptance: { expect: 3, why: '"three were deliberately left in the queue" (walkthrough)' },
     actionItemsCompleted: { expect: 2, why: 'work done this year, never on a deliberate problem' },
 
@@ -106,6 +106,11 @@ module.exports = {
       why: 'walkthrough exercises: the expired SOC 2 report',
       sql: `SELECT count(*)::int AS n FROM v_supplier_assurance_findings
              WHERE supplier_name = 'Super Bill' AND reason = 'expired'`, expect: 1 },
+    { what: 'The SIRO has set a tolerance for each of the board\'s four headline figures',
+      why: 'the board summary rates its figures red, amber and green (v169)',
+      sql: `SELECT count(*)::int AS n FROM metric_tolerances t JOIN users u ON u.id = t.set_by
+             WHERE u.role = 'siro' AND t.metric_key IN ('exposure.at_or_above_action', 'exposure.above_owner_max',
+               'exposure.decided_not_delivered', 'exposure.acceptances_expired')`, expect: 4 },
     { what: 'PeopleFirst HR\'s supplier assurance reads partial',
       why: 'walkthrough exercises: the contract with no exit terms',
       sql: `SELECT count(*)::int AS n FROM v_supplier_assurance_findings

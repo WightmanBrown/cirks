@@ -11,6 +11,91 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.4.0
+
+Patterns: a system follows a pattern, and the pattern decides which security
+questions it must answer. A security solution follows a pattern too, and says
+what it lacks. Owners and managers get a shorter menu and their department's
+obligations in My Tasks, and the CISO gets four more reports.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. Nine
+migrations run by themselves when CIRKS starts (v175 to v184), and CIRKS backs
+up the database before applying them. Then:
+
+- **No system, security solution or standard build is given a pattern.** Each
+  says *pattern not stated* until someone chooses one. Patterns are a report:
+  choosing one changes no status and no score, except where a security pattern
+  trigger names the pattern (only *S2 → Provided by the supplier* is set up).
+- **The System profile page is gone.** Its groups said which components can
+  answer which question. That is now each component's **roles**, copied from
+  the groups when you upgrade; every group is written to the audit log first.
+  Check them under *Which components fulfil which roles?* on *System Patterns*.
+- **Some people see a shorter menu.** Information Asset Owners and Managers,
+  the SIRO, the meeting secretary and SOC analysts start on the *simple menu*,
+  which leaves out the design and library pages. Anyone can switch at the foot
+  of any menu, or on *My account*. The menu never changes what a person may do.
+- **Owners and managers see less of other departments' supplier figures.** On
+  a relationship another department holds, the criticality and system counts
+  now cover only the reader's own department's systems, and say so.
+
+- **System patterns.** Eight patterns a business system follows, on the new
+  *System Patterns* page:
+  - S1 an application on servers we run, S7 on cloud infrastructure (IaaS),
+    S8 on a cloud platform (PaaS), S2 a service the supplier runs (SaaS);
+  - S3 dedicated equipment and operational technology, S4 an end-user device,
+    S5 network infrastructure, S6 a document record.
+
+  A system is asked only the questions its pattern requires, and a question
+  is required only where CIRKS reads the answer. Each system's Components tab
+  opens with its pattern, the system drawn in that shape and its unanswered
+  questions, each with *+ New* to answer it with a new component. Systems with
+  no pattern are listed with the closest pattern suggested (never chosen for
+  you). A business system with no pattern is a line in the component-record
+  finding; security systems are exempt.
+- **Security solution patterns.** Eight patterns a security solution follows,
+  from a governing document to physical protection, on *Security Solution
+  Patterns*. Solutions are grouped by pattern, and a solution's page draws its
+  pattern and what it lacks.
+- **Component roles.** A component says what it can answer on a system:
+  operating system, where it runs, network, sign-in, support team or users. A
+  change is previewed first, showing every system it affects, and one that
+  would leave a system with a gap must be confirmed.
+- **Standard builds follow a pattern.** A build states the system pattern it
+  follows. Applying a build to a system with a different pattern is refused;
+  a system with no pattern is offered the build's. Applying a second build
+  that answers the same once-only question (two operating systems, say) needs
+  a tick to confirm. The creation wizard picks the build's pattern for you.
+- **Delete a component made by mistake.** From the component's page, once
+  nothing uses it. While anything does, CIRKS names every place.
+- **The risk page answers four questions first:** how bad is it, why this
+  score, what is being done, and who decided what. The risk context graph is
+  retired.
+- **Insights:**
+  - in a report's list of risks, a risk unfolds its answer beneath it;
+  - seven question pages sit between the reports and the records (coverage,
+    exposure, decisions, control quality, meeting a standard, work, changes),
+    each reached from the questions listed under a report panel;
+  - four more reports for the CISO: *Who owns what*, *The security team's
+    service*, *Audit readiness*, and *Is the record current and trusted?*;
+  - an administrator may now set the board's tolerances, as well as the SIRO.
+- **My Tasks lists the department's unmet obligations** for Information Asset
+  Owners and Managers, each with how many things are open. A row clears by
+  itself once the obligation is met.
+- **Back to a long list lands where you left it.** The risk register, Systems
+  and Assets keep their search, filters and sort in the address.
+- **Smaller changes:**
+  - dashboard widgets are never narrower than 480 px (two columns on a laptop);
+  - graph node colours no longer clash with component type colours, and each
+    type has its own shape;
+  - the CIRKS library keeps configuration and software vulnerabilities apart,
+    and adds an acceptable use policy, device containment and leadership
+    resources;
+  - a system's page loads faster (v184).
+  - the empty *Plan* column on *Security Actions*, and the *Plan* field on an
+    action's page, are gone: nothing creates a security action plan.
+- **Fixed:** the risk register's department dropdown listed a dash for every
+  department.
+
 ## v1.3.0
 
 Insights: reports for each role. Each shows what has been decided, what is in

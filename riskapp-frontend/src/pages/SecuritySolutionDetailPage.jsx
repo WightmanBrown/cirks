@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   getSecuritySolution, updateSecuritySolution, deleteSecuritySolution, addSecuritySolutionObjective,
   removeSecuritySolutionObjective, addSecuritySolutionPart, removeSecuritySolutionPart, getControls, listComponents,
+  getSolutionPatterns, setSecuritySolutionPartSlot,
 } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
@@ -13,16 +14,18 @@ import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { DeliveryChip } from '../components/DeliveryChip';
 import { SecuritySolutionSummaryCard } from '../components/SecuritySolutionSummaryCard';
 import { SolutionPartForm } from '../components/SolutionPartForm';
-import { COMPONENT_TYPE_LABEL } from '../utils/componentTypes';
+import { TypeBadge } from '../components/ComponentPill';
 import { partWhere, deliveryLabel } from '../utils/deliveryPatterns';
 import shared from './ScopesPage.module.css';
 import parts from '../components/DeliveryPatternsSection.module.css';
 import { HelpDot } from '../components/HelpDot';
+import { SolutionPatternSection, slotOfPart } from '../components/SolutionPatternSection';
 
 // One security solution (v147): the objectives it delivers, its parts, and the
 // systems it is in place on. Everything changed here changes the solution for
 // every objective it delivers — which is the point of defining it once.
-// Report only: where it is in place is derived from what systems record.
+// Report only: where it is in place is derived from what systems record, and
+// how it measures up to its security solution pattern (v176) is derived too.
 export function SecuritySolutionDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,6 +39,8 @@ export function SecuritySolutionDetailPage() {
   const [pick, setPick] = useState('');
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ name: '', notes: '' });
+  const [patterns, setPatterns] = useState([]);
+  useEffect(() => { getSolutionPatterns().then(setPatterns).catch(() => setPatterns([])); }, []);
 
   const load = useCallback(() => {
     getSecuritySolution(id).then(setS).catch(err => {
@@ -108,6 +113,9 @@ export function SecuritySolutionDetailPage() {
             </div>
           ))}
 
+          <SolutionPatternSection s={s} patterns={patterns} canEdit={canEdit}
+            onSave={(body) => run(() => updateSecuritySolution(id, body))} />
+
           <section className={shared.section}>
             <h2 className={shared.sectionTitle}>Control objectives it delivers <span className={shared.count}>{n}</span> <HelpDot k="security_solution.objectives" placement="bottom" /></h2>
             {n === 0 ? <p className={shared.muted}>None yet — it delivers nothing until an objective is added.</p> : (
@@ -154,9 +162,11 @@ export function SecuritySolutionDetailPage() {
                 <ul className={parts.parts}>
                   {s.parts.map(part => (
                     <li key={part.id}>
-                      <span className={parts.type}>{COMPONENT_TYPE_LABEL[part.component_type] || part.component_type}</span>
+                      <span className={parts.type}><TypeBadge type={part.component_type} small label="long" /></span>
                       <Link to={`/components/${part.component_id}`}>{part.component_name}</Link>
                       <span className={parts.where}>{partWhere(part)}</span>
+                      {s.solution_pattern && <PartSlot s={s} part={part} patterns={patterns} canEdit={canEdit}
+                        onSet={(slot) => run(() => setSecuritySolutionPartSlot(id, part.id, slot))} />}
                       {canEdit && (
                         <button className={parts.linkBtn} aria-label={`Remove ${part.component_name}`}
                           onClick={() => (!reach || window.confirm(`Remove "${part.component_name}" from "${s.name}"?${reach}`))
@@ -205,6 +215,24 @@ export function SecuritySolutionDetailPage() {
         </>)}
       </div>
     </Shell>
+  );
+}
+
+// The pattern slot a part fills: matched by its type and place, or chosen by a
+// person (a record looks like any other document, so it is never guessed).
+function PartSlot({ s, part, patterns, canEdit, onSet }) {
+  const pattern = patterns.find(p => p.code === s.solution_pattern);
+  if (!pattern) return null;
+  const now = slotOfPart(s.pattern_fit, part.id);
+  if (!canEdit) {
+    return <span className={parts.where}>{now ? `fills ${now.label.toLowerCase()}` : 'outside the pattern\'s slots'}</span>;
+  }
+  return (
+    <select className={shared.input} aria-label={`The slot ${part.component_name} fills`} value={part.slot_key || ''}
+      onChange={e => onSet(e.target.value || null)}>
+      <option value="">{now && !now.stated ? `Fills ${now.label.toLowerCase()} (matched)` : 'Matched by type and place'}</option>
+      {pattern.slots.map(x => <option key={x.key} value={x.key}>Fills {x.label.toLowerCase()}</option>)}
+    </select>
   );
 }
 

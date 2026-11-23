@@ -19,7 +19,7 @@ describe('DataExportPage GROUPS', () => {
       'users', 'user-roles', 'departments',
       'threats', 'controls', 'control-threats', 'control-component-links',
       'delivery-patterns', 'delivery-pattern-objectives', 'delivery-pattern-parts',
-      'architecture-rules', 'membership-groups', 'system-builds', 'solution-choices',
+      'architecture-rules', 'system-builds', 'solution-choices',
       'components', 'component-ip-addresses',
       'information-assets', 'asset-impact-ratings',
       'systems', 'system-assets', 'system-components', 'system-threats', 'system-controls',

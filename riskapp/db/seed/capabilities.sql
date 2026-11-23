@@ -40,7 +40,6 @@ INSERT INTO capabilities (key, resource, action, dept_scopable, description) VAL
   ('exceptions.read', 'exceptions', 'read', TRUE, 'View risk exceptions'),
   ('exceptions.revoke', 'exceptions', 'revoke', TRUE, 'Revoke a risk exception'),
   ('governance.review', 'governance', 'review', FALSE, 'CISO governance queues (pending, SAP)'),
-  ('graph.read', 'graph', 'read', FALSE, 'View control/system graphs'),
   ('knowledge.enrich', 'knowledge', 'enrich', FALSE, 'Resolve an IP or hostname to the systems it belongs to'),
   ('knowledge.query', 'knowledge', 'query', FALSE, 'Look up a host/IP to its system(s) and their risk/impact (SOC enrichment)'),
   ('meetings.attendees', 'meetings', 'attendees', FALSE, 'Manage meeting attendees'),

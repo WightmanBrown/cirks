@@ -24,6 +24,14 @@ const { computeCiso } = require('../../reports/ciso');
 const { computeDepartment } = require('../../reports/department');
 const { listSystems, computeSystem } = require('../../reports/systems');
 const { computeAnalyst, computeUnknown } = require('../../reports/analyst');
+const { computeOwners } = require('../../reports/owners');
+const { computeTeam } = require('../../reports/team');
+const { computeAudit } = require('../../reports/audit');
+const { computeRecord } = require('../../reports/record');
+const { computeCoverage } = require('../../reports/coverage');
+const { computeExposure } = require('../../reports/exposure');
+const { computeDecisions } = require('../../reports/decisions');
+const { computeQuality, computeStandard, listStandards, computeWork, computeChanges } = require('../../reports/questions');
 const { can } = require('../../auth/permissions');
 
 const router = Router();
@@ -51,6 +59,108 @@ async function readerDepartment(req, res) {
   }
   return { departmentId, scope };
 }
+
+// The question pages (docs/insights-drilldown.md step 3) follow the reader's
+// scope: a reports.read reader sees the organisation and may narrow it to a
+// department; a reader with only reports.department (an IAO or IAM) always sees
+// their own department. Sends the refusal itself and returns null when neither.
+async function questionScope(req, res) {
+  const org = can(req.user.role, 'reports.read');
+  if (org.allowed && org.scope === 'all_depts') {
+    return { departmentId: req.query.department_id || null, can_choose: true };
+  }
+  if (can(req.user.role, 'reports.department').allowed) {
+    const who = await readerDepartment(req, res);
+    return who && { departmentId: who.departmentId, can_choose: who.scope === 'all_depts' };
+  }
+  res.status(403).json({ error: 'Forbidden' });
+  return null;
+}
+
+// GET /reports/coverage[?department_id=] — control coverage on systems: the
+// objectives, systems and departments best and worst covered, the degraded
+// controls to fix first, and why each is low where CIRKS can tell.
+router.get('/coverage', async (req, res, next) => {
+  try {
+    const who = await questionScope(req, res);
+    if (!who) return;
+    res.json({ ...(await computeCoverage(who.departmentId)), can_choose: who.can_choose });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(400).json({ error: 'That is not a department id.' });
+    next(err);
+  }
+});
+
+// GET /reports/exposure[?department_id=&cell=<impact>,<likelihood>&min=<score>]
+// — where the risk sits: the risks in scope (or in one heat-map square, or at
+// or above a score) grouped by department, system and threat, with what the
+// committed work will move.
+router.get('/exposure', async (req, res, next) => {
+  try {
+    const who = await questionScope(req, res);
+    if (!who) return;
+    let cell = null;
+    if (req.query.cell) {
+      const [impact, likelihood] = String(req.query.cell).split(',').map(Number);
+      if (![impact, likelihood].every((v) => Number.isInteger(v) && v >= 1 && v <= 5)) {
+        return res.status(400).json({ error: 'A square is impact,likelihood, each 1 to 5.' });
+      }
+      cell = { impact, likelihood };
+    }
+    const min = req.query.min == null || req.query.min === '' ? null : Number(req.query.min);
+    if (min != null && !(Number.isInteger(min) && min >= 1 && min <= 25)) {
+      return res.status(400).json({ error: 'A minimum score is a whole number from 1 to 25.' });
+    }
+    const only = req.query.only || null;
+    if (only && only !== 'decided_not_delivered') return res.status(400).json({ error: 'Unknown filter.' });
+    res.json({ ...(await computeExposure(who.departmentId, { cell, min, only })), can_choose: who.can_choose });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(400).json({ error: 'That is not a department id.' });
+    next(err);
+  }
+});
+
+// GET /reports/decisions[?department_id=] — decisions owed: risks at or above
+// the action threshold still waiting for a decision, who owes it and for how
+// long, and acceptances running out soon.
+router.get('/decisions', async (req, res, next) => {
+  try {
+    const who = await questionScope(req, res);
+    if (!who) return;
+    res.json({ ...(await computeDecisions(who.departmentId)), can_choose: who.can_choose });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(400).json({ error: 'That is not a department id.' });
+    next(err);
+  }
+});
+
+// GET /reports/work[?department_id=] — work in progress: the security actions
+// in hand, who holds the items, what is overdue, the risk points each removes.
+router.get('/work', async (req, res, next) => {
+  try {
+    const who = await questionScope(req, res);
+    if (!who) return;
+    res.json({ ...(await computeWork(who.departmentId)), can_choose: who.can_choose });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(400).json({ error: 'That is not a department id.' });
+    next(err);
+  }
+});
+
+// GET /reports/changes[?department_id=&days=] — what changed: every change to a
+// risk score in the period (default 90 days, at most 3 years), with its cause.
+router.get('/changes', async (req, res, next) => {
+  try {
+    const who = await questionScope(req, res);
+    if (!who) return;
+    const days = req.query.days == null || req.query.days === '' ? 90 : Number(req.query.days);
+    if (!(Number.isInteger(days) && days >= 1 && days <= 1095)) return res.status(400).json({ error: 'A period is a whole number of days from 1 to 1095.' });
+    res.json({ ...(await computeChanges(who.departmentId, days)), can_choose: who.can_choose });
+  } catch (err) {
+    if (err.code === '22P02') return res.status(400).json({ error: 'That is not a department id.' });
+    next(err);
+  }
+});
 
 router.get('/department', requireCapability('reports.department'), async (req, res, next) => {
   try {
@@ -239,6 +349,27 @@ router.get('/siro', async (req, res, next) => {
 
 // GET /reports/board — the board summary (report 9): the few figures a board
 // reads at a glance, and the monthly captures that draw their trend.
+// GET /reports/quality — control quality: applicable objectives by their judged
+// effectiveness, weak and not rated first, who rates them, the risks leaning on
+// them. Organisation-wide (the objectives belong to no department).
+router.get('/quality', async (req, res, next) => {
+  try { res.json(await computeQuality()); } catch (err) { next(err); }
+});
+
+// GET /reports/standards, /reports/standards/:code — meeting a standard: the
+// standards switched on with requirements loaded, and one standard's
+// requirements by the SoA's derivation, with the objectives falling short.
+router.get('/standards', async (req, res, next) => {
+  try { res.json({ standards: await listStandards() }); } catch (err) { next(err); }
+});
+router.get('/standards/:code', async (req, res, next) => {
+  try {
+    const s = await computeStandard(req.params.code);
+    if (!s) return res.status(404).json({ error: 'No such standard.' });
+    res.json(s);
+  } catch (err) { next(err); }
+});
+
 router.get('/board', async (req, res, next) => {
   try {
     const [board, { rows: trend }] = await Promise.all([
@@ -257,6 +388,33 @@ router.get('/board', async (req, res, next) => {
 // R5, the CISO's C3): one report for both roles.
 router.get('/unknown', async (req, res, next) => {
   try { res.json(await computeUnknown()); } catch (err) { next(err); }
+});
+
+// GET /reports/owners — who owns what (docs/reporting-ciso.md C4): every
+// person's accountabilities, responsibilities and load, by department, and the
+// gaps — no owner, an inactive owner, risks falling to the SIRO.
+router.get('/owners', async (req, res, next) => {
+  try { res.json(await computeOwners()); } catch (err) { next(err); }
+});
+
+// GET /reports/team — the security team's service (docs/reporting-ciso.md C6):
+// what the business waits on security for, turnaround and delivery by
+// quarter, and where the team's changes go.
+router.get('/team', async (req, res, next) => {
+  try { res.json(await computeTeam()); } catch (err) { next(err); }
+});
+
+// GET /reports/audit — audit readiness, compliance as a by-product
+// (docs/reporting-ciso.md C7): the evidence an auditor will ask for, each line
+// naming its ISO/IEC 27001 clause, derived from the record.
+router.get('/audit', async (req, res, next) => {
+  try { res.json(await computeAudit()); } catch (err) { next(err); }
+});
+
+// GET /reports/record — is the record current and trusted? (docs/reporting-
+// ciso.md C8): written down, kept up to date, and read by the business.
+router.get('/record', async (req, res, next) => {
+  try { res.json(await computeRecord()); } catch (err) { next(err); }
 });
 
 // GET /reports/analyst[?analyst=<user id>|team] — My work, the risk analyst's

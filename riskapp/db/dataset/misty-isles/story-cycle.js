@@ -279,6 +279,27 @@ async function exceptions({ t }) {
   log('   ✓ done');
 }
 
+// ── 4b. The board's tolerances ───────────────────────────────────────────────────
+// The SIRO agrees with the board how far each headline figure may go (v169),
+// with the reason. Chosen so the board summary teaches all three ratings: the
+// count at or above the threshold is red, two figures are amber, one is green.
+const TOLERANCES = [
+  ['exposure.at_or_above_action', 40, 60, 'The board wants no more than 40 risks needing action; above 60 it asks for a recovery plan.'],
+  ['exposure.above_owner_max', 5, 15, 'Risks beyond a risk owner\'s authority need the CISO or SIRO; a handful is expected while the estate is catalogued.'],
+  ['exposure.decided_not_delivered', 30, 60, 'Decided treatments the work has not yet delivered: tolerated while the action programme ramps up.'],
+  ['exposure.acceptances_expired', 1, 3, 'An expired acceptance is a breach of a decision; one at a time is tolerated while it is renewed or acted on.'],
+];
+async function tolerances({ t }) {
+  phase('4b. The SIRO sets the board\'s tolerances');
+  let n = 0;
+  for (const [key, green_max, amber_max, reason] of TOLERANCES) {
+    if (await tolerate(() => api(t.siro, 'PUT', `/reports/tolerances/${key}`, { green_max, amber_max, reason }), `tolerance for ${key}`)) n++;
+  }
+  // SQL: agreed with the board at the first quarterly review, nine months ago.
+  await query(`UPDATE metric_tolerances SET set_at = now() - interval '270 days' WHERE metric_key = ANY($1)`, [TOLERANCES.map(([k]) => k)]);
+  log(`   ✓ ${n} tolerances set`);
+}
+
 // ── 5. A year of review cycles and SWG meetings ──────────────────────────────────
 async function history({ p, t }) {
   phase('5. A year of review cycles and SWG meetings');
@@ -354,6 +375,7 @@ async function main() {
   await backlog(who);
   const accepted = await actions(who);
   await exceptions(who);
+  await tolerances(who);
   await history(who);
   if (accepted.length) await spreadActions(accepted);
 

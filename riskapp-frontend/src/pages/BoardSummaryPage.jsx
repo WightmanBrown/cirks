@@ -9,6 +9,9 @@ import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { CompletenessRing } from '../components/CompletenessRing';
+import { PanelQuestions } from '../components/PanelQuestions';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
 import { HeatMap, StackedBar, TrendLine } from '../components/BoardCharts';
 import styles from './BoardSummaryPage.module.css';
 
@@ -87,14 +90,17 @@ function ToleranceDialog({ tile, label, onClose, onSaved }) {
   );
 }
 
-function Tile({ tile, of, label, previous, canSet, onSet }) {
+// `to`: the question page listing what the tile counts (the tile is a link to it).
+function Tile({ tile, of, label, previous, canSet, onSet, to }) {
   const { value, tolerance: t, rag } = tile;
   // Direction of travel against the previous monthly capture, when there is one.
   const delta = previous == null ? null : value - previous;
   return (
     <div className={`${styles.tile} ${rag ? styles[rag] : ''}`}>
-      <span className={styles.tileValue}>{value}{of != null && <span className={styles.tileOf}> / {of}</span>}</span>
-      <span className={styles.tileLabel}>{label}</span>
+      <Link className={styles.tileLink} to={to}>
+        <span className={styles.tileValue}>{value}{of != null && <span className={styles.tileOf}> / {of}</span>}</span>
+        <span className={styles.tileLabel}>{label} →</span>
+      </Link>
       {rag
         ? <span className={`${styles.rag} ${styles[`rag_${rag}`]}`}>{RAG_WORD[rag]}</span>
         : <span className={styles.tileDelta}>No tolerance set</span>}
@@ -115,10 +121,18 @@ function Tile({ tile, of, label, previous, canSet, onSet }) {
 }
 
 const TILE_LABEL = {
-  'exposure.at_or_above_action': (t) => `risks scoring ${t.action} or more, which must be treated`,
+  'exposure.at_or_above_action': (t) => `risks scoring ${t.action} or higher, which must be treated`,
   'exposure.above_owner_max': (t) => `above ${t.owner_max}: only the CISO, SIRO or admin may accept`,
-  'exposure.decided_not_delivered': () => 'decided, with nothing carrying it out',
-  'exposure.acceptances_expired': () => 'acceptances expired with the risk still open',
+  'exposure.decided_not_delivered': () => 'treatment decided, but no security action',
+  'exposure.acceptances_expired': () => 'exceptions expired with the risk still open',
+};
+
+// Where each headline tile leads: the list of what it counts.
+const TILE_LINK = {
+  'exposure.at_or_above_action': (t) => `/reporting/exposure?by=risks&min=${t.action}`,
+  'exposure.above_owner_max': (t) => `/reporting/exposure?by=risks&min=${t.owner_max + 1}`,
+  'exposure.decided_not_delivered': () => '/reporting/exposure?by=risks&only=decided_not_delivered',
+  'exposure.acceptances_expired': () => '/reporting/decisions?by=expiring',
 };
 
 function Headline({ b, prev, canSet, onSet }) {
@@ -128,7 +142,7 @@ function Headline({ b, prev, canSet, onSet }) {
         const field = tile.key.split('.')[1];
         const label = TILE_LABEL[tile.key](b.thresholds);
         return (
-          <Tile key={tile.key} tile={tile} label={label}
+          <Tile key={tile.key} tile={tile} label={label} to={TILE_LINK[tile.key](b.thresholds)}
                 of={field === 'at_or_above_action' ? b.exposure.total : null}
                 previous={prev?.exposure?.[field]}
                 canSet={canSet} onSet={() => onSet(tile, label)} />
@@ -146,14 +160,14 @@ function Trend({ b }) {
     return (
       <p className={styles.note}>
         The trend starts in {month(points[0].period)}: CIRKS keeps the board's figures once a month,
-        and a line appears from the second month. Today: {b.exposure.at_or_above_action} risks scoring
-        {b.thresholds.action} or more, {b.exposure.above_owner_max} above {b.thresholds.owner_max}.
+        and a line appears from the second month. Today: {b.exposure.at_or_above_action} risks scoring{' '}
+        {b.thresholds.action} or higher, {b.exposure.above_owner_max} above {b.thresholds.owner_max}.
       </p>
     );
   }
   return (
     <TrendLine series={[
-      { key: 'at', label: `scoring ${b.thresholds.action} or more`, tone: 'series1', points: points.map((p) => ({ period: p.period, value: p.e.at_or_above_action })) },
+      { key: 'at', label: `scoring ${b.thresholds.action} or higher`, tone: 'series1', points: points.map((p) => ({ period: p.period, value: p.e.at_or_above_action })) },
       { key: 'above', label: `above ${b.thresholds.owner_max}`, tone: 'series2', points: points.map((p) => ({ period: p.period, value: p.e.above_owner_max })) },
     ]} />
   );
@@ -202,22 +216,38 @@ export function BoardSummaryPage() {
           )}
 
           <div className={styles.grid}>
-            <Panel title="Where the risks sit" helpKey="board.heat" wide>
+            <Panel title="Today's risk picture" helpKey="board.heat" wide>
               <div className={styles.heats}>
-                <HeatMap grid={b.heat_map.current} label="now" />
-                <HeatMap grid={b.heat_map.target} label="after committed work" />
+                <HeatMap grid={b.heat_map.current} label="Today" />
+                <HeatMap grid={b.heat_map.target} label="Once the agreed security work is done" />
               </div>
-              <p className={styles.note}>Each square counts risks by likelihood and impact; colour is the risk band.</p>
+              <p className={styles.note}>
+                Each square counts risks by likelihood and impact; colour is the risk band. The first grid is where the risks sit today;
+                the second is where they will sit once the security actions already accepted are complete, so the difference is what that work is worth.
+              </p>
+              <PanelQuestions questions={[
+                { label: 'Which departments carry the most risk?', to: `/reporting/exposure?by=department&min=${b.thresholds.action}` },
+                { label: 'Which systems concentrate it?', to: `/reporting/exposure?by=system&min=${b.thresholds.action}` },
+                { label: 'Which threats recur?', to: `/reporting/exposure?by=threat&min=${b.thresholds.action}` },
+                { label: `Which risks score ${b.thresholds.action} or higher, and why?`, to: `/reporting/exposure?by=risks&min=${b.thresholds.action}` },
+              ]} />
             </Panel>
 
-            <Panel title={`Is every risk scoring ${b.thresholds.action} or more answered?`} helpKey="board.answered">
+            <Panel title={`Does every risk scoring ${b.thresholds.action} or higher have a security action planned or formal acceptance?`} helpKey="board.answered">
               <CompletenessRing size={96}
                 complete={b.exposure.answered_by_action} partial={b.exposure.answered_by_acceptance} missing={b.exposure.unanswered}
-                labels={{ complete: 'being treated', partial: 'accepted', missing: 'nothing answering' }} of={`risks scoring ${b.thresholds.action} or more`} />
+                labels={{ complete: 'security action planned', partial: 'formally accepted', missing: 'neither' }} of={`risks scoring ${b.thresholds.action} or higher`} />
+              <PanelQuestions questions={[
+                { label: `Which risks scoring ${b.thresholds.action} or higher are awaiting decision, and from whom?`, to: '/reporting/decisions' },
+                { label: 'Which exceptions run out soon?', to: '/reporting/decisions?by=expiring' },
+              ]} />
             </Panel>
 
             <Panel title="Risk trend" helpKey="board.trend">
               <Trend b={b} />
+              <PanelQuestions questions={[
+                { label: 'Which risk scores changed, and why?', to: '/reporting/changes' },
+              ]} />
             </Panel>
 
             <Panel title="Compliance with standards" helpKey="board.compliance">
@@ -255,6 +285,8 @@ export function BoardSummaryPage() {
                   </div>
                 );
               })}
+              <PanelQuestions questions={b.compliance.filter((s) => s.loaded).map((s) => (
+                { label: `Which ${s.name} requirements are not met, and what holds them back?`, to: `/reporting/standard?standard=${s.code}` }))} />
             </Panel>
 
             <Panel title="Statement of Applicability" helpKey="board.soa">
@@ -273,6 +305,12 @@ export function BoardSummaryPage() {
               {b.controls.findings.objective_without_solution > 0 && (
                 <p className={styles.note}>{b.controls.findings.objective_without_solution} control objectives have no security solution to deliver them.</p>
               )}
+              <PanelQuestions questions={[
+                { label: 'Which control objectives are best and worst covered?', to: '/reporting/coverage?by=objective' },
+                { label: 'Which systems are best and worst covered?', to: '/reporting/coverage?by=system' },
+                { label: 'How does each department compare?', to: '/reporting/coverage?by=department' },
+                { label: 'Which degraded controls should be fixed first?', to: '/reporting/coverage?by=degraded' },
+              ]} />
             </Panel>
 
             <Panel title="Control quality" helpKey="board.quality">
@@ -287,6 +325,9 @@ export function BoardSummaryPage() {
                 <li><strong>{b.controls.findings.document_review}</strong> policies past their review date</li>
                 <li><strong>{b.controls.findings.supplier_assurance}</strong> supplier relationships without full assurance</li>
               </ul>
+              <PanelQuestions questions={[
+                { label: 'Which control objectives are weak or not rated, and who rates them?', to: '/reporting/quality' },
+              ]} />
             </Panel>
 
             <Panel title="Remediation" helpKey="board.remediation">
@@ -300,24 +341,44 @@ export function BoardSummaryPage() {
                 <li><strong>{b.efficiency.median_days_to_complete ?? '—'}</strong> days, median, from accepting an action to completing it</li>
                 <li><strong>{b.efficiency.actions_overdue}</strong> of {b.efficiency.actions_open} open actions past their target date</li>
               </ul>
+              <PanelQuestions questions={[
+                { label: 'Which actions are overdue, and who holds the work?', to: '/reporting/work' },
+              ]} />
             </Panel>
 
             <Panel title="Departments" helpKey="board.departments" wide>
+              <Departments b={b} />
+            </Panel>
+          </div>
+        </>}
+      </div>
+    </Shell>
+  );
+}
+
+// The board's department table, every column sortable; a department opens its
+// My department report.
+function Departments({ b }) {
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(b.departments, { accessors: {
+    name: (d) => d.department_name, at: (d) => d.at_or_above_action, none: (d) => d.unanswered, findings: (d) => d.findings,
+  } });
+  const sort = { sortKey, sortDir, onSort: toggleSort };
+  return (
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Department <HelpDot k="col.department" placement="bottom" /></th>
-                    <th>Scoring {b.thresholds.action} or more <HelpDot k="board.col.at_or_above" placement="bottom" /></th>
-                    <th className={styles.num}>Nothing answering <HelpDot k="board.col.unanswered" placement="bottom" /></th>
-                    <th className={styles.num}>Open findings <HelpDot k="board.col.findings" placement="bottom" /></th>
+                    <SortableTh column="name" {...sort} helpKey="col.department">Department</SortableTh>
+                    <SortableTh column="at" {...sort} helpKey="board.col.at_or_above">Scoring {b.thresholds.action} or higher</SortableTh>
+                    <SortableTh column="none" {...sort} className={styles.num} helpKey="board.col.unanswered">No security action planned</SortableTh>
+                    <SortableTh column="findings" {...sort} className={styles.num} helpKey="board.col.findings">Open findings</SortableTh>
                   </tr>
                 </thead>
                 <tbody>
-                  {b.departments.map((d) => {
+                  {sorted.map((d) => {
                     const widest = Math.max(1, ...b.departments.map((x) => x.risks));
                     return (
                       <tr key={d.department_id || 'none'}>
-                        <td>{d.department_name}</td>
+                        <td>{d.department_id ? <Link to={`/reporting/department?department_id=${d.department_id}`}>{d.department_name}</Link> : d.department_name}</td>
                         <td>
                           <span className={styles.inlineBar}>
                             <span className={styles.inlineFill} style={{ width: `${(100 * d.at_or_above_action) / widest}%` }} />
@@ -332,10 +393,5 @@ export function BoardSummaryPage() {
                   })}
                 </tbody>
               </table>
-            </Panel>
-          </div>
-        </>}
-      </div>
-    </Shell>
   );
 }

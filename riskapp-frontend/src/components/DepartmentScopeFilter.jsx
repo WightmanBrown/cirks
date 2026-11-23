@@ -21,6 +21,7 @@
  */
 
 import { useMemo, useState } from 'react';
+import { useUrlState } from '../hooks/useUrlState';
 import {
   SCOPE_ALL, SCOPE_DEPT, SCOPE_SHARED,
   applyDepartmentScope, departmentsIn,
@@ -35,10 +36,12 @@ import styles from './DepartmentScopeFilter.module.css';
  * @param {string}  [opts.userDeptId]  caller's department id
  * @param {Array}   [opts.facets]      page-specific extra facets {key,label,test}
  * @param {boolean} [opts.defaultToOwnDept=true]
+ * @param {Array}   [opts.scopeState]  [scope, setScope] to use instead of the hook's own
+ * @param {Array}   [opts.deptState]   [deptId, setDeptId] likewise
  */
 export function useDepartmentScope({
   rows, userDeptId, facets = [], defaultToOwnDept = true, initialScope = null,
-  alwaysInScope,
+  alwaysInScope, scopeState = null, deptState = null,
 }) {
   // Default to the caller's own department when they have one — that is the
   // whole point. Cross-department roles start on "All".
@@ -46,9 +49,10 @@ export function useDepartmentScope({
   // initialScope overrides both, for pages whose scope is URL-driven: Impact
   // Tables is deep-linked as ?scope=organisation from the SIRO widgets and the
   // /siro/impact-tables redirect, and that link must keep landing where it says.
-  const [scope,  setScope]  = useState(
-    initialScope || (userDeptId && defaultToOwnDept ? SCOPE_DEPT : SCOPE_ALL));
-  const [deptId, setDeptId] = useState('');
+  const ownScope = useState(defaultScope({ userDeptId, defaultToOwnDept, initialScope }));
+  const ownDept  = useState('');
+  const [scope,  setScope]  = scopeState || ownScope;
+  const [deptId, setDeptId] = deptState || ownDept;
 
   const departments = useMemo(() => departmentsIn(rows), [rows]);
 
@@ -68,6 +72,20 @@ export function useDepartmentScope({
     userDeptId,
     facets,
   };
+}
+
+function defaultScope({ userDeptId, defaultToOwnDept = true, initialScope = null }) {
+  return initialScope || (userDeptId && defaultToOwnDept ? SCOPE_DEPT : SCOPE_ALL);
+}
+
+/**
+ * useDepartmentScope with the choice kept in the address (`scope`, `dept`), so
+ * Back from an item returns to the same list. Same options and result.
+ */
+export function useUrlDepartmentScope(opts) {
+  const scopeState = useUrlState('scope', defaultScope(opts));
+  const deptState  = useUrlState('dept', '');
+  return useDepartmentScope({ ...opts, scopeState, deptState });
 }
 
 export function DepartmentScopeFilter({

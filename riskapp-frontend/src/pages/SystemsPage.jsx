@@ -19,7 +19,9 @@ import { maxCia } from '../utils/cia';
 import { useViewMode } from '../hooks/useViewMode';
 import { useTableSort } from '../hooks/useTableSort';
 import { useSelectedRow } from '../hooks/useSelectedRow';
-import { DepartmentScopeFilter, useDepartmentScope } from '../components/DepartmentScopeFilter';
+import { useScrollRestore } from '../hooks/useScrollRestore';
+import { useUrlState, useUrlSortState } from '../hooks/useUrlState';
+import { DepartmentScopeFilter, useUrlDepartmentScope } from '../components/DepartmentScopeFilter';
 import styles from './SystemsPage.module.css';
 
 // Column key → value accessor, for interactive header sorting (see useTableSort).
@@ -50,10 +52,16 @@ export function SystemsPage() {
   const [systems, setSystems]   = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
-  const [search, setSearch]     = useState('');
+  // Search, department and sort live in the address: Back from an item returns to the same list.
+  // The box keeps its own value (a box bound to the address can drop keystrokes)
+  // and copies it there as you type.
+  const [q, setQ]           = useUrlState('q');
+  const [search, setSearch] = useState(q);
   const [detailCache, setDetailCache] = useState({});
 
   const { selectedId, toggleSelect, summaryRowRef } = useSelectedRow(loading);
+  const sortState = useUrlSortState();
+  useScrollRestore(!loading);
 
   const viewMode = useViewMode();
   const isExpert = viewMode.isExpert;
@@ -83,7 +91,7 @@ export function SystemsPage() {
   }, []);
 
   // Shared with Assets / Services / Exceptions — see utils/departmentScope.
-  const scopeCtl = useDepartmentScope({
+  const scopeCtl = useUrlDepartmentScope({
     rows: systems,
     userDeptId: user?.department_id,
     defaultToOwnDept: isDeptScoped,
@@ -97,7 +105,7 @@ export function SystemsPage() {
     [scopeCtl.filtered, search]);
 
   const { sorted, sortKey, sortDir, toggleSort, clearSort } =
-    useTableSort(filtered, { accessors: SYSTEM_ACCESSORS, defaultCompare: byMaxRiskDescThenName });
+    useTableSort(filtered, { accessors: SYSTEM_ACCESSORS, defaultCompare: byMaxRiskDescThenName, state: sortState });
   const sortProps = { sortKey, sortDir, onSort: toggleSort };
 
   // C/I/A columns are hidden in business mode — drop such a sort back to default.
@@ -130,7 +138,7 @@ export function SystemsPage() {
             className={styles.searchInput}
             placeholder="Search systems…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setQ(e.target.value); }}
           />
           <div className={styles.filters}>
             <DepartmentScopeFilter {...scopeCtl} />

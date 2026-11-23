@@ -145,7 +145,11 @@ router.get('/', canView, async (req, res, next) => {
 
 router.post('/', canCreate, async (req, res, next) => {
   try {
-    const { name, description, department_id, owner_user_id, managed_by_user_id, is_shared, is_security_system } = req.body;
+    const { name, description, department_id, owner_user_id, managed_by_user_id, is_shared, is_security_system, system_pattern } = req.body;
+    // The pattern it follows (v177), chosen in the creation wizard; never defaulted.
+    if (system_pattern != null && !require('../../lib/systemPatterns').patternOf(system_pattern)) {
+      return res.status(400).json({ error: 'system_pattern is one of S1–S8, or left out.' });
+    }
     if (!name?.trim())  return res.status(400).json({ error: 'name is required.' });
 
     const { id: userId } = req.user;
@@ -155,10 +159,10 @@ router.post('/', canCreate, async (req, res, next) => {
     if (!effectiveDeptId) return res.status(400).json({ error: 'department_id is required and your account has no department assigned.' });
 
     const { rows } = await query(
-      `INSERT INTO systems (name, description, department_id, owner_user_id, managed_by_user_id, is_shared, is_security_system)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO systems (name, description, department_id, owner_user_id, managed_by_user_id, is_shared, is_security_system, system_pattern)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING id`,
-      [name.trim(), description?.trim() || null, effectiveDeptId, owner_user_id || await departmentIao(effectiveDeptId), managed_by_user_id || await departmentIam(effectiveDeptId), is_shared === true, is_security_system === true]
+      [name.trim(), description?.trim() || null, effectiveDeptId, owner_user_id || await departmentIao(effectiveDeptId), managed_by_user_id || await departmentIam(effectiveDeptId), is_shared === true, is_security_system === true, system_pattern || null]
     );
 
     res.status(201).json({ id: rows[0].id });
@@ -173,7 +177,7 @@ router.get('/:id', canView, async (req, res, next) => {
       SELECT
         s.id, s.name, s.description,
         s.impact_c, s.impact_i, s.impact_a, s.impact_set_at,
-        s.impact_changed_in_cycle, s.is_shared, s.is_security_system,
+        s.impact_changed_in_cycle, s.is_shared, s.is_security_system, s.system_pattern,
         s.probability_c, s.probability_i, s.probability_a,
         s.is_active, s.created_at, s.updated_at,
         d.id   AS department_id,
@@ -196,7 +200,7 @@ router.get('/:id', canView, async (req, res, next) => {
     const { rows: components } = await query(`
       SELECT
         cc.id, cc.name, cc.description, cc.component_type, cc.status AS component_status,
-        cc.instantiation,
+        cc.instantiation, cc.roles,
         -- v137: an organisational component reads the catalogue's state here,
         -- the same on every system — its recorded row's own status is not used.
         sc.status AS system_status, sc.role, sc.added_at, sc.via AS delivered_via,
@@ -206,6 +210,9 @@ router.get('/:id', canView, async (req, res, next) => {
         -- system's own answer and can be removed; an implied one cannot.
         EXISTS (SELECT 1 FROM system_components x
                  WHERE x.system_id = $1 AND x.component_id = cc.id) AS recorded,
+        -- v177: the system pattern slot a person has said it fills here.
+        (SELECT x.slot_key FROM system_components x
+          WHERE x.system_id = $1 AND x.component_id = cc.id) AS slot_key,
         EXISTS (
           SELECT 1 FROM system_controls syc
           JOIN control_component_links ccl ON ccl.control_id = syc.control_id
@@ -286,7 +293,7 @@ router.get('/:id', canView, async (req, res, next) => {
     await query('SELECT settle_system_security($1)', [req.params.id]);
     const { rows: [componentFinding] } = await query(`
       SELECT f.missing_count, f.missing_component_names, f.needed_count,
-             f.missing_membership_names, f.unrecorded_objective_names,
+             f.missing_membership_names, f.unrecorded_objective_names, f.pattern_not_stated,
              f.needs_solution_count, f.conflict_count,
              -- which objectives: a count alone cannot be acted on (owner, 2026-10-06)
              (SELECT COALESCE(json_agg(json_build_object('id', wc.id, 'title', wc.title, 'reference_code', wc.reference_code)
@@ -387,8 +394,12 @@ router.get('/:id', canView, async (req, res, next) => {
       [req.params.id]
     );
 
+    // v177: how the system measures up to its pattern (report only).
+    const fits = await require('./pattern').systemFits([req.params.id]);
+
     res.json({
       ...system,
+      pattern_fit: fits.get(req.params.id),
       components,
       expected_components: expectedComponents,
       control_delivery: controlDelivery,
@@ -782,5 +793,7 @@ router.get('/:id/available-information-assets', canCreate, async (req, res, next
 // The security architecture on this system (v148): what it wants and why,
 // choices, and applying a build. See ./security.js.
 require('./security')(router, { canView, canCreate });
+// The system's pattern and which slot a component fills (v177). See ./pattern.js.
+require('./pattern')(router, { canCreate });
 
 module.exports = router;

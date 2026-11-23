@@ -45,7 +45,7 @@ describe('the starter threats', () => {
       expect(objectiveTitles.has(l.control_title)).toBe(true);
       expect(names.has(l.threat_name)).toBe(true);
     }
-    expect(links.length).toBe(157);
+    expect(links.length).toBe(152);
   });
 
   test('are the Misty Isles threats and links, so a training install is unchanged', () => {

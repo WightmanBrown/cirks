@@ -56,7 +56,7 @@ beforeEach(() => { caps = ['reports.read']; });
 describe('CISO report', () => {
   test('leads with how many risks the business has agreed', async () => {
     show();
-    expect(await screen.findByText('risks scoring 12 or more have a treatment the business has agreed')).toBeInTheDocument();
+    expect(await screen.findByText('risks scoring 12 or higher have a treatment the business has agreed')).toBeInTheDocument();
   });
 
   test('lists the risks not yet agreed first, and the agreed ones on request', async () => {
@@ -64,7 +64,7 @@ describe('CISO report', () => {
     expect(await screen.findByText('System b — Ransomware')).toBeInTheDocument();
     expect(screen.getByText('not validated')).toBeInTheDocument();
     expect(screen.queryByText('System a — Ransomware')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /^Agreed/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Agreed \(/ }));
     expect(screen.getByText(/Minuted .*“Treat it”/)).toBeInTheDocument();
   });
 

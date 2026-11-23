@@ -36,10 +36,13 @@ export function sortRows(rows, accessor, dir = 'asc') {
 // orders the rows when no column is active, so a list keeps its meaningful
 // default order until the user clicks a header. Clicking a header cycles
 // ascending → descending → back to the default order.
-export function useTableSort(rows, { accessors = {}, defaultCompare = null } = {}) {
+// `state` (optional) is a `[sort, setSort]` pair to use instead of the hook's
+// own, e.g. useUrlSortState() to keep the sort in the address.
+export function useTableSort(rows, { accessors = {}, defaultCompare = null, state = null } = {}) {
   // key + dir in ONE state object so a single pure updater cycles them
   // (nesting one setter inside another's updater double-fires under StrictMode).
-  const [sort, setSort] = useState({ key: null, dir: 'asc' });
+  const own = useState({ key: null, dir: 'asc' });
+  const [sort, setSort] = state || own;
 
   const toggleSort = useCallback((key) => {
     setSort((prev) => {
@@ -47,9 +50,9 @@ export function useTableSort(rows, { accessors = {}, defaultCompare = null } = {
       if (prev.dir === 'asc') return { key, dir: 'desc' };  // same column → descending
       return { key: null, dir: 'asc' };                     // third click → default order
     });
-  }, []);
+  }, [setSort]);
 
-  const clearSort = useCallback(() => setSort({ key: null, dir: 'asc' }), []);
+  const clearSort = useCallback(() => setSort({ key: null, dir: 'asc' }), [setSort]);
 
   const sorted = useMemo(() => {
     if (sort.key && accessors[sort.key]) return sortRows(rows, accessors[sort.key], sort.dir);

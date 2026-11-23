@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getSystemReport, recordDecisionView } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
+import { RiskAnswerRow, RiskOpener, useRiskUnfold } from '../components/RiskAnswer';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { CompletenessRing } from '../components/CompletenessRing';
 import { HeatMap, TrendLine } from '../components/BoardCharts';
@@ -24,7 +27,7 @@ const day = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', mon
 const month = (p) => new Date(`${p}-01T00:00:00Z`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const plural = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
 const money = (v) => (v == null ? null : Number(v).toLocaleString('en-GB'));
-const ANSWER = { treated: ['Being treated', rep.good], accepted: ['Accepted', rep.warn], nothing: ['Nothing answering it', rep.bad] };
+const ANSWER = { treated: ['Security action planned', rep.good], accepted: ['Formally accepted', rep.warn], nothing: ['No security action planned', rep.bad] };
 const STATE = { met: ['Met', rep.good], partial: ['Partly met', rep.warn], gap: ['Not met', rep.bad] };
 const WHY = { direct_edit: 'Assessment changed', action_verified: 'Security action completed', corrective_action: 'Corrective action' };
 const KIND = { validated: 'Validated', minuted: 'Minuted decision', accepted: 'Risk accepted', action_accepted: 'Action accepted' };
@@ -54,7 +57,15 @@ function costWords(c) {
   return `${parts.join(', ')}${c.basis === 'organisation' ? ' (for the organisation)' : ''}`;
 }
 
+const ANSWER_ORDER = { nothing: 0, accepted: 1, treated: 2 };
+
 function Picture({ r }) {
+  const [openId, toggle] = useRiskUnfold();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(r.risks, { accessors: {
+    threat: (x) => x.threat_name, score: (x) => x.score, after: (x) => x.target_score,
+    answered: (x) => (x.at_or_above_action ? ANSWER_ORDER[x.answer] : null),
+  } });
+  const sort = { sortKey, sortDir, onSort: toggleSort };
   const t = r.thresholds.action;
   const h = r.headline;
   return (
@@ -64,29 +75,32 @@ function Picture({ r }) {
         <HeatMap grid={r.heat_map.target} label="after committed work" />
         <div>
           <CompletenessRing size={90} complete={h.answered.treated + h.answered.accepted} missing={h.answered.nothing}
-            labels={{ complete: 'being treated or accepted', missing: 'nothing answering' }} of={`risks scoring ${t} or more`} />
-          <p className={styles.note}>{plural(h.risks, 'risk')}; {h.at_or_above_action} score {t} or more and must be treated or accepted.</p>
+            labels={{ complete: 'security action planned or formally accepted', missing: 'no security action planned' }} of={`risks scoring ${t} or higher`} />
+          <p className={styles.note}>{plural(h.risks, 'risk')}; {h.at_or_above_action} score {t} or higher and must be treated or accepted.</p>
         </div>
       </div>
       {r.risks.length > 0 && (
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Threat <HelpDot k="iam.system.col.threat" placement="bottom" /></th>
-              <th className={styles.num}>Score <HelpDot k="iam.system.col.score" placement="bottom" /></th>
-              <th className={styles.num}>After work <HelpDot k="iam.system.col.target" placement="bottom" /></th>
-              <th>Answered <HelpDot k="iam.system.col.answered" placement="bottom" /></th>
+              <SortableTh column="threat" {...sort} helpKey="iam.system.col.threat">Threat</SortableTh>
+              <SortableTh column="score" {...sort} className={styles.num} helpKey="iam.system.col.score">Score</SortableTh>
+              <SortableTh column="after" {...sort} className={styles.num} helpKey="iam.system.col.target">After work</SortableTh>
+              <SortableTh column="answered" {...sort} helpKey="iam.system.col.answered">Action planned or accepted</SortableTh>
             </tr>
           </thead>
           <tbody>
-            {r.risks.map((x) => (
-              <tr key={x.risk_id}>
-                <td><Link to={`/risks/${x.risk_id}`}>{x.threat_name}</Link>
+            {sorted.map((x) => (
+              <Fragment key={x.risk_id}>
+              <tr>
+                <td><RiskOpener open={openId === x.risk_id} onToggle={() => toggle(x.risk_id)}>{x.threat_name}</RiskOpener>
                   {x.explanation && <div className={styles.note}>{x.explanation}</div>}</td>
                 <td className={styles.num}><Score value={x.score} /></td>
                 <td className={styles.num}><Score value={x.target_score} /></td>
                 <td>{x.at_or_above_action ? <Chip map={ANSWER} k={x.answer} /> : <span className={styles.note}>below {t}</span>}</td>
               </tr>
+              {openId === x.risk_id && <RiskAnswerRow colSpan={4} riskId={x.risk_id} lead="why" />}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -250,8 +264,8 @@ function Improvement({ r }) {
   return (
     <Panel title="Risk reduction over time" helpKey="iam.system.improvement">
       {points.length < 2 ? (
-        <p className={styles.note}>The monthly line starts in {month(points[0].period)}; it appears from the second month. Today: {plural(r.headline.at_or_above_action, 'risk')} scoring {t} or more.</p>
-      ) : <TrendLine series={[{ key: 'at', label: `scoring ${t} or more`, tone: 'series1', points: points.map((p) => ({ period: p.period, value: p.v })) }]} />}
+        <p className={styles.note}>The monthly line starts in {month(points[0].period)}; it appears from the second month. Today: {plural(r.headline.at_or_above_action, 'risk')} scoring {t} or higher.</p>
+      ) : <TrendLine series={[{ key: 'at', label: `scoring ${t} or higher`, tone: 'series1', points: points.map((p) => ({ period: p.period, value: p.v })) }]} />}
       <p className={styles.note}>In the last year {plural(imp.changes.length, 'risk score')} changed here: {down} down, {imp.changes.length - down} up.</p>
       {imp.changes.length > 0 && (
         <ul className={own.list}>

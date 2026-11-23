@@ -122,7 +122,7 @@ risk. How the Misty Isles pair was authored, so it can be extended coherently:
 - **Five pairs are deliberately UNTREATED** (every control treating that threat
   is `missing` on that system): Power Generation × Ransomware, Pupil/student
   records × Unauthorised data modification, Approach radar × DoS, Billing and
-  meter reading × Supply chain compromise, Costal Radar × Hardware failure. This
+  meter reading × Supply chain compromise, Coastal Radar × Hardware failure. This
   is load-bearing, not decoration. Residual probability is a **MIN over the
   DEPLOYED (operational|degraded) controls** — the *best* deployed control
   governs and missing/unknown ones are ignored — so a pair only sits at the

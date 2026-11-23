@@ -28,6 +28,22 @@ const REPORTS = [
     body: 'Everything CIRKS cannot yet measure, organisation-wide: objectives whose effect nobody has judged, threats not assessed, systems with no threat or no information, unrated assets and controls, risks past review. Each with who can put it right.',
   },
   {
+    path: '/reporting/owners', cap: 'reports.read', title: 'Who owns what',
+    body: 'When it goes wrong, whose is it? Each person\u2019s accountabilities (risks, systems, assets, services, suppliers) and responsibilities (actions, objectives, documents, findings), what needs them now, and where nobody is named: no owner, an inactive owner, risks falling to the SIRO.',
+  },
+  {
+    path: '/reporting/team', cap: 'reports.read', title: 'The security team\u2019s service',
+    body: 'Is the security team responsive, and where does its time go? What the business is waiting on security for, oldest first; how fast risks are validated and actions accepted and delivered, quarter by quarter; who in the team makes the changes; and the risk points completed work has removed.',
+  },
+  {
+    path: '/reporting/audit', cap: 'reports.read', title: 'Audit readiness',
+    body: 'Is the evidence an auditor will ask for already there, because normal work produced it? Risk assessment and treatment, the Statement of Applicability and its approval, each standard switched on, measurement, management review, policies, suppliers and findings, each naming its ISO/IEC 27001 clause. What is not complete is the work still to do.',
+  },
+  {
+    path: '/reporting/record', cap: 'reports.read', title: 'Is the record current and trusted?',
+    body: 'Can someone new, or someone asking, rely on what CIRKS says? Whether systems, business services, information assets and components are described, owned and linked; which have not changed in a long time; and who in the business reads CIRKS.',
+  },
+  {
     path: '/reporting/board', cap: 'reports.read', title: 'Board summary',
     body: 'Information risk on one page, in pictures: risks against the thresholds, a heat map now and after committed work, compliance with each standard, control coverage and quality, remediation, and each department in a line. Printable for the board.',
   },

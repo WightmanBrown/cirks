@@ -340,12 +340,6 @@
 }
 .updateBannerIcon { color: var(--amber-light); font-size: 1rem; }
 
-.tdPlan {
-  font-size: 12px;
-  color: var(--text-muted);
-  max-width: 160px;
-}
-
 .tdMono {
   font-family: var(--font-mono);
   font-size: 12px;

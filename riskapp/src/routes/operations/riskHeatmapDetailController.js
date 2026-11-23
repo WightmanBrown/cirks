@@ -15,7 +15,7 @@ const { isDepartmentIsolationEnabled } = require('../../auth/permissions');
  *   { count: number, risks: Array<RiskDetail> }
  *
  * RiskDetail fields:
- *   risk_id, system_name, asset_name, threat_name, department
+ *   risk_id, system_name, asset_name, threat_name, department, department_name
  *   prob_c, prob_i, prob_a          — analyst-set probability per CIA dimension
  *   impact_c, impact_i, impact_a    — asset CIA impact ratings (1–5)
  *   mitigation_title                — title of the highest-priority active action, or null
@@ -60,6 +60,8 @@ function buildSQL(statusClause, deptClause = '') {
       ia.name               AS asset_name,
       t.name                AS threat_name,
       d.name                AS department,
+      -- The department filter reads department_name, as every other list does.
+      d.name                AS department_name,
       sys.department_id     AS department_id,
       dro.owner_names       AS owner_name,
       dro.is_siro_fallback  AS owner_is_siro_fallback,

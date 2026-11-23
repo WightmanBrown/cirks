@@ -4,9 +4,10 @@
 // Copyright (C) 2026 Wightman Brown Limited
 
 // The Misty Isles security architecture (v148, docs/system-security-view.md
-// step 2): the MIG Security Architecture Standard, its six membership groups,
-// the rules that follow from what a system is built on, a few builds, and each
-// system's answers to the groups. Applied through the real API as the CISO, so
+// step 2): the MIG Security Architecture Standard, the roles its components can
+// answer (v178; the six membership groups until then), the rules that follow
+// from what a system is built on, a few builds, each system's pattern and its
+// answers. Applied through the real API as the CISO, so
 // it is audited like any other change, and idempotent: run it again and it adds
 // only what is missing.
 //
@@ -46,8 +47,6 @@ const NEW_COMPONENTS = [
   ['Water works OT network', 'technology', 'The isolated operational network at Wellhead Road water treatment works.'],
   ['Airport and harbour OT network', 'technology', 'The operational network shared by the airport and the harbour.'],
   ['Microsoft Azure UK South', 'facility', 'MIG’s Azure subscription, UK South region.'],
-  ['Supplier-hosted (SaaS)', 'facility', 'Hosted by the supplier; MIG does not run the infrastructure.'],
-  ['Supplier-managed (SaaS)', 'technology', 'The supplier manages the operating system; MIG has no access to it.'],
   ['Joined to MIG Active Directory', 'technology', 'Users and administrators sign in with their MIG Active Directory account.'],
   ['Entra ID sign-in', 'technology', 'Users sign in with their MIG Entra ID (Microsoft 365) account.'],
   ['Local accounts only', 'technology', 'Accounts exist only on the system itself; no central sign-in.'],
@@ -57,20 +56,28 @@ const NEW_COMPONENTS = [
   ['Members of the public', 'people', 'Citizens using a public-facing service.'],
 ];
 
-// The six groups (owner, 2026-10-01), with their members.
+// The six questions (owner, 2026-10-01), each with the components that can
+// answer it. Since v178 that is a ROLE on each component (its slot); the groups
+// themselves are gone. "Supplier-hosted (SaaS)" and "Supplier-managed (SaaS)"
+// were answers made up to clear questions that did not apply: a supplier-run
+// service is not asked them, and Provided by the supplier is triggered by its
+// pattern (v178).
 const GROUPS = [
-  { name: 'Connectivity', members: ['MIGNet (internal)', 'MIGNet (DMZ)', 'Azure cloud network', 'External internet',
-      'Power station OT network', 'Water works OT network', 'Airport and harbour OT network'] },
-  { name: 'Hosting', members: ['Bank Street server room', 'The Castle server room', 'Shark Point Server Room', 'Castle Vaults DR room',
+  { name: 'Connectivity', slot: 'network', members: ['MIGNet (internal)', 'MIGNet (DMZ)', 'Azure cloud network', 'External internet',
+      'Power station OT network', 'Water works OT network', 'Airport and harbour OT network',
+      'MIG CCTV Network'] },   // the owner's (CIRKS-dev 2026-10-09), as the next three
+  { name: 'Hosting', slot: 'hosting', members: ['Bank Street server room', 'The Castle server room', 'Shark Point Server Room', 'Castle Vaults DR room',
       "Crow's Nest Disaster Management Centre", 'MIG Official Premises', 'Mobile locations', 'MS O365 UK South', 'Super Bill SaaS cloud',
       'Dr Max Windshear Airport ATC tower', 'Dr Max Windshear Airport Fuel Bunker', 'Wellhead Road, Water Treatment Works',
-      'Microsoft Azure UK South', 'Supplier-hosted (SaaS)'] },
-  { name: 'Operating system', members: ['Windows Server 2016', 'Windows Server 2025', 'Windows 11', 'Windows 10', 'Windows 7',
-      'Ubuntu Server 24.04 LTS', 'Debian 12', 'AlmaLinux 9', 'Cisco IOS XE V26 26.1.1', 'PAN-OS', 'Raspberry Pi 5', 'Supplier-managed (SaaS)'] },
-  { name: 'Authentication service', members: ['Joined to MIG Active Directory', 'Entra ID sign-in', 'Local accounts only', 'Supplier-managed sign-in'] },
-  { name: 'Support team', members: ['IT Administrators', 'Agency IT contractors', 'Power station operations team',
+      'Microsoft Azure UK South', 'Raspberry Pi 5'] },   // the Pi is the hardware the Risk Management System runs on
+  { name: 'Operating system', slot: 'operating_system', members: ['Windows Server 2016', 'Windows Server 2025', 'Windows 11', 'Windows 10', 'Windows 7',
+      'Ubuntu Server 24.04 LTS', 'Debian 12', 'AlmaLinux 9', 'Cisco IOS XE V26 26.1.1', 'PAN-OS',
+      'HIKVision Embedded Linux / Firmware'] },
+  { name: 'Authentication service', slot: 'sign_in', members: ['Joined to MIG Active Directory', 'Entra ID sign-in', 'Local accounts only', 'Supplier-managed sign-in',
+      'HIK Vision Control Desk'] },
+  { name: 'Support team', slot: 'support_team', members: ['IT Administrators', 'Agency IT contractors', 'Power station operations team',
       'Water plant operations team', 'InfoSec Team', 'Supplier support team'] },
-  { name: 'User group', members: ['All desktop users', 'HR Team', 'Treasury Team', 'Healthcare Medical Team', 'Education Team',
+  { name: 'User group', slot: 'users', members: ['All desktop users', 'HR Team', 'Treasury Team', 'Healthcare Medical Team', 'Education Team',
       'Science Team', 'AG Chambers', 'Clerk of Court', 'Prison Service Team', 'Internal revenue team', 'Coast Guard', 'Police Force',
       'Fire and Rescue', 'Ambulance Service', 'Port Authority Team', 'ATC team', 'AirOperations Team', 'AirOperations Fuelling Team',
       'AirOperations Engineering', 'Pharmacists', 'MIG Utilities billing team', 'Power station operations team',
@@ -103,7 +110,10 @@ const RULES = [
   ['Active Directory (on-premises)', ['Joined to MIG Active Directory']],
   ['Entra ID (cloud)', ['Entra ID sign-in']],
   ['Remote-access VPN', ['Mobile locations']],
-  ['Provided by the supplier', ['Supplier-hosted (SaaS)']],
+  // v178: triggered by the system pattern, not a stand-in component.
+  ['Provided by the supplier', [], null, ['S2']],
+  // CIRKS-test, 2026-10-23: cites the Acceptable Use Policy, not the standard.
+  ['AI agent monitoring', ['Crowdstrike Falcon Agent'], 'Acceptable Use Policy'],
 ];
 
 const BUILDS = [
@@ -113,11 +123,17 @@ const BUILDS = [
     'Crowdstrike Falcon Agent', 'Veeam Backup', 'TLS 1.2+ configuration']],
   ['MIG Azure server', ['Azure cloud network', 'Microsoft Azure UK South', 'Entra ID sign-in', 'Microsoft Defender for Servers',
     'Azure Backup', 'TLS 1.2+ configuration']],
-  ['Supplier SaaS', ['External internet', 'Supplier-hosted (SaaS)', 'Supplier-managed (SaaS)', 'Supplier-managed sign-in', 'Supplier support team']],
+  // No operating system: a supplier-run service is not asked one (v177).
+  ['Supplier SaaS', ['External internet', 'Supplier-managed sign-in', 'Supplier support team']],
+  // The owner's (CIRKS-dev 2026-10-09).
+  ['MIG CCTV Pattern', ['MIG CCTV system', 'MIG CCTV Network', 'HIKVision Embedded Linux / Firmware', 'HIK Vision Control Desk',
+    'MIG Security Control Room', 'The Castle server room', 'IT Administrators', 'Police Force']],
+  ['Information Point', ['AlmaLinux 9', 'MIGNet (internal)']],
 ];
 
 // The hosting class of every system (build.js §2), which most answers follow.
 const CLASS = require('./hostingClasses');
+const { systemPatternFor, PLAYBOOKS_DOCUMENT } = require('./system-patterns');
 const MICROSOFT_SAAS = new Set(['MIG Document Management', 'MIG Telephony and Messaging', 'MIG Video Conferencing',
   'Information Security Management System', 'Microsoft Defender for Cloud']);
 const OT_NET = { 'Power Distribution': 'Power station OT network', 'Power Generation': 'Power station OT network',
@@ -133,10 +149,9 @@ const FILL = {
   'Criminal Records and Firearms Licensing System': ['Windows Server 2016'],
   'Electoral Roll': ['Windows Server 2025', 'IT Administrators', 'Members of the public'],
   'GIS Land Register': ['Ubuntu Server 24.04 LTS', 'IT Administrators', 'Utilities Team'],
-  'Host Intrusion Detection System': ['Supplier-managed (SaaS)'],          // the CrowdStrike console is CrowdStrike's service
   'Network Intrusion Detection System': ['PAN-OS'],
   'MIG Remote Access VPN': ['PAN-OS'],
-  'Information Security Playbooks': ['Windows 7', 'InfoSec Team'],          // §6.2: no agent can run
+  'Information Security Playbooks': ['InfoSec Team'],                       // printed: a document record (v177)
   'Student Desktop': ['Windows 11', 'MIG Official Premises', 'IT Administrators', 'Education Team'],
   'Pupil/student records system': ['Bank Street server room'],
   'Tax Records System': ['Bank Street server room'],
@@ -171,16 +186,16 @@ const CHOICE_NOTE = 'Azure-hosted servers use Defender for Servers and Azure Bac
 function answersFor(sys, cls, records) {
   const out = [];
   const add = (c) => out.push(c);
+  // The playbooks are printed (v177, a document record): no network, no sign-in.
+  if (systemPatternFor(sys)?.system_pattern === 'S6') return out;
   // Connectivity
   if (cls === 'IT' || cls === 'INF') add(sys === 'MIG Remote Access VPN' ? 'MIGNet (DMZ)' : sys === 'MIG Desktop (remote)' ? 'External internet' : 'MIGNet (internal)');
   if (cls === 'AZ' || sys === 'Microsoft Defender for Cloud') add('Azure cloud network');
   if (cls === 'SAAS' && sys !== 'Microsoft Defender for Cloud') add('External internet');
   if (cls === 'OT') add(OT_NET[sys] || 'Airport and harbour OT network');
-  // Hosting — what is recorded already answers it; else from the class.
+  // Hosting — from the class. A supplier-run service is not asked where it runs
+  // or its operating system (v177/v178).
   if (cls === 'AZ') add('Microsoft Azure UK South');
-  if (cls === 'SAAS' && !records.facility) add('Supplier-hosted (SaaS)');
-  // Operating system
-  if (cls === 'SAAS') add('Supplier-managed (SaaS)');
   // Authentication service
   if (cls === 'IT' || cls === 'INF') add('Joined to MIG Active Directory');
   if (cls === 'AZ' || (cls === 'SAAS' && MICROSOFT_SAAS.has(sys))) add('Entra ID sign-in');
@@ -193,9 +208,19 @@ function answersFor(sys, cls, records) {
 
 // ── Plumbing ────────────────────────────────────────────────────────────────────
 let H;
-async function api(method, path, body) {
+// Sign in, and sign in again when the 15-minute access token runs out: on a slow
+// machine (the CI runner) a step can outlast it (2026-11-17, step 3 failed with
+// "401 Access token expired" partway through).
+async function signIn() {
+  const login = await (await fetch(`${BASE}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: AS, password: PASSWORD }) })).json();
+  if (!login.access_token) throw new Error(`could not sign in as ${AS}`);
+  H = { 'content-type': 'application/json', authorization: `Bearer ${login.access_token}` };
+}
+async function api(method, path, body, retried = false) {
   if (DRY && method !== 'GET') { console.log(`  [dry] ${method} ${path} ${body ? JSON.stringify(body) : ''}`); return {}; }
   const r = await fetch(`${BASE}${path}`, { method, headers: H, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 401 && !retried) { await signIn(); return api(method, path, body, true); }
   const t = await r.text();
   const data = t ? JSON.parse(t) : {};
   if (!r.ok && r.status !== 409) throw new Error(`${method} ${path} → ${r.status} ${data.error || t}`);
@@ -203,10 +228,7 @@ async function api(method, path, body) {
 }
 
 async function main() {
-  const login = await (await fetch(`${BASE}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email: AS, password: PASSWORD }) })).json();
-  if (!login.access_token) throw new Error(`could not sign in as ${AS}`);
-  H = { 'content-type': 'application/json', authorization: `Bearer ${login.access_token}` };
+  await signIn();
 
   // Components
   const all = async () => (await api('GET', '/components?all=1')).components;
@@ -242,11 +264,15 @@ async function main() {
   // Library
   const lib = await api('GET', '/architecture');
   const std = id(STANDARD.name);
-  for (const [i, g] of GROUPS.entries()) {
-    let group = lib.groups?.find((x) => x.name === g.name);
-    if (!group) group = (await api('POST', '/architecture/groups', { name: g.name, standard_id: std, sort_index: i + 1 })).group || { members: [] };
-    const have = new Set((group.members || []).map((m) => m.name));
-    for (const m of g.members) if (!have.has(m)) await api('POST', `/architecture/groups/${group.id}/members`, { component_id: id(m) });
+  // Each component's roles (v178): every question it answers.
+  const rolesOf = new Map();
+  for (const g of GROUPS) for (const m of g.members) rolesOf.set(m, [...(rolesOf.get(m) || []), g.slot]);
+  for (const [name, roles] of rolesOf) {
+    const c = index.get(name);
+    if (!c) throw new Error(`"${name}" is not in the library`);
+    const want = [...new Set(roles)].sort();
+    if (JSON.stringify([...(c.roles || [])].sort()) === JSON.stringify(want)) continue;
+    await api('PUT', `/architecture/components/${c.id}/roles`, { roles: want, confirm_gaps: true });
   }
   const solutions = await api('GET', '/controls/solutions');
   const solutionId = (name) => {
@@ -254,11 +280,16 @@ async function main() {
     if (!s) throw new Error(`security solution "${name}" is not in the library`);
     return s.id;
   };
-  for (const [name, triggers] of RULES) {
-    let rule = lib.rules?.find((r) => r.pattern_name === name && r.standard_id === std);
-    if (!rule) rule = (await api('POST', '/architecture/rules', { pattern_id: solutionId(name), standard_id: std })).rule || { triggers: [] };
+  for (const [name, triggers, document, patterns = []] of RULES) {
+    const cites = document ? id(document) : std;   // a rule cites the standard unless it names its own document
+    let rule = lib.rules?.find((r) => r.pattern_name === name && r.standard_id === cites);
+    if (!rule) rule = (await api('POST', '/architecture/rules', { pattern_id: solutionId(name), standard_id: cites })).rule || { triggers: [] };
     const have = new Set((rule.triggers || []).map((t) => t.name));
     for (const t of triggers) if (!have.has(t)) await api('POST', `/architecture/rules/${rule.id}/triggers`, { component_id: id(t) });
+    // A system pattern as the trigger (v178).
+    for (const code of patterns) {
+      if (!(rule.pattern_triggers || []).includes(code)) await api('POST', `/architecture/rules/${rule.id}/patterns`, { system_pattern: code });
+    }
   }
   for (const [name, members] of BUILDS) {
     let build = lib.builds?.find((b) => b.name === name);
@@ -266,35 +297,33 @@ async function main() {
     const have = new Set((build.components || []).map((c) => c.name));
     for (const m of members) if (!have.has(m)) await api('POST', `/architecture/builds/${build.id}/components`, { component_id: id(m) });
   }
-  console.log(`library: ${GROUPS.length} groups, ${RULES.length} rules, ${BUILDS.length} builds`);
+  console.log(`library: ${rolesOf.size} components with roles, ${RULES.length} rules, ${BUILDS.length} builds`);
 
-  // Each system's answers — only to groups it has not answered. Read what the
-  // system RECORDS from its security view: the system page also lists the
-  // components its controls imply, which it does not record.
+  // Each system's answers — only to questions it has not answered. Read what the
+  // system RECORDS (the system page also lists components its controls imply,
+  // which it does not record) and the roles those components play.
   const systems = await api('GET', '/systems');
   const list = Array.isArray(systems) ? systems : systems.systems;
-  // A component can answer several groups (IT Administrators: support team and
-  // user group); it is added if ANY group it answers is still unanswered.
-  const groupsOf = new Map();
-  for (const g of GROUPS) for (const m of g.members) groupsOf.set(m, [...(groupsOf.get(m) || []), g.name]);
   let answered = 0; let chosen = 0;
   const unclassed = [];
   for (const s of list.filter((x) => x.is_active !== false)) {
     const cls = Object.entries(CLASS).find(([, names]) => names.includes(s.name))?.[0];
     if (!cls) { unclassed.push(s.name); continue; }
     const sec = await api('GET', `/systems/${s.id}/security`);
-    const answeredGroups = new Set((sec.memberships || []).filter((m) => m.answered).map((m) => m.name));
+    const detail = DRY ? { components: [] } : await api('GET', `/systems/${s.id}`);
+    const hasRole = new Set((detail.components || []).filter((c) => c.recorded).flatMap((c) => rolesOf.get(c.name) || []));
     const rel = await api('GET', `/suppliers/relationships?system_id=${s.id}`);
     const records = {
-      facility: answeredGroups.has('Hosting'),
       contracted: (rel.relationships || []).some((r) => r.relationship_type === 'contracted_service' && r.status !== 'ended'),
     };
     const want = [...answersFor(s.name, cls, records), ...(FILL[s.name] || [])];
+    // A component can play several roles (IT Administrators: support team and
+    // who uses it); it is added if ANY role it plays is still unanswered.
     const adding = new Set();
     for (const c of want) {
-      const gs = groupsOf.get(c);
-      if (!gs) throw new Error(`"${c}" is not a member of any group`);
-      if (gs.every((g) => answeredGroups.has(g)) || adding.has(c)) continue;
+      const roles = rolesOf.get(c);
+      if (!roles) throw new Error(`"${c}" has no role`);
+      if (roles.every((r) => hasRole.has(r)) || adding.has(c)) continue;
       adding.add(c);
     }
     for (const c of adding) { await api('POST', `/systems/${s.id}/components`, { component_id: id(c) }); answered++; }
@@ -308,6 +337,42 @@ async function main() {
     }
   }
   console.log(`answers recorded: ${answered}; solutions chosen: ${chosen}`);
+
+  // Each business system's pattern (v177, system-patterns.js), and the component
+  // that fills each slot no membership group answers. The printed playbooks are
+  // recorded as the document they are.
+  if (!index.has(PLAYBOOKS_DOCUMENT.name)) {
+    await api('POST', '/components', { component_type: 'information', name: PLAYBOOKS_DOCUMENT.name,
+      description: PLAYBOOKS_DOCUMENT.description, status: 'operational', document_kind: 'procedure', document_version: '1.0',
+      document_approved_on: new Date().toISOString().slice(0, 10),
+      document_next_review: new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10) });
+    comps = await all(); index = byName();
+  }
+  let patterned = 0; let slotted = 0;
+  for (const s of list.filter((x) => x.is_active !== false)) {
+    const sp = systemPatternFor(s.name);
+    if (!sp) continue;
+    const detail = DRY ? { components: [] } : await api('GET', `/systems/${s.id}`);
+    if (detail.system_pattern !== sp.system_pattern) {
+      await api('PATCH', `/systems/${s.id}/pattern`, { system_pattern: sp.system_pattern });
+      patterned++;
+    }
+    const recorded = new Map((detail.components || []).filter((c) => c.recorded).map((c) => [c.name, c]));
+    for (const [slot, names] of Object.entries(sp.slots)) {
+      for (const name of names) {
+        let c = recorded.get(name);
+        if (!c && name === PLAYBOOKS_DOCUMENT.name) {
+          await api('POST', `/systems/${s.id}/components`, { component_id: id(name) });
+          c = { id: id(name), slot_key: null };
+        }
+        if (!c) throw new Error(`${s.name}: "${name}" is not recorded, so it cannot fill ${slot}`);
+        if (c.slot_key === slot) continue;
+        await api('PATCH', `/systems/${s.id}/components/${c.id}/slot`, { slot_key: slot });
+        slotted++;
+      }
+    }
+  }
+  console.log(`system patterns set: ${patterned}; slots filled by hand: ${slotted}`);
 
   // Record what the architecture wants (owner, 2026-10-02): every objective a
   // wanted solution delivers that the system has no control row for. Each row's

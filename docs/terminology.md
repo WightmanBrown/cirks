@@ -54,7 +54,7 @@ Two further sources of confusion the manual should anticipate:
   each of its 106 subcategories also loaded as a control objective of the same
   wording, so the objective and the requirement looked identical, and NIST's
   outcome statements became what people managed. Since v1.1 CIRKS ships its own
-  control objectives (156, written for the job, e.g. *Restores are tested*), and
+  control objectives (158, written for the job, e.g. *Restores are tested*), and
   NIST CSF, ISO 27001 and CIS Controls are reporting sets mapped onto them. A
   requirement is met only when every objective mapped to it is in place.
 - **Loading a standard is not adopting it.** A standard can be loaded purely as a
@@ -183,3 +183,41 @@ On screen that word hid the cause — wanted by whom? — so it is not used ther
 
 *Implies*, not *infers*: a fact implies; a reader infers. Internal names keep
 "wanted" (the views, `docs/system-security-view.md`); they are not shown to users.
+
+## Security solution pattern, standard build, system profile (owner, 2026-11-09)
+
+Three things that were all called "pattern" or "template". The internal names
+(`system_builds`, the `/architecture/builds` routes, the `/architecture-patterns`
+path) are unchanged. The system profile was retired in v178: the membership
+groups, their routes and the `/architecture-template` page went, replaced by the
+system patterns and component roles.
+
+| Word | What it is | Generic or the organisation's | Example |
+|---|---|---|---|
+| **Security solution pattern** | A reusable shape of security solution: its slots (the kinds of part it needs, each in a role) and what makes it complete (`docs/meta-architecture.md` §11, P1–P8; built in v176, `/security-solution-patterns`). A security solution says which one it implements. | Generic | *Governing document*, *Central security service*, *Configured setting* |
+| **System pattern** | One of the eight shapes a business system takes, each with its own questions (slots): an application on premises, on cloud infrastructure (IaaS) or on a cloud platform (PaaS), software as a service (SaaS), dedicated equipment and operational technology, end-user device, network infrastructure, document record (v177, `/system-patterns`, `docs/system-patterns.md`). A system says which it follows; it must answer only the slots its pattern requires (v178: required only where something reads the answer). | Generic | *Supplier-run service*, *Dedicated equipment* |
+| **Role (of a component)** | A question of a system pattern a component can answer on any system that records it: Windows 11 can answer *Operating system*; IT Administrators *Support team* and *Who uses it* (v178). Replaced the system profile's membership groups. | Generic | *can answer: Where it runs* |
+| **Standard build** | The organisation's own way of building a kind of system, repeated on every system built to it. Applying it copies its components onto a system. Was *system architecture pattern*. | The organisation's | MIG Desktop, MIG CCTV |
+| ~~**System profile**~~ | Retired in v178. Was the questions every system's record must answer, one membership group per question; the questions are now the system pattern's slots, and what answers each is a role on the component. | — | — |
+
+Say *a system built to the MIG Desktop standard build*, and *a component that can
+answer Where it runs*. Do not call a standard build a pattern: that word is kept for
+the generic security solution patterns.
+
+---
+
+## Exception / accept / acceptance (owner, 2026-11-16)
+
+Three acts that users run together:
+
+| Word | What it is | Where |
+|---|---|---|
+| **Exception** | The formal, time-limited record that a risk (or an assurance finding) is accepted: its justification, who accepted it and in what role, the review cadence and the expiry. It can be renewed or revoked, and it lapses when it expires. | Security Exceptions register; a risk's *Who decided what?*; a finding's banner |
+| **Accept** (the treatment) | One of the four treatments (avoid, mitigate, transfer, accept). Deciding to accept is not enough: until an exception is recorded, nobody has accepted the risk. | Treatment decision on the risk |
+| **Acceptance** of a security action | The CISO (or the SIRO at the Security Working Group) agreeing a proposed security action, which freezes its items and snapshots the risk. | Acceptance Queue; *awaiting acceptance* |
+
+So on screen: *Exceptions in force*, *no security action and no exception*,
+*Decided to accept, with no exception recorded*, but *Action awaiting
+acceptance*. Never "acceptance" for the record. Internal names
+(`exceptions`, `acceptances` fields in report payloads) are not renamed.
+

@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  getArchitecture, createArchitectureItem, updateArchitectureItem, deleteArchitectureItem, createStarterGroups,
+  getArchitecture, createArchitectureItem, updateArchitectureItem, deleteArchitectureItem,
+  addRulePatternTrigger, removeRulePatternTrigger,
   addArchitectureComponent, removeArchitectureComponent, listSecuritySolutions, listComponents,
 } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -11,16 +12,20 @@ import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { PatternChip } from '../components/PatternChip';
-import { COMPONENT_TYPES, componentTypeLabel, componentTypeShort } from '../utils/componentTypes';
+import { COMPONENT_TYPES, componentTypeLabel } from '../utils/componentTypes';
 import shared from './ScopesPage.module.css';
 import styles from './ArchitecturePages.module.css';
+import { TypeBadge } from '../components/ComponentPill';
 import { HelpDot } from '../components/HelpDot';
 
 // The security architecture (v148, docs/system-security-view.md §4.2–§4.4), as
-// three pages (owner, 2026-10-02):
-//   Systems architecture template  — what every system must record (membership groups);
-//   Security pattern triggers      — the security solutions a component on a system calls for (rules);
-//   System architecture patterns   — components that live together, applied as a copy (builds).
+// pages (owner, 2026-10-02):
+//   Security pattern triggers — the security solutions a component on a system,
+//                               or a system pattern (v178), calls for (rules);
+//   Standard builds           — components that live together, applied as a copy (builds).
+// The System profile page (membership groups) was retired in v178: what a system
+// must record is its pattern's slots, and what can answer them is a role on the
+// component, both on the System patterns page.
 // Written by the security team (controls.write); everyone who reads the control
 // catalogue can see them. Template gaps are reported (system page, findings); a
 // trigger implies a solution, and an implied objective's status follows its
@@ -29,7 +34,7 @@ import { HelpDot } from '../components/HelpDot';
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 // A component picker grouped by type, leaving out the ones already chosen.
-function ComponentPicker({ components, exclude, label, placeholder, onPick }) {
+export function ComponentPicker({ components, exclude, label, placeholder, onPick }) {
   const [value, setValue] = useState('');
   const groups = useMemo(() => COMPONENT_TYPES.map(t => ({
     type: t, items: components.filter(c => c.component_type === t && !exclude.has(c.id)),
@@ -51,14 +56,14 @@ function ComponentPicker({ components, exclude, label, placeholder, onPick }) {
 }
 
 // Components as removable chips, each linking to its page.
-function ComponentChips({ items, canEdit, onRemove, empty, removeLabel }) {
+export function ComponentChips({ items, canEdit, onRemove, empty, removeLabel }) {
   if (!items.length) return <span className={shared.muted}>{empty}</span>;
   return (
     <ul className={styles.chips}>
       {items.map(c => (
         <li key={c.id} className={styles.chip}>
           <Link to={`/components/${c.id}`}>{c.name}</Link>
-          <span className={styles.kind}>{componentTypeShort(c.component_type)}</span>
+          <TypeBadge type={c.component_type} variant="text" />
           {c.systems != null && <span className={styles.kind} title="Active systems recording it">· {plural(c.systems, 'system')}</span>}
           {canEdit && (
             <button className={styles.x} aria-label={`${removeLabel} ${c.name}`} title={`${removeLabel} ${c.name}`}
@@ -82,16 +87,16 @@ function DocumentSelect({ documents, value, onChange, label }) {
 }
 
 
+// v178: the System profile page is retired. What a system must record is its
+// system pattern's slots, and what can answer each is a role on the component
+// (the System patterns page).
 const PAGES = [
-  { path: '/architecture-template',     label: 'Systems architecture template' },
+  { path: '/system-patterns',           label: 'System patterns' },
   { path: '/security-pattern-triggers', label: 'Security pattern triggers' },
-  { path: '/architecture-patterns',     label: 'System architecture patterns' },
+  { path: '/architecture-patterns',     label: 'Standard builds' },
 ];
 
 // What each page loads, and the shared refresh-after-change.
-// The CIRKS starter template's groups (routes/architecture: STARTER_GROUPS).
-export const STARTER_GROUP_NAMES = ['Connectivity', 'Hosting', 'Operating system', 'Authentication service', 'Support team', 'User group'];
-
 // `cap`: the template and the patterns are an architect's work (architecture.write,
 // v155); the rules that require a security solution stay with controls.write.
 function useArchitecture(cap = 'controls.write') {
@@ -133,14 +138,19 @@ function Frame({ title, comment, children, a, needsDocs, helpKey, helpPlacement 
           <div>
             <h1 className={shared.title}>{title}{helpKey && <> <HelpDot k={helpKey} placement={helpPlacement} /></>}</h1>
             {comment && <p className={shared.desc}><b>{comment}</b></p>}
-            <p className={shared.note}>
-              Part of the security architecture, with{' '}
-              {PAGES.filter(p => p !== here).map((p, i) => (
-                <span key={p.path}>{i > 0 && ' and '}<Link to={p.path}>{p.label}</Link></span>
-              ))}. Gaps appear on each system and in the <Link to="/findings">findings</Link>. What a system records
-              decides which security solutions it implies, and an implied objective&rsquo;s status on the system
-              follows its solution &mdash; so this can change risk scores.
-            </p>
+            <details className={styles.more}>
+              <summary>
+                Part of the security architecture, with{' '}
+                {PAGES.filter(p => p !== here).map((p, i) => (
+                  <span key={p.path}>{i > 0 && ' and '}<Link to={p.path}>{p.label}</Link></span>
+                ))}
+              </summary>
+              <p className={shared.note}>
+                Gaps appear on each system and in the <Link to="/findings">findings</Link>. What a system records
+                decides which security solutions it implies, and an implied objective&rsquo;s status on the system
+                follows its solution &mdash; so this can change risk scores.
+              </p>
+            </details>
           </div>
           {!a.canEdit && <ReadOnlyBadge reason={`Editing this needs the ${a.cap} capability (CISO, risk analyst, admin).`} />}
         </div>
@@ -157,116 +167,12 @@ function Frame({ title, comment, children, a, needsDocs, helpKey, helpPlacement 
   );
 }
 
-export function ArchitectureTemplatePage() {
-  const a = useArchitecture('architecture.write');
-  const { canEdit, lib, components, run, docs, noDocs, confirmRemove } = a;
-  const [draftGroup, setDraftGroup] = useState({ name: '', standard_id: '' });
-  // The CIRKS starter template (POST /architecture/groups/starter): six groups,
-  // created empty. Defaults to the starter "Security architecture standard"
-  // document when it is there.
-  const [starterDoc, setStarterDoc] = useState('');
-  const [starterMsg, setStarterMsg] = useState('');
-  const starterDefault = docs.find(d => d.name === 'Security architecture standard')?.id || '';
-  const missingStarter = STARTER_GROUP_NAMES.filter(n => !lib?.groups.some(g => g.name.toLowerCase() === n.toLowerCase()));
-  return (
-    <Frame title="Systems architecture template" comment="What every system must record." a={a} needsDocs helpKey="security_architecture.template">
-      {lib && (<>
-          <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Groups <span className={shared.count}>{lib.groups.length}</span> <HelpDot k="security_architecture.groups" placement="bottom" /></h2>
-            <p className={shared.note}>
-              Each system should include one component from each group — its network zone, where it is hosted,
-              its operating system and so on. A system that includes none has a gap, because without it the rules
-              below cannot tell what the system needs. Where a group does not really apply, the system records an
-              explicit answer (for example <i>Supplier-managed (SaaS)</i>) rather than leaving it blank.
-            </p>
-            {lib.groups.length === 0 && <p className={shared.muted}>No membership groups yet.</p>}
-            {lib.groups.map(g => {
-              const memberIds = new Set(g.members.map(m => m.id));
-              const triggerIds = new Set(g.triggers.map(m => m.id));
-              return (
-                <article key={g.id} className={styles.card}>
-                  <header className={styles.cardHead}>
-                    <div>
-                      <div className={styles.titleRow}><h3 className={styles.cardTitle}>{g.name} <HelpDot k="security_architecture.group_card" placement="bottom" /></h3><PatternChip kind="template" /></div>
-                      <span className={shared.note}>
-                        From {g.standard_name} ·{' '}
-                        {g.triggers.length ? 'applies to systems recording a trigger below' : `applies to all ${plural(lib.active_systems, 'system')}`}
-                        {' · '}
-                        {g.members.length === 0
-                          ? <span className={shared.warn}>asks nothing until it has a member</span>
-                          : (
-                            <span className={g.systems_unanswered ? shared.warn : shared.good}>
-                              {g.systems_unanswered ? `${plural(g.systems_unanswered, 'system')} ${g.systems_unanswered === 1 ? 'has' : 'have'} not recorded one` : 'every system has recorded one'}
-                            </span>
-                          )}
-                      </span>
-                    </div>
-                    {canEdit && (
-                      <button className={shared.linkBtn} onClick={() => confirmRemove(`the group "${g.name}"`, 'Systems will no longer be asked to record one of its members.')
-                        && run(() => deleteArchitectureItem('groups', g.id))}>Remove group</button>
-                    )}
-                  </header>
-                  <div className={styles.row}>
-                    <span className={styles.label}>Members</span>
-                    <ComponentChips items={g.members} canEdit={canEdit} empty="No members yet — add the answers a system can give, and the group starts asking."
-                      removeLabel="Remove member" onRemove={(cid) => run(() => removeArchitectureComponent('groups', g.id, 'members', cid))} />
-                  </div>
-                  {canEdit && (
-                    <ComponentPicker components={components} exclude={memberIds} label={`Member to add to ${g.name}`}
-                      placeholder="Add a member…" onPick={(cid) => run(() => addArchitectureComponent('groups', g.id, 'members', cid))} />
-                  )}
-                  {(g.triggers.length > 0 || canEdit) && (
-                    <details className={styles.more} open={g.triggers.length > 0}>
-                      <summary>Applies only to systems recording… <span className={shared.count}>{g.triggers.length || 'every system'}</span></summary>
-                      <ComponentChips items={g.triggers} canEdit={canEdit} empty="Every system — no triggers."
-                        removeLabel="Remove trigger" onRemove={(cid) => run(() => removeArchitectureComponent('groups', g.id, 'triggers', cid))} />
-                      {canEdit && (
-                        <ComponentPicker components={components} exclude={triggerIds} label={`Trigger to add to ${g.name}`}
-                          placeholder="Limit to systems recording…" onPick={(cid) => run(() => addArchitectureComponent('groups', g.id, 'triggers', cid))} />
-                      )}
-                    </details>
-                  )}
-                </article>
-              );
-            })}
-            {canEdit && !noDocs && (
-              <div className={shared.create}>
-                <input className={shared.input} placeholder="New group, e.g. Network zone" value={draftGroup.name}
-                  aria-label="Name of the new membership group" onChange={e => setDraftGroup(d => ({ ...d, name: e.target.value }))} />
-                <DocumentSelect documents={docs} value={draftGroup.standard_id} label="Document the new group comes from"
-                  onChange={v => setDraftGroup(d => ({ ...d, standard_id: v }))} />
-                <button className={shared.primary} disabled={!draftGroup.name.trim() || !draftGroup.standard_id}
-                  onClick={async () => { if (await run(() => createArchitectureItem('groups', draftGroup))) setDraftGroup({ name: '', standard_id: '' }); }}>
-                  Create group
-                </button>
-              </div>
-            )}
-            {canEdit && !noDocs && missingStarter.length > 0 && (
-              <div className={shared.create}>
-                <span className={shared.note}>
-                  Start from the CIRKS template: {missingStarter.join(', ')}. The groups arrive empty — add your own
-                  answers to each — and ask nothing until they have a member.
-                </span>
-                <DocumentSelect documents={docs} value={starterDoc || starterDefault} label="Document the template comes from"
-                  onChange={setStarterDoc} />
-                <button className={shared.primary} disabled={!(starterDoc || starterDefault)}
-                  onClick={async () => {
-                    let r;
-                    if (await run(async () => { r = await createStarterGroups({ standard_id: starterDoc || starterDefault }); })) {
-                      setStarterMsg(`Added ${r.created.join(', ')}. Add members to each.`);
-                    }
-                  }}>
-                  Add the starter groups
-                </button>
-              </div>
-            )}
-            {starterMsg && <p className={shared.note} role="status">{starterMsg}</p>}
-          </section>
-
-      </>)}
-    </Frame>
-  );
-}
+// The system patterns (src/lib/systemPatterns.js), by code, for the trigger chips.
+const SYSTEM_PATTERN_NAMES = {
+  S1: 'Application on premises', S2: 'Software as a service (SaaS)', S3: 'Dedicated equipment and operational technology',
+  S4: 'End-user device', S5: 'Network infrastructure', S6: 'Document record',
+  S7: 'Application on cloud infrastructure (IaaS)', S8: 'Application on a cloud platform (PaaS)',
+};
 
 export function SecurityPatternTriggersPage() {
   const a = useArchitecture();
@@ -278,8 +184,8 @@ export function SecurityPatternTriggersPage() {
           <section className={shared.section}>
             <h2 className={shared.sectionTitle}>Triggers <span className={shared.count}>{lib.rules.length}</span> <HelpDot k="security_architecture.rules" placement="bottom" /></h2>
             <p className={shared.note}>
-              Each rule below names a security solution and the components that trigger it. A system that has <b>any one</b> of
-              those components must have the solution. List alternatives on one rule (for example <i>Windows Server 2016</i> and{' '}
+              Each rule below names a security solution and what triggers it: components, or a system pattern. A system that
+              has <b>any one</b> of those components, or follows one of those patterns, must have the solution. List alternatives on one rule (for example <i>Windows Server 2016</i> and{' '}
               <i>Windows Server 2025</i>) rather than writing two rules. If two rules call for different solutions for the same
               control objective on a system, the system shows a conflict and someone chooses.
             </p>
@@ -310,6 +216,29 @@ export function SecurityPatternTriggersPage() {
                     <ComponentPicker components={components} exclude={triggerIds} label={`Trigger to add to the ${r.pattern_name} rule`}
                       placeholder="Add a trigger…" onPick={(cid) => run(() => addArchitectureComponent('rules', r.id, 'triggers', cid))} />
                   )}
+                  <div className={styles.row}>
+                    <span className={styles.label}>Or every system following <HelpDot k="security_architecture.pattern_triggers" /></span>
+                    {(r.pattern_triggers || []).length === 0 && !canEdit && <span className={shared.muted}>no system pattern</span>}
+                    <ul className={styles.chips}>
+                      {(r.pattern_triggers || []).map(code => (
+                        <li key={code} className={styles.chip}>
+                          <Link to={`/system-patterns#${code}`}>{code} · {SYSTEM_PATTERN_NAMES[code]}</Link>
+                          {canEdit && (
+                            <button className={styles.x} aria-label={`Remove trigger ${code}`} title={`Remove trigger ${code}`}
+                              onClick={() => run(() => removeRulePatternTrigger(r.id, code))}>×</button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    {canEdit && (
+                      <select className={shared.input} value="" aria-label={`System pattern to add as a trigger of the ${r.pattern_name} rule`}
+                        onChange={e => e.target.value && run(() => addRulePatternTrigger(r.id, e.target.value))}>
+                        <option value="">Add a system pattern…</option>
+                        {Object.entries(SYSTEM_PATTERN_NAMES).filter(([c]) => !(r.pattern_triggers || []).includes(c))
+                          .map(([c, n]) => <option key={c} value={c}>{c} · {n}</option>)}
+                      </select>
+                    )}
+                  </div>
                 </article>
               );
             })}
@@ -335,33 +264,74 @@ export function SecurityPatternTriggersPage() {
   );
 }
 
+// The applications in order of who answers for each layer, then the rest.
+const PATTERN_ORDER = ['S1', 'S7', 'S8', 'S2', 'S3', 'S4', 'S5', 'S6'];
+
+// "… follows S1 · Application on premises" on a standard build's header line
+// (v182). No pattern is allowed, with a warning; an architect chooses or changes
+// it in place.
+function BuildPattern({ build, canEdit, onChange }) {
+  const [editing, setEditing] = useState(false);
+  const code = build.system_pattern;
+  if (editing || (canEdit && !code)) {
+    return (
+      <span className={styles.follows}>
+        follows
+        <select className={shared.input} value={code || ''} autoFocus={editing}
+          aria-label={`The system pattern ${build.name} follows`}
+          onChange={async (e) => { await onChange(e.target.value); setEditing(false); }}
+          onBlur={() => setEditing(false)}>
+          <option value="">no pattern yet: choose one</option>
+          {PATTERN_ORDER.map(c => <option key={c} value={c}>{c} · {SYSTEM_PATTERN_NAMES[c]}</option>)}
+        </select>
+      </span>
+    );
+  }
+  if (!code) {
+    return <span className={`${styles.follows} ${styles.noPattern}`}>follows no pattern yet: the questions a system built from it must answer are unknown</span>;
+  }
+  return (
+    <span className={styles.follows}>
+      follows <Link to={`/system-patterns#${code}`}>{code} · {SYSTEM_PATTERN_NAMES[code]}</Link>
+      {canEdit && <button className={shared.linkBtn} aria-label={`Change the pattern ${build.name} follows`} onClick={() => setEditing(true)}>change</button>}
+    </span>
+  );
+}
+
 export function ArchitecturePatternsPage() {
   const a = useArchitecture('architecture.write');
   const { canEdit, lib, components, run } = a;
   const [draftBuild, setDraftBuild] = useState('');
+  const [draftPattern, setDraftPattern] = useState('');
   const [renaming, setRenaming] = useState(null);   // { id, name } while a pattern's name is being edited
   return (
-    <Frame title="System architecture patterns" a={a} helpKey="security_architecture.patterns">
+    <Frame title="Standard builds" a={a} helpKey="security_architecture.patterns">
       {lib && (<>
           <section className={shared.section}>
-            <h2 className={shared.sectionTitle}>Patterns <span className={shared.count}>{lib.builds.length}</span> <HelpDot k="security_architecture.builds" placement="bottom" /></h2>
-            <p className={shared.note}>
-              A system architecture pattern is a named set of components that are normally installed together. For example,
-              a standard Windows server is its operating system, its endpoint protection agent and its logging agent. Define
-              each pattern once here, then use it to record those components on a system in one step instead of adding them
-              one at a time.
+            <p className={styles.keyMessage}>
+              A standard build is a short-hand way of creating a system using repeatable components.{' '}
+              <span className={styles.buildCount}>{lib.builds.length} standard build{lib.builds.length === 1 ? '' : 's'}</span>{' '}
+              <HelpDot k="security_architecture.builds" placement="bottom" />
             </p>
-            <p className={shared.note}>
-              Applying a pattern <b>copies</b> its components onto the system. After that the system&rsquo;s components are its
-              own: changing or removing a pattern here does not change any system it was already applied to.
-            </p>
-            <p className={shared.note}>
-              A pattern does not decide what a system must have. That comes from the{' '}
-              <Link to="/architecture-template">Systems architecture template</Link> and the{' '}
-              <Link to="/security-pattern-triggers">Security pattern triggers</Link>. Applying a pattern from a system&rsquo;s
-              page is not available yet.
-            </p>
-            {lib.builds.length === 0 && <p className={shared.muted}>No patterns yet.</p>}
+            <details className={styles.more}>
+              <summary>More about standard builds</summary>
+              <p className={shared.note}>
+                A standard build is a named set of components installed together, repeated on every system built to it. For
+                example, a standard Windows server is its operating system, its endpoint protection agent and its logging agent.
+                Define each standard build once here, then use it to record those components on a system in one step.
+              </p>
+              <p className={shared.note}>
+                Each standard build follows a <Link to="/system-patterns">system pattern</Link>, which decides the questions a
+                system must answer. A build answers some of them, not necessarily all: what differs from system to system, most
+                often where it runs, is answered on each system. What a system must have comes from its pattern and the{' '}
+                <Link to="/security-pattern-triggers">Security pattern triggers</Link>, never from the build.
+              </p>
+              <p className={shared.note}>
+                Applying a standard build <b>copies</b> its components onto the system. After that the system&rsquo;s components are its
+                own: changing or removing a standard build here does not change any system it was already applied to.
+              </p>
+            </details>
+            {lib.builds.length === 0 && <p className={shared.muted}>No standard builds yet.</p>}
             {lib.builds.map(b => {
               const ids = new Set(b.components.map(c => c.id));
               return (
@@ -382,17 +352,22 @@ export function ArchitecturePatternsPage() {
                       </form>
                     ) : (
                       <div>
-                        <div className={styles.titleRow}><h3 className={styles.cardTitle}>{b.name} <HelpDot k="security_architecture.build_card" placement="bottom" /></h3><PatternChip kind="pattern" /></div>
+                        <div className={styles.titleRow}>
+                          <h3 className={styles.cardTitle}>{b.name} <HelpDot k="security_architecture.build_card" placement="bottom" /></h3>
+                          <PatternChip kind="pattern" />
+                          <BuildPattern build={b} canEdit={canEdit}
+                            onChange={(code) => run(() => updateArchitectureItem('builds', b.id, { system_pattern: code || null }))} />
+                        </div>
                         {b.notes && <span className={shared.note}>{b.notes}</span>}
                       </div>
                     )}
                     {canEdit && renaming?.id !== b.id && (
                       <div className={styles.row}>
                         <button className={shared.linkBtn} aria-label={`Rename ${b.name}`}
-                          onClick={() => setRenaming({ id: b.id, name: b.name })}>Rename pattern</button>
+                          onClick={() => setRenaming({ id: b.id, name: b.name })}>Rename standard build</button>
                         <button className={shared.linkBtn}
-                          onClick={() => window.confirm(`Remove the pattern "${b.name}"? Systems it was applied to keep their components.`)
-                            && run(() => deleteArchitectureItem('builds', b.id))}>Remove pattern</button>
+                          onClick={() => window.confirm(`Remove the standard build "${b.name}"? Systems it was applied to keep their components.`)
+                            && run(() => deleteArchitectureItem('builds', b.id))}>Remove standard build</button>
                       </div>
                     )}
                   </header>
@@ -407,11 +382,18 @@ export function ArchitecturePatternsPage() {
             })}
             {canEdit && (
               <div className={shared.create}>
-                <input className={shared.input} placeholder="New pattern, e.g. MIG Windows server" value={draftBuild}
-                  aria-label="Name of the new pattern" onChange={e => setDraftBuild(e.target.value)} />
+                <input className={shared.input} placeholder="New standard build, e.g. MIG Windows server" value={draftBuild}
+                  aria-label="Name of the new standard build" onChange={e => setDraftBuild(e.target.value)} />
+                <select className={shared.input} value={draftPattern} aria-label="The system pattern the new standard build follows"
+                  onChange={e => setDraftPattern(e.target.value)}>
+                  <option value="">Which system pattern does it follow?</option>
+                  {PATTERN_ORDER.map(code => <option key={code} value={code}>{code} · {SYSTEM_PATTERN_NAMES[code]}</option>)}
+                </select>
                 <button className={shared.primary} disabled={!draftBuild.trim()}
-                  onClick={async () => { if (await run(() => createArchitectureItem('builds', { name: draftBuild }))) setDraftBuild(''); }}>
-                  Create pattern
+                  onClick={async () => {
+                    if (await run(() => createArchitectureItem('builds', { name: draftBuild, system_pattern: draftPattern || null }))) { setDraftBuild(''); setDraftPattern(''); }
+                  }}>
+                  Create standard build
                 </button>
               </div>
             )}

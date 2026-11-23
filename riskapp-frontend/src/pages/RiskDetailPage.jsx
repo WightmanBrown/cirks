@@ -2,8 +2,8 @@
 // Copyright (C) 2026 Wightman Brown Limited
 import { PatternChip } from '../components/PatternChip';
 import { RecordedViews } from '../components/RecordedViews';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams, useLocation, Link } from 'react-router-dom';
 import DeliveredControlChip, { isDeliveredOnce } from '../components/DeliveredControlChip';
 import SharedComponentChip, { isShared } from '../components/SharedComponentChip';
 import { useAuth }                           from '../context/AuthContext';
@@ -16,7 +16,7 @@ import {
   setSystemControlStatus, setSystemComponentStatus,
   setRiskControlProbability, linkThreatControl, unlinkThreatControl,
 } from '../api';
-import { RiskGraph }                         from '../components/RiskGraph';
+import { RiskAnswer }                        from '../components/RiskAnswer';
 import { ComponentPill, TypeBadge }          from '../components/ComponentPill';
 import { Shell }                             from '../components/Shell';
 import { HelpDot }                           from '../components/HelpDot';
@@ -51,7 +51,7 @@ import { InfoTip } from '../components/InfoTip';
 import { ComponentModal } from '../components/ComponentModal';
 import styles from './RiskDetailPage.module.css';
 import { personLabel } from '../utils/roles';
-import { componentTypeShort, COMPONENT_TYPE_LABEL, componentStatusLabel } from '../utils/componentTypes';
+import { COMPONENT_TYPE_LABEL, componentStatusLabel } from '../utils/componentTypes';
 import { DateField } from '../components/DateField';
 import { solutionSummary, solutionStateLabel } from '../utils/securitySolutions';
 
@@ -85,8 +85,9 @@ export function RiskDetailPage() {
   // panel would hide the very thing they were sent to do.
   const [searchParams] = useSearchParams();
   const focusCoverage  = searchParams.get('panel') === 'coverage';
+  const location       = useLocation();
   const navigate      = useNavigate();
-  const { user, hasCapability } = useAuth();
+  const { user } = useAuth();
 
   const [risk,       setRisk]       = useState(null);
   const [loading,    setLoading]    = useState(true);
@@ -105,6 +106,29 @@ export function RiskDetailPage() {
   const { mode: viewMode, canUseExpert, setMode: setViewMode,
           saveDefault, isDirty: viewModeDirty } = useViewMode();
   const simpleMode = viewMode !== 'expert';
+
+  // Which question sections are open. Only the one asked about opens: the
+  // address names it (#why from a report's risk answer), the risk-creation
+  // wizard sends the analyst to the objectives (?panel=coverage), and otherwise
+  // the answer at the top is enough until the reader opens one.
+  const [openSections, setOpenSections] = useState(() => new Set(
+    [sectionFromHash(location.hash) || (focusCoverage ? 'why' : null)].filter(Boolean)));
+  const toggleSection = (k) => setOpenSections((cur) => {
+    const next = new Set(cur);
+    if (next.has(k)) next.delete(k); else next.add(k);
+    return next;
+  });
+  const goToSection = useCallback((k, elementId = k) => {
+    setOpenSections((cur) => new Set(cur).add(k));
+    // After the section has rendered open.
+    setTimeout(() => document.getElementById(elementId)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+  }, []);
+  useEffect(() => {
+    const k = sectionFromHash(location.hash);
+    if (k) goToSection(k);
+  }, [location.hash, goToSection]);
+  // The answer is re-read whenever the risk is (an edit may change any of it).
+  const [answerVersion, setAnswerVersion] = useState(0);
 
 
 
@@ -140,6 +164,7 @@ export function RiskDetailPage() {
     try {
       const data = await getRisk(id);
       setRisk(data);
+      setAnswerVersion((v) => v + 1);
       setForm(formFromRisk(data));
     } catch (err) {
       setError(err.response?.data?.error || 'Could not load risk.');
@@ -347,12 +372,75 @@ export function RiskDetailPage() {
             onActionChange={a => { setValidateAction(a); setValidateError(''); }}
             onNotesChange={setValidateNotes}
             onSubmit={handleValidateSubmit}
+            onGo={goToSection}
           />
         )}
 
         {risk && (
           <div className={styles.body}>
 
+            {/* ── return notes (shown when risk has been returned by CISO) ── */}
+            {risk.validation_notes && (
+              <section className={`${styles.card} ${styles.cardReturned}`}>
+                <h2 className={styles.cardTitle}>Return Notes <HelpDot k="risk.detail.return_notes" placement="bottom" /></h2>
+                <p className={styles.rationaleText}>{risk.validation_notes}</p>
+              </section>
+            )}
+
+
+            {/* ── The answer (docs/insights-drilldown.md): how bad, why, what is
+                   being done, who decided — the questions people bring to a risk.
+                   Each section below answers one of them and opens on its own
+                   address (#score, #why, #work, #decision, #about), so a report
+                   or question page lands on the answer it was asked for. ── */}
+            <RiskAnswer key={answerVersion} riskId={risk.id} lead={sectionFromHash(location.hash) || 'score'} />
+
+            <RiskSection id="score" question="How bad is it?" helpKey="risk_answer.score" summary="The score on each dimension, and how it has changed"
+              open={openSections.has('score')} onToggle={() => toggleSection('score')}>
+              <ResidualRiskPanel risk={risk} form={form} simpleMode={simpleMode} />
+              {!simpleMode && <ResidualHistoryPanel riskId={risk.id} />}
+            </RiskSection>
+
+            <RiskSection id="why" question="Why this score?" helpKey="risk_answer.why" summary="The control objectives against this threat on this system, and its vulnerable components"
+              open={openSections.has('why')} onToggle={() => toggleSection('why')}>
+              <LinkedControlsSection
+                risk={risk}
+                canEdit={user?.role === 'ciso' || user?.role === 'risk_analyst' || user?.role === 'admin'}
+                onChange={load}
+                navigate={navigate}
+                isExpert={!simpleMode}
+                startOpen={focusCoverage}
+              />
+              <LinkedComponentsSection
+                risk={risk}
+                canEdit={user?.role === 'ciso' || user?.role === 'risk_analyst' || user?.role === 'admin'}
+                onChange={load}
+              />
+            </RiskSection>
+
+            <RiskSection id="work" question="What is being done?" helpKey="risk_answer.work" summary="The security actions for this risk and their items"
+              open={openSections.has('work')} onToggle={() => toggleSection('work')}>
+              {form.no_action_required
+                ? <p className={styles.cardHint}>Marked &ldquo;no action required&rdquo;: current controls are judged sufficient. See <em>Who decided what?</em></p>
+                : <div id="risk-section-actions"><GapActionSection risk={risk} canEdit={canEdit} user={user} onChange={load} /></div>}
+            </RiskSection>
+
+            <RiskSection id="decision" question="Who decided what?" helpKey="risk_answer.decision" summary="Treatment, exceptions, validation and the views recorded on decisions"
+              open={openSections.has('decision')} onToggle={() => toggleSection('decision')}>
+              <TreatmentPanel
+                risk={risk} form={form} canEdit={canEdit}
+                onChange={handleFormChange}
+                onActionChange={load}
+              />
+              <div className={styles.metaGrid}>
+                <MetaRow label="Validation" value={risk.validation_status} />
+                {risk.validated_at && <MetaRow label="Validated" value={`${fmtDate(risk.validated_at)}${risk.validated_by_name ? `, by ${risk.validated_by_name}` : ''}`} />}
+              </div>
+              <RecordedViews riskId={risk.id} />
+            </RiskSection>
+
+            <RiskSection id="about" question="About this risk" helpKey="risk.section.about" summary="What the risk is, the system, threat, assets exposed, owner and dates"
+              open={openSections.has('about') || anyEditing} onToggle={() => toggleSection('about')}>
             {/* ── rationale ── */}
             <section className={`${styles.card} ${editingRationale ? styles.cardEditing : ''}`}>
               <div className={styles.cardHeaderRow}>
@@ -380,14 +468,6 @@ export function RiskDetailPage() {
               }
               {editingRationale && saveErr && <p className={styles.saveErr}>{saveErr}</p>}
             </section>
-
-            {/* ── return notes (shown when risk has been returned by CISO) ── */}
-            {risk.validation_notes && (
-              <section className={`${styles.card} ${styles.cardReturned}`}>
-                <h2 className={styles.cardTitle}>Return Notes <HelpDot k="risk.detail.return_notes" placement="bottom" /></h2>
-                <p className={styles.rationaleText}>{risk.validation_notes}</p>
-              </section>
-            )}
 
             {/* ── context card ── */}
             <section className={`${styles.card} ${editingContext ? styles.cardEditing : ''}`}>
@@ -463,71 +543,12 @@ export function RiskDetailPage() {
                     : fmtDate(risk.review_date)
                   }
                 />
-                {!editingContext && (
-                  <>
-                    <MetaRow label="Created" value={fmtDate(risk.created_at)} />
-                    {risk.validated_at    && <MetaRow label="Validated"    value={fmtDate(risk.validated_at)} />}
-                    {risk.validated_by_name && <MetaRow label="Validated by" value={risk.validated_by_name} />}
-                  </>
-                )}
+                {!editingContext && <MetaRow label="Created" value={fmtDate(risk.created_at)} />}
               </div>
               {editingContext && saveErr && <p className={styles.saveErr}>{saveErr}</p>}
             </section>
 
-            {/* ── Panel 1: Current risk (read-only — probability is derived from
-                   the per-control judgements in the Threat Coverage panel) ── */}
-            <ResidualRiskPanel
-              risk={risk} form={form}
-              simpleMode={simpleMode}
-            />
-
-            {/* ── Panel 2: Risk history ── (expert concept; hidden in business view) */}
-            {!simpleMode && <ResidualHistoryPanel riskId={risk.id} />}
-
-            {/* ── linked components (own in-panel Edit/Done toggle; live writes) ── */}
-            <LinkedComponentsSection
-              risk={risk}
-              canEdit={user?.role === 'ciso' || user?.role === 'risk_analyst' || user?.role === 'admin'}
-              onChange={load}
-            />
-
-            {/* ── Panel 3: Mitigating controls (own in-panel Edit/Done toggle; live writes) ── */}
-            <LinkedControlsSection
-              risk={risk}
-              canEdit={user?.role === 'ciso' || user?.role === 'risk_analyst' || user?.role === 'admin'}
-              onChange={load}
-              navigate={navigate}
-              isExpert={!simpleMode}
-              startOpen={focusCoverage}
-            />
-
-            {/* ── Panel 5: Security action (live for authorised roles; own inline forms) ── */}
-            <SecurityActionPanel
-              risk={risk} form={form} canEdit={canEdit} user={user}
-              onChange={handleFormChange}
-              onActionChange={load}
-              simpleMode={simpleMode}
-            />
-            <RecordedViews riskId={risk.id} />
-
-            {/* ── Panel 6: Risk context graph (graph.read capability) ──
-                OPEN by default (owner, 2026-09-18). It was folded, which is why
-                it read as unused: a panel nobody opens is indistinguishable from
-                one nobody wants, and this one earns its place — it is the only
-                view on the page that shows how the pieces CONNECT, where the
-                other panels each describe one kind of thing in isolation.
-                Every other panel folds because it is a list whose answer is a
-                count; a picture has no summary line that would substitute for
-                it, so folding it hides the whole point. */}
-            {hasCapability('graph.read') && (
-              <CollapsibleCard
-                title="Risk context"
-                helpKey="risk.detail.risk_graph"
-                description="How this risk connects: system, threat, information assets, PPITF components and mitigating controls."
-              >
-                <RiskGraph riskId={risk.id} riskScore={risk.risk_score} />
-              </CollapsibleCard>
-            )}
+            </RiskSection>
 
           </div>
         )}
@@ -555,14 +576,54 @@ function MetaRow({ label, value }) {
 // Each risk-detail panel uses this so the user can fold it down to title +
 // description. Description is always visible; the body hides when collapsed.
 
+// The page's question sections (docs/insights-drilldown.md). A section is the
+// only thing that folds: the panels inside it are laid out flat (InSection), so
+// the reader opens one question and sees its whole answer without a second fold.
+const QUESTION_SECTIONS = ['score', 'why', 'work', 'decision', 'about'];
+function sectionFromHash(hash) {
+  const k = (hash || '').replace(/^#/, '');
+  return QUESTION_SECTIONS.includes(k) ? k : null;
+}
+const InSection = createContext(false);
+
+function RiskSection({ id, question, helpKey, summary, open, onToggle, children }) {
+  return (
+    <section id={id} className={`${styles.questionSection} ${open ? styles.questionOpen : ''}`}>
+      <div className={styles.questionHeaderRow}>
+        <button type="button" className={styles.questionHeader} aria-expanded={open} onClick={onToggle}>
+          <span className={styles.collapseChevron} aria-hidden="true">{open ? '▾' : '▸'}</span>
+          <h2 className={styles.questionTitle}>{question}</h2>
+          {!open && <span className={styles.questionSummary}>{summary}</span>}
+        </button>
+        <HelpDot k={helpKey} placement="bottom" />
+      </div>
+      {open && <div className={styles.questionBody}><InSection.Provider value={true}>{children}</InSection.Provider></div>}
+    </section>
+  );
+}
+
 function CollapsibleCard({ title, description, descriptionTip, helpKey, helpPlacement = 'bottom', defaultCollapsed = false, collapsedSummary = null, className = '', id, editing = false, headerActions, children }) {
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const flat = useContext(InSection);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed && !flat);
   const toggle = () => setCollapsed(c => !c);
   // `headerActions` shows on a folded card, so a panel that both folds and edits
   // can offer an Edit button that appears to do nothing. Entering edit mode
   // opens the panel; leaving it does not re-fold, since the reader is now
   // looking at what they came for.
   useEffect(() => { if (editing) setCollapsed(false); }, [editing]);
+  if (flat) {
+    return (
+      <div id={id} className={`${styles.subPanel} ${className} ${editing ? styles.cardEditing : ''}`}>
+        <div className={styles.cardHeaderRow}>
+          <h3 className={styles.subPanelTitle}>{title}</h3>
+          {helpKey && <HelpDot k={helpKey} placement={helpPlacement} label={typeof title === 'string' ? `About ${title}` : undefined} />}
+          {headerActions && <div className={styles.cardHeaderRight}><div className={styles.cardHeaderActions}>{headerActions}</div></div>}
+        </div>
+        {description && <p className={styles.cardHint}>{description}{descriptionTip}</p>}
+        {children}
+      </div>
+    );
+  }
   return (
     <section
       id={id}
@@ -637,10 +698,12 @@ const TREATMENT_OPTIONS = [
   { value: 'avoid',    label: 'Avoid',    hint: 'Eliminate the activity that creates the risk' },
   { value: 'mitigate', label: 'Mitigate', hint: 'Apply controls to reduce likelihood and/or impact' },
   { value: 'transfer', label: 'Transfer', hint: 'Insurance, contract, or third-party assumption' },
-  { value: 'accept',   label: 'Accept',   hint: 'Document acceptance with a review date' },
+  { value: 'accept',   label: 'Accept',   hint: 'Record an exception with a review date' },
 ];
 
-function SecurityActionPanel({ risk, form, canEdit, user, onChange, onActionChange }) {
+// The treatment decision and any acceptance: half of "Who decided what?".
+// The risk's security actions are "What is being done?" (GapActionSection).
+function TreatmentPanel({ risk, form, canEdit, onChange, onActionChange }) {
   const noAction = Boolean(form.no_action_required);
   const decision = form.treatment_decision || '';
   const threshold = risk.mandatory_action_score ?? 12;
@@ -672,10 +735,10 @@ function SecurityActionPanel({ risk, form, canEdit, user, onChange, onActionChan
 
   return (
     <CollapsibleCard
-      id="risk-section-actions"
-      title="Security action"
+      id="risk-section-treatment-decision"
+      title="Treatment"
       helpKey="risk.detail.security_action"
-      description="What can we do to improve the security of the system?"
+      description="What has been decided about this risk?"
     >
       <label className={styles.checkboxRow}>
         <input
@@ -734,13 +797,6 @@ function SecurityActionPanel({ risk, form, canEdit, user, onChange, onActionChan
           onClose={() => setExcModal(null)}
           onSuccess={() => { setExcModal(null); onActionChange(); }}
         />
-      )}
-
-      {/* Gap-driven security actions (docs/security-actions.md) — build from the
-          coverage gap, per-item owners + comments, CISO accept, incremental
-          per-item completion. Replaces the old propose form + action list. */}
-      {!noAction && (
-        <GapActionSection risk={risk} canEdit={canEdit} user={user} onChange={onActionChange} />
       )}
     </CollapsibleCard>
   );
@@ -912,7 +968,7 @@ function GapActionBuilder({ risk, onCancel, onCreated }) {
                 ? <input type="checkbox" checked={!!sel[k]} onChange={() => toggle(k)} />
                 : <input type="checkbox" checked disabled title="Mandatory — must be actioned" />}
               <span className={styles.gapKind}>{CHANGE_KIND_LABEL[cc.change_kind]}</span>
-              <span className={styles.compType}>{componentTypeShort(cc.component_type)}</span>
+              <span className={styles.compType}><TypeBadge type={cc.component_type} variant="text" /></span>
               <span>{cc.name}</span>
               {cc.open_action && plannedTag(cc.open_action)}
             </label>
@@ -1041,7 +1097,7 @@ function ActionItemRow({ risk, action, item, user, onChange }) {
     <li className={`${styles.gapItemRow} ${withdrawn ? styles.gapItemWithdrawn : ''}`}>
       <span className={styles.gapKind}>{CHANGE_KIND_LABEL[item.change_kind]}</span>
       {item.framework_ref && <span className={styles.tcRef}>{item.framework_ref}</span>}
-      {item.component_type && <span className={styles.compType}>{componentTypeShort(item.component_type)}</span>}
+      {item.component_type && <span className={styles.compType}><TypeBadge type={item.component_type} variant="text" /></span>}
       <span className={done ? styles.tcMuted : styles.gapItemLabel}>{item.label}</span>
       {item.owner && <span className={styles.gapItemOwner}>{item.owner.name}</span>}
       {item.target && <span className={styles.gapItemTarget} title="Target residual once operational">→ {item.target.c}/{item.target.i}/{item.target.a}</span>}
@@ -1116,7 +1172,7 @@ function ExceptionSection({ canEdit, activeException, onOpenModal }) {
   return (
     <div className={`${styles.exceptionCard} ${expiryClass}`}>
       <div className={styles.exceptionHeader}>
-        <span className={styles.exceptionTitle}>Active acceptance exception <HelpDot k="risk.detail.active_exception" placement="bottom" /></span>
+        <span className={styles.exceptionTitle}>Active exception <HelpDot k="risk.detail.active_exception" placement="bottom" /></span>
         <span className={styles.exceptionExpiry}>
           {days < 0
             ? `Overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'}`
@@ -1701,13 +1757,13 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                       // have no per-system state to record here.
                       ? c.components.map(cc => (
                           <div key={cc.id} className={styles.tcComp}>
-                            <span className={styles.compType}>{componentTypeShort(cc.component_type)}</span>
+                            <span className={styles.compType}><TypeBadge type={cc.component_type} variant="text" /></span>
                             <span className={styles.tcCompName}>{cc.name}</span>
                           </div>
                         ))
                       : c.components.map(cc => (
                           <div key={cc.id} className={styles.tcComp}>
-                            <span className={styles.compType}>{componentTypeShort(cc.component_type)}</span>
+                            <span className={styles.compType}><TypeBadge type={cc.component_type} variant="text" /></span>
                             <span className={compMuted(cc) ? styles.tcMuted : styles.tcCompName}>{cc.name}</span>
                             {cc.has_open_action && <span className={styles.plannedTag} title="A security action is in flight to improve this">planned</span>}
                             {isShared(cc) ? <SharedComponentChip component={cc} /> : <>
@@ -2467,14 +2523,14 @@ function readinessChecks(risk) {
   return checks;
 }
 
-function ValidationPanel({ risk, open, action, notes, error, busy, onActionChange, onNotesChange, onSubmit }) {
+// The question section each readiness check's fix lives in.
+const CHECK_SECTION = { treatment: 'decision', exceptions: 'decision', actions: 'work' };
+
+function ValidationPanel({ risk, open, action, notes, error, busy, onActionChange, onNotesChange, onSubmit, onGo }) {
   const checks = readinessChecks(risk);
   const allOk  = checks.every(c => c.ok);
 
-  const scrollTo = (section) => {
-    const el = document.getElementById(`risk-section-${section}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const scrollTo = (section) => onGo(CHECK_SECTION[section], `risk-section-${section}`);
 
   return (
     <div className={styles.validationPanel}>

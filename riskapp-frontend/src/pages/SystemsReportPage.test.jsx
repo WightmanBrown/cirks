@@ -75,7 +75,7 @@ describe('System report', () => {
   test('explains each risk and whether it is answered', async () => {
     show();
     expect(await screen.findByText('Malware that encrypts data')).toBeInTheDocument();
-    expect(screen.getByText('Nothing answering it')).toBeInTheDocument();
+    expect(screen.getByText('No security action planned')).toBeInTheDocument();
   });
   test('shows a requirement not met here, with the objective missing', async () => {
     show();

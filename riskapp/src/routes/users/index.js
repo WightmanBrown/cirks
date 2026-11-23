@@ -133,4 +133,33 @@ router.put('/me/view-mode', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// ── Menu: simple or full (v183, owner 2026-11-18) ─────────────────────────────
+// The simple menu leaves out the design and library pages most owners never
+// need. NULL = the default for the ACTIVE role, so switching role moves it.
+const MENU_SIMPLE_ROLES = new Set([
+  'information_asset_owner', 'information_asset_manager', 'siro', 'meeting_secretary', 'soc_analyst',
+]);
+const menuDefault = (role) => (MENU_SIMPLE_ROLES.has(role) ? 'simple' : 'full');
+const menuBody = (chosen, role) => ({ menu_mode: chosen || menuDefault(role), chosen: chosen || null, role_default: menuDefault(role) });
+
+// GET /users/me/menu-mode → { menu_mode, chosen, role_default }
+router.get('/me/menu-mode', async (req, res, next) => {
+  try {
+    const { rows } = await query('SELECT menu_mode FROM users WHERE id = $1', [req.user.id]);
+    res.json(menuBody(rows[0]?.menu_mode, req.user.role));
+  } catch (err) { next(err); }
+});
+
+// PUT /users/me/menu-mode  body: { menu_mode: 'simple' | 'full' | null }  (null = my role's default)
+router.put('/me/menu-mode', async (req, res, next) => {
+  try {
+    const menuMode = (req.body || {}).menu_mode;
+    if (menuMode !== null && !['simple', 'full'].includes(menuMode)) {
+      return res.status(400).json({ error: "menu_mode must be 'simple', 'full' or null." });
+    }
+    await query('UPDATE users SET menu_mode = $1 WHERE id = $2', [menuMode, req.user.id]);
+    res.json(menuBody(menuMode, req.user.role));
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

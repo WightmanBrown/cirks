@@ -13,6 +13,7 @@ import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
 import { Th } from '../components/Th';
 import { HelpDot } from '../components/HelpDot';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 // Controls are native; the framework filter means "mapped to this standard". The
 // chips come from the standards registry — any standard with mappings — so one
@@ -34,6 +35,7 @@ export function ControlLibraryPage() {
   const [controls,         setControls]         = useState([]);
   const [summary,          setSummary]          = useState(null);
   const [loading,          setLoading]          = useState(true);
+  useScrollRestore(!loading);   // Back from an item lands where you left the list
   const [error,            setError]            = useState('');
   // Filters live in the URL so the filtered list has a real address — drilling into
   // a control and coming back (or sharing the link) restores the same filtered view.

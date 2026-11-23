@@ -44,7 +44,13 @@ INSERT INTO users (id, email, full_name, password_hash, role, department_id) VAL
   ('11111111-0000-0000-0000-000000000005', 'business.user.it@org.local',   'Private Frank Pike',        '$2b$12$RxbxTqpUGq4hbAR9fIyqiO7zILYYVkgfDSNY.42cGLzP93v0d6rwS', 'information_asset_owner',   '22222222-0000-0000-0000-000000000001'),
   ('11111111-0000-0000-0000-000000000006', 'security.consultant@org.local','Private James Frazer',      '$2b$12$RxbxTqpUGq4hbAR9fIyqiO7zILYYVkgfDSNY.42cGLzP93v0d6rwS', 'security_consultant',       '22222222-0000-0000-0000-000000000001'),
   ('11111111-0000-0000-0000-000000000007', 'siro@org.local',               'Reverend Timothy Farthing', '$2b$12$RxbxTqpUGq4hbAR9fIyqiO7zILYYVkgfDSNY.42cGLzP93v0d6rwS', 'siro',                      '22222222-0000-0000-0000-000000000001'),
-  ('11111111-0000-0000-0000-000000000008', 'meeting.secretary@org.local',  'Maurice Yeatman',           '$2b$12$RxbxTqpUGq4hbAR9fIyqiO7zILYYVkgfDSNY.42cGLzP93v0d6rwS', 'meeting_secretary',         '22222222-0000-0000-0000-000000000001');
+  ('11111111-0000-0000-0000-000000000008', 'meeting.secretary@org.local',  'Maurice Yeatman',           '$2b$12$RxbxTqpUGq4hbAR9fIyqiO7zILYYVkgfDSNY.42cGLzP93v0d6rwS', 'meeting_secretary',         '22222222-0000-0000-0000-000000000001'),
+  -- The SOC analyst the integration tests sign tokens for (helpers.js USERS.soc).
+  -- Without the row every request as soc failed its api_request_log insert, and
+  -- each failed query cost the pool a fresh connection (~240 per rbacMatrix run
+  -- instead of ~27) — enough churn for the self-hosted runner's Docker port
+  -- forwarding to drop one now and then, hanging a test for 30 s (2026-11-11).
+  ('11111111-0000-0000-0000-000000000009', 'soc.analyst@org.local',        'Lance Corporal Jack Jones', '$2b$12$RxbxTqpUGq4hbAR9fIyqiO7zILYYVkgfDSNY.42cGLzP93v0d6rwS', 'soc_analyst',               '22222222-0000-0000-0000-000000000001');
 
 -- Department head = the business user (accountable risk owner), per the ownership model.
 UPDATE departments SET owner_user_id = '11111111-0000-0000-0000-000000000005'
@@ -297,7 +303,6 @@ INSERT INTO public.capabilities VALUES ('bil.read', 'bil', 'read', false, 'View 
 INSERT INTO public.capabilities VALUES ('bil.write', 'bil', 'write', true, 'Create/edit impact tables and levels');
 INSERT INTO public.capabilities VALUES ('bil.publish', 'bil', 'publish', true, 'Publish an impact table (scope enforced in controller)');
 INSERT INTO public.capabilities VALUES ('bil.mandatory', 'bil', 'mandatory', false, 'Flag an impact table mandatory');
-INSERT INTO public.capabilities VALUES ('graph.read', 'graph', 'read', false, 'View control/system graphs');
 INSERT INTO public.capabilities VALUES ('knowledge.enrich', 'knowledge', 'enrich', false, 'Resolve an IP or hostname to the systems it belongs to');
 INSERT INTO public.capabilities VALUES ('knowledge.query', 'knowledge', 'query', false, 'Look up a host/IP to its system(s) and their risk/impact (SOC enrichment)');
 INSERT INTO public.capabilities VALUES ('risks.read', 'risks', 'read', true, 'View risks');
@@ -398,6 +403,7 @@ INSERT INTO public.role_permissions VALUES ('ciso', 'architecture.write', 'all_d
 INSERT INTO public.role_permissions VALUES ('risk_analyst', 'architecture.write', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('admin', 'reports.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('admin', 'risk_appetite.write', 'all_depts');
+INSERT INTO public.role_permissions VALUES ('admin', 'reports.tolerances', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('ciso', 'reports.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('siro', 'reports.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('siro', 'risk_appetite.write', 'all_depts');
@@ -466,10 +472,6 @@ INSERT INTO public.role_permissions VALUES ('ciso', 'bil.publish', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('admin', 'bil.mandatory', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('siro', 'bil.mandatory', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('ciso', 'bil.mandatory', 'all_depts');
-INSERT INTO public.role_permissions VALUES ('admin', 'graph.read', 'all_depts');
-INSERT INTO public.role_permissions VALUES ('security_consultant', 'graph.read', 'all_depts');
-INSERT INTO public.role_permissions VALUES ('ciso', 'graph.read', 'all_depts');
-INSERT INTO public.role_permissions VALUES ('risk_analyst', 'graph.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('admin', 'knowledge.query', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('security_consultant', 'knowledge.query', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('ciso', 'knowledge.query', 'all_depts');
@@ -481,7 +483,6 @@ INSERT INTO public.role_permissions VALUES ('soc_analyst', 'bil.read', 'all_dept
 INSERT INTO public.role_permissions VALUES ('soc_analyst', 'components.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('soc_analyst', 'controls.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('soc_analyst', 'exceptions.read', 'all_depts');
-INSERT INTO public.role_permissions VALUES ('soc_analyst', 'graph.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('soc_analyst', 'risk_heatmap.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('soc_analyst', 'risks.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('soc_analyst', 'services.read', 'all_depts');
@@ -498,7 +499,6 @@ INSERT INTO public.role_permissions VALUES ('security_architect', 'components.re
 INSERT INTO public.role_permissions VALUES ('security_architect', 'controls.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('security_architect', 'exceptions.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('security_architect', 'findings.read', 'all_depts');
-INSERT INTO public.role_permissions VALUES ('security_architect', 'graph.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('security_architect', 'knowledge.query', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('security_architect', 'risk_heatmap.read', 'all_depts');
 INSERT INTO public.role_permissions VALUES ('security_architect', 'risks.read', 'all_depts');

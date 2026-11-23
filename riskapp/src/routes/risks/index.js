@@ -18,6 +18,7 @@ const RISK_DEPT_VIA = {
 };
 const { query, pool }   = require('../../db/pool');
 const { canAcceptRiskAtScore } = require('../../auth/acceptanceAuthority');
+const { riskAnswer } = require('../../reports/riskAnswer');
 
 const router = Router();
 router.use(authenticate);
@@ -42,7 +43,7 @@ const VALID_CADENCES   = new Set(['monthly', 'quarterly', 'annual']);
 
 // Human-readable audit narrative for an exception revoke.
 function format_revoke_narrative(actorName, threatName, systemName, notes) {
-  const base = `Risk-acceptance exception revoked by ${actorName} for "${threatName}" (${systemName}). `
+  const base = `Risk exception revoked by ${actorName} for "${threatName}" (${systemName}). `
              + 'Risk returned to needing a treatment decision.';
   const reason = notes?.trim() ? ` Reason: ${notes.trim()}` : '';
   return base + reason;
@@ -856,6 +857,25 @@ router.patch('/:id/action-items/:iid', canWrite, async (req, res, next) => {
 });
 
 // ── GET /risks/:id ─────────────────────────────────────────────────────────────
+
+// ── GET /risks/:id/answer ─────────────────────────────────────────────────────
+// The risk answer (docs/insights-drilldown.md): how bad, why, what is being
+// done, who decided. Unfolds under a risk in the reports' risk lists and heads
+// the risk page. Scoped as GET /risks/:id: a department-scoped role reads its
+// own department's risks and those on shared systems.
+router.get('/:id/answer', canRead, async (req, res, next) => {
+  try {
+    const { rows: [scope] } = await query(
+      `SELECT s.department_id, s.is_shared FROM risks r JOIN systems s ON s.id = r.system_id
+        WHERE r.id = $1 AND r.is_active`, [req.params.id]);
+    if (!scope) return res.status(404).json({ error: 'Risk not found.' });
+    if (isDepartmentIsolationEnabled() && DEPT_ROLES.has(req.user.role)) {
+      const deptId = await getUserDept(req.user.id);
+      if (scope.department_id !== deptId && !scope.is_shared) return res.status(403).json({ error: 'Forbidden.' });
+    }
+    res.json(await riskAnswer(req.params.id));
+  } catch (err) { next(err); }
+});
 
 router.get('/:id', canRead, async (req, res, next) => {
   try {

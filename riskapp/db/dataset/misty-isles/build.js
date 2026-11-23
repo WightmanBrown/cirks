@@ -64,11 +64,12 @@ const IAM = { infosec: 'R.Perlman@mig.local' };
 
 // §2 — the hosting class of every system (shared with architecture.js).
 const CLASS = require('./hostingClasses');
+const { patternFor } = require('./solution-patterns');
 const classOf = {};
 for (const [k, list] of Object.entries(CLASS)) for (const s of list) classOf[s] = k;
 
 // Owner decisions §8.
-const SYSTEM_RENAMES = { 'Electoral Role': 'Electoral Roll', 'Driver licensing system': 'Driver and Vehicle Licensing System',
+const SYSTEM_RENAMES = { 'Electoral Role': 'Electoral Roll', 'Costal Radar and Ship Tracking': 'Coastal Radar and Ship Tracking', 'Driver licensing system': 'Driver and Vehicle Licensing System',
                          'Vehicle Licensing System': 'Driver and Vehicle Licensing System' };
 const NEW_SYSTEMS = [
   { name: 'MIG Remote Access VPN', department_name: 'Department of Information Security',
@@ -113,7 +114,11 @@ const COMPONENT_RENAMES = { 'Palo Alto ATP': 'PaloAlto ATP', 'KnowB4': 'KnowBe4'
 const ORGANISATIONAL_TECH = new Set(['Crowdstrike SaaS', 'Microsoft Active Directory Domain Services', 'Microsoft Entra ID', 'Wazuh',
   'Microsoft Defender XDR console', 'Veeam Backup & Replication server', 'PaloAlto GlobalProtect gateway', 'PaloAlto 850-22',
   'PaloAlto ATP', 'Advanced Threat Prevention Network Intrusion Detection platform', 'ExtremeCloud IQ Site Engine',
-  'ME End-Point Central', 'KnowBe4', 'Zero trust isolation', 'Microsoft Sharepoint', 'Microsoft 365 Archive', 'MS Teams On-line SaaS']);
+  'ME End-Point Central', 'KnowBe4', 'Zero trust isolation', 'Microsoft Sharepoint', 'Microsoft 365 Archive', 'MS Teams On-line SaaS',
+  // the owner's (October 2026)
+  'MIG CCTV system', 'Chubb electronic access control', 'Server Room :: CCTV at The Castle', 'Server room HVAC',
+  'Crowdstrike AIDR', 'CIRKS',
+  'Rapid7 Nexpose Management and reporting console', 'Rapid7 Nexpose scanning engine']);
 
 // §4 — delivery patterns. Parts: [component, location, service system?]
 const EDR = [
@@ -132,7 +137,9 @@ const BACKUP = [
   { name: 'Veeam backup', parts: [['Veeam Backup', 'on_system'], ['Veeam Backup & Replication server', 'service', 'MIG Backup'],
     ['Resilience and recovery', 'service', 'MIG Backup'], ['IT Administrators', 'service', 'MIG Backup']] },
   { name: 'Microsoft 365 Backup', parts: [['Microsoft 365 Backup', 'on_system']] },
-  { name: 'Azure Backup', parts: [['Azure Backup', 'on_system']] },
+  // The data handling policy and IT Administrators: CIRKS-test, 2026-10-23.
+  { name: 'Azure Backup', parts: [['Azure Backup', 'on_system'], ['Data handling policy', 'organisation'],
+    ['IT Administrators', 'service', 'MIG Backup']] },
   { name: 'Configuration backup (network appliances)', parts: [['Network configuration backup', 'on_system']] },
   { name: 'Provided by the supplier', kind: 'supplier' },
 ];
@@ -142,17 +149,30 @@ const CONTAINMENT = [
     ['InfoSec Team', 'service', 'Host Intrusion Detection System'], ['Incident management', 'organisation']] },
   { name: 'Provided by the supplier', kind: 'supplier' },
 ];
+const ISMS = { name: 'Information Security Management and Information Risk Knowledge', parts: [
+  ['CIRKS information risk knowledge system', 'on_system'], ['InfoSec Team', 'service', 'CIRKS'], ['CIRKS', 'service', 'CIRKS']] };
 // Keyed by CIRKS control objective (v1.1). Endpoint agents deliver host
 // detection, central analysis, logging and execution control alike.
 const PATTERNS = {
-  'CIRKS1.DM-07': EDR, 'CIRKS1.DM-08': EDR, 'CIRKS1.DM-09': EDR, 'CIRKS1.SVM-06': EDR,
-  'CIRKS1.BRR-02': BACKUP, 'CIRKS1.BRR-06': BACKUP, 'CIRKS1.BRR-03': BACKUP,
-  // Containment and recovery (owner, 2026-10-28): delivered by endpoint protection.
+  'CIRKS1.DM-07': EDR, 'CIRKS1.DM-09': EDR, 'CIRKS1.SVM-06': EDR,
+  // Central monitoring capability, and containment and recovery, are the
+  // organisation's, not each system's (owner, 2026-11-06): one team, one
+  // process, one plan. Containing one device is IR-10, on each system.
+  'CIRKS1.DM-08': [{ name: 'Central security monitoring', parts: [['Detective Monitoring', 'organisation'], ['InfoSec Team', 'organisation'],
+    ['Wazuh', 'service', 'Security monitoring platform']] }],
+  'CIRKS1.IR-04': [{ name: 'Incident containment and recovery', parts: [['Incident response policy', 'organisation'],
+    ['Incident management', 'organisation'], ['Incident response playbooks', 'organisation'], ['InfoSec Team', 'organisation']] }],
+  // Devices can be contained: the per-system half of containment (owner, 2026-11-09),
+  // delivered by endpoint protection as modelled for IR-04 on 2026-10-28.
   // Network isolation's effect is secondary, so it does not put the objective in
   // place on its own; where endpoint protection is missing or cannot run (OT,
   // Windows 7) that is a talking point. Appliance syslog contains nothing.
-  'CIRKS1.IR-04': [...EDR.filter((p) => p.name !== 'Syslog to Wazuh (network appliances)' && p.kind !== 'supplier'),
+  // The OSSEC agent does not eradicate incidents either (owner, CIRKS-dev 2026-10-02).
+  'CIRKS1.IR-10': [...EDR.filter((p) => !['Syslog to Wazuh (network appliances)', 'OSSEC agent (being retired)'].includes(p.name) && p.kind !== 'supplier'),
                    ...named(CONTAINMENT, 'CrowdStrike host containment', 'Provided by the supplier')],
+  // The Acceptable Use Policy delivers the objective added for it (owner, 2026-11-06).
+  'CIRKS1.PER-05': [{ name: 'Acceptable Use Policy', parts: [['Acceptable Use Policy', 'organisation']] }],
+  'CIRKS1.BRR-02': BACKUP, 'CIRKS1.BRR-06': BACKUP, 'CIRKS1.BRR-03': BACKUP,
   // Malware protection: the endpoint protection that prevents, not only detects.
   'CIRKS1.CVM-04': named(EDR, 'CrowdStrike EDR', 'Microsoft Defender for Servers (Azure)', 'Provided by the supplier'),
   // Zoning and segregation (owner, 2026-10-29): network isolation is exactly this:
@@ -182,7 +202,36 @@ const PATTERNS = {
   'CIRKS1.AA-03': [
     { name: 'Active Directory (on-premises)', parts: [['Microsoft Active Directory Domain Services', 'service', 'MIG Authentication, Authorisation and Access Control system'],
       ['IT Administrators', 'service', 'MIG Authentication, Authorisation and Access Control system']] },
-    { name: 'Entra ID (cloud)', parts: [['Microsoft Entra ID', 'service', 'MIG Authentication, Authorisation and Access Control system']] },
+    { name: 'Entra ID (cloud)', parts: [['Microsoft Entra ID', 'service', 'MIG Authentication, Authorisation and Access Control system'],
+      ['User account management process', 'organisation']] },   // the owner's (CIRKS-dev 2026-10-02)
+  ],
+  // CIRKS-test, 2026-10-23 (as Stevie Topping). AI agent monitoring was given NIST
+  // GV.RR-03 (adequate resources), which maps to Leadership provides resources
+  // (IRM-16, owner 2026-11-09; it was Leadership commitment before).
+  'CIRKS1.IRM-16': [{ name: 'AI agent monitoring', parts: [['Crowdstrike Falcon Agent', 'on_system'],
+    ['InfoSec Team', 'service', 'Security monitoring platform'], ['Wazuh', 'service', 'Security monitoring platform']] }],
+  // ... and CIRKS as the supplier register (NIST GV.SC-01, ID.AM-04, GV.SC-04, GV.SC-07).
+  ...Object.fromEntries(['CIRKS1.SCM-01', 'CIRKS1.SCM-02', 'CIRKS1.SCM-03', 'CIRKS1.SCM-05'].map((ref) => [ref, [ISMS]])),
+  // Configuration vulnerabilities and software vulnerabilities are kept apart
+  // (owner, 2026-11-09). Wazuh checks configuration, not software, so it delivers
+  // Configuration monitoring. Nexpose does both kinds of scan: with its login on a
+  // system it finds vulnerable software (SVM-02); from the network alone it finds
+  // what a system exposes (CVM-09). The owner's solutions of CIRKS-dev 2026-10-01
+  // (on SVM-02, NIST ID.RA-01) split accordingly.
+  'CIRKS1.CVM-02': [
+    { name: 'Wazuh configuration monitoring', parts: [['Wazuh agent', 'on_system'], ['Wazuh', 'service', 'Security monitoring platform'],
+      ['Vulnerability management', 'organisation']] },
+  ],
+  'CIRKS1.SVM-02': [
+    { name: 'Rapid 7 authenticated scanning', parts: [['Rapid7 Nexpose Login', 'on_system'],
+      ['Rapid7 Nexpose Management and reporting console', 'service', 'Security monitoring platform'],
+      ['Rapid7 Nexpose scanning engine', 'service', 'Vulnerability Scanning System']] },
+  ],
+  // A system counts only with evidence of a recent scan of it (owner, 2026-11-09),
+  // which CIRKS cannot record yet, so no system is given this objective.
+  'CIRKS1.CVM-09': [
+    { name: 'Rapid 7 network scanning', parts: [['Rapid7 Nexpose Management and reporting console', 'service', 'Security monitoring platform'],
+      ['Rapid7 Nexpose scanning engine', 'service', 'Vulnerability Scanning System']] },
   ],
 };
 // Library lists follow the patterns' on-system parts (§4): Starlink and OneWeb
@@ -205,6 +254,75 @@ const INCOMPLETE_ASSETS = new Set(['Cyber Response Playbooks', 'Information Risk
                                    'Aviation Band Radio Traffic for ATC']);
 const RERATE_SEVERE = { 'Criminal Records': [5, 5, 3], 'Firearms and Explosives Licensing Information': [5, 5, 3] };  // §8.3
 
+// The owner's own modelling on CIRKS-dev, 1–23 October 2026, written into the
+// story so every build has it (owner, 2026-11-05: "Add them to the dataset").
+// Taken from CIRKS-dev's audit and request logs; NIST objectives the owner
+// named are given here as the CIRKS objectives they map to.
+const OWNER_SYSTEMS = [
+  { name: 'Vulnerability Scanning System', department_name: 'Department of Information Security',
+    owner_email: 'C.Shannon@mig.local', manager_email: 'R.Perlman@mig.local',
+    description: 'Our vulnerability scanner service, which looks for software vulnerabilities and configuration vulnerabilities.' },
+  { name: 'MIG CCTV system', department_name: 'Department of Information Security',
+    owner_email: 'C.Shannon@mig.local', manager_email: 'R.Perlman@mig.local',
+    description: 'The CCTV system which monitors MIG premises. Not to be confused with the public CCTV, which the Police operate from the same facility.' },
+  { name: 'Bus Information Displays', department_name: 'Department of Roads and Airports',
+    owner_email: 'C.Giles@mig.local', manager_email: 'K.Johnson@mig.local',
+    description: 'Bus timing and information display system.' },
+  { name: 'Tourist Information Points – back end', department_name: 'DEFA',
+    owner_email: 'A.Lovelace@mig.local', manager_email: 'R.Franklin@mig.local',
+    description: 'The server that delivers content to the tourist information points: a Linux server in the server room on the internal network, administered by IT. The kiosks themselves are the separate system Tourist Information Points – kiosks.' },
+  // CIRKS-test, 2026-10-23 (as Stevie Topping): CIRKS itself, run as a security system.
+  { name: 'CIRKS', department_name: 'Department of Information Security',
+    owner_email: 'C.Shannon@mig.local', manager_email: 'R.Perlman@mig.local',
+    description: 'Our information risk knowledge platform: the CIRKS application, run by the InfoSec team.' },
+  { name: 'Tourist Information Points – kiosks', department_name: 'DEFA',
+    owner_email: 'A.Lovelace@mig.local', manager_email: 'R.Franklin@mig.local',
+    description: 'The publicly accessible information points: kiosks standing in public places, which display content from Tourist Information Points – back end. Different technology and physical exposure from the back end, so a separate system (modelling patterns, 2026-10-13).' },
+];
+const OWNER_COMPONENTS = [
+  ['MIG CCTV system', 'technology', 'organisational', 'Our centrally monitored CCTV system.'],
+  ['Chubb electronic access control', 'technology', 'organisational', 'Our main access control suite for access to our secure premises.'],
+  ['Server Room :: CCTV at The Castle', 'technology', 'organisational', 'CCTV camera in the server room at the Castle.'],
+  ['HIK Vision Control Desk', 'technology', 'per_system', 'The main control desk for the CCTV, including HIKVision\'s own authentication of users.'],
+  ['HIKVision Embedded Linux / Firmware', 'technology', 'per_system', 'The HIKVision DVR operating system.'],
+  ['MIG CCTV Network', 'technology', 'per_system', 'The CCTV network which runs across the estate. It is often physically exposed, so it has low trust. On the internal networks it runs as a VLAN.'],
+  ['MIG Security Control Room', 'facility', 'organisational', 'Our central control room at the Castle.'],
+  ['Rapid7 Nexpose Login', 'technology', 'per_system', 'The account each machine needs so the vulnerability scanner can run a fully authenticated scan.'],
+  ['Rapid7 Nexpose Management and reporting console', 'technology', 'organisational', 'The central console that controls Nexpose and reports from it.'],
+  ['Rapid7 Nexpose scanning engine', 'technology', 'organisational', 'The Nexpose scanning engine, on the network.'],
+  ['Server room HVAC', 'technology', 'organisational', 'Server room cooling.'],
+  ['Crowdstrike AIDR', 'technology', 'organisational', 'CrowdStrike AI Detection and Response.'],
+  ['CIRKS', 'technology', 'organisational', 'The CIRKS application, installed from the public CIRKS repository.'],
+  ['User account management process', 'process', 'organisational', 'The process by which we check that a request to access a system, change permissions or decommission a user\'s account is valid. It includes the rules for requesting changes and for verifying identity.'],
+];
+// What the owner recorded on each system (an "unknown" status is theirs: not yet assessed).
+const OWNER_ON_SYSTEM = {
+  'Vulnerability Scanning System': [['Ubuntu Server 24.04 LTS'], ['Crowdstrike Falcon Agent'], ['Veeam Backup'], ['TLS 1.2+ configuration'],
+    ['IT Administrators'], ['InfoSec Team'], ['CIRKS information risk knowledge system'], ['CIRKS Information Risk Management Process'],
+    ['Vulnerability management'], ['Rapid7 Nexpose scanning engine', 'unknown'], ['The Castle server room', 'unknown']],
+  'MIG CCTV system': [['MIG CCTV system'], ['MIG CCTV Network'], ['HIKVision Embedded Linux / Firmware'], ['HIK Vision Control Desk'],
+    ['MIG Security Control Room'], ['The Castle server room'], ['IT Administrators'], ['Police Force']],
+  'Bus Information Displays': [['Windows Server 2025'], ['AlmaLinux 9'], ['IT Administrators'], ['Bank Street server room', 'unknown']],
+  'Tourist Information Points – back end': [['AlmaLinux 9']],
+  'Security monitoring platform': [['Rapid7 Nexpose Management and reporting console', 'unknown']],
+  // CIRKS-test, 2026-10-23. CIRKS and the InfoSec team are recorded as working: a
+  // service part's state is read from here (docs/meta-architecture.md §3, conflict 1).
+  'CIRKS': [['Ubuntu Server 24.04 LTS'], ['Crowdstrike Falcon Agent'], ['Veeam Backup'], ['TLS 1.2+ configuration'],
+    ['IT Administrators'], ['Bank Street server room', 'unknown'], ['CIRKS'], ['InfoSec Team']],
+  'Medical Records System': [['Rapid7 Nexpose Login', 'unknown']],
+};
+// The back end has no backup and no TLS: the owner's record says so.
+const OWNER_OFF_SYSTEM = { 'Tourist Information Points – back end': ['Veeam Backup', 'TLS 1.2+ configuration'] };
+// Recorded by hand on the scanner, before anything delivers them (ID.RA-04/-05/-08).
+const OWNER_RECORDED = { 'Vulnerability Scanning System': ['CIRKS1.IRM-01', 'CIRKS1.RAST-01', 'CIRKS1.IRM-04', 'CIRKS1.SD-10'] };
+// The OT scope and the custom objective narrowed to it (2026-10-02).
+const OT_SCOPE = { name: 'Operational Technologies', description: 'All OT systems for our CNI',
+  systems: ['Aircraft fuelling', 'Approach radar', 'Billing and meter reading', 'Coastal Radar and Ship Tracking',
+    'Emergency Communications System', 'Flight information display', 'Medical Imaging System', 'Power Distribution',
+    'Power Generation', 'Water Distribution'] };
+const OT_OBJECTIVE = { reference_code: 'CIRKS.OT.T-01', title: 'Operational Technology systems have minimal attack surfaces',
+  description: 'Any system which is defined an Operational Technology has its attack surface minimised. Networks are heavily segregated and permit list network policies in use. Systems are physically protected including access to electronic connection. User accounts are minimised.' };
+
 // ── 1. Systems ──────────────────────────────────────────────────────────────────
 const renameIn = (slug, col, map) => { for (const r of rows(slug)) if (map[r[col]]) r[col] = map[r[col]]; };
 const dedupe = (slug, keyFn) => { const seen = new Set(); data[slug].rows = rows(slug).filter((r) => { const k = keyFn(r); if (seen.has(k)) return false; seen.add(k); return true; }); };
@@ -219,9 +337,9 @@ dedupe('system-components', (r) => `${r.system_name}|${r.component_name}|${r.com
 dedupe('system-threats', (r) => `${r.system_name}|${r.threat_name}`);
 dedupe('system-controls', (r) => `${r.system_name}|${r.control_title}`);
 dedupe('business-service-systems', (r) => `${r.service_name}|${r.system_name}`);
-for (const s of NEW_SYSTEMS) {
+for (const s of [...NEW_SYSTEMS, ...OWNER_SYSTEMS]) {
   rows('systems').push({ name: s.name, description: s.description, department_name: s.department_name,
-    owner_email: IAO.infosec, manager_email: IAM.infosec, is_shared: 'false', is_active: 'true' });
+    owner_email: s.owner_email || IAO.infosec, manager_email: s.manager_email || IAM.infosec, is_shared: 'false', is_active: 'true' });
 }
 for (const r of rows('systems')) if (DESCRIPTIONS[r.name] && !r.description) r.description = DESCRIPTIONS[r.name];
 for (const r of rows('systems')) if (!classOf[r.name]) throw new Error(`no hosting class for system "${r.name}"`);
@@ -247,7 +365,7 @@ for (const [slug, col] of [['components', 'name'], ['control-component-links', '
 dedupe('components', (r) => `${r.name}|${r.component_type}`);
 dedupe('control-component-links', (r) => `${r.control_title}|${r.component_name}|${r.component_type}`);
 dedupe('system-components', (r) => `${r.system_name}|${r.component_name}|${r.component_type}`);
-for (const [name, type, inst, description] of NEW_COMPONENTS) {
+for (const [name, type, inst, description] of [...NEW_COMPONENTS, ...OWNER_COMPONENTS]) {
   rows('components').push({ name, component_type: type, status: 'operational', description, created_by_email: 'ciso@mig.local', instantiation: inst });
 }
 for (const r of rows('components')) {
@@ -305,6 +423,8 @@ put('MIG Desktop (internal)', 'Agency IT contractors');
 put('IT Support Ticketing System', 'Agency IT contractors');
 put('MIG Document Management', 'Microsoft 365 Backup');
 put('MIG Corporate Email', 'MS Exchange 2019');
+for (const [sys, list] of Object.entries(OWNER_ON_SYSTEM)) for (const [c, status] of list) put(sys, c, status || 'operational');
+for (const [sys, list] of Object.entries(OWNER_OFF_SYSTEM)) for (const c of list) drop(sys, c);
 for (const [sys, comp] of DEGRADED_PARTS) {
   if (!onSystem[sys]?.has(comp)) throw new Error(`deliberate problem names ${comp} on ${sys}, which the story does not put there`);
   onSystem[sys].get(comp).status = 'degraded';
@@ -325,12 +445,23 @@ const titleByRef = {};
 for (const r of rows('controls')) if (r.reference_code) titleByRef[r.reference_code] = r.title;
 const T = (ref) => { if (!titleByRef[ref]) throw new Error(`no objective for ${ref}`); return titleByRef[ref]; };
 const refOfTitle = (title) => Object.keys(titleByRef).find((ref) => titleByRef[ref] === title);
+// Wazuh moved from SVM-02 to CVM-02 (owner, 2026-11-09): where SVM-02 was recorded,
+// Configuration monitoring is recorded too, its state derived in section 6.
+for (const r of rows('system-controls').filter((x) => x.control_title === T('CIRKS1.SVM-02'))) {
+  if (!rows('system-controls').some((x) => x.system_name === r.system_name && x.control_title === T('CIRKS1.CVM-02'))) {
+    rows('system-controls').push({ ...r, control_title: T('CIRKS1.CVM-02'), status: 'unknown', exclusion_reason: '' });
+  }
+}
+// Organisation-wide objectives have no per-system rows (owner, 2026-11-06).
+const ORGANISATION_WIDE = ['CIRKS1.DM-08', 'CIRKS1.IR-04'];
+for (const r of rows('controls')) if (ORGANISATION_WIDE.includes(r.reference_code)) r.delivery = 'organisation';
+data['system-controls'].rows = rows('system-controls').filter((r) => !ORGANISATION_WIDE.map(T).includes(r.control_title));
 for (const [ref, names] of Object.entries(LIBRARY_REMOVE)) {
   data['control-component-links'].rows = rows('control-component-links').filter((r) => !(r.control_title === T(ref) && names.includes(r.component_name)));
 }
 // Security solutions (v147): one row per solution, the objectives it delivers,
 // and its parts once. A name used for several objectives must mean the same parts.
-data['delivery-patterns'] = { columns: ['name', 'kind', 'notes'], rows: [] };
+data['delivery-patterns'] = { columns: ['name', 'kind', 'notes', 'solution_pattern', 'slots_not_needed'], rows: [] };
 data['delivery-pattern-objectives'] = { columns: ['pattern_name', 'control_title'], rows: [] };
 data['delivery-pattern-parts'] = { columns: ['pattern_name', 'component_name', 'component_type', 'location', 'service_system_name'], rows: [] };
 const solutionParts = {};
@@ -342,7 +473,10 @@ for (const [ref, patterns] of Object.entries(PATTERNS)) {
       if (solutionParts[p.name] !== sig) throw new Error(`security solution "${p.name}" has different parts on different objectives`);
     } else {
       solutionParts[p.name] = sig;
-      rows('delivery-patterns').push({ name: p.name, kind: p.kind || 'parts', notes: '' });
+      // The pattern each implements (v176, solution-patterns.js).
+      const sp = patternFor(p.name);
+      rows('delivery-patterns').push({ name: p.name, kind: p.kind || 'parts', notes: '',
+        solution_pattern: sp.solution_pattern || '', slots_not_needed: sp.slots_not_needed.join(' | ') });
       for (const [comp, location, service] of p.parts || []) {
         if (!typeOf[comp]) throw new Error(`pattern part "${comp}" is not in the library`);
         rows('delivery-pattern-parts').push({ pattern_name: p.name, component_name: comp,
@@ -366,6 +500,21 @@ for (const [sys, refs] of [['MIG Remote Access VPN', ['CIRKS1.DM-07', 'CIRKS1.AA
       provenance: 'recorded', notes: '', exclusion_reason: '' });
   }
 }
+
+rows('system-controls').push({ system_name: 'Vulnerability Scanning System', control_title: T('CIRKS1.SVM-02'), status: 'unknown',
+  provenance: 'recorded', notes: '', exclusion_reason: '' });   // derived in section 6
+
+// The OT scope and its custom objective (owner, CIRKS-dev 2026-10-02).
+rows('scopes').push({ name: OT_SCOPE.name, description: OT_SCOPE.description });
+for (const s of OT_SCOPE.systems) {
+  if (!classOf[s]) throw new Error(`OT scope names ${s}, which the story does not have`);
+  rows('scope-systems').push({ scope_name: OT_SCOPE.name, system_name: s });
+}
+rows('controls').push({ title: OT_OBJECTIVE.title, description: OT_OBJECTIVE.description, control_type: 'preventive',
+  reference_code: OT_OBJECTIVE.reference_code, delivery: 'group', is_baseline: 'false', effectiveness: '', effectiveness_notes: '', owner_email: '' });
+rows('soa-entries').push({ control_title: OT_OBJECTIVE.title, applicable: 'true', drivers: 'risk', justification: '',
+  implementation_status: 'not_implemented', implementation_description: '', owner_email: '' });
+rows('soa-entry-scopes').push({ control_title: OT_OBJECTIVE.title, scope_name: OT_SCOPE.name });
 
 // ── 5. Suppliers and evidence (§5, fictional names carry the problems) ──────────
 const setTitles = {};   // applies_to → [titles]
@@ -452,6 +601,12 @@ ev('Palo Alto Networks', PR, null, 'PaloAlto 850-22', 'contract_terms', 'Support
 rel('Veeam', PR, 'Department of Information Security', null, 'Veeam Backup', { ref: 'VEEAM-UL-9' });
 rel('Plotnet', PR, 'Disaster and Emergency Management', null, 'Plotnet Secure Radio', { ref: 'PLT-77' });
 ev('CrowdStrike', PR, null, 'Crowdstrike Falcon Agent', 'contract_terms', 'Falcon subscription agreement, support schedule', 'CS-FAL-2025', '', [T('CIRKS1.SVM-02'), T('CIRKS1.SVM-03')]);
+// The owner's (CIRKS-dev 2026-10-23): the master services contract, to 2037.
+// Its eight NIST objectives as the CIRKS objectives they map to, kept to those
+// a product relationship is expected to evidence.
+ev('CrowdStrike', PR, null, 'Crowdstrike SaaS', 'contract_terms', 'Master services contract', 'Juno 1', day(3890),
+  () => expected(PR).filter((t) => ['CIRKS1.SCM-02', 'CIRKS1.SCM-03', 'CIRKS1.SCM-04', 'CIRKS1.SCM-05', 'CIRKS1.EST-02',
+    'CIRKS1.EST-04', 'CIRKS1.SVM-02', 'CIRKS1.SVM-03', 'CIRKS1.SVM-04'].map(T).includes(t)), day(-17));
 
 // ── 6. Control status on each system, derived from the patterns ─────────────────
 const statusOn = (sys, comp) => onSystem[sys]?.get(comp)?.status;
@@ -491,6 +646,11 @@ for (const r of rows('system-controls')) {
   } else if (r.status === 'unknown' || r.status === 'degraded') {
     r.status = 'operational';   // assessed; degradation lives on named parts now
   }
+}
+// The owner's hand-recorded objectives on the scanner, as they left them: not assessed.
+for (const [sys, refs] of Object.entries(OWNER_RECORDED)) {
+  for (const ref of refs) rows('system-controls').push({ system_name: sys, control_title: T(ref), status: 'unknown',
+    provenance: 'recorded', notes: '', exclusion_reason: '' });
 }
 // §6.2 — Prison: someone marked endpoint monitoring operational; nothing delivers it.
 for (const r of rows('system-controls')) {

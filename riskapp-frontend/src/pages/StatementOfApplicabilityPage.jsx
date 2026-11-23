@@ -15,6 +15,7 @@ import { Spinner } from '../components/Spinner';
 import { HelpDot } from '../components/HelpDot';
 import { ControlStatusPill } from '../components/ControlStatusPill';
 import styles from './StatementOfApplicabilityPage.module.css';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 // Risk-traceability bands (Sprint 2b) — mirrors the server's derivation so the
 // badge stays live through an optimistic edit. ISO 27001:2022 6.1.3 decouples
@@ -97,6 +98,7 @@ export function StatementOfApplicabilityPage({ framework: frameworkProp }) {
   const [summaryFromServer, setSummaryFromServer] = useState(null);
   const [standards, setStandards] = useState([]);  // for the view switcher
   const [loading, setLoading] = useState(true);
+  useScrollRestore(!loading);   // Back from an item lands where you left the list
   const [error, setError]     = useState('');
   // In-flight saves, controls that just saved (for the transient tick), and
   // controls with typed-but-not-yet-committed text. Three states rather than

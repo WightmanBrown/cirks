@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  getArchitecture, getDepartments, getUsers, searchComponents,
+  getArchitecture, getSystemPatterns, getDepartments, getUsers, searchComponents,
   createSystem, applySystemBuild, linkSystemComponent, setSystemComponentStatus,
   createArchitectureItem, addArchitectureComponent,
 } from '../api';
@@ -15,15 +15,17 @@ import { PersonSelect } from '../components/PersonSelect';
 import { PatternChip } from '../components/PatternChip';
 import { HelpDot } from '../components/HelpDot';
 import { ComponentModal } from '../components/ComponentModal';
-import { componentTypeShort } from '../utils/componentTypes';
 import { CROSS_DEPT_ROLES } from '../utils/departmentScope';
 import styles from './SystemCreateWizard.module.css';
+import { TypeBadge } from '../components/ComponentPill';
 
-// Creating a system, led through a system architecture pattern (owner,
+// Creating a system, led through a standard build (owner,
 // 2026-10-09). A pattern records the usual components in one step and keeps
 // systems of the same kind alike; a one-off is still built by hand and can be
-// saved as a pattern at the end. The last step shows what the system's own
-// record will imply before anything is created.
+// saved as a pattern at the end. The answers step asks which system pattern it
+// follows and that pattern's questions (v178: answered by components that can
+// play each role). The last step shows what the system's own record will imply
+// before anything is created.
 
 const STEPS = ['What it is', 'What it is built like', 'Its answers', 'Anything special', 'Review'];
 // The ⓘ beside each step's label, in the same order as STEPS.
@@ -37,35 +39,36 @@ const STEP_HELP = [
 const HAND = 'hand';
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
-// Everything the new system will record: the pattern's components, the template
-// answers picked by hand, and anything added specially — each once.
-export function chosenComponents({ build, picks, groups, custom }) {
+// Everything the new system will record: the standard build's components, the
+// answers picked by hand (slot key → component, from the roles list), and
+// anything added specially — each once.
+export function chosenComponents({ build, picks, roles, custom }) {
   const out = new Map();
   for (const c of build?.components || []) out.set(c.id, { ...c, from: 'pattern' });
-  for (const [gid, cid] of Object.entries(picks || {})) {
-    const m = (groups || []).find(g => g.id === gid)?.members.find(x => x.id === cid);
+  for (const [key, cid] of Object.entries(picks || {})) {
+    const m = (roles || []).find(r => r.key === key)?.members.find(x => x.id === cid);
     if (m && !out.has(m.id)) out.set(m.id, { ...m, from: 'answer' });
   }
   for (const c of custom || []) if (!out.has(c.id)) out.set(c.id, { ...c, from: 'added' });
   return [...out.values()];
 }
 
-// A template group applies to every system, or — with triggers — only to a
-// system that records one of them. A group with no members asks nothing yet
-// (v165), so it is not shown.
-export function groupsThatApply(groups, chosen) {
-  const ids = new Set(chosen.map(c => c.id));
-  return (groups || []).filter(g => g.members?.length
-    && (!g.triggers?.length || g.triggers.some(t => ids.has(t.id))));
+// The questions the chosen system pattern asks that a role answers (v178), each
+// with what answers it among the chosen components.
+export function slotsToAnswer(pattern, roles, chosen) {
+  const can = (c, key) => (c.roles || (roles || []).find(r => r.key === key)?.members.find(m => m.id === c.id)?.roles || []).includes(key);
+  return (pattern?.slots || []).filter(s => s.fill === 'role')
+    .map(s => ({ ...s, answers: chosen.filter(c => can(c, s.key)) }));
 }
 
 // The security solutions the record will imply: a rule whose trigger is among
-// the components.
-export function impliedSolutions(rules, chosen) {
+// the components, or (v178) names the system pattern.
+export function impliedSolutions(rules, chosen, systemPattern = null) {
   const ids = new Set(chosen.map(c => c.id));
   const out = new Map();
   for (const r of rules || []) {
     const by = r.triggers.filter(t => ids.has(t.id)).map(t => t.name);
+    if (systemPattern && (r.pattern_triggers || []).includes(systemPattern)) by.push(`its pattern, ${systemPattern}`);
     if (by.length) out.set(r.pattern_name, [...(out.get(r.pattern_name) || []), ...by]);
   }
   return [...out.entries()].map(([name, by]) => ({ name, by: [...new Set(by)] }));
@@ -92,7 +95,9 @@ export function SystemCreateWizard() {
   // step 2
   const [mode, setMode]     = useState(undefined);    // a pattern's id | HAND
   // step 3 / 4
-  const [picks, setPicks]   = useState({});           // group id → component id
+  const [picks, setPicks]   = useState({});           // slot key → component id
+  const [patterns, setPatterns] = useState([]);       // the system patterns
+  const [sysPattern, setSysPattern] = useState(undefined);   // its code | '' (not sure yet)
   const [custom, setCustom] = useState([]);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
@@ -104,9 +109,10 @@ export function SystemCreateWizard() {
   const [error, setError]   = useState('');
   const [createdId, setCreatedId] = useState(null);
 
-  const loadLib = useCallback(() => getArchitecture().then(setLib).catch(() => setLib({ groups: [], rules: [], builds: [] })), []);
+  const loadLib = useCallback(() => getArchitecture().then(setLib).catch(() => setLib({ roles: [], rules: [], builds: [] })), []);
   useEffect(() => {
     loadLib();
+    getSystemPatterns().then(d => setPatterns(d.patterns || [])).catch(() => setPatterns([]));
     getDepartments().then(d => setDepts(d || [])).catch(() => {});
     getUsers().then(u => setUsers(u || [])).catch(() => {});
   }, [loadLib]);
@@ -116,11 +122,11 @@ export function SystemCreateWizard() {
   useEffect(() => { if (!ownerTouched) setOwner(deptIao?.id || ''); }, [deptIao?.id, ownerTouched]);
 
   const build = lib?.builds.find(b => b.id === mode) || null;
-  const chosen = useMemo(() => chosenComponents({ build, picks, groups: lib?.groups, custom }), [build, picks, lib, custom]);
-  const applying = useMemo(() => groupsThatApply(lib?.groups, chosen), [lib, chosen]);
-  const answersFor = (g) => chosen.filter(c => g.members.some(m => m.id === c.id));
-  const blanks = applying.filter(g => answersFor(g).length === 0);
-  const implied = useMemo(() => impliedSolutions(lib?.rules, chosen), [lib, chosen]);
+  const pattern = patterns.find(p => p.code === sysPattern) || null;
+  const chosen = useMemo(() => chosenComponents({ build, picks, roles: lib?.roles, custom }), [build, picks, lib, custom]);
+  const slots = useMemo(() => slotsToAnswer(pattern, lib?.roles, chosen), [pattern, lib, chosen]);
+  const blanks = slots.filter(s => s.required && s.answers.length === 0);
+  const implied = useMemo(() => impliedSolutions(lib?.rules, chosen, sysPattern || null), [lib, chosen, sysPattern]);
 
   useEffect(() => {
     if (search.trim().length < 2) { setResults([]); return; }
@@ -140,7 +146,7 @@ export function SystemCreateWizard() {
   const stepOk = [
     name.trim() && (!isCrossDept || deptId) && security !== null,
     mode !== undefined,
-    true,
+    sysPattern !== undefined,
     chosen.length === 0 || status !== '',
     true,
   ];
@@ -153,9 +159,12 @@ export function SystemCreateWizard() {
         const made = await createSystem({
           name: name.trim(), description: desc.trim() || undefined, department_id: deptId || undefined,
           owner_user_id: ownerId || undefined, is_shared: isShared, is_security_system: security === true,
+          system_pattern: sysPattern || undefined,
         });
         id = made.id; setCreatedId(id);
       }
+      // A new system has nothing recorded, so a build cannot overlap it; its pattern
+      // came with the build (or was chosen by hand for a build that states none).
       if (build) await applySystemBuild(id, build.id, status);
       for (const c of chosen.filter(x => x.from !== 'pattern')) {
         await linkSystemComponent(id, c.id);
@@ -165,7 +174,7 @@ export function SystemCreateWizard() {
         catch (err) { if (err.response?.status !== 409) throw err; }
       }
       if (savePattern && !build && chosen.length) {
-        const made = await createArchitectureItem('builds', { name: `${name.trim()} pattern` });
+        const made = await createArchitectureItem('builds', { name: `${name.trim()} standard build` });
         const bid = (made.build || made).id;
         for (const c of chosen) await addArchitectureComponent('builds', bid, 'components', c.id);
       }
@@ -233,13 +242,13 @@ export function SystemCreateWizard() {
           </>)}
 
           {step === 1 && (<>
-            <p className={styles.lead}>Start from a system architecture pattern if one fits. It records the usual components in one
+            <p className={styles.lead}>Start from a standard build if one fits. It records the usual components in one
               step and keeps systems of the same kind alike.</p>
-            {lib && lib.builds.length === 0 && <p className={styles.muted}>No patterns have been made yet.</p>}
+            {lib && lib.builds.length === 0 && <p className={styles.muted}>No standard builds have been made yet.</p>}
             <div className={styles.options}>
               {(lib?.builds || []).map(b => (
                 <button type="button" key={b.id} className={styles.option} aria-pressed={mode === b.id}
-                  onClick={() => { setMode(b.id); setPicks({}); }}>
+                  onClick={() => { setMode(b.id); setPicks({}); setSysPattern(b.system_pattern || undefined); }}>
                   <span><PatternChip kind="pattern" iconOnly /> {b.name}</span>
                   <small>{plural(b.components.length, 'component')}{b.notes ? ` · ${b.notes}` : ''}</small>
                 </button>
@@ -248,60 +257,80 @@ export function SystemCreateWizard() {
             <h2 className={styles.sub}>Nothing fits? <HelpDot k="system_wizard.nothing_fits" placement="bottom" /></h2>
             <div className={styles.options}>
               <div className={styles.note}>
-                <b>There will be more like this: make a pattern first.</b>{' '}
+                <b>There will be more like this: make a standard build first.</b>{' '}
                 {canArchitect
-                  ? <>Build it on <Link to="/architecture-patterns" target="_blank" rel="noreferrer">System architecture patterns</Link> (opens in a new tab), then{' '}
-                      <button type="button" className={styles.linkBtn} onClick={loadLib}>reload the patterns</button> and choose it here.</>
-                  : <>Making a pattern needs the architecture permission. Ask an architect, or build this one by hand.</>}
+                  ? <>Build it on <Link to="/architecture-patterns" target="_blank" rel="noreferrer">Standard builds</Link> (opens in a new tab), then{' '}
+                      <button type="button" className={styles.linkBtn} onClick={loadLib}>reload the standard builds</button> and choose it here.</>
+                  : <>Making a standard build needs the architecture permission. Ask an architect, or build this one by hand.</>}
               </div>
               <button type="button" className={styles.option} aria-pressed={mode === HAND} onClick={() => { setMode(HAND); setPicks({}); }}>
                 It is a one-off: build it by hand
-                <small>Pick each component yourself. You can save it as a pattern at the end.</small>
+                <small>Pick each component yourself. You can save it as a standard build at the end.</small>
               </button>
             </div>
           </>)}
 
           {step === 2 && (<>
-            <p className={styles.lead}>Every system records one component from each group of the systems architecture template.
-              {build ? ' The pattern answers most of them.' : ' Building by hand, you answer each one.'}</p>
-            {applying.length === 0 && <p className={styles.muted}>The template has no groups yet.</p>}
-            <div className={styles.slots}>
-              {applying.map(g => {
-                const got = answersFor(g);
-                return (
-                  <div key={g.id} className={got.length ? styles.slot : styles.slotEmpty}>
-                    <span className={styles.slotGroup}>{g.name}</span>
-                    {got.length > 0
-                      ? <span className={styles.slotValue}>{got.map(c => c.name).join(', ')}</span>
-                      : (
-                        <select className={styles.input} value={picks[g.id] || ''} aria-label={`Answer for ${g.name}`}
-                          onChange={e => setPicks(p => ({ ...p, [g.id]: e.target.value }))}>
-                          <option value="">Nothing recorded — choose one…</option>
-                          {g.members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                        </select>
-                      )}
-                    {picks[g.id] && got.length > 0 && (
-                      <button type="button" className={styles.linkBtn} onClick={() => setPicks(p => { const n = { ...p }; delete n[g.id]; return n; })}>Change</button>
-                    )}
-                  </div>
-                );
-              })}
+            <p className={styles.lead}>Which shape of system is it? Its pattern decides the questions its record must answer.
+              {build ? ' The standard build answers most of them.' : ' Building by hand, you answer each one.'}</p>
+            {build?.system_pattern && (
+              <p className={styles.say}>The standard build <b>{build.name}</b> follows {build.system_pattern}, so this system does
+                too. To use another pattern, go back and choose a build that follows it, or build it by hand.</p>
+            )}
+            <div className={styles.options}>
+              {patterns.map(p => (
+                <button type="button" key={p.code} className={styles.option} aria-pressed={sysPattern === p.code}
+                  disabled={!!build?.system_pattern && p.code !== build.system_pattern}
+                  onClick={() => { setSysPattern(p.code); setPicks({}); }}>
+                  {p.code} · {p.name}
+                  <small>{p.summary}</small>
+                </button>
+              ))}
+              <button type="button" className={styles.option} aria-pressed={sysPattern === ''} disabled={!!build?.system_pattern}
+                onClick={() => { setSysPattern(''); setPicks({}); }}>
+                Not sure yet
+                <small>{security ? 'Fine for a security system: its security solutions describe it.' : 'Nothing is asked, and the system is named in the findings until a pattern is chosen.'}</small>
+              </button>
             </div>
-            {blanks.length > 0
-              ? <p className={styles.warn}>{plural(blanks.length, 'group')} not answered: {blanks.map(g => g.name).join(', ')}. You can create the
-                  system with blanks; it will show as an incomplete record until they are answered.</p>
-              : applying.length > 0 && <p className={styles.say}>Every group is answered.</p>}
-            <p className={styles.muted}>The right answer is not listed? It has to be created and added to that group first; you can do that in the next step.</p>
+            {pattern && (<>
+              <div className={styles.slots}>
+                {slots.map(sl => {
+                  const members = (lib?.roles || []).find(r => r.key === sl.key)?.members || [];
+                  return (
+                    <div key={sl.key} className={sl.answers.length ? styles.slot : styles.slotEmpty}>
+                      <span className={styles.slotGroup}>{sl.label}{sl.required ? '' : ' (optional)'}</span>
+                      {sl.answers.length > 0
+                        ? <span className={styles.slotValue}>{sl.answers.map(c => c.name).join(', ')}</span>
+                        : (
+                          <select className={styles.input} value={picks[sl.key] || ''} aria-label={`Answer for ${sl.label}`}
+                            onChange={e => setPicks(p => ({ ...p, [sl.key]: e.target.value }))}>
+                            <option value="">Nothing recorded — choose one…</option>
+                            {members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                          </select>
+                        )}
+                      {picks[sl.key] && sl.answers.length > 0 && (
+                        <button type="button" className={styles.linkBtn} onClick={() => setPicks(p => { const n = { ...p }; delete n[sl.key]; return n; })}>Change</button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {blanks.length > 0
+                ? <p className={styles.warn}>{plural(blanks.length, 'required question')} not answered: {blanks.map(s => s.label).join(', ')}. You can create the
+                    system with blanks; it will show as an incomplete record until they are answered.</p>
+                : <p className={styles.say}>Every required question is answered.</p>}
+              <p className={styles.muted}>The right answer is not listed? Create it in the next step and say what it can answer.</p>
+            </>)}
           </>)}
 
           {step === 3 && (<>
-            <p className={styles.lead}>Anything this system has that {build ? 'the pattern does not' : 'is not an answer above'}: special software, a
+            <p className={styles.lead}>Anything this system has that {build ? 'the standard build does not' : 'is not an answer above'}: special software, a
               device, a team.</p>
             <ul className={styles.list}>
               {chosen.map(c => (
                 <li key={c.id}>
-                  <span className={styles.type}>{componentTypeShort(c.component_type)}</span> {c.name}
-                  <span className={styles.from}>{c.from === 'pattern' ? 'from the pattern' : c.from === 'answer' ? 'template answer' : 'added by hand'}</span>
+                  <span className={styles.type}><TypeBadge type={c.component_type} variant="text" /></span> {c.name}
+                  <span className={styles.from}>{c.from === 'pattern' ? 'from the standard build' : c.from === 'answer' ? 'answers a question' : 'added by hand'}</span>
                   {c.from === 'added' && (
                     <button type="button" className={styles.linkBtn} aria-label={`Remove ${c.name}`}
                       onClick={() => setCustom(list => list.filter(x => x.id !== c.id))}>Remove</button>
@@ -319,7 +348,7 @@ export function SystemCreateWizard() {
               <ul className={styles.list}>
                 {results.map(c => (
                   <li key={c.id}>
-                    <span className={styles.type}>{componentTypeShort(c.component_type)}</span> {c.name}
+                    <span className={styles.type}><TypeBadge type={c.component_type} variant="text" /></span> {c.name}
                     <button type="button" className={styles.linkBtn} aria-label={`Add ${c.name}`}
                       onClick={() => { setCustom(list => [...list, c]); setSearch(''); setResults([]); }}>Add</button>
                   </li>
@@ -348,16 +377,14 @@ export function SystemCreateWizard() {
                 {chosen.some(c => c.from !== 'pattern') && `, plus ${plural(chosen.filter(c => c.from !== 'pattern').length, 'component')} added here`}.
                 {' '}{plural(chosen.length, 'component')}{status ? `, recorded as ${status}` : ''}.
               </div>
+              <div className={styles.muted}>{pattern ? `Follows ${pattern.code} · ${pattern.name}.` : 'No system pattern stated.'}</div>
               <div className={styles.slots}>
-                {applying.map(g => {
-                  const got = answersFor(g);
-                  return (
-                    <div key={g.id} className={got.length ? styles.slot : styles.slotEmpty}>
-                      <span className={styles.slotGroup}>{g.name}</span>
-                      <span className={styles.slotValue}>{got.length ? got.map(c => c.name).join(', ') : 'Nothing recorded'}</span>
-                    </div>
-                  );
-                })}
+                {slots.map(sl => (
+                  <div key={sl.key} className={sl.answers.length || !sl.required ? styles.slot : styles.slotEmpty}>
+                    <span className={styles.slotGroup}>{sl.label}</span>
+                    <span className={styles.slotValue}>{sl.answers.length ? sl.answers.map(c => c.name).join(', ') : 'Nothing recorded'}</span>
+                  </div>
+                ))}
               </div>
               <h2 className={styles.sub}>What this record implies <HelpDot k="system_wizard.implies" placement="bottom" /></h2>
               {implied.length === 0
@@ -372,7 +399,7 @@ export function SystemCreateWizard() {
             {!build && chosen.length > 0 && canArchitect && (
               <label className={styles.tick}>
                 <input type="checkbox" checked={savePattern} onChange={e => setSavePattern(e.target.checked)} />
-                <span>Save this build as a system architecture pattern<small>Named &ldquo;{name.trim()} pattern&rdquo;, for the next system like it. You can rename it afterwards.</small></span>
+                <span>Save this as a standard build<small>Named &ldquo;{name.trim()} standard build&rdquo;, for the next system like it. You can rename it afterwards.</small></span>
               </label>
             )}
             {error && <p className={styles.error} role="alert">{error}{createdId && <> <Link to={`/systems/${createdId}`}>Open the system</Link></>}</p>}

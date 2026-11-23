@@ -259,7 +259,7 @@ export function SecurityExceptionsPage() {
             <p className={styles.emptyBody}>
               {expiryFilter || levelFilter
                 ? 'Try adjusting the filters above.'
-                : 'No active risk acceptance exceptions.'}
+                : 'No active risk exceptions.'}
             </p>
           </div>
         )}

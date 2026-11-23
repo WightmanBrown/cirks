@@ -75,3 +75,7 @@
   .tiles { grid-template-columns: repeat(4, 1fr); }
   .grid { grid-template-columns: 1fr 1fr; }
 }
+/* A headline tile opens the list of what it counts. */
+.tileLink { display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; border-radius: 4px; }
+.tileLink:hover .tileLabel { color: var(--accent); text-decoration: underline; }
+.tileLink:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

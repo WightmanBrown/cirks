@@ -8,7 +8,7 @@ import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
 import { HelpDot } from '../components/HelpDot';
 import styles from './ActionRollUpPage.module.css';
-import { componentTypeShort } from '../utils/componentTypes';
+import { TypeBadge } from '../components/ComponentPill';
 
 // The cross-system remediation view (docs/security-actions.md, decision #2):
 // open action items grouped by control/component and its library owner — the
@@ -106,7 +106,7 @@ function ElementCard({ row, kind }) {
       <button type="button" className={styles.cardHead} onClick={() => setOpen(o => !o)} aria-expanded={open}>
         <span className={styles.caret}>{open ? '▾' : '▸'}</span>
         {kind === 'control' && row.framework_ref && <span className={styles.ref}>{row.framework_ref}</span>}
-        {kind === 'component' && <span className={styles.ctype}>{componentTypeShort(row.component_type)}</span>}
+        {kind === 'component' && <span className={styles.ctype}><TypeBadge type={row.component_type} variant="text" /></span>}
         <span className={styles.name}>{name}</span>
         <span className={styles.owner}>{responsibleLabel(row)}</span>
         <span className={styles.sysCount}>{countLabel(row)}</span>

@@ -8,10 +8,36 @@ import {
   getSiroCyclePending, getSiroActionPending,
   getMyInProgressActions,
   getAcceptanceQueue, getMeetings,
-  getReturnedToMe,
+  getReturnedToMe, getDepartmentReport,
 } from '../api';
 import { HelpDot } from './HelpDot';
 import styles from './MyActionsWidget.module.css';
+
+// The department's security obligations (the My department report, D7) that
+// are not met, as tasks for its owner and manager (owner, 2026-11-18: "in
+// effect actions … we missed the obligations"). One row per obligation with
+// something open, counting the open rows, linking to the report's list of them.
+export const OBLIGATION_TASK = {
+  assets_rated:        'Information assets not rated against every mandatory impact table',
+  component_record:    'Systems whose component record is incomplete',
+  threats_assessed:    'Threats identified on your systems but not assessed',
+  risks_answered:      'Risks at or above the threshold with no treatment or acceptance',
+  acceptances_in_date: 'Accepted risks out of date or above the accepter’s authority',
+  suppliers_evidenced: 'Supplier relationships without evidence of compliance',
+  risks_validated:     'Risks not yet validated',
+};
+export const OBLIGATION_ROLES = new Set(['information_asset_owner', 'information_asset_manager']);
+
+export function obligationItems(report) {
+  return (report?.obligations || [])
+    .filter(o => (o.open?.length || 0) > 0)
+    .map(o => ({
+      label: OBLIGATION_TASK[o.key] || o.label,
+      path:  '/reporting/department#obligations',
+      kind:  'action',
+      count: o.open.length,
+    }));
+}
 
 // Each item: { label, path, fetch, kind }
 // kind 'action' = must-do (red alert when > 0)
@@ -128,9 +154,10 @@ export function MyActionsWidget() {
     let cancelled = false;
 
     (async () => {
-      const [results, inFlightData] = await Promise.all([
+      const [results, inFlightData, deptReport] = await Promise.all([
         Promise.allSettled(defs.map(d => d.fetch())),
         getMyInProgressActions().catch(() => null),
+        OBLIGATION_ROLES.has(user?.role) ? getDepartmentReport().catch(() => null) : null,
       ]);
       if (cancelled) return;
 
@@ -158,6 +185,9 @@ export function MyActionsWidget() {
           count: ip,
         });
       }
+
+      // The department's security obligations not yet met (owner and manager).
+      resolved.push(...obligationItems(deptReport));
 
       setItems(resolved);
       setLoading(false);

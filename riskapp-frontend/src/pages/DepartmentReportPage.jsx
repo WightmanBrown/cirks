@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getDepartmentReport, getDepartments } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
+import { PanelQuestions } from '../components/PanelQuestions';
+import { RiskAnswerRow, RiskOpener, useRiskUnfold } from '../components/RiskAnswer';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { CompletenessRing } from '../components/CompletenessRing';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
 import { HeatMap, TrendLine } from '../components/BoardCharts';
 import { scoreLevel } from '../utils/riskColors';
 import styles from './BoardSummaryPage.module.css';
@@ -26,12 +30,17 @@ const month = (p) => new Date(`${p}-01T00:00:00Z`).toLocaleDateString('en-GB', {
 const plural = (k, one, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
 const FIRST = 8;
 
-const ANSWER = { treated: ['Being treated', rep.good], accepted: ['Accepted', rep.warn], nothing: ['Nothing answering it', rep.bad] };
+const ANSWER = { treated: ['Security action planned', rep.good], accepted: ['Formally accepted', rep.warn], nothing: ['No security action planned', rep.bad] };
 const WHY = { direct_edit: 'Assessment changed', action_verified: 'Security action completed', corrective_action: 'Corrective action' };
 
-function Panel({ title, helpKey, children }) {
+function Panel({ title, helpKey, children, id }) {
+  // `id`: an address to land on (My Tasks links to #obligations, 2026-11-18).
+  useEffect(() => {
+    if (!id || window.location.hash !== `#${id}`) return;
+    document.getElementById(id)?.scrollIntoView({ block: 'start' });
+  }, [id]);
   return (
-    <section className={styles.panel}>
+    <section className={styles.panel} id={id} style={id ? { scrollMarginTop: 80 } : undefined}>
       <h2 className={styles.panelTitle}>{title} <HelpDot k={helpKey} placement="bottom" /></h2>
       {children}
     </section>
@@ -85,13 +94,13 @@ function Headlines({ r }) {
   return (
     <div className={styles.tiles}>
       <Tile value={answered} of={h.at_or_above_action}
-        label={`of ${w} risks scoring ${t} or more are being treated or accepted`}
-        detail={h.answered.nothing ? `${plural(h.answered.nothing, 'risk has', 'risks have')} nothing answering ${h.answered.nothing === 1 ? 'it' : 'them'} yet.` : 'Every one has an answer.'} />
+        label={`of ${w} risks scoring ${t} or higher have a security action planned or have been formally accepted`}
+        detail={h.answered.nothing ? `${plural(h.answered.nothing, 'risk has', 'risks have')} neither yet.` : 'Every one has.'} />
       <Tile value={h.obligations_met} of={h.obligations_total}
         label={`of ${w} security obligations are met`}
         detail={`The record keeps this checklist${r.can_choose ? '' : ' for you'}; each open item below says what to do.`} />
       <Tile value={h.shared_at_or_above_action}
-        label={`risks scoring ${t} or more on systems other departments own that ${w} services use`}
+        label={`risks scoring ${t} or higher on systems other departments own that ${w} services use`}
         detail={`Across ${plural(r.shared.systems.filter((s) => s.at_or_above_action > 0).length, 'system')}. ${r.can_choose ? 'They are not the department\u2019s to fix, but it should know about them.' : 'They are not yours to fix, but they are yours to know about.'}`} />
       <Tile value={h.actions_need_you}
         label={`security action${h.actions_need_you === 1 ? ' needs' : 's need'} ${r.can_choose ? 'the department' : 'you'}`}
@@ -110,21 +119,98 @@ function Glance({ r }) {
         <HeatMap grid={r.heat_map.target} label="after committed work" />
         <div>
           <CompletenessRing size={96} complete={h.answered.treated + h.answered.accepted} missing={h.answered.nothing}
-            labels={{ complete: 'being treated or accepted', missing: 'nothing answering' }} of={`risks scoring ${t} or more`} />
+            labels={{ complete: 'security action planned or formally accepted', missing: 'no security action planned' }} of={`risks scoring ${t} or higher`} />
           <p className={styles.note}>
-            {plural(h.risks, 'risk')} on {whose(r) === 'your' ? 'your department\u2019s' : 'the department\u2019s'} systems; {h.at_or_above_action} score {t} or more, which means they must be treated or accepted
+            {plural(h.risks, 'risk')} on {whose(r) === 'your' ? 'your department\u2019s' : 'the department\u2019s'} systems; {h.at_or_above_action} score {t} or higher, which means they must be treated or accepted
             ({h.answered.treated} being treated, {h.answered.accepted} accepted).
             {h.above_owner_max > 0 && <> {plural(h.above_owner_max, 'risk scores', 'risks score')} above {r.thresholds.owner_max}: only the CISO, SIRO or admin may accept {h.above_owner_max === 1 ? 'it' : 'them'}.</>}
           </p>
         </div>
       </div>
+      <PanelQuestions questions={[
+        { label: 'Which of these risks need a decision, and from whom?', to: `/reporting/decisions?dept=${r.department.id}` },
+        { label: 'Which of the systems carry the most risk?', to: `/reporting/exposure?by=system&dept=${r.department.id}` },
+        { label: 'Which controls are missing on the systems?', to: `/reporting/coverage?by=system&dept=${r.department.id}` },
+      ]} />
+    </Panel>
+  );
+}
+
+// Compliance gaps (owner, 2026-11-16): control objectives the Statement of
+// Applicability says apply, with no active implementation on the department's
+// systems or for the organisation as a whole. Systems with most gaps first.
+const IMPL = { not_implemented: 'not implemented', partial: 'partly implemented', planned: 'planned' };
+const objLabel = (o) => `${o.ref ? `${o.ref.replace(/^CIRKS1\./, '')} ` : ''}${o.title}`;
+
+function ComplianceGaps({ r }) {
+  const g = r.compliance_gaps;
+  const [open, setOpen] = useState(null);
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(g.systems, { accessors: {
+    system: (x) => x.system_name, gaps: (x) => x.objectives.length,
+  } });
+  const sort = { sortKey, sortDir, onSort: toggleSort };
+  return (
+    <Panel title="Compliance gaps" helpKey="dept.compliance_gaps">
+      <p className={styles.note}>
+        Control objectives the Statement of Applicability says apply, with nothing in place to deliver them:
+        {' '}{plural(g.system_gaps, 'gap')} on {plural(g.systems.length, 'system')} of {r.can_choose ? r.department.name : 'your department'},
+        and {plural(g.organisation.length, 'objective')} delivered for the whole organisation not yet implemented.
+      </p>
+      {g.systems.length > 0 && (
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <SortableTh column="system" {...sort} helpKey="col.system">System</SortableTh>
+              <SortableTh column="gaps" {...sort} className={styles.num} helpKey="dept.col.gaps">Objectives not in place</SortableTh>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((x) => (
+              <Fragment key={x.system_id}>
+                <tr>
+                  <td><Link to={`/reporting/systems/${x.system_id}`}>{x.system_name}</Link></td>
+                  <td className={styles.num}>
+                    <button type="button" className={styles.linkBtn} aria-expanded={open === x.system_id}
+                      onClick={() => setOpen(open === x.system_id ? null : x.system_id)}>
+                      {x.objectives.length} {open === x.system_id ? '▾' : '▸'}
+                    </button>
+                  </td>
+                </tr>
+                {open === x.system_id && (
+                  <tr><td colSpan={2}>
+                    <ul className={own.list}>
+                      {x.objectives.map((o) => (
+                        <li key={o.control_id}><Link to={`/controls/${o.control_id}`}>{objLabel(o)}</Link>
+                          <span className={styles.note}> — {o.status === 'unknown' ? 'state unknown' : 'not in place'}</span></li>
+                      ))}
+                    </ul>
+                  </td></tr>
+                )}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {g.organisation.length > 0 && <>
+        <h3 className={own.groupTitle}>Delivered for the whole organisation, not yet implemented ({g.organisation.length})</h3>
+        <p className={styles.note}>These are not your department&apos;s to deliver, but every one of your systems relies on them.</p>
+        <ul className={own.list}>
+          {g.organisation.map((o) => (
+            <li key={o.control_id}><Link to={`/controls/${o.control_id}`}>{objLabel(o)}</Link>
+              <span className={styles.note}> — {IMPL[o.status] || o.status}{o.delivery === 'group' ? ', for a group of systems' : ''}</span></li>
+          ))}
+        </ul>
+      </>}
+      <PanelQuestions questions={[
+        { label: 'Which of the systems is weakest, and why?', to: `/reporting/coverage?by=system&dept=${r.department.id}` },
+      ]} />
     </Panel>
   );
 }
 
 function Obligations({ r }) {
   return (
-    <Panel title="Your security obligations" helpKey="dept.obligations">
+    <Panel title="Your security obligations" helpKey="dept.obligations" id="obligations">
       <ul className={own.obligations}>
         {r.obligations.map((o) => (
           <li key={o.key}>
@@ -154,7 +240,9 @@ function Actions({ r }) {
       <Panel title="Your security actions" helpKey="dept.actions">
         <p className={styles.note}>
           No security action touches your department.
-          {r.headline.answered.nothing > 0 && <> {plural(r.headline.answered.nothing, 'risk')} scoring {t} or more {r.headline.answered.nothing === 1 ? 'has' : 'have'} nothing answering {r.headline.answered.nothing === 1 ? 'it' : 'them'}: an action is built from the risk&apos;s page, or the risk is accepted.</>}
+          {r.headline.answered.nothing > 0 && <> {r.can_choose ? 'The department has' : 'You have'} {plural(r.headline.answered.nothing, 'risk')} scoring {t} or higher.
+            {r.headline.answered.nothing === 1 ? ' It should have a security action in place, but there is none' : ' These should have security actions in place, but there are none'}:
+            an action is built from the risk&apos;s page, or the risk is formally accepted.</>}
         </p>
       </Panel>
     );
@@ -214,8 +302,8 @@ function Shared({ r }) {
               <th>System <HelpDot k="dept.col.system" placement="bottom" /></th>
               <th>Owned by <HelpDot k="dept.col.owned_by" placement="bottom" /></th>
               <th>Your services <HelpDot k="dept.col.services" placement="bottom" /></th>
-              <th className={styles.num}>Scoring {t} or more <HelpDot k="dept.col.shared_risks" placement="bottom" /></th>
-              <th className={styles.num}>Answered <HelpDot k="dept.col.answered" placement="bottom" /></th>
+              <th className={styles.num}>Scoring {t} or higher <HelpDot k="dept.col.shared_risks" placement="bottom" /></th>
+              <th className={styles.num}>Action planned or accepted <HelpDot k="dept.col.answered" placement="bottom" /></th>
             </tr>
           </thead>
           <tbody>
@@ -240,6 +328,7 @@ function Shared({ r }) {
 }
 
 function Reputation({ r }) {
+  const [openId, toggle] = useRiskUnfold();
   const rr = r.reputation;
   return (
     <Panel title="Your reputational risks" helpKey="dept.reputation">
@@ -263,12 +352,15 @@ function Reputation({ r }) {
           </thead>
           <tbody>
             {rr.risks.slice(0, 25).map((x) => (
-              <tr key={x.risk_id}>
-                <td>{x.own ? <Link to={`/risks/${x.risk_id}`}>{x.system_name} — {x.threat_name}</Link> : `${x.system_name} — ${x.threat_name}`}</td>
+              <Fragment key={x.risk_id}>
+              <tr>
+                <td>{x.own ? <RiskOpener open={openId === x.risk_id} onToggle={() => toggle(x.risk_id)}>{x.system_name} — {x.threat_name}</RiskOpener> : `${x.system_name} — ${x.threat_name}`}</td>
                 <td className={styles.num}><Score value={x.score} /></td>
                 <td className={styles.note}>{x.ratings.map((g) => `${g.asset_name} (${g.table_name}, level ${g.level})`).join('; ')}</td>
                 <td>{x.own ? 'Yours' : x.department_name}</td>
               </tr>
+              {openId === x.risk_id && <RiskAnswerRow colSpan={4} riskId={x.risk_id} lead="score" />}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -278,6 +370,7 @@ function Reputation({ r }) {
 }
 
 function Improvement({ r }) {
+  const [openId, toggle] = useRiskUnfold();
   const t = r.thresholds.action;
   const imp = r.improvement;
   const points = imp.trend.map((s) => ({ period: s.period, v: s.summary.at_or_above_action }));
@@ -289,10 +382,10 @@ function Improvement({ r }) {
       {points.length < 2 ? (
         <p className={styles.note}>
           The monthly line starts in {month(points[0].period)}: CIRKS keeps your department&apos;s figures once a month,
-          and the line appears from the second month. Today: {plural(r.headline.at_or_above_action, 'risk')} scoring {t} or more.
+          and the line appears from the second month. Today: {plural(r.headline.at_or_above_action, 'risk')} scoring {t} or higher.
         </p>
       ) : (
-        <TrendLine series={[{ key: 'at', label: `scoring ${t} or more`, tone: 'series1', points: points.map((p) => ({ period: p.period, value: p.v })) }]} />
+        <TrendLine series={[{ key: 'at', label: `scoring ${t} or higher`, tone: 'series1', points: points.map((p) => ({ period: p.period, value: p.v })) }]} />
       )}
       <p className={styles.note}>
         In the last year {plural(imp.changes.length, 'risk score')} changed on your systems: {down.length} went down and {imp.changes.length - down.length} went up.
@@ -310,17 +403,21 @@ function Improvement({ r }) {
           </thead>
           <tbody>
             {imp.changes.slice(0, 25).map((c) => (
-              <tr key={c.id}>
+              <Fragment key={c.id}>
+              <tr>
                 <td>{day(c.changed_at)}</td>
-                <td><Link to={`/risks/${c.risk_id}`}>{c.system_name} — {c.threat_name}</Link></td>
+                <td><RiskOpener open={openId === c.id} onToggle={() => toggle(c.id)}>{c.system_name} — {c.threat_name}</RiskOpener></td>
                 <td className={styles.num}><Score value={c.before} /> → <Score value={c.after} /></td>
                 <td className={styles.note}>{c.action_title || WHY[c.source] || c.source}{c.notes ? `: ${c.notes}` : ''}</td>
                 <td className={styles.note}>{c.changed_by_name || '—'}</td>
               </tr>
+              {openId === c.id && <RiskAnswerRow colSpan={5} riskId={c.risk_id} lead="why" />}
+              </Fragment>
             ))}
           </tbody>
         </table>
       )}
+      <PanelQuestions questions={[{ label: 'What moved each score, across the department?', to: `/reporting/changes?days=365&dept=${r.department.id}` }]} />
     </Panel>
   );
 }
@@ -409,6 +506,7 @@ export function DepartmentReportPage() {
           <div className={rep.stack}>
             <Glance r={r} />
             <Obligations r={r} />
+            <ComplianceGaps r={r} />
             <Actions r={r} />
             <Shared r={r} />
             <Reputation r={r} />

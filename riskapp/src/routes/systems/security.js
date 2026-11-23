@@ -9,7 +9,13 @@
 //   PUT    /systems/:id/solution-choices/:controlId    choose a solution for an objective
 //   DELETE /systems/:id/solution-choices/:controlId
 //   GET    /systems/:id/builds/:buildId/apply          what applying a build would do
-//   POST   /systems/:id/builds/:buildId/apply          { status } — copy it on
+//   POST   /systems/:id/builds/:buildId/apply          { status, confirm_overlap?, set_pattern? } — copy it on;
+//          409 pattern_mismatch when the build and the system follow different
+//          patterns; set_pattern takes the build's pattern for a system with
+//          none (decisions 21–22);
+//          409 build_overlaps when it would answer a once-only question again
+//          (a second operating system, a second place it runs) and
+//          confirm_overlap is not true (decision 24, docs/system-patterns.md)
 //
 // Choosing and applying are edits to the system, so they take systems.write and
 // the department seat (assertWriteScope) — the IAM for their own department.
@@ -18,6 +24,7 @@
 const { query, withActor } = require('../../db/pool');
 const { assertWriteScope }  = require('../../auth/scoping');
 const { neededComponentsSql } = require('../../lib/neededComponents');
+const { buildOverlaps, patternOf } = require('../../lib/systemPatterns');
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // A build's components are copied with a status the person states (§4.4). There
@@ -61,32 +68,15 @@ async function systemSecurity(systemId) {
   // read, since completeness can change by many routes; writes the choice and
   // an audit row giving the reason. Idempotent.
   await query('SELECT settle_system_security($1)', [systemId]);
-  const [memberships, solutions, objectives] = await Promise.all([
-    // Every membership group that applies to the system, with what it records.
-    query(`
-      SELECT g.id, g.name, g.sort_index, doc.name AS standard_name,
-             COALESCE((SELECT json_agg(json_build_object('id', cc.id, 'name', cc.name) ORDER BY cc.name)
-                         FROM membership_group_members m
-                         JOIN system_components x ON x.component_id = m.component_id AND x.system_id = $1
-                         JOIN control_components cc ON cc.id = m.component_id
-                        WHERE m.group_id = g.id), '[]') AS recorded,
-             COALESCE((SELECT json_agg(json_build_object('id', cc.id, 'name', cc.name, 'instantiation', cc.instantiation) ORDER BY cc.name)
-                         FROM membership_group_members m JOIN control_components cc ON cc.id = m.component_id
-                        WHERE m.group_id = g.id), '[]') AS members
-        FROM membership_groups g JOIN control_components doc ON doc.id = g.standard_id
-       -- v165: a group with no members asks nothing yet.
-       WHERE EXISTS (SELECT 1 FROM membership_group_members m0 WHERE m0.group_id = g.id)
-         AND (NOT EXISTS (SELECT 1 FROM membership_group_triggers t WHERE t.group_id = g.id)
-              OR EXISTS (SELECT 1 FROM membership_group_triggers t
-                           JOIN system_components x ON x.component_id = t.component_id AND x.system_id = $1
-                          WHERE t.group_id = g.id))
-       ORDER BY g.sort_index, lower(g.name)`, [systemId]),
+  // v178: the system profile is gone; what a system must record is its
+  // pattern's slots, read on the system page from GET /systems/:id.
+  const [solutions, objectives] = await Promise.all([
     // Each wanted solution once, with every reason it is wanted.
     query(`
       SELECT w.pattern_id, p.name AS pattern_name, p.kind,
              json_agg(json_build_object(
                'reason', w.reason, 'rule_id', w.rule_id, 'standard_name', w.standard_name,
-               'trigger_component_name', w.trigger_component_name,
+               'trigger_component_name', w.trigger_component_name, 'trigger_pattern', w.trigger_pattern,
                'control_id', w.control_id, 'control_title', c.title, 'reference_code', c.reference_code)
                ORDER BY w.reason, w.standard_name, w.trigger_component_name) AS reasons,
              COALESCE((SELECT json_agg(json_build_object('id', oc.id, 'title', oc.title, 'reference_code', oc.reference_code)
@@ -125,7 +115,6 @@ async function systemSecurity(systemId) {
                 c.reference_code, c.title`, [systemId]),
   ]);
   return {
-    memberships: memberships.rows.map((g) => ({ ...g, answered: g.recorded.length > 0 })),
     solutions: solutions.rows,
     objectives: objectives.rows,
   };
@@ -133,16 +122,42 @@ async function systemSecurity(systemId) {
 
 // What copying a build onto the system would add, and — if the copies are not
 // operational — how many remediation candidates that creates on its risks.
-async function buildPreview(db, systemId, buildId) {
-  const { rows: [b] } = await db.query('SELECT name FROM system_builds WHERE id = $1', [buildId]);
+// The build's pattern against the system's (decisions 21–23, docs/system-patterns.md):
+//   match       both state the same pattern
+//   mismatch    both state one and they differ: refused, a person decides which is wrong
+//   offer       the build states one and the system none: offered, set only when confirmed
+//   build_none  the build states none: allowed, with a warning of what is lost
+function patternCheck(buildCode, systemCode) {
+  const words = (c) => (c ? { code: c, name: patternOf(c).name } : null);
+  const state = !buildCode ? 'build_none'
+    : !systemCode ? 'offer'
+    : buildCode === systemCode ? 'match' : 'mismatch';
+  return { state, build: words(buildCode), system: words(systemCode) };
+}
+
+// setPattern: whether an offered pattern is taken (decision 22). The preview
+// assumes it is, so its overlaps are the ones the person will meet.
+async function buildPreview(db, systemId, buildId, { setPattern = true } = {}) {
+  const { rows: [b] } = await db.query('SELECT name, system_pattern FROM system_builds WHERE id = $1', [buildId]);
   if (!b) return null;
+  const { rows: [sys] } = await db.query('SELECT system_pattern FROM systems WHERE id = $1', [systemId]);
+  const pattern = patternCheck(b.system_pattern, sys?.system_pattern ?? null);
   const { rows: comps } = await db.query(`
-    SELECT cc.id, cc.name, cc.component_type, cc.instantiation,
+    SELECT cc.id, cc.name, cc.component_type, cc.instantiation, cc.roles,
            EXISTS (SELECT 1 FROM system_components x WHERE x.system_id = $1 AND x.component_id = cc.id) AS already
       FROM system_build_components bc JOIN control_components cc ON cc.id = bc.component_id
      WHERE bc.build_id = $2
      ORDER BY cc.component_type, cc.name`, [systemId, buildId]);
   const adding = comps.filter((c) => !c.already).map((c) => c.id);
+  // Decision 24: a second build may answer a once-only question again.
+  const { rows: recorded } = await db.query(`
+    SELECT cc.id, cc.name, cc.roles, x.slot_key, s.system_pattern
+      FROM systems s
+      LEFT JOIN system_components x ON x.system_id = s.id
+      LEFT JOIN control_components cc ON cc.id = x.component_id
+     WHERE s.id = $1`, [systemId]);
+  const effective = sys?.system_pattern ?? (pattern.state === 'offer' && setPattern ? b.system_pattern : null);
+  const overlaps = buildOverlaps(effective, recorded.filter((r) => r.id), comps.filter((c) => !c.already));
   // A component that is not operational is a mandatory candidate on every active
   // risk whose threat a control needing it counters (the Build-from-gap rule).
   // Organisational components are never per-system candidates (v137).
@@ -157,9 +172,11 @@ async function buildPreview(db, systemId, buildId) {
      WHERE r.system_id = $1 AND r.is_active AND n.component_id = ANY($2::uuid[])`, [systemId, adding])
     : { rows: [{ pairs: 0, risks: 0, components: 0 }] };
   return {
-    build: { id: buildId, name: b.name },
+    build: { id: buildId, name: b.name, system_pattern: b.system_pattern },
+    pattern,
     components: comps,
     adding: adding.length,
+    overlaps,
     // Only if the copies are added as anything other than operational.
     candidates_if_not_operational: cand[0],
   };
@@ -247,9 +264,22 @@ module.exports = function mount(router, { canView, canCreate }) {
     try {
       await assertWriteScope(req, { table: 'systems', id: req.params.id });
       const out = await withActor(req.user.id, async (db) => {
-        const p = await buildPreview(db, req.params.id, req.params.buildId);
+        const setPattern = req.body?.set_pattern === true;
+        const p = await buildPreview(db, req.params.id, req.params.buildId, { setPattern });
         if (!p) return null;
+        if (p.pattern.state === 'mismatch') return { mismatch: p };
+        if (p.overlaps.length && req.body?.confirm_overlap !== true) return { overlap: p };
         const { rows: [s] } = await db.query('SELECT name FROM systems WHERE id = $1', [req.params.id]);
+        let patternSet = null;
+        if (p.pattern.state === 'offer' && setPattern) {
+          await db.query('UPDATE systems SET system_pattern = $2, updated_at = now() WHERE id = $1', [req.params.id, p.pattern.build.code]);
+          patternSet = p.pattern.build.code;
+          // Written as PATCH /systems/:id/pattern writes it, so the pattern's history is in one place.
+          await db.query(
+            `INSERT INTO audit_log (user_id, action, entity_type, entity_id, entity_label, human_narrative)
+             VALUES ($1, 'update', 'system', $2, $3, $4)`, [req.user.id, req.params.id, s.name,
+              `System "${s.name}": pattern not stated → ${patternSet} ${p.pattern.build.name}, from the standard build "${p.build.name}"`]);
+        }
         const { rows } = await db.query(`
           INSERT INTO system_components (system_id, component_id, status, added_by)
           SELECT $1, bc.component_id, $3::system_element_status, $4
@@ -258,10 +288,29 @@ module.exports = function mount(router, { canView, canCreate }) {
           RETURNING component_id`, [req.params.id, req.params.buildId, status, req.user.id]);
         await audit(db, req.user.id, req.params.id, s.name, 'update',
           `${s.name}: build "${p.build.name}" applied — ${rows.length} component${rows.length === 1 ? '' : 's'} added as ${status}`
-          + (p.components.length > rows.length ? `, ${p.components.length - rows.length} already recorded` : ''));
-        return { added: rows.length, already: p.components.length - rows.length };
+          + (p.components.length > rows.length ? `, ${p.components.length - rows.length} already recorded` : '')
+          + p.overlaps.map((o) => `; confirmed a second answer to "${o.label}": ${o.adding.map((c) => c.name).join(', ')}`
+            + ` beside ${o.recorded.map((c) => c.name).join(', ')}`).join(''));
+        return { added: rows.length, already: p.components.length - rows.length, ...(patternSet ? { system_pattern: patternSet } : {}) };
       });
       if (!out) return res.status(404).json({ error: 'Build not found.' });
+      if (out.mismatch) {
+        const { build, system } = out.mismatch.pattern;
+        return res.status(409).json({
+          error: `The standard build "${out.mismatch.build.name}" follows ${build.code} ${build.name}; this system follows `
+            + `${system.code} ${system.name}. One of them is wrong. Change the system's pattern, or choose a build that follows `
+            + `${system.code}, before applying it.`,
+          code: 'pattern_mismatch', pattern: out.mismatch.pattern,
+        });
+      }
+      if (out.overlap) {
+        const o = out.overlap.overlaps;
+        return res.status(409).json({
+          error: `This standard build would give the system a second answer to ${o.map((x) => `"${x.label}"`).join(' and ')}. `
+            + 'Confirm that the system really has both, or record it as two systems.',
+          code: 'build_overlaps', overlaps: o,
+        });
+      }
       res.status(201).json(out);
     } catch (err) { next(err); }
   });

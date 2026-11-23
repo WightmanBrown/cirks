@@ -37,6 +37,8 @@ router.get('/',        canView,   getControls);
 // The security solutions library (v147) — registered before '/:id' routes.
 router.get('/solutions', canView, patterns.listSolutions);
 router.get('/solutions/recorded-on', canView, patterns.recordedOn);
+// The security solution patterns (v176): what each needs, shipped with the code.
+router.get('/solution-patterns', canView, patterns.listSolutionPatterns);
 // One solution, seen from its own page (/security-solutions/:id).
 router.post('/solutions',                                    canCreate, patterns.createSolution);
 router.get('/solutions/:patternId',                          canView,   patterns.getSolution);
@@ -45,6 +47,7 @@ router.delete('/solutions/:patternId',                       canCreate, patterns
 router.post('/solutions/:patternId/objectives',              canCreate, patterns.addSolutionObjective);
 router.delete('/solutions/:patternId/objectives/:controlId', canCreate, patterns.removeSolutionObjective);
 router.post('/solutions/:patternId/parts',                   canCreate, patterns.addSolutionPart);
+router.patch('/solutions/:patternId/parts/:partId',          canCreate, patterns.setSolutionPartSlot);
 router.delete('/solutions/:patternId/parts/:partId',         canCreate, patterns.removeSolutionPart);
 router.post('/import', adminOnly, importControls);
 router.post('/',       canCreate, createControl);

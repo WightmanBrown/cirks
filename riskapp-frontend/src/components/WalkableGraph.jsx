@@ -159,9 +159,10 @@ export function WalkableGraph({ rootType, rootId }) {
         />
         {!loading && !error && (
           <div className={styles.legend}>
-            {LEGEND_ITEMS.map(({ key, label, color }) => (
+            {LEGEND_ITEMS.map(({ key, label, color, shape }) => (
               <div key={key} className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: color.bg, border: `2px solid ${color.border}` }} />
+                <span className={`${styles.legendDot} ${styles[`shape_${shape.replace(/-/g, '_')}`] || ''}`}
+                  data-shape={shape} style={{ background: color.bg, border: `2px solid ${color.border}` }} />
                 <span className={styles.legendLabel}>{label}</span>
               </div>
             ))}

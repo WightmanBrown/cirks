@@ -26,7 +26,7 @@ export function FindingAcceptForm({ kind = 'rating-incomplete', subjectId, asset
       await acceptFinding(kind, id, { justification, expires_at: expiresAt, review_cadence: cadence });
       await onDone();
     } catch (ex) {
-      setErr(ex.response?.data?.error || 'Could not record the acceptance.');
+      setErr(ex.response?.data?.error || 'Could not record the exception.');
       setBusy(false);
     }
   }

@@ -3,7 +3,7 @@
 //
 // The SIRO's report (docs/reporting-siro.md, reports 1 and 2).
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 let caps;
@@ -37,8 +37,10 @@ const report = {
   },
 };
 
+const { riskAnswerSample } = await import('../components/RiskAnswer.sample');
 vi.mock('../api', () => ({
   getSiroReport: vi.fn(async () => report),
+  getRiskAnswer: vi.fn(async () => riskAnswerSample()),
   getViewMode: vi.fn(async () => ({ view_mode: 'business' })),
   putViewMode: vi.fn(async () => ({})),
 }));
@@ -59,12 +61,15 @@ describe('SIRO report', () => {
     expect(screen.getByText('needs reports.read')).toBeInTheDocument();
   });
 
-  test('lists the risks decided with nothing carrying them out, each opening the risk', async () => {
+  test('lists the risks decided with nothing carrying them out, each unfolding its answer', async () => {
     show();
-    const heading = await screen.findByRole('heading', { name: /Decided, with nothing carrying it out/ });
+    const heading = await screen.findByRole('heading', { name: /Risks with a treatment decided but no security action/ });
     const table = heading.nextElementSibling.nextElementSibling;
     expect(table).toHaveTextContent('Ransomware');
-    expect(table.querySelector('a[href="/risks/r1"]')).not.toBeNull();
+    fireEvent.click(within(table).getByRole('button', { name: /Ransomware/ }));
+    // The decision comes first on the SIRO's lists, and links to that section.
+    expect(await within(table).findByText('Mitigate, not agreed')).toBeInTheDocument();
+    expect(table.querySelector('a[href="/risks/r1#decision"]')).not.toBeNull();
   });
 
   test('says who may accept what, from the organisation\'s thresholds', async () => {
@@ -74,19 +79,32 @@ describe('SIRO report', () => {
     expect(screen.getAllByText('19').length).toBeGreaterThan(0);
   });
 
-  test('flags an acceptance outside its accepter\'s authority and one expiring soon', async () => {
+  test('flags an exception outside its accepter\'s authority and one expiring soon', async () => {
     show();
     expect(await screen.findByText('No: the risk has risen')).toBeInTheDocument();
-    expect(screen.getByText(/1 acceptance now outside the accepter's authority/)).toBeInTheDocument();
-    expect(screen.getByText(/1 acceptance expiring within 90 days/)).toBeInTheDocument();
+    expect(screen.getByText(/1 exception now outside the accepter's authority/)).toBeInTheDocument();
+    expect(screen.getByText(/1 exception expiring within 90 days/)).toBeInTheDocument();
     expect(screen.getByText('2 times')).toBeInTheDocument();
   });
 
-  test('shows exposure now and after committed work', async () => {
+  test('summarises the risk by department, with the organisation as the last row', async () => {
     show();
-    const heading = await screen.findByRole('heading', { name: /Now, and after committed work/ });
-    const rows = heading.nextElementSibling.querySelectorAll('tbody tr');
-    expect(rows[0]).toHaveTextContent('Scoring 12 or more32');
-    expect(rows[1]).toHaveTextContent('Above 1911');
+    const heading = await screen.findByRole('heading', { name: /Risk by department/ });
+    const table = heading.parentElement.querySelector('table');
+    expect(table.querySelector('tfoot')).toHaveTextContent('All departments');
+    expect(screen.queryByRole('heading', { name: /Now, and after committed work/ })).not.toBeInTheDocument();
+  });
+
+  test('a headline box lists the risks behind its number and says where it comes from', async () => {
+    show();
+    const box = await screen.findByRole('button', { name: /treatment decided, but no security action/ });
+    fireEvent.click(box);
+    expect(box).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent(/Where this number comes from/);
+    expect(screen.getByRole('heading', { name: /Risks with a treatment decided but no security action/ })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Who may accept a risk/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Active exceptions/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Show everything' }));
+    expect(await screen.findByRole('heading', { name: /Who may accept a risk/ })).toBeInTheDocument();
   });
 });

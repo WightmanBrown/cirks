@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 import { getComponentColor } from '../utils/componentColors';
+import { componentTypeLabel, componentTypeShort } from '../utils/componentTypes';
 import styles from './ComponentPill.module.css';
 
 const STATUS_COLOR = {
@@ -77,16 +78,25 @@ export function ComponentPill({
 }
 
 /**
- * Small type label chip — used as a group header in list views.
+ * THE way to show a component's type, in the PPITF colours (styles/globals.css,
+ * --ppitf-*), so a type reads the same on every page.
+ *
+ * badge (default): a filled chip, for a heading or a group.
+ * text:            the type word in its colour, beside a component's name.
+ * `label` long gives "Policies & documents"; short (default) gives "document".
  */
-export function TypeBadge({ type, small = false }) {
+export function TypeBadge({ type, small = false, variant = 'badge', label = 'short', className = '' }) {
   const { bg, text } = getComponentColor(type);
+  const word = label === 'long' ? componentTypeLabel(type) : componentTypeShort(type);
+  if (variant === 'text') {
+    return <span className={`${styles.typeText} ${className}`} style={{ color: bg }}>{word}</span>;
+  }
   return (
     <span
-      className={`${styles.typeBadge} ${small ? styles.typeBadgeSmall : ''}`}
+      className={`${styles.typeBadge} ${small ? styles.typeBadgeSmall : ''} ${className}`}
       style={{ background: bg, color: text }}
     >
-      {type}
+      {word}
     </span>
   );
 }

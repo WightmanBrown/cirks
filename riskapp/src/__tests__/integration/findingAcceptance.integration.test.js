@@ -113,7 +113,7 @@ describe('revoking it', () => {
     expect((await revoke('siro')).status).toBe(409);
     const { rows } = await query(
       `SELECT human_narrative FROM audit_log WHERE entity_type = 'exceptions' AND entity_id = $1`, [exceptionId]);
-    expect(rows[0].human_narrative).toMatch(/revoked the acceptance/);
+    expect(rows[0].human_narrative).toMatch(/revoked the exception/);
     expect((await finding()).exception_id).toBeNull();
   });
 

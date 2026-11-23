@@ -4,11 +4,33 @@ on:
   push:
     branches: [main]
   pull_request:
+    # ready_for_review: a draft skips the slow story check, so it runs when the
+    # pull request is marked ready.
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# A newer push to the same pull request cancels the run it supersedes.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Where jobs run (owner, 2026-11-09): on the runners the repository variable
+# CI_RUNS_ON names, as JSON, e.g. '["self-hosted","cirks-dev"]' in CIRKS-dev, where
+# a runner on the CIRKS-dev machine uses no paid minutes. Unset (the public
+# repository, or to fall back) means GitHub's ubuntu-latest. Jobs that start
+# Postgres use a random host port, and the story check's API uses 3913, because
+# that machine runs its own Postgres on 5432 and CIRKS on 3000.
+#
+# Minutes (owner, 2026-11-09): CIRKS-dev's Actions minutes are paid; the public
+# repository's are free. A change reaches main only through a pull request that
+# has passed every job, so in CIRKS-dev the push to main runs nothing (each job's
+# `if`). The public repository still runs everything on main, which keeps its
+# README badge honest.
 
 jobs:
   audit:
+    if: github.event_name != 'push' || github.repository == 'WightmanBrown/cirks'
     name: dependency audit (hardening H-10)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,8 +64,9 @@ jobs:
           npm audit --prefix riskapp-frontend || true
 
   install-script:
+    if: github.event_name != 'push' || github.repository == 'WightmanBrown/cirks'
     name: install guide and install.sh agree
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,11 +76,19 @@ jobs:
       # Install workflow then proves those blocks install CIRKS.
       - run: node deploy/check-install-script.mjs
       - run: node --test deploy/
+      - name: shellcheck (GitHub's runners have it; the CIRKS-dev runner fetches it)
+        run: |
+          if ! command -v shellcheck > /dev/null; then
+            v=v0.10.0; arch=$(uname -m)
+            curl -sSfL "https://github.com/koalaman/shellcheck/releases/download/$v/shellcheck-$v.linux.$arch.tar.xz" | tar -xJ -C "$RUNNER_TEMP"
+            echo "$RUNNER_TEMP/shellcheck-$v" >> "$GITHUB_PATH"
+          fi
       - run: shellcheck deploy/install.sh .github/scripts/remove-preinstalled-docker.sh
 
   frontend:
+    if: github.event_name != 'push' || github.repository == 'WightmanBrown/cirks'
     name: frontend (lint · test · build)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     defaults:
       run:
         working-directory: riskapp-frontend
@@ -75,8 +106,9 @@ jobs:
       - run: npm run build
 
   backend-unit:
+    if: github.event_name != 'push' || github.repository == 'WightmanBrown/cirks'
     name: backend (mocked unit tests)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     defaults:
       run:
         working-directory: riskapp
@@ -92,8 +124,9 @@ jobs:
       - run: npm test
 
   migration-upgrade-path:
+    if: github.event_name != 'push' || github.repository == 'WightmanBrown/cirks'
     name: migrations against a POPULATED database (upgrade path)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     defaults:
       run:
         working-directory: riskapp
@@ -117,7 +150,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: riskapp_test
         ports:
-          - 5432:5432
+          - 5432        # a random host port: a self-hosted runner has its own Postgres on 5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -125,9 +158,13 @@ jobs:
           --health-retries 5
     env:
       PGPASSWORD: postgres
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
-      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
     steps:
+      - name: Use this job's own database, on the port the runner gave it
+        run: |
+          port=${{ job.services.postgres.ports['5432'] }}
+          echo "PGPORT=$port" >> "$GITHUB_ENV"
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:$port/riskapp_test" >> "$GITHUB_ENV"
+          echo "TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:$port/riskapp_test" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0          # need main to diff the migration set against
@@ -165,8 +202,9 @@ jobs:
             awk '{ if ($1 < 100) { print "role_permissions collapsed to " $1 " rows — a migration inserted into a table db/seed.js only fills when EMPTY"; exit 1 } else print "role_permissions: " $1 " rows" }'
 
   backend-integration:
+    if: github.event_name != 'push' || github.repository == 'WightmanBrown/cirks'
     name: backend (DB-backed integration tests)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     defaults:
       run:
         working-directory: riskapp
@@ -178,7 +216,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: riskapp_test
         ports:
-          - 5432:5432
+          - 5432        # a random host port: a self-hosted runner has its own Postgres on 5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -186,9 +224,14 @@ jobs:
           --health-retries 5
     env:
       PGPASSWORD: postgres
-      # _env.js honours TEST_DATABASE_URL and hard-fails unless it targets riskapp_test.
-      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
     steps:
+      - name: Use this job's own database, on the port the runner gave it
+        run: |
+          port=${{ job.services.postgres.ports['5432'] }}
+          echo "PGPORT=$port" >> "$GITHUB_ENV"
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:$port/riskapp_test" >> "$GITHUB_ENV"
+          # _env.js honours TEST_DATABASE_URL and hard-fails unless it targets riskapp_test.
+          echo "TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:$port/riskapp_test" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -198,16 +241,16 @@ jobs:
           cache-dependency-path: riskapp/package-lock.json
       - run: npm ci
       - name: Build riskapp_test via the migration runner, then seed
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_test
         run: |
           npm run migrate            # fresh DB → baseline + pending migrations (exercises the runner)
           psql "$TEST_DATABASE_URL" -v ON_ERROR_STOP=1 -q -f test/e2e/db/seed.sql
       - run: npm run test:integration
 
   misty-isles-story:
+    # Not on a draft: it takes 13 minutes; it runs when the pull request is marked ready.
+    if: (github.event_name != 'push' || github.repository == 'WightmanBrown/cirks') && !github.event.pull_request.draft
     name: Misty Isles story check (the training dataset, not the app)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
     # A full Misty Isles build takes about 21 minutes on a GitHub runner (8 here).
     timeout-minutes: 45
     defaults:
@@ -228,20 +271,24 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: riskapp_story
         ports:
-          - 5432:5432
+          - 5432        # a random host port: a self-hosted runner has its own Postgres on 5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/riskapp_story
       JWT_ACCESS_SECRET: story-check-access-secret-not-used-anywhere-else
       JWT_REFRESH_SECRET: story-check-refresh-secret-not-used-anywhere-else
-      PORT: '3000'
+      PORT: '3913'                    # not 3000: a self-hosted runner may be serving CIRKS there
       AUTH_RATE_LIMIT_MAX: '100000'   # the install signs in as many people, many times
       ADMIN_PASSWORD: Story-Check-Pass-2026
     steps:
+      - name: Use this job's own database, on the port the runner gave it
+        run: |
+          port=${{ job.services.postgres.ports['5432'] }}
+          echo "PGPORT=$port" >> "$GITHUB_ENV"
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:$port/riskapp_story" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0          # to see whether this pull request touches riskapp/
@@ -273,10 +320,10 @@ jobs:
       - name: Build Misty Isles with the real install.js
         if: steps.scope.outputs.run == 'true'
         run: |
-          node src/server.js > /tmp/api.log 2>&1 &
-          for i in $(seq 1 60); do curl -sf http://127.0.0.1:3000/health > /dev/null && break; sleep 1; done
-          node db/dataset/misty-isles/install.js --base http://127.0.0.1:3000/api/v1 \
-            || { echo "::error title=Misty Isles story check could not build the dataset::install.js failed — see this step's log"; tail -40 /tmp/api.log; exit 1; }
+          node src/server.js > "$RUNNER_TEMP/api.log" 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:3913/health > /dev/null && break; sleep 1; done
+          node db/dataset/misty-isles/install.js --base http://127.0.0.1:3913/api/v1 \
+            || { echo "::error title=Misty Isles story check could not build the dataset::install.js failed — see this step's log"; tail -40 "$RUNNER_TEMP/api.log"; exit 1; }
       - name: Check the story's promises
         if: steps.scope.outputs.run == 'true'
         run: node db/dataset/misty-isles/story-check.js

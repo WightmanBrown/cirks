@@ -14,6 +14,7 @@ const api = vi.hoisted(() => ({
   getAcceptanceQueue:     vi.fn().mockResolvedValue({ count: 0 }),
   getMeetings:            vi.fn().mockResolvedValue({ meetings: [] }),
   getReturnedToMe:        vi.fn().mockResolvedValue({ count: 0 }),
+  getDepartmentReport:    vi.fn().mockResolvedValue({ obligations: [] }),
 }));
 vi.mock('../api', () => api);
 
@@ -59,5 +60,27 @@ describe('MyActionsWidget (rendered)', () => {
     const row = await screen.findByText('Remediation items still open');
     row.click();
     expect(navigate).toHaveBeenCalledWith('/remediation');
+  });
+
+  test('an owner sees the department\'s unmet security obligations as tasks (owner, 2026-11-18)', async () => {
+    api.getDepartmentReport.mockResolvedValue({ obligations: [
+      { key: 'assets_rated', label: 'x', open: [{}, {}] },
+      { key: 'risks_validated', label: 'y', open: [] },
+      { key: 'threats_assessed', label: 'z', open: [{}] },
+    ] });
+    mockAuth({ role: 'information_asset_owner' });
+    render(<MyActionsWidget />);
+    const row = await screen.findByText('Information assets not rated against every mandatory impact table');
+    expect(screen.getByText('Threats identified on your systems but not assessed')).toBeInTheDocument();
+    expect(screen.queryByText('Risks not yet validated')).toBeNull();           // met: no task
+    row.click();
+    expect(navigate).toHaveBeenCalledWith('/reporting/department#obligations');
+  });
+
+  test('roles without a department report do not ask for one', async () => {
+    mockAuth({ role: 'ciso' });
+    render(<MyActionsWidget />);
+    await screen.findByText('My Tasks');
+    expect(api.getDepartmentReport).not.toHaveBeenCalled();
   });
 });

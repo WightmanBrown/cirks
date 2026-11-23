@@ -81,34 +81,59 @@ export function TrendLine({ series, height = 140 }) {
 }
 
 // ── Scatter: effort against what it removes ───────────────────────────────────
-// points: [{ key, x, y, label, named }] (named ones carry their label); the top-left quarter (little effort, much
-// removed) is named, so the eye goes there first.
+// points: [{ key, x, y, label, title?, named }] (named ones carry their label); the top-left quarter (little effort,
+// much removed) is shaded and named, so the eye goes there first. Points at the same place are drawn as one dot
+// carrying every label (two objectives with the same gain on the same systems used to print over each other), and
+// the scale runs past the largest value so no dot or label sits on the edge (the rightmost label was cut to "C").
+const niceMax = (v) => {
+  const raw = Math.max(1, v * 1.15);
+  const step = raw <= 10 ? 2 : raw <= 50 ? 10 : raw <= 100 ? 10 : 10 ** Math.floor(Math.log10(raw)) / 2;
+  return Math.ceil(raw / step) * step;
+};
+
 export function Scatter({ points, xLabel, yLabel, height = 220, corner }) {
   const W = 520, H = height, L = 40, R = 16, T = 12, B = 34;
-  const maxX = Math.max(1, ...points.map((p) => p.x));
-  const maxY = Math.max(1, ...points.map((p) => p.y));
+  const maxX = niceMax(Math.max(...points.map((p) => p.x)));
+  const maxY = niceMax(Math.max(...points.map((p) => p.y)));
   const x = (v) => L + ((W - L - R) * v) / maxX;
   const y = (v) => T + (H - T - B) * (1 - v / maxY);
+  const at = new Map();
+  for (const p of points) {
+    const k = `${p.x}|${p.y}`;
+    const g = at.get(k) || { key: p.key, x: p.x, y: p.y, labels: [], titles: [], named: false };
+    g.labels.push(p.label); g.titles.push(p.title || p.label); g.named = g.named || p.named;
+    at.set(k, g);
+  }
+  const groups = [...at.values()];
   return (
     <svg className={styles.scatter} viewBox={`0 0 ${W} ${H}`} role="img"
-         aria-label={`${yLabel} against ${xLabel}: ${points.map((p) => `${p.label}, ${p.x} and ${p.y}`).join('; ')}`}>
+         aria-label={`${yLabel} against ${xLabel}: ${points.map((p) => `${p.title || p.label}, ${p.x} ${xLabel}, ${p.y} ${yLabel}`).join('; ')}`}>
       <rect x={L} y={T} width={(W - L - R) / 2} height={(H - T - B) / 2} className={styles.corner} />
       {corner && <text x={L + 6} y={T + 14} className={styles.axis}>{corner}</text>}
       <line x1={L} x2={W - R} y1={H - B} y2={H - B} className={styles.grid} />
       <line x1={L} x2={L} y1={T} y2={H - B} className={styles.grid} />
       <text x={L} y={H - B + 14} className={styles.axis} textAnchor="middle">0</text>
+      <text x={x(maxX / 2)} y={H - B + 14} className={styles.axis} textAnchor="middle">{maxX / 2}</text>
       <text x={W - R} y={H - B + 14} className={styles.axis} textAnchor="end">{maxX}</text>
+      <text x={L - 6} y={y(maxY / 2)} className={styles.axis} textAnchor="end" dominantBaseline="middle">{maxY / 2}</text>
       <text x={L - 6} y={y(maxY)} className={styles.axis} textAnchor="end" dominantBaseline="middle">{maxY}</text>
       <text x={(L + W - R) / 2} y={H - 4} className={styles.axis} textAnchor="middle">{xLabel}</text>
       <text x={12} y={(T + H - B) / 2} className={styles.axis} textAnchor="middle" transform={`rotate(-90 12 ${(T + H - B) / 2})`}>{yLabel}</text>
-      {points.map((p) => (
-        <g key={p.key}>
-          <circle cx={x(p.x)} cy={y(p.y)} r={5} className={styles.point}>
-            <title>{`${p.label}: ${p.y} ${yLabel}, ${p.x} ${xLabel}`}</title>
-          </circle>
-          {p.named && <text x={x(p.x) + 8} y={y(p.y)} className={styles.seriesLabel} dominantBaseline="middle">{p.label}</text>}
-        </g>
-      ))}
+      {groups.map((g) => {
+        const right = x(g.x) > W * 0.65;
+        return (
+          <g key={g.key}>
+            <circle cx={x(g.x)} cy={y(g.y)} r={10} fill="transparent">
+              <title>{`${g.titles.join('; ')}: ${g.y} ${yLabel}, ${g.x} ${xLabel}`}</title>
+            </circle>
+            <circle cx={x(g.x)} cy={y(g.y)} r={5} className={styles.point} pointerEvents="none" />
+            {g.named && (
+              <text x={x(g.x) + (right ? -9 : 9)} y={y(g.y)} textAnchor={right ? 'end' : 'start'}
+                    className={styles.seriesLabel} dominantBaseline="middle">{g.labels.join(', ')}</text>
+            )}
+          </g>
+        );
+      })}
     </svg>
   );
 }

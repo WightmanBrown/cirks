@@ -64,6 +64,9 @@ const MATRIX = [
   // (owner_user_id required) before the write gate, so all read roles pass; non-read 403.
   ['patch',`/api/v1/controls/${U}/maturity-cap`, ['analyst', 'ciso', 'consultant', 'admin', 'iam', 'owner', 'soc']],
   ['patch',`/api/v1/controls/${U}`, ['analyst', 'ciso', 'admin']],
+  // Security solution patterns (v176): read with the library, a part's slot set by the security team.
+  ['get',  '/api/v1/controls/solution-patterns', ['analyst', 'ciso', 'consultant', 'admin', 'iam', 'owner', 'soc']],
+  ['patch',`/api/v1/controls/solutions/${U}/parts/${U}`, ['analyst', 'ciso', 'admin']],
   ['get',  `/api/v1/controls/${U}`, ['analyst', 'ciso', 'consultant', 'admin', 'iam', 'owner', 'soc']],
 
   // ── assets (canView incl. owner; canCreate excludes owner; canAdmin = ciso/admin) ──
@@ -95,6 +98,7 @@ const MATRIX = [
   // ── components ──
   ['get',  '/api/v1/components', ['analyst', 'ciso', 'consultant', 'admin', 'iam', 'soc']],
   ['post', '/api/v1/components', ['analyst', 'ciso', 'admin', 'iam']],
+  ['delete',`/api/v1/components/${U}`, ['analyst', 'ciso', 'admin', 'iam']],
 
   // ── graph ──
 
@@ -124,6 +128,9 @@ const MATRIX = [
   ['delete',`/api/v1/systems/${U}`, ['ciso', 'admin']],
   ['post', `/api/v1/systems/${U}/components`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
   ['delete',`/api/v1/systems/${U}/components/${U}`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
+  // System patterns (v177): a system's pattern and a component's slot are edits to the system.
+  ['patch',`/api/v1/systems/${U}/pattern`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
+  ['patch',`/api/v1/systems/${U}/components/${U}/slot`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
   ['post', `/api/v1/systems/${U}/information-assets`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
   ['delete',`/api/v1/systems/${U}/information-assets/${U}`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
   ['get',  `/api/v1/systems/${U}/available-information-assets`, ['ciso', 'admin', 'analyst', 'consultant', 'iam']],
@@ -185,11 +192,22 @@ const MATRIX = [
   ['get',  '/api/v1/reports/department', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
   ['get',  '/api/v1/reports/systems', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
   ['get',  '/api/v1/reports/unknown', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/coverage', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/exposure', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/decisions', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/work', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/changes', ['admin', 'ciso', 'siro', 'analyst', 'iam', 'owner']],
+  ['get',  '/api/v1/reports/quality', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/standards', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/owners', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/team', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/audit', ['admin', 'ciso', 'siro', 'analyst']],
+  ['get',  '/api/v1/reports/record', ['admin', 'ciso', 'siro', 'analyst']],
   ['get',  '/api/v1/reports/analyst', ['admin', 'ciso', 'analyst']],
   ['get',  '/api/v1/org/risk-appetite', ['admin', 'siro']],
   // Tolerances the board's figures are rated against (v169): the SIRO's alone.
-  ['put',    '/api/v1/reports/tolerances/exposure.above_owner_max', ['siro']],
-  ['delete', '/api/v1/reports/tolerances/exposure.above_owner_max', ['siro']],
+  ['put',    '/api/v1/reports/tolerances/exposure.above_owner_max', ['siro', 'admin']],
+  ['delete', '/api/v1/reports/tolerances/exposure.above_owner_max', ['siro', 'admin']],
   ['get',  `/api/v1/suppliers/${U}`, ALL],
   ['get',  `/api/v1/suppliers/relationships?system_id=${U}`, ALL],
   ['post', '/api/v1/suppliers', ['admin', 'ciso', 'analyst', 'iam', 'owner', 'consultant', 'siro']],
@@ -209,10 +227,13 @@ const MATRIX = [
   // v148 — the security architecture library is library work (controls.write);
   // reading it follows the catalogue (controls.read).
   ['get',   '/api/v1/architecture', ['admin', 'ciso', 'analyst', 'iam', 'owner', 'consultant', 'soc']],
+  ['get',   '/api/v1/architecture/system-patterns', ['admin', 'ciso', 'analyst', 'iam', 'owner', 'consultant', 'soc']],
   ['post',  '/api/v1/architecture/rules', ['admin', 'ciso', 'analyst']],
   ['delete',`/api/v1/architecture/rules/${U}`, ['admin', 'ciso', 'analyst']],
-  ['post',  `/api/v1/architecture/groups/${U}/members`, ['admin', 'ciso', 'analyst']],
-  ['post',  '/api/v1/architecture/groups/starter', ['admin', 'ciso', 'analyst']],   // {} → 400 (no document), nothing created
+  // v178: a component's roles (the template) are an architect's; a rule's system pattern triggers the security team's.
+  ['get',   `/api/v1/architecture/components/${U}/roles`, ['admin', 'ciso', 'analyst']],
+  ['put',   `/api/v1/architecture/components/${U}/roles`, ['admin', 'ciso', 'analyst']],
+  ['post',  `/api/v1/architecture/rules/${U}/patterns`, ['admin', 'ciso', 'analyst']],
   ['post',  '/api/v1/architecture/builds', ['admin', 'ciso', 'analyst']],
   // …while choosing a solution and applying a build are edits to the system.
   ['get',   `/api/v1/systems/${U}/security`, ['admin', 'ciso', 'analyst', 'iam', 'owner', 'consultant', 'secretary', 'soc']],
@@ -234,6 +255,7 @@ const MATRIX = [
 
   // ── risks ──
   ['get',  `/api/v1/risks/${U}`, ['ciso', 'analyst', 'admin', 'iam', 'owner', 'secretary', 'soc']],
+  ['get',  `/api/v1/risks/${U}/answer`, ['ciso', 'analyst', 'admin', 'iam', 'owner', 'secretary', 'soc']],
   ['post', '/api/v1/risks', ['ciso', 'analyst', 'admin']],
   ['post', `/api/v1/risks/${U}/components`, ['ciso', 'analyst', 'admin']],
   ['delete',`/api/v1/risks/${U}/components/${U}`, ['ciso', 'analyst', 'admin']],
@@ -384,6 +406,8 @@ const ANY_AUTH = [
   ['put', '/api/v1/users/me/dashboard-layout'],
   ['get', '/api/v1/users/me/view-mode'],
   ['put', '/api/v1/users/me/view-mode'],
+  ['get', '/api/v1/users/me/menu-mode'],
+  ['put', '/api/v1/users/me/menu-mode'],
   ['get', '/api/v1/meetings/swg-summary'],
   ['get', `/api/v1/meetings/${U}/published-minutes`],
   ['get', `/api/v1/meetings/${U}/calendar.ics`],

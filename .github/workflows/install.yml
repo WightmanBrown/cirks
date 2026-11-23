@@ -12,11 +12,19 @@
 #   snap       install.sh stops when Docker is the snap (INSTALL.md 1.1).
 #   cloud-init deploy/cloud-init/cirks-training.yaml on real Ubuntu VMs.
 #
-# Pull requests run it only when the install itself changes; everything else
-# (a migration, say) is covered by the weekly run in the public repository and
-# by the push of each release there.
+# It runs by itself only in the public repository, where Actions minutes are
+# free: on pull requests and pushes that change the install, weekly, and on each
+# release. In CIRKS-dev (paid minutes) it runs only on demand (workflow_dispatch);
+# an edit to INSTALL.md alone used to set off a 35-minute install. The cheap check
+# that the guide and install.sh agree still runs on every pull request (ci.yml,
+# install-script). Owner, 2026-11-09.
 
 name: Install
+
+# A newer push to the same pull request cancels the run it supersedes.
+concurrency:
+  group: install-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
   pull_request:
@@ -50,8 +58,8 @@ env:
 jobs:
   guide:
     name: install guide, ${{ matrix.path }} (${{ matrix.runner }})
-    # The weekly run is for the public repository; CIRKS-dev's minutes are not free.
-    if: github.event_name != 'schedule' || github.repository == 'WightmanBrown/cirks'
+    # Automatic runs are for the public repository; CIRKS-dev's minutes are not free.
+    if: github.repository == 'WightmanBrown/cirks' || github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.runner }}
     # x86 runners take 42-51 minutes, mostly slow apt; 60 cancelled a healthy run (2026-10-26).
     timeout-minutes: 90
@@ -94,7 +102,7 @@ jobs:
 
   snap:
     name: install.sh stops on Docker installed as a snap
-    if: github.event_name != 'schedule' || github.repository == 'WightmanBrown/cirks'
+    if: github.repository == 'WightmanBrown/cirks' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -126,8 +134,9 @@ jobs:
     if: >-
       (github.event_name == 'schedule' && github.repository == 'WightmanBrown/cirks')
       || github.event_name == 'workflow_dispatch'
-      || contains(github.event.head_commit.message, '[cloud-init]')
-      || contains(github.event.pull_request.title, '[cloud-init]')
+      || (github.repository == 'WightmanBrown/cirks'
+          && (contains(github.event.head_commit.message, '[cloud-init]')
+              || contains(github.event.pull_request.title, '[cloud-init]')))
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     strategy:

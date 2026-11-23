@@ -234,3 +234,16 @@
   background: var(--bg-hover);
   color: var(--accent);
 }
+
+/* The foot of each dropdown: simple or full menu (v183). */
+.dropSwitch {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 8px 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.dropSwitch:hover { background: var(--bg-hover); text-decoration: underline; }

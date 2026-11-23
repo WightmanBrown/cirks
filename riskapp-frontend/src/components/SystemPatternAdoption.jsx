@@ -10,83 +10,8 @@ import styles from './SystemPatternAdoption.module.css';
 
 const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
-// The systems architecture template on one system: each group it must answer,
-// with what it records or a visible blank (owner, 2026-10-06).
-//
-// A blank is answered where it is seen (2026-10-12): pick one of the group's
-// components and say what state it is in here — the same three answers the
-// security solutions below ask for a part that is not recorded. A component
-// that exists once for the organisation has one state everywhere, so it is
-// only recorded, never given a state here.
-export function TemplateStrip({ memberships, canEdit = false, onAnswer }) {
-  const [picked, setPicked] = useState({});
-  // group id -> the name being recorded. It stays until the page's refreshed
-  // record shows the group answered, not just until the save returns: the
-  // refresh takes a few seconds, and a picker that came back to life in that
-  // gap looked as if nothing had happened and invited a second click.
-  const [recording, setRecording] = useState({});
-  if (!memberships || memberships.length === 0) return null;
-
-  async function answer(group, component, status) {
-    setRecording(r => ({ ...r, [group.id]: component.name }));
-    let saved = false;
-    try { saved = (await onAnswer(component.id, status)) !== false; } catch { saved = false; }
-    if (!saved) setRecording(r => { const { [group.id]: _gone, ...rest } = r; return rest; });
-  }
-
-  return (
-    <div className={styles.slots}>
-      {memberships.map(g => {
-        const canAnswer = !g.answered && !recording[g.id] && canEdit && onAnswer && g.members.length > 0;
-        const chosen = g.members.find(m => m.id === picked[g.id]);
-        return (
-          <div key={g.id} className={`${styles.slot} ${g.answered ? '' : styles.slotEmpty}`}>
-            <span className={styles.slotGroup}>{g.name}</span>
-            <span className={styles.slotValue}>
-              {g.answered ? g.recorded.map(r => r.name).join(', ')
-                : recording[g.id] ? recording[g.id] : 'Nothing recorded'}
-            </span>
-            {!g.answered && recording[g.id] && (
-              <span className={styles.slotHint} role="status">Recording it on this system…</span>
-            )}
-            {!g.answered && !canAnswer && !recording[g.id] && g.members.length > 0 && (
-              <span className={styles.slotHint}>One of the {plural(g.members.length, 'component')} in this group should be recorded here.</span>
-            )}
-            {!g.answered && g.members.length === 0 && (
-              <span className={styles.slotHint}>This group has no components to choose from yet.</span>
-            )}
-            {canAnswer && (
-              <div className={styles.slotAnswer}>
-                <select className={styles.slotSelect} value={picked[g.id] || ''}
-                  aria-label={`Which ${g.name} component this system has`}
-                  onChange={e => setPicked(p => ({ ...p, [g.id]: e.target.value }))}>
-                  <option value="">Which one does this system have?</option>
-                  {g.members.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                </select>
-                {chosen && chosen.instantiation === 'organisational' && (<>
-                  <span className={styles.slotHint}>It exists once for the organisation, so its state is shared and is not set here.</span>
-                  <div className={styles.slotButtons}>
-                    <button type="button" className={styles.slotPrimary}
-                      onClick={() => answer(g, chosen, null)}>Record it on this system</button>
-                  </div>
-                </>)}
-                {chosen && chosen.instantiation !== 'organisational' && (<>
-                  <span className={styles.slotHint}>What state is it in on this system?</span>
-                  <div className={styles.slotButtons}>
-                    <button type="button" className={styles.slotPrimary}
-                      onClick={() => answer(g, chosen, 'operational')}>Working</button>
-                    <button type="button" className={styles.slotSecondary}
-                      onClick={() => answer(g, chosen, 'degraded')}>Degraded</button>
-                  </div>
-                </>)}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+// (The system profile strip that stood here was retired in v178: a system's
+// questions are its pattern's slots, answered in SystemPatternSection.)
 
 const STATE_WORD = { adding: 'adding now', on: 'on this system', would: 'would be added' };
 
@@ -100,13 +25,13 @@ export function PatternDiagram({ name, components }) {
   return (
     <div className={styles.scroll}>
       <svg className={styles.diagram} viewBox={`0 0 ${W} ${Math.max(H, 80)}`} role="img"
-        aria-label={`The pattern ${name} and its ${plural(components.length, 'component')}: which are on this system and which adopting it would add`}>
+        aria-label={`The standard build ${name} and its ${plural(components.length, 'component')}: which are on this system and which adopting it would add`}>
         {components.map((c, i) => {
           const y = top + i * step;
           return <path key={c.id} className={c.state === 'would' ? styles.edgeWould : styles.edge}
             d={`M196 ${cy} C 250 ${cy}, 250 ${y}, 300 ${y}`} />;
         })}
-        <text className={styles.eyebrow} x="16" y={cy - 34}>ARCHITECTURE PATTERN</text>
+        <text className={styles.eyebrow} x="16" y={cy - 34}>STANDARD BUILD</text>
         <rect className={styles.patternBox} x="16" y={cy - 26} width="180" height="52" rx="8" />
         {label.map((line, i) => (
           <text key={i} className={styles.patternName} x="106" textAnchor="middle"
@@ -137,16 +62,18 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
   const [preview, setPreview] = useState(null);
   const [view,    setView]    = useState('picture');
   const [status,  setStatus]  = useState('');
+  const [confirmed, setConfirmed] = useState(false);
+  const [takePattern, setTakePattern] = useState(false);
   const [busy,    setBusy]    = useState(false);
   const [error,   setError]   = useState('');
   const build = builds.find(b => b.id === buildId) || builds[0];
 
   useEffect(() => {
     let live = true;
-    setPreview(null); setError('');
+    setPreview(null); setError(''); setConfirmed(false); setTakePattern(false);
     previewSystemBuild(systemId, build.id)
       .then(p => { if (live) setPreview(p); })
-      .catch(err => { if (live) setError(err?.response?.data?.error || 'Could not work out what this pattern would add.'); });
+      .catch(err => { if (live) setError(err?.response?.data?.error || 'Could not work out what this standard build would add.'); });
     return () => { live = false; };
   }, [systemId, build.id]);
 
@@ -155,30 +82,44 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
   }));
   const adding = preview?.adding ?? 0;
   const cand = preview?.candidates_if_not_operational;
+  const overlaps = preview?.overlaps || [];
+  const needsConfirm = overlaps.length > 0 && !confirmed;
+  const pattern = preview?.pattern;
+  const mismatch = pattern?.state === 'mismatch';
 
   async function adopt() {
     setBusy(true); setError('');
-    try { onAdopted(await applySystemBuild(systemId, build.id, status), build); }
-    catch (err) { setError(err?.response?.data?.error || 'The pattern was not adopted.'); }
+    try {
+      onAdopted(await applySystemBuild(systemId, build.id, status, {
+        confirmOverlap: overlaps.length > 0 && confirmed,
+        setPattern: pattern?.state === 'offer' && takePattern,
+      }), build);
+    } catch (err) {
+      const d = err?.response?.data;
+      // Declining the offered pattern can change which questions count once;
+      // the API then names the overlaps, and they are confirmed here like any other.
+      if (d?.code === 'build_overlaps') { setPreview(p => ({ ...p, overlaps: d.overlaps })); setConfirmed(false); }
+      setError(d?.error || 'The standard build was not adopted.');
+    }
     finally { setBusy(false); }
   }
 
   return (
-    <section className={styles.panel} aria-label={`Adopt the pattern ${build.name}`}>
+    <section className={styles.panel} aria-label={`Adopt the standard build ${build.name}`}>
       <div className={styles.panelHead}>
         <div className={styles.row}>
           <PatternChip kind="pattern" />
           {builds.length === 1
             ? <b>{build.name}</b>
             : (
-              <select className={styles.select} value={build.id} aria-label="Which pattern"
+              <select className={styles.select} value={build.id} aria-label="Which standard build"
                 onChange={e => setBuildId(e.target.value)}>
                 {builds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             )}
           <HelpDot k="pattern_adoption.title" placement="bottom" />
         </div>
-        <div className={styles.seg} role="group" aria-label="View of the pattern">
+        <div className={styles.seg} role="group" aria-label="View of the standard build">
           <button type="button" aria-pressed={view === 'picture'} onClick={() => setView('picture')}>Picture</button>
           <button type="button" aria-pressed={view === 'list'} onClick={() => setView('list')}>List</button>
         </div>
@@ -186,10 +127,10 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
 
       <p className={styles.lead}>
         {component
-          ? <><b>{component.name}</b> is part of {builds.length === 1 ? 'a system architecture pattern' : `${builds.length} system architecture patterns`}. Adopting a pattern records its whole set of components on this system in one step.</>
-          : <>Adopting this pattern records its whole set of components on this system in one step.</>}
-        {' '}It is a copy: changing the pattern later does not change this system.{' '}
-        <Link to="/architecture-patterns">About patterns</Link>
+          ? <><b>{component.name}</b> is part of {builds.length === 1 ? 'a standard build' : `${builds.length} standard builds`}. Adopting a standard build records its whole set of components on this system in one step.</>
+          : <>Adopting this standard build records its whole set of components on this system in one step.</>}
+        {' '}It is a copy: changing the standard build later does not change this system.{' '}
+        <Link to="/architecture-patterns">About standard builds</Link>
       </p>
 
       {error && <p className={styles.error} role="alert">{error}</p>}
@@ -201,7 +142,7 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
           <figcaption className={styles.legend}>
             <span><i className={styles.swOn} />on this system</span>
             {component && <span><i className={styles.swAdding} />adding now</span>}
-            <span><i className={styles.swWould} />adopting the pattern would add it</span>
+            <span><i className={styles.swWould} />adopting the standard build would add it</span>
           </figcaption>
         </figure>
       )}
@@ -225,7 +166,7 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
       )}
 
       {preview && adding === 0 && (
-        <p className={styles.muted}>Every component of this pattern is already recorded on this system. There is nothing to adopt.</p>
+        <p className={styles.muted}>Every component of this standard build is already recorded on this system. There is nothing to adopt.</p>
       )}
       {preview && adding > 0 && (
         <label className={styles.field}>
@@ -246,12 +187,63 @@ export function PatternAdoptionPanel({ systemId, builds, component, onAddOnly, o
         </label>
       )}
 
+      {mismatch && (
+        <div className={styles.mismatch} role="alert">
+          <p>
+            <b>This standard build follows {pattern.build.code} {pattern.build.name}; this system follows
+            {' '}{pattern.system.code} {pattern.system.name}.</b>
+            <HelpDot k="pattern_adoption.mismatch" placement="bottom" />
+          </p>
+          <p className={styles.muted}>
+            One of them is wrong. Change the system&apos;s pattern, or choose a build that follows {pattern.system.code}, before adopting it.
+          </p>
+        </div>
+      )}
+      {preview && adding > 0 && pattern?.state === 'offer' && (
+        <label className={styles.check}>
+          <input type="checkbox" checked={takePattern} onChange={e => setTakePattern(e.target.checked)} />
+          {' '}This system states no pattern. Set it to {pattern.build.code} {pattern.build.name}, the pattern this standard build follows
+          <HelpDot k="pattern_adoption.offer" placement="bottom" />
+        </label>
+      )}
+      {preview && adding > 0 && pattern?.state === 'build_none' && (
+        <p className={styles.warn}>
+          This standard build states no pattern. It can still be adopted, but nothing checks that it suits this system.
+          {' '}<Link to="/architecture-patterns">Say which pattern it follows</Link>
+        </p>
+      )}
+
+      {preview && adding > 0 && !mismatch && overlaps.length > 0 && (
+        <div className={styles.overlap} role="alert">
+          <p>
+            <b>This system already answers {overlaps.length === 1 ? 'a question' : 'questions'} this standard build answers again.</b>
+            <HelpDot k="pattern_adoption.overlap" placement="bottom" />
+          </p>
+          <ul>
+            {overlaps.map(o => (
+              <li key={o.slot}>
+                <b>{o.label}:</b> {o.recorded.map(c => c.name).join(', ')} is recorded;
+                {' '}adopting would add {o.adding.map(c => c.name).join(', ')}.
+              </li>
+            ))}
+          </ul>
+          <p className={styles.muted}>
+            A system usually has one. A second changes which security solutions it needs, and often means the
+            record is really two systems: consider recording the second part as a system of its own.
+          </p>
+          <label className={styles.check}>
+            <input type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />
+            {' '}This system really has both
+          </label>
+        </div>
+      )}
+
       <div className={styles.row}>
         {component && <button type="button" className={styles.secondary} onClick={() => onAddOnly(component)}>Add {component.name} only</button>}
-        {adding > 0 && (
-          <button type="button" className={styles.primary} disabled={!status || busy} onClick={adopt}
-            title={status ? undefined : 'Choose the state of the components first'}>
-            {busy ? 'Adopting…' : `Adopt the pattern (adds ${plural(adding, 'component')})`}
+        {adding > 0 && !mismatch && (
+          <button type="button" className={styles.primary} disabled={!status || needsConfirm || busy} onClick={adopt}
+            title={!status ? 'Choose the state of the components first' : needsConfirm ? 'Confirm the second answer first' : undefined}>
+            {busy ? 'Adopting…' : `Adopt the standard build (adds ${plural(adding, 'component')})`}
           </button>
         )}
         <button type="button" className={styles.linkBtn} onClick={onClose}>Cancel</button>

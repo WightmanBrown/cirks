@@ -32,22 +32,16 @@ Backup policy,Ransomware,NIST CSF 2.0 threat-informed mapping
 Backups are protected,Ransomware,NIST CSF 2.0 threat-informed mapping
 Restores are tested,Ransomware,NIST CSF 2.0 threat-informed mapping
 Configuration monitoring,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-Detection of malware and viruses,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
 Detection and prevention of malicious activity,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
 Configuration monitoring,Malware infection,NIST CSF 2.0 threat-informed mapping
-Detection of malware and viruses,Malware infection,NIST CSF 2.0 threat-informed mapping
 Detection and prevention of malicious activity,Malware infection,NIST CSF 2.0 threat-informed mapping
 Configuration monitoring,Ransomware,NIST CSF 2.0 threat-informed mapping
-Detection of malware and viruses,Ransomware,NIST CSF 2.0 threat-informed mapping
 Detection and prevention of malicious activity,Ransomware,NIST CSF 2.0 threat-informed mapping
 Configuration monitoring,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
-Detection of malware and viruses,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
 Detection and prevention of malicious activity,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
 Configuration monitoring,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
-Detection of malware and viruses,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
 Detection and prevention of malicious activity,Unauthorised data modification,NIST CSF 2.0 threat-informed mapping
 Configuration monitoring,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-Detection of malware and viruses,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
 Detection and prevention of malicious activity,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
 Device hardening policy and standard,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
 Device hardening policy and standard,Privilege escalation,NIST CSF 2.0 threat-informed mapping
@@ -68,11 +62,11 @@ Service and system accounts,Stolen or compromised credentials,NIST CSF 2.0 threa
 Device identification and network access (802.1X),Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
 Authentication information is protected,Interception of internal network traffic,NIST CSF 2.0 threat-informed mapping
 Containment and recovery,Denial of service (DoS/DDoS),NIST CSF 2.0 threat-informed mapping
-Containment and recovery,Ransomware,NIST CSF 2.0 threat-informed mapping
-Containment and recovery,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
-Containment and recovery,Malware infection,NIST CSF 2.0 threat-informed mapping
+Devices can be contained,Ransomware,NIST CSF 2.0 threat-informed mapping
+Devices can be contained,Zero-day exploitation,NIST CSF 2.0 threat-informed mapping
+Devices can be contained,Malware infection,NIST CSF 2.0 threat-informed mapping
 Role-based training,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
-Central monitoring team,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
+Central monitoring capability,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
 Software installation is controlled,Malware infection,NIST CSF 2.0 threat-informed mapping
 Software installation is controlled,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
 Software installation is controlled,Ransomware,NIST CSF 2.0 threat-informed mapping
@@ -120,7 +114,7 @@ Physical entry is controlled,Malicious insider misuse,NIST CSF 2.0 threat-inform
 Physical security monitoring,Malicious insider misuse,NIST CSF 2.0 threat-informed mapping
 Physical entry is controlled,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
 Physical security monitoring,Physical intrusion or theft,NIST CSF 2.0 threat-informed mapping
-Central monitoring team,Data exfiltration,NIST CSF 2.0 threat-informed mapping
+Central monitoring capability,Data exfiltration,NIST CSF 2.0 threat-informed mapping
 Vulnerability reports are handled,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
 Recovery objectives,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
 Recovery is managed,Natural disaster or environmental event,NIST CSF 2.0 threat-informed mapping
@@ -151,8 +145,9 @@ Continuity and recovery plans,Ransomware,NIST CSF 2.0 threat-informed mapping
 Strong authentication,Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
 Device identification and network access (802.1X),Phishing targeting user credentials,NIST CSF 2.0 threat-informed mapping
 Strong authentication,Stolen or compromised credentials,NIST CSF 2.0 threat-informed mapping
-Vulnerabilities are identified,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
-Vulnerabilities are identified,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
-Vulnerabilities are identified,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
+Software vulnerability scanning,Exploitation of an unpatched vulnerability,NIST CSF 2.0 threat-informed mapping
+Software vulnerability scanning,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping
+Network vulnerability scanning,Security misconfiguration,NIST CSF 2.0 threat-informed mapping
 Malware protection,Malware infection,
 Malware protection,Ransomware,
+Network vulnerability scanning,Exploitation of a public-facing application,NIST CSF 2.0 threat-informed mapping

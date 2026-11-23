@@ -3,7 +3,7 @@
 //
 // The IAO's My department report (docs/reporting-iao.md).
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 const grid = () => Array.from({ length: 5 }, () => Array(5).fill(0));
@@ -18,7 +18,7 @@ const report = (extra = {}) => ({
   risks: [],
   obligations: [
     { key: 'assets_rated', label: 'Every information asset rated against every mandatory impact table', total: 3, met: 3, open: [] },
-    { key: 'risks_answered', label: 'Every risk scoring 15 or more being treated or accepted', total: 4, met: 1,
+    { key: 'risks_answered', label: 'Every risk scoring 15 or higher being treated or accepted', total: 4, met: 1,
       open: [{ link: '/risks/r1', label: 'Records — Ransomware', why: 'scores 20; nothing answering it' }] },
   ],
   actions: [],
@@ -28,6 +28,13 @@ const report = (extra = {}) => ({
   reputation: { tables_marked: 0, table_names: [], risks: [] },
   improvement: { trend: [], changes: [], days: 365 },
   gaps: { unassessed: [], systems_without_threats: [], assets_on_no_system: [], assets_not_rated: [] },
+  compliance_gaps: {
+    systems: [{ system_id: 's1', system_name: 'Patient Records', objectives: [
+      { control_id: 'c1', ref: 'CIRKS1.BRR-02', title: 'Backups are protected', status: 'missing' },
+      { control_id: 'c2', ref: 'CIRKS1.CVM-04', title: 'Malware protection', status: 'unknown' }] }],
+    system_gaps: 2,
+    organisation: [{ control_id: 'c3', ref: 'CIRKS1.SCM-03', title: 'Suppliers are assessed', delivery: 'organisation', status: 'planned' }],
+  },
   ...extra,
 });
 let caps, data;
@@ -44,8 +51,8 @@ beforeEach(() => { caps = ['reports.department']; data = report(); });
 describe('My department', () => {
   test('leads with the risks answered, using the organisation’s threshold', async () => {
     show();
-    expect(await screen.findByText('of your risks scoring 15 or more are being treated or accepted')).toBeInTheDocument();
-    expect(screen.getByText('3 risks have nothing answering them yet.')).toBeInTheDocument();
+    expect(await screen.findByText('of your risks scoring 15 or higher have a security action planned or have been formally accepted')).toBeInTheDocument();
+    expect(screen.getByText('3 risks have neither yet.')).toBeInTheDocument();
   });
 
   test('lists open obligations with where to put them right', async () => {
@@ -58,6 +65,15 @@ describe('My department', () => {
     show();
     expect(await screen.findByText('Gordon Welchman')).toBeInTheDocument();
     expect(screen.getByText('Corporate Email')).not.toHaveAttribute('href');
+  });
+
+  test('lists the compliance gaps: per system, and for the whole organisation', async () => {
+    show();
+    expect(await screen.findByText(/2 gaps on 1 system of your department, and 1 objective delivered for the whole organisation not yet implemented/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^2/ }));
+    expect(screen.getByRole('link', { name: 'BRR-02 Backups are protected' })).toHaveAttribute('href', '/controls/c1');
+    expect(screen.getByText(/state unknown/)).toBeInTheDocument();
+    expect(screen.getByText(/— planned/)).toBeInTheDocument();
   });
 
   test('says how to mark a reputational table when none is marked', async () => {

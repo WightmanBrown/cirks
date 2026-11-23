@@ -4,10 +4,10 @@
 export default {
   // RiskAppetitePage
   'appetite.title':          { title: 'Risk appetite', body: 'The organisation\u2019s risk appetite, as three numbers: the score at which a risk must be treated, and how high a risk analyst and a risk owner may accept a risk. The SIRO and admin can change them, with a reason; every change is in the audit log.' },
-  'appetite.current':        { title: 'The organisation\u2019s risk appetite', body: 'The action threshold: a risk scoring this or more must be treated and cannot be marked \u201cno action required\u201d. A risk analyst may accept only risks below it; a risk owner at least up to it. A change that would put a risk marked \u201cno action required\u201d at or above the threshold is refused, naming the risks, until each has a treatment decision.' },
+  'appetite.current':        { title: 'The organisation\u2019s risk appetite', body: 'The action threshold: a risk scoring this or higher must be treated and cannot be marked \u201cno action required\u201d. A risk analyst may accept only risks below it; a risk owner at least up to it. A change that would put a risk marked \u201cno action required\u201d at or above the threshold is refused, naming the risks, until each has a treatment decision.' },
   'appetite.steps':          { title: 'What each threshold would mean', body: 'A score is impact \u00d7 likelihood, so only some scores occur. For each score your active risks have, how many would have to be treated if the threshold were set there. A threshold between two of these scores gives the same answer as the higher one.' },
   'appetite.col.threshold':  { title: 'Threshold', body: 'A score at which the action threshold could be set.' },
-  'appetite.col.risks':      { title: 'Risks to treat', body: 'Active risks scoring this or more: the risks that would have to be treated.' },
+  'appetite.col.risks':      { title: 'Risks to treat', body: 'Active risks scoring this or higher: the risks that would have to be treated.' },
   // AccountManagementPage
   'admin.account_management':        { title: 'Account management', body: 'Every person who can sign in to CIRKS. Create accounts, change a person’s name, primary role, department or active status, and reset their password or two-factor authentication. You cannot change your own role, department or active status here.' },
   'admin.accounts.new':              { title: 'New account', body: 'Creates an account with a primary role and an optional department. It is created with sign-in locked: it gets its own random password that nobody is told, so it can own risks and actions straight away but nobody can sign in until you set a password in its row. Give the person that password securely. Additional roles are granted on the Access Control page.' },
@@ -20,6 +20,7 @@ export default {
 
   // MyAccountPage (v166)
   'account.title':                   { title: 'My account', body: 'Settings that belong to you rather than to the organisation. Open it from your email address in the top bar.' },
+  'account.menu':                    { title: 'Menu', body: 'The simple menu leaves out the design and library pages most information asset owners and managers never need: threats, system patterns, standard builds, the control library, the Statement of Applicability, scopes, the remediation roll-up and the security architecture pages. It changes only what the menu offers: those pages are still reachable from links on other pages, and you can switch at the foot of any menu. Simple is the default for owners, managers, the SIRO, the meeting secretary and SOC analysts.' },
   'account.totp':                    { title: 'Two-factor sign-in', body: 'When it is on, signing in needs your password and a six-digit code from an authenticator app on your phone, so a stolen password is not enough on its own. Set it up by scanning the code shown into the app and typing the code it then shows. Turning it off needs your password and a code. If you lose your phone, an administrator can clear it on Account Management, and you set it up again.' },
 
   // AdminRbacPage

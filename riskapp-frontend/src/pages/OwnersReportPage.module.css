@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (C) 2026 Wightman Brown Limited */
+.toolbar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.deptPick { font-size: 12px; color: var(--text-secondary); }
+.deptPick select { background: var(--bg-inset); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; padding: 4px 6px; font-size: 12px; }
+.detail { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 6px 0 10px; }
+.detailTitle { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+@media (max-width: 760px) { .detail { grid-template-columns: 1fr; } }
+.scroll { overflow-x: auto; }
+.kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.kind { display: flex; flex-direction: column; gap: 6px; }

@@ -64,7 +64,7 @@ function ChangeForm({ appetite, byScore, onSaved, onCancel }) {
 
   return (
     <form onSubmit={save} className={`${styles.form} ${own.form}`}>
-      <label className={styles.field}>Action threshold: a risk scoring this or more must be treated
+      <label className={styles.field}>Action threshold: a risk scoring this or higher must be treated
         <input type="number" min="1" max="25" step="1" required value={form.action_threshold} onChange={set('action_threshold')} />
       </label>
       <label className={styles.field}>A risk analyst may accept risks scoring up to
@@ -148,7 +148,7 @@ export function RiskAppetitePage() {
                 onSaved={() => { setEditing(false); load(); }} />
             ) : <>
               <ul className={styles.facts}>
-                <li><strong>{a.action_threshold}</strong> a risk scoring this or more must be treated ({plural(atOrAbove(byScore, a.action_threshold), 'risk')} of {total} today)</li>
+                <li><strong>{a.action_threshold}</strong> a risk scoring this or higher must be treated ({plural(atOrAbove(byScore, a.action_threshold), 'risk')} of {total} today)</li>
                 <li><strong>{a.analyst_max}</strong> a risk analyst may accept risks scoring up to this</li>
                 <li><strong>{a.owner_max}</strong> a risk owner may accept risks scoring up to this; above it, only the CISO, SIRO or admin</li>
               </ul>

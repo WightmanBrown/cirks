@@ -99,12 +99,14 @@
   --state-unknown:        #475569;
 
   /* Graphs (Cytoscape cannot read CSS, so utils/themeColours.js resolves
-     these when a graph is drawn) */
-  --graph-service: #c084fc;  --graph-service-edge: #9333ea;
-  --graph-asset:   #2dd4bf;  --graph-asset-edge:   #0d9488;
-  --graph-risk:    #f59e0b;  --graph-risk-edge:    #d97706;
+     these when a graph is drawn). None of these may share a hue with a component
+     type (--ppitf-*), which the graph also draws (owner, 2026-11-18: assets and
+     components were too close to tell apart); each type has its own shape too. */
+  --graph-service: #f1f5f9;  --graph-service-edge: #94a3b8;
+  --graph-asset:   #f472b6;  --graph-asset-edge:   #db2777;
+  --graph-risk:    #a3e635;  --graph-risk-edge:    #65a30d;
   --graph-threat:  #ef4444;  --graph-threat-edge:  #b91c1c;
-  --graph-action:  #60a5fa;  --graph-action-edge:  #2563eb;
+  --graph-action:  #fde047;  --graph-action-edge:  #ca8a04;
   --graph-system:  #1e293b;  --graph-system-text:  #cbd5e1;
   --graph-node:    #334155;  --graph-node-edge:    #475569;  --graph-node-text: #f1f5f9;
   --graph-quiet-text: #94a3b8;

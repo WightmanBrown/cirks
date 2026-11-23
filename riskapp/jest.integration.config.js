@@ -10,4 +10,9 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/src/__tests__/integration/**/*.test.js'],
   setupFiles: ['<rootDir>/src/__tests__/integration/_env.js'],
+  // CI runs on CIRKS-dev's own self-hosted ARM runner (2026-11-09), shared with
+  // the dev servers. There a request now and then stalls past Jest's default 5 s
+  // although every test takes well under 100 ms locally; on 10 Nov that failed a
+  // different test on each run. 30 s keeps a stall from reading as a failure.
+  testTimeout: 30000,
 };

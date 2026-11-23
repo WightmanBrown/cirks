@@ -14,6 +14,7 @@ import { RatingChip } from '../components/RatingChip';
 import { CompletenessRing } from '../components/CompletenessRing';
 import { supplierTypeLabel } from '../utils/supplierTypes';
 import styles from './ScopesPage.module.css';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 // Suppliers (v142). A supplier is the organisation; what we have with it is a
 // relationship — its supplier type, the department that contracts it (and so owns it),
@@ -39,7 +40,7 @@ function AssuranceCell({ s }) {
       {s.gap_count > 0 && (
         <span className={styles.note}>
           Gaps on {s.gap_count} of {s.live_count} live relationship{s.live_count === 1 ? '' : 's'}
-          {s.unanswered_gaps > 0 ? ` · ${s.unanswered_gaps} not yet answered` : ' · answered (action or acceptance)'}
+          {s.unanswered_gaps > 0 ? ` · ${s.unanswered_gaps} not yet answered` : ' · answered (action or exception)'}
         </span>
       )}
     </>
@@ -52,6 +53,7 @@ export function SuppliersPage() {
   const canWrite = hasCapability('suppliers.write');
   const viewMode = useViewMode();
   const [rows, setRows]   = useState(null);
+  useScrollRestore(rows !== null);   // Back from an item lands where you left the list
   const [error, setError] = useState('');
   const [name, setName]   = useState('');
   const [busy, setBusy]   = useState(false);

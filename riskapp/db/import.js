@@ -276,9 +276,11 @@ const DATASETS = [
   { slug: 'components', columns: ['name', 'component_type', 'status', 'description', 'notes', 'created_by_email',
                                    'instantiation', 'is_host', 'hostname', 'document_kind', 'document_version',
                                    'document_owner_email', 'document_approved_by_email', 'document_approved_on',
-                                   'document_next_review', 'document_url'],
+                                   'document_next_review', 'document_url', 'roles'],
     handle: async (r, c) => {
       const name = req(r.name, 'name'); const type = req(r.component_type, 'component_type');
+      // The roles it can answer (v178); an export made before them has none.
+      const roles = (txt(r.roles) || '').split('|').map((x) => x.trim()).filter(Boolean);
       if ((await c.q('SELECT 1 FROM control_components WHERE name = $1 AND component_type = $2', [name, type])).rowCount) return 'skipped';
       await insertRow(c, 'control_components', {
         name, component_type: type, status: defOpt(r.status), description: txt(r.description), notes: txt(r.notes),
@@ -287,7 +289,7 @@ const DATASETS = [
         document_kind: txt(r.document_kind), document_version: txt(r.document_version),
         document_owner_id: await c.userId(r.document_owner_email), document_approved_by: await c.userId(r.document_approved_by_email),
         document_approved_on: txt(r.document_approved_on), document_next_review: txt(r.document_next_review),
-        document_url: txt(r.document_url),
+        document_url: txt(r.document_url), roles,
       });
       return 'imported';
     } },
@@ -357,11 +359,12 @@ const DATASETS = [
       WHERE ia.id = d.asset_id`);
     } },
 
-  { slug: 'systems', columns: ['name', 'description', 'department_name', 'owner_email', 'manager_email', 'is_shared', 'is_active'],
+  // The system pattern (v177) arrives with the system; an export made before it has none.
+  { slug: 'systems', columns: ['name', 'description', 'department_name', 'owner_email', 'manager_email', 'is_shared', 'is_active', 'system_pattern'],
     handle: async (r, c) => (await insertRow(c, 'systems',
       { name: req(r.name, 'name'), description: txt(r.description), department_id: await c.deptId(r.department_name),
         owner_user_id: await c.userId(r.owner_email), managed_by_user_id: await c.userId(r.manager_email),
-        is_shared: boolOpt(r.is_shared), is_active: boolOpt(r.is_active) },
+        is_shared: boolOpt(r.is_shared), is_active: boolOpt(r.is_active), system_pattern: txt(r.system_pattern) },
       ['department_id', 'name']) ? 'imported' : 'skipped') },
 
   { slug: 'system-assets', columns: ['system_name', 'asset_name', 'notes'],
@@ -369,10 +372,10 @@ const DATASETS = [
       { system_id: await c.systemId(r.system_name), asset_id: await c.assetId(r.asset_name), notes: txt(r.notes) },
       ['system_id', 'asset_id']) ? 'imported' : 'skipped') },
 
-  { slug: 'system-components', columns: ['system_name', 'component_name', 'component_type', 'role', 'status'],
+  { slug: 'system-components', columns: ['system_name', 'component_name', 'component_type', 'role', 'status', 'slot_key'],
     handle: async (r, c) => (await insertRow(c, 'system_components',
       { system_id: await c.systemId(r.system_name), component_id: await c.componentId(r.component_name, r.component_type),
-        role: txt(r.role), status: defOpt(r.status) },
+        role: txt(r.role), status: defOpt(r.status), slot_key: txt(r.slot_key) },
       ['system_id', 'component_id']) ? 'imported' : 'skipped') },
 
   // The system's threat exposure — one half of the risk surface (a risk is
@@ -441,9 +444,10 @@ const DATASETS = [
   // carried its control_title: the same name becomes one solution, and the
   // row's objective is linked to it.
   // The estimates (cost v170, effort v173) come with a new solution only, and
-  // keep their basis; an export made before them simply has none.
+  // keep their basis; an export made before them simply has none. So do the
+  // pattern it implements and the slots it does not need (v176).
   { slug: 'delivery-patterns', columns: ['name', 'kind', 'notes', 'cost_one_off', 'cost_annual', 'cost_basis', 'cost_note',
-                                         'effort_hours_month', 'effort_basis', 'effort_note'],
+                                         'effort_hours_month', 'effort_basis', 'effort_note', 'solution_pattern', 'slots_not_needed'],
     handle: async (r, c) => {
       const name = req(r.name, 'name');
       let id = await c.patternId(name, { optional: true });
@@ -455,7 +459,11 @@ const DATASETS = [
           cost_note: txt(r.cost_note), cost_set_by: actor, cost_set_at: new Date() } : {};
         const effort = txt(r.effort_basis) ? { effort_hours_month: num(r.effort_hours_month), effort_basis: txt(r.effort_basis),
           effort_note: txt(r.effort_note), effort_set_by: actor, effort_set_at: new Date() } : {};
-        await insertRow(c, 'delivery_patterns', { name, kind: defOpt(r.kind), notes: txt(r.notes), created_by: actor, ...cost, ...effort });
+        const pattern = txt(r.solution_pattern)
+          ? { solution_pattern: txt(r.solution_pattern),
+              slots_not_needed: (txt(r.slots_not_needed) || '').split('|').map((x) => x.trim()).filter(Boolean) }
+          : {};
+        await insertRow(c, 'delivery_patterns', { name, kind: defOpt(r.kind), notes: txt(r.notes), created_by: actor, ...cost, ...effort, ...pattern });
         id = await c.patternId(name);
         made = true;
       }
@@ -474,19 +482,20 @@ const DATASETS = [
       return res.rowCount ? 'imported' : 'skipped';
     } },
 
-  { slug: 'delivery-pattern-parts', columns: ['pattern_name', 'component_name', 'component_type', 'location', 'service_system_name'],
+  { slug: 'delivery-pattern-parts', columns: ['pattern_name', 'component_name', 'component_type', 'location', 'service_system_name', 'slot_key'],
     handle: async (r, c) => {
       const location = req(r.location, 'location');
       const service = txt(r.service_system_name) ? await c.systemId(r.service_system_name) : null;
       const res = await c.q(
-        `INSERT INTO delivery_pattern_parts (pattern_id, component_id, location, service_system_id)
-         VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`,
-        [await c.patternId(req(r.pattern_name, 'pattern_name')), await c.componentId(r.component_name, r.component_type), location, service]);
+        `INSERT INTO delivery_pattern_parts (pattern_id, component_id, location, service_system_id, slot_key)
+         VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
+        [await c.patternId(req(r.pattern_name, 'pattern_name')), await c.componentId(r.component_name, r.component_type), location, service,
+         txt(r.slot_key)]);
       return res.rowCount ? 'imported' : 'skipped';
     } },
 
   // ── The security architecture (v148) — one row per trigger / member / part ──
-  { slug: 'architecture-rules', columns: ['pattern_name', 'standard_name', 'notes', 'trigger_component_name', 'trigger_component_type'],
+  { slug: 'architecture-rules', columns: ['pattern_name', 'standard_name', 'notes', 'trigger_component_name', 'trigger_component_type', 'trigger_system_pattern'],
     handle: async (r, c) => {
       const patternId = await c.patternId(req(r.pattern_name, 'pattern_name'));
       const standardId = await c.componentId(r.standard_name, 'information');
@@ -499,27 +508,29 @@ const DATASETS = [
           { rule_id: rule.id, component_id: await c.componentId(r.trigger_component_name, r.trigger_component_type) },
           ['rule_id', 'component_id']);
       }
+      if (txt(r.trigger_system_pattern)) {
+        const { rows: [rule] } = await c.q('SELECT id FROM architecture_rules WHERE pattern_id = $1 AND standard_id = $2', [patternId, standardId]);
+        made += await insertRow(c, 'architecture_rule_pattern_triggers',
+          { rule_id: rule.id, system_pattern: txt(r.trigger_system_pattern) }, ['rule_id', 'system_pattern']);
+      }
       return made ? 'imported' : 'skipped';
     } },
 
-  { slug: 'membership-groups', columns: ['group_name', 'standard_name', 'notes', 'sort_index', 'role', 'component_name', 'component_type'],
+  // An export made before v178 still has the system profile's groups. Their
+  // members become roles on the components: the slot the group answered (v177),
+  // or for an older export the slot of the CIRKS starter group of that name.
+  // Triggers, and groups answering no slot, are not carried (v178 retired them).
+  { slug: 'membership-groups', columns: ['group_name', 'standard_name', 'notes', 'sort_index', 'role', 'component_name', 'component_type', 'slot_key'],
     handle: async (r, c) => {
-      const name = req(r.group_name, 'group_name');
-      let { rows: [g] } = await c.q('SELECT id FROM membership_groups WHERE lower(btrim(name)) = lower(btrim($1))', [name]);
-      let made = 0;
-      if (!g) {
-        made = await insertRow(c, 'membership_groups', {
-          name, standard_id: await c.componentId(r.standard_name, 'information'), notes: txt(r.notes),
-          sort_index: txt(r.sort_index) ? parseInt(r.sort_index, 10) : undefined, created_by: await c.actor() });
-        ({ rows: [g] } = await c.q('SELECT id FROM membership_groups WHERE lower(btrim(name)) = lower(btrim($1))', [name]));
-      }
-      if (txt(r.component_name)) {
-        const role = req(r.role, 'role');
-        if (!['member', 'trigger'].includes(role)) throw new Error(`role must be "member" or "trigger", not "${role}"`);
-        made += await insertRow(c, role === 'member' ? 'membership_group_members' : 'membership_group_triggers',
-          { group_id: g.id, component_id: await c.componentId(r.component_name, r.component_type) }, ['group_id', 'component_id']);
-      }
-      return made ? 'imported' : 'skipped';
+      const STARTER = { connectivity: 'network', hosting: 'hosting', 'operating system': 'operating_system',
+        'authentication service': 'sign_in', 'support team': 'support_team', 'user group': 'users' };
+      const slot = txt(r.slot_key) || STARTER[(txt(r.group_name) || '').toLowerCase()];
+      if (!slot || txt(r.role) !== 'member' || !txt(r.component_name)) return 'skipped';
+      const id = await c.componentId(r.component_name, r.component_type);
+      const res = await c.q(
+        `UPDATE control_components SET roles = (SELECT array_agg(DISTINCT x ORDER BY x) FROM unnest(roles || $2::text) x)
+          WHERE id = $1 AND NOT ($2 = ANY (roles))`, [id, slot]);
+      return res.rowCount ? 'imported' : 'skipped';
     } },
 
   { slug: 'system-builds', columns: ['build_name', 'notes', 'component_name', 'component_type'],

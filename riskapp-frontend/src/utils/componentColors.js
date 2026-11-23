@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 // Canonical PPITF component colour palette, as CSS colour names (styles/globals.css).
-// Used by: RiskGraph and the walkable graph (resolved through utils/themeColours),
+// Used by: the walkable graph (resolved through utils/themeColours),
 // ComponentPill, and the component pages. A DOM style can use these directly.
 
 const ppitf = (type, text) => ({

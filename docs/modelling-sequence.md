@@ -130,6 +130,70 @@ systems list rather than hidden.
 8. **Controls** deployed on systems; the coverage gap becomes security actions;
    completing an action's items lowers the risk incrementally.
 
+## Building a system: start from a standard build
+
+**Needed in the user manual and in training** (owner, 2026-11-18; design in
+`system-patterns.md`, decisions 16–23, proposed and not built yet).
+
+We model a system only to answer security questions, so a system's record is its
+**pattern** (which questions it must answer) plus the **components** that answer
+them. A standard build is a pattern partly answered in advance. The usual path:
+
+1. **Choose the standard build.** The system takes the build's pattern and its
+   components (copied, so a later change to the build changes nothing here).
+2. **Answer what the build left open.** A build leaves out what differs between
+   systems, most often *where it runs*. The system's Components tab lists the
+   unanswered questions.
+3. **Add the rest of the system**: its information assets, owner, suppliers and
+   anything special about it.
+
+With no build that fits, build it by hand: choose the pattern, answer its
+questions, and save it as a standard build if more systems like it will follow.
+
+### The entry points
+
+There is more than one way in, so this draft flow chart is for the manual. It
+shows the PROPOSED flow: builds do not carry a pattern yet.
+
+```mermaid
+flowchart TD
+  start([A system to record]) --> exists{Already in CIRKS?}
+  exists -- no --> wizard[New system wizard<br>/systems/new]
+  exists -- yes --> tab[The system's Components tab]
+
+  wizard --> fits{Does a standard build fit?}
+  fits -- yes --> build[Choose the build:<br>pattern and components come with it]
+  fits -- "no, but more will follow" --> makebuild[Make a standard build first:<br>choose its pattern, add the shared components]
+  makebuild --> build
+  fits -- "no, a one-off" --> hand[Choose the pattern,<br>pick each component]
+  hand --> save{Save it as a standard build?}
+  save -- yes --> newbuild[(A new build, with the pattern)]
+  save -- no --> gaps
+  newbuild --> gaps
+  build --> gaps[Answer what is left open<br>e.g. where it runs]
+
+  tab --> haspat{Has a pattern?}
+  haspat -- no --> apply{Apply a standard build?}
+  apply -- yes --> offer[Offer the build's pattern;<br>set it when confirmed]
+  apply -- no --> choose[Choose the pattern]
+  offer --> gaps
+  choose --> gaps
+  haspat -- yes --> applyyes{Apply a standard build?}
+  applyyes -- "same pattern" --> gaps
+  applyyes -- "different pattern" --> refuse[Refused: decide which pattern is right]
+  haspat -. "no pattern fits" .-> weird[Valid, with a warning:<br>record its components anyway]
+  weird --> rest
+  applyyes -- no --> gaps
+
+  gaps --> rest[Information assets, owner,<br>suppliers, anything special]
+  rest --> done([The system is recorded])
+
+  sec{{Security system?}} -.-> note[A pattern is optional:<br>its security solutions describe it]
+```
+
+Other ways in, not drawn: a bulk import (`db/import.js`) states each system's
+pattern in the data, and a security system can be left with no pattern.
+
 ## Infrastructure and shared systems
 
 Networks, identity services and shared platforms need their own rule, because

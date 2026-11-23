@@ -1,0 +1,6 @@
+.score { display: inline-block; min-width: 26px; text-align: center; border-radius: 4px; padding: 1px 4px; font-family: var(--font-mono); }
+.band_low          { background: var(--band-low-bg);          color: var(--band-low-fg); }
+.band_medium       { background: var(--band-medium-bg);       color: var(--band-medium-fg); }
+.band_high         { background: var(--band-high-bg);         color: var(--band-high-fg); }
+.band_critical     { background: var(--band-critical-bg);     color: var(--band-critical-fg); }
+.band_catastrophic { background: var(--band-catastrophic-bg); color: var(--band-catastrophic-fg); }

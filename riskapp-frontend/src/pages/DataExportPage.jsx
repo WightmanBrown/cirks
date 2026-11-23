@@ -31,7 +31,6 @@ export const GROUPS = [
       { key: 'delivery-pattern-objectives', label: 'Security solution objectives', desc: 'Which control objectives each security solution delivers. One solution can deliver several.' },
       { key: 'delivery-pattern-parts',  label: 'Security solution parts',  desc: 'Each solution\u2019s parts and where each must be: on the system, on a named security service, or once for the organisation.' },
       { key: 'architecture-rules', label: 'Architecture rules', desc: 'Security solutions the security architecture requires, the document each comes from, and the components that trigger it — one row per trigger.' },
-      { key: 'membership-groups', label: 'Membership groups', desc: 'What every system must record about itself (network zone, hosting, operating system…): each group\u2019s members and any triggers, one row each.' },
       { key: 'system-builds', label: 'System builds', desc: 'Sets of components applied to a system as a copy — one row per component.' },
       { key: 'solution-choices', label: 'Security solution choices', desc: 'The security solution chosen for a control objective on each system, and who chose it.' },
     ],

@@ -18,6 +18,7 @@
 
 const { query, withActor } = require('../../db/pool');
 const { CIRKS_NAME, CIRKS_COMPONENT_DESCRIPTION, CIRKS_SOLUTION_NOTES, cirksReasonFor } = require('../../lib/cirksDelivers');
+const { PATTERNS, patternOf, slotOf, fitOf } = require('../../lib/solutionPatterns');
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const LOCATIONS = ['on_system', 'service', 'organisation'];
@@ -95,17 +96,19 @@ async function audit(db, userId, action, controlId, label, narrative) {
 
 // A solution with its parts and every objective it delivers.
 const SOLUTION_SQL = `
-  SELECT p.id, p.name, p.kind, p.notes,
+  SELECT p.id, p.name, p.kind, p.notes, p.solution_pattern, p.slots_not_needed,
          p.cost_one_off::float AS cost_one_off, p.cost_annual::float AS cost_annual, p.cost_basis, p.cost_note,
          p.cost_set_at, (SELECT full_name FROM users WHERE id = p.cost_set_by) AS cost_set_by_name,
          p.effort_hours_month::float AS effort_hours_month, p.effort_basis, p.effort_note,
          p.effort_set_at, (SELECT full_name FROM users WHERE id = p.effort_set_by) AS effort_set_by_name,
          COALESCE((SELECT json_agg(json_build_object(
                     'id', pp.id, 'component_id', cc.id, 'component_name', cc.name, 'component_type', cc.component_type,
-                    'location', pp.location, 'service_system_id', pp.service_system_id, 'service_system_name', s.name)
+                    'location', pp.location, 'service_system_id', pp.service_system_id, 'service_system_name', s.name,
+                    'slot_key', pp.slot_key, 'document_kind', cc.document_kind, 'status', vs.status::text)
                     ORDER BY pp.location, cc.name)
                      FROM delivery_pattern_parts pp
                      JOIN control_components cc ON cc.id = pp.component_id
+                     LEFT JOIN v_component_state vs ON vs.component_id = cc.id
                      LEFT JOIN systems s ON s.id = pp.service_system_id
                     WHERE pp.pattern_id = p.id), '[]') AS parts,
          -- The objective's code: its own, else its first standard mapping (DE.CM-09).
@@ -120,12 +123,41 @@ const SOLUTION_SQL = `
                     WHERE o.pattern_id = p.id), '[]') AS objectives
     FROM delivery_patterns p`;
 
+// How each solution measures up to its security solution pattern (v176, report
+// only). A part on each system counts as degraded where it is degraded on any
+// system the solution is in play on, so that is read once for all of them.
+async function withFit(rows) {
+  if (!rows.length) return rows;
+  const { rows: deg } = await query(`
+    SELECT q.pattern_id, x AS part_name, count(DISTINCT q.system_id)::int AS systems
+      FROM v_delivery_pattern_state q, unnest(q.degraded_parts) x
+     WHERE q.in_play AND q.pattern_id = ANY($1::uuid[])
+     GROUP BY 1, 2`, [rows.map((r) => r.id)]);
+  const degradedOn = new Map(deg.map((d) => [`${d.pattern_id}|${d.part_name}`, d.systems]));
+  for (const r of rows) {
+    for (const part of r.parts) part.degraded_on = degradedOn.get(`${r.id}|${part.component_name}`) || 0;
+    r.pattern_fit = fitOf(r);
+  }
+  return rows;
+}
+
 /** The solutions delivering one objective. Used by GET /controls/:id. */
 async function patternsFor(controlId) {
   const { rows } = await query(`${SOLUTION_SQL}
      WHERE EXISTS (SELECT 1 FROM delivery_pattern_objectives o WHERE o.pattern_id = p.id AND o.control_id = $1)
      ORDER BY p.kind, lower(p.name)`, [controlId]);
-  return rows;
+  return withFit(rows);
+}
+
+// GET /controls/solution-patterns — the eight patterns, each with its slots and
+// how many solutions say they implement it.
+async function listSolutionPatterns(req, res, next) {
+  try {
+    const { rows } = await query(
+      `SELECT solution_pattern, count(*)::int AS n FROM delivery_patterns WHERE solution_pattern IS NOT NULL GROUP BY 1`);
+    const n = Object.fromEntries(rows.map((r) => [r.solution_pattern, r.n]));
+    res.json({ patterns: PATTERNS.map((p) => ({ ...p, solutions: n[p.code] || 0 })) });
+  } catch (err) { next(err); }
 }
 
 // GET /controls/solutions — the library of security solutions, for choosing one.
@@ -137,7 +169,7 @@ async function listSolutions(req, res, next) {
         LEFT JOIN (SELECT pattern_id, count(DISTINCT system_id)::int AS systems
                      FROM v_delivery_pattern_state WHERE in_play GROUP BY pattern_id) n ON n.pattern_id = x.id
        ORDER BY x.kind, lower(x.name)`);
-    res.json({ solutions: rows });
+    res.json({ solutions: await withFit(rows) });
   } catch (err) { next(err); }
 }
 
@@ -405,11 +437,26 @@ const SYSTEMS_SQL = `
   HAVING bool_or(ps.in_play)
    ORDER BY lower(s.name)`;
 
+// Systems that need an objective the solution delivers and have no solution in
+// place for it: where this one could go next.
+const NEED_WITHOUT_SQL = `
+  SELECT s.id, s.name
+    FROM system_controls sc
+    JOIN systems s ON s.id = sc.system_id AND s.is_active
+   WHERE sc.control_id IN (SELECT control_id FROM delivery_pattern_objectives WHERE pattern_id = $1)
+     AND sc.status = 'missing'
+     AND NOT EXISTS (SELECT 1 FROM v_delivery_pattern_state q
+                      WHERE q.system_id = sc.system_id AND q.control_id = sc.control_id AND q.in_play)
+   GROUP BY s.id, s.name
+   ORDER BY lower(s.name)`;
+
 async function solutionById(id) {
   const { rows } = await query(`${SOLUTION_SQL} WHERE p.id = $1`, [id]);
   if (!rows.length) return null;
+  await withFit(rows);
   const { rows: systems } = await query(SYSTEMS_SQL, [id]);
-  return { ...rows[0], systems };
+  const { rows: needWithout } = await query(NEED_WITHOUT_SQL, [id]);
+  return { ...rows[0], systems, need_without: needWithout };
 }
 
 // GET /controls/solutions/:patternId
@@ -461,14 +508,36 @@ async function updateSolution(req, res, next) {
   const est = estimateSets(b, req.user.id, sets, params);
   if (est.error) return res.status(400).json({ error: est.error });
   const { costChange, effortChange } = est;
+  // The security solution pattern it implements (v176): a code, or null for not
+  // stated. A new pattern starts with every slot needed unless told otherwise.
+  if ('solution_pattern' in b) {
+    if (b.solution_pattern !== null && !patternOf(b.solution_pattern)) {
+      return res.status(400).json({ error: `solution_pattern is one of ${PATTERNS.map((x) => x.code).join(', ')}, or null.` });
+    }
+    params.push(b.solution_pattern); sets.push(`solution_pattern = $${params.length}`);
+    if (!('slots_not_needed' in b)) sets.push(`slots_not_needed = '{}'`);
+  }
+  if ('slots_not_needed' in b) {
+    const list = b.slots_not_needed;
+    if (!Array.isArray(list) || list.some((k) => typeof k !== 'string')) return res.status(400).json({ error: 'slots_not_needed is a list of slot keys.' });
+    params.push([...new Set(list)]); sets.push(`slots_not_needed = $${params.length}::text[]`);
+  }
   if (!sets.length) return res.status(400).json({ error: 'Nothing to change.' });
   try {
     const found = await withActor(req.user.id, async (db) => {
       const before = await db.query(
         `SELECT name, cost_one_off::float AS one_off, cost_annual::float AS annual, cost_basis AS basis,
-                effort_hours_month::float AS hours, effort_basis
+                effort_hours_month::float AS hours, effort_basis, solution_pattern
            FROM delivery_patterns WHERE id = $1`, [req.params.patternId]);
       if (!before.rows.length) return false;
+      // Slots not needed must be slots of the pattern it implements.
+      if ('slots_not_needed' in b) {
+        const code = 'solution_pattern' in b ? b.solution_pattern : before.rows[0].solution_pattern;
+        const bad = b.slots_not_needed.filter((k) => !slotOf(code, k));
+        if (bad.length) {
+          return { status: 400, error: code ? `${patternOf(code).name} has no slot ${bad.join(', ')}.` : 'Choose the pattern before saying which of its slots are not needed.' };
+        }
+      }
       const { rows: [r] } = await db.query(
         `UPDATE delivery_patterns SET ${sets.join(', ')}, updated_at = now() WHERE id = $1 RETURNING name`, params);
       const was = before.rows[0];
@@ -478,10 +547,16 @@ async function updateSolution(req, res, next) {
       const effort = effortChange
         ? `; estimated effort ${describeEffort(was.effort_basis && { hours: was.hours, basis: was.effort_basis })} → ${describeEffort(effortChange.basis && effortChange)}`
         : '';
+      const label = (code) => (code ? `${code} ${patternOf(code).name}` : 'not stated');
+      const pattern = 'solution_pattern' in b && was.solution_pattern !== b.solution_pattern
+        ? `; pattern ${label(was.solution_pattern)} → ${label(b.solution_pattern)}` : '';
+      const notNeeded = 'slots_not_needed' in b
+        ? `; slots not needed: ${b.slots_not_needed.length ? b.slots_not_needed.join(', ') : 'none'}` : '';
       await solutionAudit(db, req.user.id, 'update', req.params.patternId, r.name,
-        `Security solution "${was.name}" changed${was.name !== r.name ? ` — now "${r.name}"` : ''}${cost}${effort}`);
+        `Security solution "${was.name}" changed${was.name !== r.name ? ` — now "${r.name}"` : ''}${cost}${effort}${pattern}${notNeeded}`);
       return true;
     });
+    if (found && found.error) return res.status(found.status).json({ error: found.error });
     if (!found) return res.status(404).json({ error: 'Security solution not found.' });
     res.json({ solution: await solutionById(req.params.patternId) });
   } catch (err) {
@@ -552,21 +627,23 @@ async function removeSolutionObjective(req, res, next) {
   } catch (err) { next(err); }
 }
 
-// POST /controls/solutions/:patternId/parts — { component_id, location, service_system_id? }
+// POST /controls/solutions/:patternId/parts — { component_id, location, service_system_id?, slot_key? }
 async function addSolutionPart(req, res, next) {
   const { component_id, location, service_system_id } = req.body || {};
+  const slotKey = req.body?.slot_key || null;
   if (!UUID_RE.test(component_id || '')) return res.status(400).json({ error: 'Choose a component.' });
   if (!LOCATIONS.includes(location)) return res.status(400).json({ error: 'Say where the part must be: on the system, on a security system, or once for the organisation.' });
   if (location === 'service' && !UUID_RE.test(service_system_id || '')) return res.status(400).json({ error: 'Choose the security system this part is on.' });
   try {
     const out = await withActor(req.user.id, async (db) => {
-      const { rows: [p] } = await db.query(`SELECT name, kind FROM delivery_patterns WHERE id = $1`, [req.params.patternId]);
+      const { rows: [p] } = await db.query(`SELECT name, kind, solution_pattern FROM delivery_patterns WHERE id = $1`, [req.params.patternId]);
       if (!p) return { status: 404, error: 'Security solution not found.' };
+      if (slotKey && !slotOf(p.solution_pattern, slotKey)) return { status: 400, error: `"${p.name}" has no pattern slot ${slotKey}.` };
       const bad = await checkPart(db, { component_id, location, service_system_id });
       if (bad) return bad;
       await db.query(
-        `INSERT INTO delivery_pattern_parts (pattern_id, component_id, location, service_system_id) VALUES ($1, $2, $3, $4)`,
-        [req.params.patternId, component_id, location, location === 'service' ? service_system_id : null]);
+        `INSERT INTO delivery_pattern_parts (pattern_id, component_id, location, service_system_id, slot_key) VALUES ($1, $2, $3, $4, $5)`,
+        [req.params.patternId, component_id, location, location === 'service' ? service_system_id : null, slotKey]);
       const cc = await db.query('SELECT name FROM control_components WHERE id = $1', [component_id]);
       await solutionAudit(db, req.user.id, 'update', req.params.patternId, p.name,
         `Part "${cc.rows[0]?.name}" (${location.replace('_', ' ')}) added to security solution "${p.name}"`);
@@ -578,6 +655,34 @@ async function addSolutionPart(req, res, next) {
     const r = refusal(err); if (r) return res.status(r[0]).json({ error: r[1] });
     next(err);
   }
+}
+
+// PATCH /controls/solutions/:patternId/parts/:partId — { slot_key } (v176): the
+// pattern slot this part fills, or null to let it be matched by its type and place.
+async function setSolutionPartSlot(req, res, next) {
+  const b = req.body || {};
+  if (!('slot_key' in b)) return res.status(400).json({ error: 'Say which slot the part fills: slot_key, or null.' });
+  try {
+    const out = await withActor(req.user.id, async (db) => {
+      const { rows: [x] } = await db.query(
+        `SELECT p.name, p.solution_pattern, cc.name AS component
+           FROM delivery_pattern_parts pp
+           JOIN delivery_patterns p ON p.id = pp.pattern_id
+           JOIN control_components cc ON cc.id = pp.component_id
+          WHERE pp.id = $1 AND pp.pattern_id = $2`, [req.params.partId, req.params.patternId]);
+      if (!x) return { status: 404, error: 'Part not found.' };
+      const slot = b.slot_key === null ? null : slotOf(x.solution_pattern, b.slot_key);
+      if (b.slot_key !== null && !slot) {
+        return { status: 400, error: x.solution_pattern ? `${patternOf(x.solution_pattern).name} has no slot ${b.slot_key}.` : 'Choose the solution\'s pattern first.' };
+      }
+      await db.query('UPDATE delivery_pattern_parts SET slot_key = $1 WHERE id = $2', [b.slot_key, req.params.partId]);
+      await solutionAudit(db, req.user.id, 'update', req.params.patternId, x.name,
+        `Part "${x.component}" of security solution "${x.name}" ${slot ? `fills "${slot.label}"` : 'is matched to its pattern by type and place'}`);
+      return {};
+    });
+    if (out.error) return res.status(out.status).json({ error: out.error });
+    res.json({ solution: await solutionById(req.params.patternId) });
+  } catch (err) { next(err); }
 }
 
 // DELETE /controls/solutions/:patternId/parts/:partId
@@ -664,5 +769,5 @@ async function useCirks(req, res, next) {
   }
 }
 
-module.exports = { useCirks, getSolution, createSolution, updateSolution, deleteSolution, addSolutionObjective,
+module.exports = { listSolutionPatterns, setSolutionPartSlot, useCirks, getSolution, createSolution, updateSolution, deleteSolution, addSolutionObjective,
   removeSolutionObjective, addSolutionPart, removeSolutionPart, patternsFor, deliveryFor, listSolutions, recordedOn, createPattern, updatePattern, deletePattern, addPart, removePart };

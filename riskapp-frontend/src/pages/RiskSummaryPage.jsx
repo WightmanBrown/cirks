@@ -20,7 +20,7 @@
  *   view  'current' | 'future'
  */
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams }  from 'react-router-dom';
 import { useAuth }                       from '../context/AuthContext';
 import { getCurrentRisks, getFutureRisks, getRisk } from '../api';
@@ -36,7 +36,9 @@ import { RatingChip } from '../components/RatingChip';
 import { InfoTip } from '../components/InfoTip';
 import { HelpDot } from '../components/HelpDot';
 import { useViewMode } from '../hooks/useViewMode';
-import { DepartmentScopeFilter, useDepartmentScope } from '../components/DepartmentScopeFilter';
+import { useScrollRestore } from '../hooks/useScrollRestore';
+import { useUrlState, useUrlSortState } from '../hooks/useUrlState';
+import { DepartmentScopeFilter, useUrlDepartmentScope } from '../components/DepartmentScopeFilter';
 import { applyDepartmentScope, CROSS_DEPT_ROLES }    from '../utils/departmentScope';
 import { RiskGrid } from '../components/RiskGrid';
 import styles from './RiskSummaryPage.module.css';
@@ -269,10 +271,20 @@ export function RiskSummaryPage({ view }) {
   const [showCreate,  setShowCreate]  = useState(false);
   const [detailCache, setDetailCache] = useState({});
 
-  // { gridKey: 'max'|'conf'|'int'|'avail', p: number, i: number } | null
-  const [activeFilter, setActiveFilter] = useState(null);
-  const [sortKey,      setSortKey]      = useState('res_max');
-  const [sortDir,      setSortDir]      = useState('desc');
+  // The grid cell, sort and department live in the address, so Back from a
+  // risk returns to the same list (and a filtered register can be bookmarked).
+  // cell=<gridKey>.<p>.<i>  →  { gridKey: 'max'|'conf'|'int'|'avail', p, i } | null
+  const [cell, setCell] = useUrlState('cell');
+  const activeFilter = useMemo(() => {
+    const [gridKey, p, i] = cell.split('.');
+    // An address naming a grid or cell that does not exist (stale, or edited) is ignored.
+    const ok = ACCESSORS[gridKey] && [p, i].every((n) => /^[1-5]$/.test(n));
+    return ok ? { gridKey, p: Number(p), i: Number(i) } : null;
+  }, [cell]);
+  const setActiveFilter = useCallback((f) => setCell(f ? `${f.gridKey}.${f.p}.${f.i}` : ''), [setCell]);
+  const [sort, setSort] = useUrlSortState('sort', { key: 'res_max', dir: 'desc' });
+  const { key: sortKey, dir: sortDir } = sort;
+  useScrollRestore(!loading);
 
   // Display mode (account-wide default + per-session override) drives the
   // C/I/A-vs-MAX breakdown and whether values render as numbers or word chips.
@@ -283,10 +295,9 @@ export function RiskSummaryPage({ view }) {
   // C/I/A breakdown column is no longer reachable — fall back to current-risk max.
   useEffect(() => {
     if (!expertView && /_(c|i|a)$/.test(sortKey)) {
-      setSortKey('res_max');
-      setSortDir('desc');
+      setSort({ key: 'res_max', dir: 'desc' });
     }
-  }, [expertView, sortKey]);
+  }, [expertView, sortKey, setSort]);
 
   const gridDefs = expertView ? EXPERT_GRID_DEFS : BUSINESS_GRID_DEFS;
 
@@ -297,7 +308,7 @@ export function RiskSummaryPage({ view }) {
     if (activeFilter && !gridDefs.some(g => g.key === activeFilter.gridKey)) {
       setActiveFilter(null);
     }
-  }, [expertView, activeFilter, gridDefs]);
+  }, [expertView, activeFilter, gridDefs, setActiveFilter]);
 
   const canCreate = ['ciso', 'risk_analyst', 'admin'].includes(user?.role);
 
@@ -337,17 +348,17 @@ export function RiskSummaryPage({ view }) {
   }, [selectedId, loading]);
 
   function toggleSelect(id) {
-    if (selectedId === id) {
-      searchParams.delete('selected');
-    } else {
-      searchParams.set('selected', id);
-    }
-    setSearchParams(searchParams, { replace: true });
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      if (p.get('selected') === id) p.delete('selected');
+      else p.set('selected', id);
+      return p;
+    }, { replace: true });
   }
 
   // Scope to one system if ?system=<id> is present in the URL — heatmap
   // matrices and the table both narrow to that system's risks.
-  const scopeCtl = useDepartmentScope({
+  const scopeCtl = useUrlDepartmentScope({
     rows: risks,
     userDeptId: user?.department_id,
     defaultToOwnDept: !CROSS_DEPT_ROLES.has(user?.role),
@@ -410,16 +421,18 @@ export function RiskSummaryPage({ view }) {
   }, [scopedRisks, activeFilter, sortKey, sortDir]);
 
   function clearSystemFilter() {
-    searchParams.delete('system');
-    setSearchParams(searchParams, { replace: true });
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      p.delete('system');
+      return p;
+    }, { replace: true });
   }
 
   function handleSort(key) {
     if (sortKey === key) {
-      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+      setSort({ key, dir: sortDir === 'asc' ? 'desc' : 'asc' });
     } else {
-      setSortKey(key);
-      setSortDir(key === 'name' || key === 'owner' ? 'asc' : 'desc');
+      setSort({ key, dir: key === 'name' || key === 'owner' ? 'asc' : 'desc' });
     }
   }
 
@@ -429,12 +442,9 @@ export function RiskSummaryPage({ view }) {
   }
 
   function handleCellClick(gridKey, p, i) {
-    setActiveFilter(prev =>
-      // Clicking the same cell again clears the filter
-      prev && prev.gridKey === gridKey && prev.p === p && prev.i === i
-        ? null
-        : { gridKey, p, i }
-    );
+    // Clicking the same cell again clears the filter
+    const prev = activeFilter;
+    setActiveFilter(prev && prev.gridKey === gridKey && prev.p === p && prev.i === i ? null : { gridKey, p, i });
   }
 
   return (

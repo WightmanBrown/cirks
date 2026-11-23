@@ -1,0 +1,11 @@
+.asks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.ask { font-size: 13px; font-weight: 500; color: var(--accent); text-decoration: none; }
+.ask:hover { text-decoration: underline; }

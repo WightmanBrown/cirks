@@ -14,8 +14,8 @@ Scope and context,nist_csf,GV.OC-02,full
 Scope and context,nist_csf,GV.OC-04,full
 Scope and context,nist_csf,GV.OC-05,full
 Leadership commitment,nist_csf,GV.PO-01,full
-Leadership commitment,nist_csf,GV.RR-01,full
-Leadership commitment,nist_csf,GV.RR-03,full
+Leadership provides resources,nist_csf,GV.RR-01,full
+Leadership provides resources,nist_csf,GV.RR-03,full
 Security objectives and measurement,nist_csf,GV.OV-03,full
 Security objectives and measurement,nist_csf,GV.RM-01,full
 Corrective action and improvement,nist_csf,ID.IM-01,full
@@ -46,7 +46,7 @@ Device hardening policy and standard,nist_csf,PR.PS-01,full
 Configuration monitoring,nist_csf,PR.PS-01,full
 Configuration monitoring,nist_csf,DE.CM-09,full
 Configuration change control,nist_csf,ID.RA-07,full
-Vulnerabilities are identified,nist_csf,ID.RA-01,full
+Software vulnerability scanning,nist_csf,ID.RA-01,full
 Patching within target timescales,nist_csf,PR.PS-02,full
 Unsupported software and hardware,nist_csf,PR.PS-02,full
 Unsupported software and hardware,nist_csf,PR.PS-03,full
@@ -63,13 +63,12 @@ Segregation of duties,nist_csf,PR.AA-05,full
 Logging policy,nist_csf,DE.CM-03,full
 Log aggregation and storage,nist_csf,PR.PS-04,full
 Monitoring coverage,nist_csf,DE.CM-06,full
-Detection of malware and viruses,nist_csf,DE.CM-09,full
 Detection and prevention of malicious activity,nist_csf,DE.CM-09,full
 Detection and prevention of malicious activity,nist_csf,DE.CM-03,full
-Central monitoring team,nist_csf,DE.AE-02,full
-Central monitoring team,nist_csf,DE.AE-03,full
-Central monitoring team,nist_csf,DE.AE-06,full
-Central monitoring team,nist_csf,DE.AE-07,full
+Central monitoring capability,nist_csf,DE.AE-02,full
+Central monitoring capability,nist_csf,DE.AE-03,full
+Central monitoring capability,nist_csf,DE.AE-06,full
+Central monitoring capability,nist_csf,DE.AE-07,full
 Backup policy,nist_csf,PR.DS-11,full
 Backups are protected,nist_csf,PR.DS-11,full
 Restores are tested,nist_csf,PR.DS-11,full
@@ -115,7 +114,7 @@ Assessment and triage,nist_csf,RS.MA-02,full
 Assessment and triage,nist_csf,RS.MA-03,full
 Assessment and triage,nist_csf,RS.MA-04,full
 Containment and recovery,nist_csf,RS.MA-01,full
-Containment and recovery,nist_csf,RS.MI-01,full
+Devices can be contained,nist_csf,RS.MI-01,full
 Containment and recovery,nist_csf,RS.MI-02,full
 Containment and recovery,nist_csf,RC.RP-01,full
 Evidence is preserved,nist_csf,RS.AN-06,full
@@ -147,3 +146,4 @@ Physical security monitoring,nist_csf,PR.AA-06,full
 Physical security monitoring,nist_csf,DE.CM-02,full
 Environmental threats,nist_csf,PR.IR-02,full
 Equipment maintenance,nist_csf,PR.PS-03,full
+Acceptable use policy,nist_csf,GV.PO-01,full

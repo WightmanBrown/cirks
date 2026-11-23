@@ -196,6 +196,49 @@ describe('department scoping', () => {
   });
 });
 
+describe('another department\'s relationship counts only the reader\'s systems (roadmap 9)', () => {
+  // The agent is on SUP IT SaaS (impact 4) and SUP Other Sys (impact 5).
+  let sid, theirs, ours;
+  beforeAll(async () => {
+    sid = await makeSupplier('SUP Agent Vendor');
+    const mk = async (department_id) => (await api('ciso', 'post', `/suppliers/${sid}/relationships`)
+      .send({ relationship_type: 'product', component_id: tech, department_id, status: 'active' })).body.id;
+    theirs = await mk(otherDept);
+    ours   = await mk(IT_DEPT);
+  });
+
+  test('an IAO sees the other department\'s contract reach only into their own systems', async () => {
+    const res = await api('owner', 'get', `/suppliers/${sid}`);
+    const t = res.body.relationships.find((r) => r.id === theirs);
+    expect(t).toMatchObject({ systems_touched: 1, max_impact: 4, figures_narrowed: true });
+    expect(t.criticality_systems.map((x) => x.name)).toEqual(['SUP IT SaaS']);
+  });
+
+  test('…but their own department\'s contract keeps its whole figures', async () => {
+    const res = await api('owner', 'get', `/suppliers/${sid}`);
+    const o = res.body.relationships.find((r) => r.id === ours);
+    expect(o).toMatchObject({ systems_touched: 2, max_impact: 5, figures_narrowed: false });
+    expect(o.criticality_systems.map((x) => x.name)).toEqual(['SUP Other Sys']);
+  });
+
+  test('an organisation-wide reader sees every system', async () => {
+    const res = await api('ciso', 'get', `/suppliers/${sid}`);
+    for (const r of res.body.relationships) {
+      expect(r).toMatchObject({ systems_touched: 2, max_impact: 5, figures_narrowed: false });
+    }
+  });
+
+  test('the list and the system page narrow the same way', async () => {
+    await api('ciso', 'patch', `/suppliers/relationships/${ours}`).send({ status: 'ended' });
+    const list = await api('owner', 'get', '/suppliers');
+    expect(list.body.suppliers.find((x) => x.id === sid).max_impact).toBe(4);
+    const all = await api('ciso', 'get', '/suppliers');
+    expect(all.body.suppliers.find((x) => x.id === sid).max_impact).toBe(5);
+    const page = await api('owner', 'get', `/suppliers/relationships?system_id=${itSys}`);
+    expect(page.body.relationships.find((r) => r.id === theirs)).toMatchObject({ systems_touched: 1, figures_narrowed: true });
+  });
+});
+
 describe('ending, moving and deleting', () => {
   test('moving a relationship between departments is audited, with the actor', async () => {
     const sid = await makeSupplier('SUP Moved Co');

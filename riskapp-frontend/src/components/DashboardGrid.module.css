@@ -114,3 +114,18 @@
   opacity: 0.18;
   border-radius: var(--radius-md);
 }
+
+/* "Customise layout": each widget's width, to tune MIN_WIDGET_W by (2026-11-18). */
+.widthBadge {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  z-index: 2;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--text-on-fill);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  pointer-events: none;
+}

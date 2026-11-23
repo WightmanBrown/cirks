@@ -23,6 +23,7 @@ import { HelpDot } from '../components/HelpDot';
 import { DepartmentScopeFilter, useDepartmentScope } from '../components/DepartmentScopeFilter';
 import { CROSS_DEPT_ROLES } from '../utils/departmentScope';
 import styles from './BusinessServicesPage.module.css';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 // Adoption is a services-only concept — a department using another department's
 // service — and is orthogonal to which department OWNS it. Conflating the two is
@@ -105,6 +106,7 @@ export function BusinessServicesPage() {
   const navigate = useNavigate();
   const [services, setServices]     = useState([]);
   const [loading, setLoading]       = useState(true);
+  useScrollRestore(!loading);   // Back from an item lands where you left the list
   const [error, setError]           = useState('');
   const [showAdd, setShowAdd]       = useState(false);
   const [detailCache, setDetailCache] = useState({});

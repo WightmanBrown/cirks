@@ -3,6 +3,7 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { vi } from 'vitest';
+import { P5, EDR_FIT } from '../components/patternFixtures';
 
 vi.mock('../components/Shell', () => ({ Shell: ({ children }) => <div>{children}</div> }));
 vi.mock('../components/BackButton', () => ({ BackButton: () => null }));
@@ -11,10 +12,12 @@ vi.mock('../context/AuthContext', () => ({ useAuth: () => ({ hasCapability: (c) 
 
 const EDR = {
   id: 's1', name: 'CrowdStrike EDR', kind: 'parts', notes: null, systems_in_place: 22,
+  solution_pattern: 'P5', slots_not_needed: [], pattern_fit: EDR_FIT, need_without: [{ id: 'n1', name: 'HR System' }],
   objectives: [{ id: 'o1', title: 'Networks are monitored', reference_code: 'DE.CM-01' }, { id: 'o2', title: 'Logs', reference_code: 'PR.PS-04' }],
   parts: [{ id: 'p1', component_id: 'c1', component_name: 'Crowdstrike Falcon Agent', component_type: 'technology', location: 'on_system' }],
 };
-const SUP = { id: 's2', name: 'Provided by the supplier', kind: 'supplier', systems_in_place: 7, objectives: [], parts: [] };
+const SUP = { id: 's2', name: 'Provided by the supplier', kind: 'supplier', systems_in_place: 7, objectives: [], parts: [],
+  solution_pattern: null, pattern_fit: { pattern: null, state: 'per_supplier', slots: [], also: [], missing: [] } };
 vi.mock('../api', () => ({
   listSecuritySolutions: vi.fn(async () => [EDR, SUP]),
   createSecuritySolution: vi.fn(),
@@ -23,6 +26,7 @@ vi.mock('../api', () => ({
   removeSecuritySolutionObjective: vi.fn(), addSecuritySolutionPart: vi.fn(), removeSecuritySolutionPart: vi.fn(),
   getControls: vi.fn(async () => ({ controls: [] })), listComponents: vi.fn(async () => []),
   getComponentRecordedOn: vi.fn(), updateComponent: vi.fn(),
+  getSolutionPatterns: vi.fn(async () => [P5]), setSecuritySolutionPartSlot: vi.fn(),
 }));
 
 import { SecuritySolutionsPage } from './SecuritySolutionsPage';
@@ -40,6 +44,18 @@ describe('SecuritySolutionsPage', () => {
     expect(screen.getByRole('link', { name: 'Open details →' })).toHaveAttribute('href', '/security-solutions/s1');
     expect(screen.getByRole('link', { name: 'DE.CM-01 Networks are monitored' })).toHaveAttribute('href', '/controls/o1');
     expect(screen.queryByText('Create')).toBeNull();
+  });
+
+  test('groups by pattern, checks each against it, and names the commonest gap', async () => {
+    render(<MemoryRouter initialEntries={['/security-solutions']}><SecuritySolutionsPage /></MemoryRouter>);
+    expect(await screen.findByRole('link', { name: 'P5 · Central security service' })).toHaveAttribute('href', '/security-solution-patterns#P5');
+    expect(screen.getByText('1 of 1 have no policy.')).toBeInTheDocument();
+    expect(screen.getByText('✗ policy')).toBeInTheDocument();
+    expect(screen.getByText('! part on the system degraded')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'No pattern stated' })).toBeInTheDocument();
+    expect(screen.getByText('Checked per supplier relationship')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Complete against its pattern/ }));
+    expect(screen.queryByText('CrowdStrike EDR')).toBeNull();
   });
 
   test('?selected= opens the row; search finds by objective', async () => {
@@ -61,5 +77,21 @@ describe('SecuritySolutionDetailPage', () => {
     expect(screen.getByText(/It delivers 2 objectives, so a change here changes it for all of them/)).toBeInTheDocument();
     expect(screen.getByText('Remove from the library')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^Component parts/ })).toBeInTheDocument();
+  });
+
+  test('draws the pattern, then the solution in the same shape, with what it lacks', async () => {
+    caps = new Set(['controls.read', 'controls.write']);
+    render(<MemoryRouter initialEntries={['/security-solutions/s1']}>
+      <Routes><Route path="/security-solutions/:id" element={<SecuritySolutionDetailPage />} /></Routes>
+    </MemoryRouter>);
+    expect(await screen.findByText('Incomplete against its pattern. Missing: Policy.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'P5 · Central security service' })).toHaveAttribute('href', '/security-solution-patterns#P5');
+    expect(screen.getByLabelText('CrowdStrike EDR against Central security service')).toBeInTheDocument();
+    expect(screen.getByText('No policy')).toBeInTheDocument();
+    expect(screen.getByText('degraded on 1 system')).toBeInTheDocument();
+    expect(screen.getByText(/Detective Monitoring\./)).toBeInTheDocument();          // also part of it
+    expect(screen.getByRole('link', { name: 'HR System' })).toHaveAttribute('href', '/systems/n1');
+    expect(screen.getByLabelText('The pattern this solution implements')).toHaveValue('P5');
+    expect(screen.getByLabelText('The slot Crowdstrike Falcon Agent fills')).toBeInTheDocument();
   });
 });

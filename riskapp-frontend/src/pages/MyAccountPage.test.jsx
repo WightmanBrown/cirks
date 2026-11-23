@@ -12,9 +12,11 @@ const api = {
   setupTotp: vi.fn(async () => ({ secret: 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP', otpauth_url: 'otpauth://totp/x', qr: 'data:image/png;base64,AAAA' })),
   confirmTotp: vi.fn(async () => { status = { enabled: true, enabled_at: '2026-11-02T10:00:00Z', pending: false }; return { enabled: true }; }),
   disableTotp: vi.fn(async () => { status = { enabled: false, enabled_at: null, pending: false }; return { enabled: false }; }),
+  getMenuMode: vi.fn(async () => ({ menu_mode: 'full', chosen: null, role_default: 'full' })),
+  putMenuMode: vi.fn(async (m) => ({ menu_mode: m || 'full', chosen: m, role_default: 'full' })),
 };
 vi.mock('../api', () => api);
-vi.mock('../context/AuthContext', () => ({ useAuth: () => ({ user: { full_name: 'Casey Ciso', email: 'ciso@org.local' } }) }));
+vi.mock('../context/AuthContext', () => ({ useAuth: () => ({ user: { id: 'u1', role: 'ciso', full_name: 'Casey Ciso', email: 'ciso@org.local' } }) }));
 vi.mock('../components/Shell', () => ({ Shell: ({ children }) => <div>{children}</div> }));
 vi.mock('../components/BackButton', () => ({ BackButton: () => null }));
 
@@ -59,5 +61,18 @@ describe('My account: two-factor sign-in', () => {
     fireEvent.click(off);
     await waitFor(() => expect(api.disableTotp).toHaveBeenCalledWith('my-password-1', '654321'));
     expect(await screen.findByText('Two-factor sign-in is off.')).toBeInTheDocument();
+  });
+});
+
+describe('My account: the menu (v183)', () => {
+  test('shows the full menu as the CISO\'s default; choosing simple saves it, and it can go back to the default', async () => {
+    show();
+    const full = await screen.findByRole('radio', { name: /Full menu/ });
+    await waitFor(() => expect(full).toBeChecked());
+    expect(screen.getByText(/the default for your role/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: /Simple menu/ }));
+    await waitFor(() => expect(api.putMenuMode).toHaveBeenCalledWith('simple'));
+    fireEvent.click(await screen.findByRole('button', { name: /Go back to my role/ }));
+    await waitFor(() => expect(api.putMenuMode).toHaveBeenCalledWith(null));
   });
 });

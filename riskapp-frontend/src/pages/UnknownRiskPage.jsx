@@ -74,7 +74,7 @@ export function UnknownRiskPage() {
           <section className={styles.panel}>
             <h2 className={styles.panelTitle}>What nobody has looked at <HelpDot k="unknown.groups" placement="bottom" /></h2>
             {r.high_unjudged > 0 && (
-              <p className={styles.note}>{plural(r.high_unjudged, 'risk')} scoring {r.thresholds.action} or more {r.high_unjudged === 1 ? 'has' : 'have'} an objective whose effect nobody has judged: start there.</p>
+              <p className={styles.note}>{plural(r.high_unjudged, 'risk')} scoring {r.thresholds.action} or higher {r.high_unjudged === 1 ? 'has' : 'have'} an objective whose effect nobody has judged: start there.</p>
             )}
             <ul className={own.obligations}>
               {r.groups.map((g) => (

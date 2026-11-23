@@ -45,7 +45,7 @@ export function FindingBanner({ kind, subjectId, departmentId, title, detail, ac
   async function revoke() {
     setBusy(true); setErr('');
     try { await revokeFindingAcceptance(accepted.id); await onChanged(); }
-    catch (e) { setErr(e.response?.data?.error || 'Could not revoke the acceptance'); }
+    catch (e) { setErr(e.response?.data?.error || 'Could not revoke the exception'); }
     finally { setBusy(false); }
   }
 
@@ -71,7 +71,7 @@ export function FindingBanner({ kind, subjectId, departmentId, title, detail, ac
       <div className={styles.side}>
         {accepted ? (
           hasCapability('exceptions.revoke')
-            ? <button className={styles.btnGhost} disabled={busy} onClick={revoke}>Revoke acceptance</button>
+            ? <button className={styles.btnGhost} disabled={busy} onClick={revoke}>Revoke exception</button>
             : <span className={styles.muted}>Accepted</span>
         ) : action ? (
           <Link to={`/actions/${action.id}`} className={styles.link}>

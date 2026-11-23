@@ -19,12 +19,12 @@ export function useSelectedRow(loading) {
   const summaryRowRef = useRef(null);
 
   function toggleSelect(id) {
-    if (selectedId === id) {
-      searchParams.delete('selected');
-    } else {
-      searchParams.set('selected', id);
-    }
-    setSearchParams(searchParams, { replace: true });
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      if (p.get('selected') === id) p.delete('selected');
+      else p.set('selected', id);
+      return p;
+    }, { replace: true });
   }
 
   useEffect(() => {

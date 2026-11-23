@@ -439,7 +439,8 @@ router.post('/:id/complete', async (req, res, next) => {
 
 // ── GET /actions ──────────────────────────────────────────────────────────────
 // Scoped security-actions list (replaces the CISO-only GET /governance/sap/actions
-// for the list page). LEFT JOINs the plan so PROPOSED actions (plan_id NULL) appear.
+// for the list page). No plan is shown: nothing creates a security action plan
+// since the gap-driven rebuild (owner, 2026-11-21).
 //
 // RACI read-scope: global roles see all; dept-scoped roles (IAO/IAM) see only
 // actions sitting on a risk whose owning system is in their department or shared.
@@ -508,7 +509,6 @@ router.get('/', canRead, async (req, res, next) => {
         sa.target_date, sa.completed_at, sa.accepted_at,
         ${subjectSql()},
         u.full_name AS owner_name,
-        sap.title   AS plan_title,
         (SELECT COUNT(*) FROM security_action_items sai WHERE sai.action_id = sa.id) AS item_count,
         (SELECT COUNT(*) FROM security_action_items sai
           WHERE sai.action_id = sa.id AND sai.status = 'completed')                  AS items_done,
@@ -521,7 +521,6 @@ router.get('/', canRead, async (req, res, next) => {
             JOIN risks rc ON rc.id = sarc.risk_id AND rc.is_active = TRUE
            WHERE sarc.action_id = sa.id) AS risk_count
       FROM security_actions sa
-      LEFT JOIN security_action_plans sap ON sap.id = sa.plan_id
       JOIN users u ON u.id = sa.primary_owner_user_id
       LEFT JOIN LATERAL (
         SELECT r.id AS risk_id, t.name AS threat_name, s.name AS system_name,
@@ -663,11 +662,9 @@ router.get('/:id', canRead, async (req, res, next) => {
         u.full_name  AS owner_name, u.email AS owner_email, u.role AS owner_role,
         cb.full_name AS completed_by_name,
         ab.full_name AS accepted_by_name,
-        sap.title    AS plan_title, sap.status AS plan_status,
         (sa.target_date < CURRENT_DATE AND sa.status NOT IN ${NOT_OVERDUE}) AS is_overdue,
         ${needsUpdateSql('$2')} AS needs_update
       FROM security_actions sa
-      LEFT JOIN security_action_plans sap ON sap.id = sa.plan_id
       JOIN users u  ON u.id  = sa.primary_owner_user_id
       LEFT JOIN users cb ON cb.id = sa.completed_by
       LEFT JOIN users ab ON ab.id = sa.accepted_by

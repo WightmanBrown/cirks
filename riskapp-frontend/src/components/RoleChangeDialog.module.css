@@ -1,0 +1,29 @@
+/* The preview before a component's roles change (RoleChangeDialog.jsx, v178). */
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+.change { margin: 0; color: var(--text-secondary); }
+.change b { color: var(--text-primary); }
+.was { text-decoration: line-through; }
+.ripple {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
+}
+.ripple ul { margin: 6px 0 0; padding-left: 18px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; }
+.risky {
+  border-color: var(--red);
+  background: color-mix(in srgb, var(--red) 8%, var(--bg-inset));
+}
+.head { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+.bad { color: var(--red-light); }
+.good { color: var(--green-light); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.sure { display: inline-flex; align-items: center; gap: 6px; color: var(--text-primary); }

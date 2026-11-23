@@ -38,7 +38,7 @@ On first boot the entrypoint:
    `ORG_NAME` env var, default *My Organisation*), the capability catalogue, the
    four SoA-lens `standards` rows, the canonical `role_permissions` grants (from
    `src/auth/capabilityDefaults.js`), the **NIST CSF 2.0 reporting set** (its 106
-   requirements) and, on a new install, the **CIRKS control objectives**: 156,
+   requirements) and, on a new install, the **CIRKS control objectives**: 158,
    mapped to ISO 27001, CIS Controls v8.1 and NIST CSF, so every standard's
    Statement of Applicability is covered out of the box. ISO and CIS ship as
    reference numbers only; upload your licensed copy for their wording. No users are created.
@@ -164,7 +164,7 @@ in the importer's format.
 | **20 threats**, each linked to the CIRKS control objectives that counter it (157 links). A risk's controls are the objectives deployed on its system *and* linked to its threat, so without the links no control reduces a risk | On first start, with the CIRKS objectives (`db/seed.js`), into an empty threat catalogue only |
 | **25 policies, standards and procedures**, *not published*, organisational, each linked to the objectives it supports | When `db/create-admin.js` creates the first administrator, if there are no documents yet (a document needs a creating user) |
 | **Six impact tables**, worded, not published | On demand: **Impact Tables → Starter tables…** (CISO, SIRO, admin) |
-| **Six systems architecture template groups** — connectivity, hosting, operating system, authentication service, support team, user group — created empty | On demand: **Systems architecture template → Add the starter groups**, citing a document (by default the starter *Security architecture standard*). An empty group asks nothing of any system until it has a member |
+| **Six system profile groups** — connectivity, hosting, operating system, authentication service, support team, user group — created empty | On demand: **System profile → Add the starter groups**, citing a document (by default the starter *Security architecture standard*). An empty group asks nothing of any system until it has a member |
 
 Nothing is loaded over what is already there. **An installation from before the
 starter library** loads the threats, links and documents with the importer —

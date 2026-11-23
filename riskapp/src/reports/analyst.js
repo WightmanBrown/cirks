@@ -216,7 +216,7 @@ async function computeAnalyst(userIds, who) {
         .map((r) => row(r.id, 'pending validation')).sort(byScore) },
     { key: 'review', label: 'Past their review date', rows: ident.filter((r) => r.past_review)
         .map((r) => row(r.id, `review was due ${new Date(r.review_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`)).sort(byScore) },
-    { key: 'unjudged', label: `Risks scoring ${action} or more with an objective nobody has judged`,
+    { key: 'unjudged', label: `Risks scoring ${action} or higher with an objective nobody has judged`,
       rows: unjudged.filter((u) => mine.has(u.identified_by) && u.score >= action)
         .map((u) => row(u.risk_id, `${u.objectives} objective${u.objectives === 1 ? '' : 's'} not judged`)).sort(byScore) },
     { key: 'items', label: 'Your open action items', rows: items.map((i) => ({ label: `${i.element} on ${i.system_name}`, why: i.title,

@@ -30,13 +30,14 @@ import { RatingChip } from '../components/RatingChip';
 import styles from './SystemDetailPage.module.css';
 import SharedComponentChip, { isShared as isSharedComponent } from '../components/SharedComponentChip';
 import filterStyles from '../components/DepartmentScopeFilter.module.css';
-import { componentTypeShort } from '../utils/componentTypes';
 import { ComponentRecordFindingBanner } from '../components/FindingBanner';
 import { deliverySentence } from '../utils/deliveryPatterns';
 import { DeliveryChip } from '../components/DeliveryChip';
 import { ComponentModal } from '../components/ComponentModal';
-import { TemplateStrip, PatternAdoptionPanel } from '../components/SystemPatternAdoption';
+import { PatternAdoptionPanel } from '../components/SystemPatternAdoption';
 import { SystemSecuritySolutions, triggeredSolutions } from '../components/SystemSecuritySolutions';
+import { SystemPatternSection } from '../components/SystemPatternSection';
+import { TypeBadge } from '../components/ComponentPill';
 
 const CAN_EDIT  = new Set(['ciso', 'admin', 'risk_analyst', 'security_consultant', 'information_asset_manager']);
 const CAN_ADMIN = new Set(['ciso', 'admin']);
@@ -185,10 +186,9 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
     }
   }
 
-  // Answer a blank template group from the strip. A component that exists once
-  // for the organisation has no per-system state to set (the API refuses one).
-  // Returns whether it was saved, so the strip knows to keep showing the answer
-  // while the page refreshes, or to offer the choice again.
+  // Answer an empty slot of the system's pattern (v178). A component that
+  // exists once for the organisation has no per-system state to set (the API
+  // refuses one). Returns whether it was saved.
   async function handleAnswer(componentId, status) {
     setLinkError('');
     try {
@@ -208,25 +208,20 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
 
       <h3 className={styles.tabSectionTitle}>Architecture components <HelpDot k="system_detail.architecture_components" placement="bottom" /></h3>
       <p className={styles.muted}>
-        What this system is made of. Add components freely; where one belongs to a system architecture pattern,
-        the whole pattern is offered.
+        What this system is made of. Add components freely; where one belongs to a standard build,
+        the whole standard build is offered.
       </p>
 
-      {security && security.memberships.length > 0 && (<>
-        <div className={styles.tabSubTitle}>
-          <PatternChip kind="template" />
-          <span>Each system should include one component from each group.</span>
-          <HelpDot k="system_detail.template" placement="bottom" />
-        </div>
-        <TemplateStrip memberships={security.memberships} canEdit={canEdit} onAnswer={handleAnswer} />
-      </>)}
+      <SystemPatternSection system={system} canEdit={canEdit} onChanged={onRefresh} onAnswer={handleAnswer}
+        canCreateAnswer={hasCapability('architecture.write')}
+        solutions={security?.solutions || []} />
 
       {canEdit && (
         <div className={styles.pickerBox}>
           <div className={styles.pickerSearchRow}>
             <input
               className={styles.pickerInput}
-              placeholder={builds.length > 0 ? 'Search components or patterns to add (min 2 chars)…' : 'Search components to add (min 2 chars)…'}
+              placeholder={builds.length > 0 ? 'Search components or standard builds to add (min 2 chars)…' : 'Search components to add (min 2 chars)…'}
               aria-label="Search components to add"
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -241,9 +236,9 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
               + New
             </button>
             {builds.length > 0 && (
-              <select className={styles.typeSelect} value="" aria-label="Adopt a system architecture pattern"
+              <select className={styles.typeSelect} value="" aria-label="Adopt a standard build"
                 onChange={e => { const b = builds.find(x => x.id === e.target.value); if (b) offerBuild(b); }}>
-                <option value="">Adopt a pattern…</option>
+                <option value="">Adopt a standard build…</option>
                 {builds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
               </select>
             )}
@@ -254,8 +249,8 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
               {matchingBuilds.map(b => (
                 <div key={b.id} className={styles.pickerOption}>
                   <span className={styles.pickerOptionName}><PatternChip kind="pattern" iconOnly /> {b.name}</span>
-                  <span className={styles.pickerOptionType}>pattern · {b.components.length} component{b.components.length === 1 ? '' : 's'}</span>
-                  <button className={styles.btnLink} onClick={() => offerBuild(b)} aria-label={`Adopt the pattern ${b.name}`}>Adopt…</button>
+                  <span className={styles.pickerOptionType}>standard build · {b.components.length} component{b.components.length === 1 ? '' : 's'}</span>
+                  <button className={styles.btnLink} onClick={() => offerBuild(b)} aria-label={`Adopt the standard build ${b.name}`}>Adopt…</button>
                 </div>
               ))}
             </div>
@@ -267,7 +262,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
                   <span className={styles.pickerOptionName}>
                     {c.name}{buildsWith(c.id).length > 0 && <>{' '}<PatternChip kind="pattern" iconOnly /></>}
                   </span>
-                  <span className={styles.pickerOptionType}>{componentTypeShort(c.component_type)}</span>
+                  <span className={styles.pickerOptionType}><TypeBadge type={c.component_type} variant="text" /></span>
                   <button className={styles.btnLink} onClick={() => handleAdd(c)} aria-label={`Add ${c.name}`}>Add</button>
                 </div>
               ))}
@@ -384,7 +379,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
           </p>
           {expected.map(c => (
             <div key={c.id} className={styles.expectedRow}>
-              <span className={styles.compType}>{componentTypeShort(c.component_type)}</span>
+              <span className={styles.compType}><TypeBadge type={c.component_type} variant="text" /></span>
               <span className={styles.componentName}>{c.name}</span>
               <span className={styles.expectedWhy} title={c.required_by.join('\n')}>
                 required by {c.required_by.length === 1

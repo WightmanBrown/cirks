@@ -16,6 +16,7 @@ import styles               from './ComponentLibraryPage.module.css';
 import { componentStatusLabel } from '../utils/componentTypes';
 import { ComponentModal } from '../components/ComponentModal';
 import { HelpDot } from '../components/HelpDot';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 
 // Status is a health ladder, not a word list, so it sorts by how much attention
@@ -216,6 +217,7 @@ export default function ComponentLibraryPage({ componentType, title, singular, s
 
   const [items, setItems]           = useState([]);
   const [loading, setLoading]       = useState(true);
+  useScrollRestore(!loading);   // Back from an item lands where you left the list
   const [error, setError]           = useState('');
   const [search, setSearch]         = useState('');
   const [showAdd, setShowAdd]       = useState(false);

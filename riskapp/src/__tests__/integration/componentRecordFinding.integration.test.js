@@ -19,9 +19,18 @@ const findings = async () =>
 const complete = () => request(app).post(`/api/v1/actions/${actionId}/complete`).set(as('ciso'));
 
 beforeAll(async () => {
-  const sys = async (name) => (await query(
-    `INSERT INTO systems (name, department_id, owner_user_id) VALUES ($1, $2, $3) RETURNING id`,
-    [name, IT_DEPT, USERS.owner.id])).rows[0].id;
+  // Each fixture system follows a pattern with its one required slot answered
+  // (v178), so the only reason it is a finding is the one under test.
+  const room = (await query(
+    `INSERT INTO control_components (component_type, name, status, instantiation, roles, created_by)
+     VALUES ('facility', 'REC room', 'operational', 'organisational', '{hosting}', $1) RETURNING id`, [USERS.admin.id])).rows[0].id;
+  const sys = async (name) => {
+    const id = (await query(
+      `INSERT INTO systems (name, department_id, owner_user_id, system_pattern) VALUES ($1, $2, $3, 'S6') RETURNING id`,
+      [name, IT_DEPT, USERS.owner.id])).rows[0].id;
+    await query(`INSERT INTO system_components (system_id, component_id, status) VALUES ($1, $2, 'operational')`, [id, room]);
+    return id;
+  };
   sysA = await sys('REC Sys A');
   sysB = await sys('REC Sys B');
   controlId = (await query(
@@ -55,7 +64,7 @@ afterAll(async () => {
   await query(`DELETE FROM system_controls WHERE control_id = $1`, [controlId]);
   await query(`DELETE FROM control_component_links WHERE control_id = $1`, [controlId]);
   await query(`DELETE FROM audit_log WHERE entity_id = ANY($1)`, [[per, org, uns]]);
-  await query(`DELETE FROM control_components WHERE id = ANY($1)`, [[per, org, uns]]);
+  await query(`DELETE FROM control_components WHERE id = ANY($1) OR name = 'REC room'`, [[per, org, uns]]);
   await query(`DELETE FROM controls WHERE id = $1`, [controlId]);
   await query(`DELETE FROM systems WHERE id = ANY($1)`, [[sysA, sysB]]);
 });

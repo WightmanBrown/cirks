@@ -70,6 +70,11 @@ export async function getRisk(id) {
   const { data } = await client.get(`/risks/${id}`);
   return data;
 }
+// The risk answer: how bad, why, what is being done, who decided.
+export async function getRiskAnswer(id) {
+  const { data } = await client.get(`/risks/${id}/answer`);
+  return data;
+}
 
 export async function createRisk(body) {
   const { data } = await client.post('/risks', body);
@@ -429,11 +434,6 @@ export async function unlinkRiskControl(riskId, controlId) {
   await client.delete(`/risks/${riskId}/controls/${controlId}`);
 }
 
-export async function getRiskGraph(id) {
-  const { data } = await client.get(`/graph/risk/${id}`);
-  return data;
-}
-
 export async function getControlComponents(controlId) {
   const { data } = await client.get(`/controls/${controlId}/components`);
   return data;
@@ -481,6 +481,11 @@ export async function createComponent(body) {
 export async function updateComponent(id, body) {
   const { data } = await client.patch(`/components/${id}`, body);
   return data;
+}
+
+// A component created by mistake (409 naming where it is still used).
+export async function deleteComponent(id) {
+  await client.delete(`/components/${id}`);
 }
 
 export async function addComponentIp(componentId, body) {
@@ -709,6 +714,16 @@ export async function getViewMode() {
 
 export async function putViewMode(view_mode) {
   await client.put('/users/me/view-mode', { view_mode });
+}
+
+// The simple or full menu (v183): { menu_mode, chosen, role_default }.
+export async function getMenuMode() {
+  const { data } = await client.get('/users/me/menu-mode');
+  return data;
+}
+export async function putMenuMode(menu_mode) {
+  const { data } = await client.put('/users/me/menu-mode', { menu_mode });
+  return data;
 }
 
 // Configurable-RBAC: the caller's resolved capability set for their active role,
@@ -1314,6 +1329,72 @@ export async function getAnalystReport(analyst) {
   const { data } = await client.get('/reports/analyst', { params: analyst && analyst !== 'team' ? { analyst } : {} });
   return data;
 }
+export async function getRecordCurrent() {
+  const { data } = await client.get('/reports/record');
+  return data;
+}
+
+export async function getAuditReadiness() {
+  const { data } = await client.get('/reports/audit');
+  return data;
+}
+
+export async function getTeamService() {
+  const { data } = await client.get('/reports/team');
+  return data;
+}
+
+export async function getOwnersReport() {
+  const { data } = await client.get('/reports/owners');
+  return data;
+}
+
+// Control coverage on systems (a question page); the reader's own department
+// for an IAO or IAM, whatever is asked.
+export async function getCoverage(departmentId) {
+  const { data } = await client.get('/reports/coverage', { params: departmentId ? { department_id: departmentId } : {} });
+  return data;
+}
+// Where the risk sits (a question page): narrowed by department, a heat-map
+// square ('impact,likelihood') or a minimum score.
+export async function getExposure({ departmentId, cell, min, only } = {}) {
+  const params = {};
+  if (only) params.only = only;
+  if (departmentId) params.department_id = departmentId;
+  if (cell) params.cell = cell;
+  if (min) params.min = min;
+  const { data } = await client.get('/reports/exposure', { params });
+  return data;
+}
+// Decisions owed (a question page).
+export async function getDecisionsOwed(departmentId) {
+  const { data } = await client.get('/reports/decisions', { params: departmentId ? { department_id: departmentId } : {} });
+  return data;
+}
+// The remaining question pages: control quality, meeting a standard (one per
+// standard switched on), work in progress, what changed.
+export async function getQualityQuestion() {
+  const { data } = await client.get('/reports/quality');
+  return data;
+}
+export async function getReportStandards() {
+  const { data } = await client.get('/reports/standards');
+  return data;
+}
+export async function getStandardQuestion(code) {
+  const { data } = await client.get(`/reports/standards/${encodeURIComponent(code)}`);
+  return data;
+}
+export async function getWorkQuestion(departmentId) {
+  const { data } = await client.get('/reports/work', { params: departmentId ? { department_id: departmentId } : {} });
+  return data;
+}
+export async function getChangesQuestion(departmentId, days) {
+  const params = { days };
+  if (departmentId) params.department_id = departmentId;
+  const { data } = await client.get('/reports/changes', { params });
+  return data;
+}
 export async function getUnknownRisk() {
   const { data } = await client.get('/reports/unknown');
   return data;
@@ -1475,6 +1556,32 @@ export async function removeSecuritySolutionPart(id, partId) {
   const { data } = await client.delete(`/controls/solutions/${id}/parts/${partId}`);
   return data.solution;
 }
+// The security solution patterns (v176): the eight shapes, each with its slots.
+export async function getSolutionPatterns() {
+  const { data } = await client.get('/controls/solution-patterns');
+  return data.patterns;
+}
+// Which pattern slot a part fills; null lets it be matched by type and place.
+export async function setSecuritySolutionPartSlot(id, partId, slotKey) {
+  const { data } = await client.patch(`/controls/solutions/${id}/parts/${partId}`, { slot_key: slotKey });
+  return data.solution;
+}
+
+// The system patterns (v177): the eight shapes, every system against its pattern.
+export async function getSystemPatterns() {
+  const { data } = await client.get('/architecture/system-patterns');
+  return data;
+}
+// The pattern a system follows; null for not stated. Returns { system_pattern, pattern_fit }.
+export async function setSystemPattern(id, code) {
+  const { data } = await client.patch(`/systems/${id}/pattern`, { system_pattern: code });
+  return data;
+}
+// Which slot of its pattern a recorded component fills; null to read it from its group.
+export async function setSystemComponentSlot(id, componentId, slotKey) {
+  const { data } = await client.patch(`/systems/${id}/components/${componentId}/slot`, { slot_key: slotKey });
+  return data;
+}
 
 // ── The security architecture (v148) ─────────────────────────────────────────
 // Rules, membership groups and builds: library work (controls.write).
@@ -1499,19 +1606,39 @@ export async function previewSystemBuild(systemId, buildId) {
   return data;
 }
 // Adopt it: copy its components on, in the state given (required).
-export async function applySystemBuild(systemId, buildId, status) {
-  const { data } = await client.post(`/systems/${systemId}/builds/${buildId}/apply`, { status });
+// confirmOverlap: the person has confirmed a second answer to a once-only
+// question (decision 24); without it the API refuses with 409 build_overlaps.
+// setPattern: take the build's pattern for a system with none (decision 22).
+export async function applySystemBuild(systemId, buildId, status, { confirmOverlap = false, setPattern = false } = {}) {
+  const body = { status };
+  if (confirmOverlap) body.confirm_overlap = true;
+  if (setPattern) body.set_pattern = true;
+  const { data } = await client.post(`/systems/${systemId}/builds/${buildId}/apply`, body);
   return data;
 }
-// kind: 'rules' | 'groups' | 'builds'
+// kind: 'rules' | 'builds'
 export async function createArchitectureItem(kind, body) {
   const { data } = await client.post(`/architecture/${kind}`, body);
   return data;
 }
-// The CIRKS starter template: six empty groups citing { standard_id }.
-export async function createStarterGroups(body) {
-  const { data } = await client.post('/architecture/groups/starter', body);
+// A component's roles (v178): what changing them would do, and doing it. A
+// change that leaves a system with a gap is refused (409, with the preview)
+// unless confirmGaps.
+export async function previewComponentRoles(componentId, roles) {
+  const { data } = await client.get(`/architecture/components/${componentId}/roles`, { params: { roles: roles.join(',') } });
   return data;
+}
+export async function setComponentRoles(componentId, roles, confirmGaps = false) {
+  const { data } = await client.put(`/architecture/components/${componentId}/roles`, { roles, confirm_gaps: confirmGaps });
+  return data;
+}
+// A system pattern as a security pattern trigger (v178).
+export async function addRulePatternTrigger(ruleId, code) {
+  const { data } = await client.post(`/architecture/rules/${ruleId}/patterns`, { system_pattern: code });
+  return data;
+}
+export async function removeRulePatternTrigger(ruleId, code) {
+  await client.delete(`/architecture/rules/${ruleId}/patterns/${code}`);
 }
 export async function updateArchitectureItem(kind, id, body) {
   const { data } = await client.patch(`/architecture/${kind}/${id}`, body);

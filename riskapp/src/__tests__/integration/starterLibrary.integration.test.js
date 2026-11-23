@@ -4,8 +4,9 @@
 
 // The CIRKS starter library's one-click parts (owner, 2026-11-02):
 //   POST /bil/impact-tables/starter     six impact tables, UNPUBLISHED
-//   POST /architecture/groups/starter   six template groups, EMPTY
-// and v165: a group with no members asks nothing, so the empty groups flag no
+//   (the six starter template groups, v165, were retired with the system
+//   profile in v178: a component's roles say which questions it answers)
+// and v165: a group with no members asked nothing, so the empty groups flagged no
 // system until the organisation gives them answers. The loaders that run on a
 // new installation (db/seed/starterLibrary.js) leave an existing catalogue alone.
 
@@ -29,8 +30,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await query(`DELETE FROM audit_log WHERE entity_id IN (SELECT id FROM membership_groups WHERE standard_id = $1)`, [ids.STD]);
-  await query(`DELETE FROM membership_groups WHERE standard_id = $1`, [ids.STD]);
   await query(`DELETE FROM impact_tables WHERE id = ANY($1)`, [ids.tables || []]);
   await query(`DELETE FROM control_components WHERE id = ANY($1)`, [[ids.STD, ids.HOST]]);
 });
@@ -80,55 +79,9 @@ describe('starter impact tables', () => {
   });
 });
 
-describe('starter template groups, and v165: an empty group asks nothing', () => {
-  test('needs the architecture.write capability and a document', async () => {
-    expect((await api('owner', 'post', '/architecture/groups/starter')
-      .send({ standard_id: ids.STD })).status).toBe(403);
-    expect((await api('ciso', 'post', '/architecture/groups/starter').send({})).status).toBe(400);
-  });
-
-  test('creates the six groups empty, citing the document, audited', async () => {
-    const r = await api('ciso', 'post', '/architecture/groups/starter').send({ standard_id: ids.STD });
-    expect(r.status).toBe(201);
-    expect(r.body.created).toEqual(['Connectivity', 'Hosting', 'Operating system', 'Authentication service',
-      'Support team', 'User group']);
-    const { rows } = await query(
-      `SELECT g.id, g.name, (SELECT count(*)::int FROM membership_group_members m WHERE m.group_id = g.id) AS members
-         FROM membership_groups g WHERE g.standard_id = $1 ORDER BY g.sort_index`, [ids.STD]);
-    expect(rows).toHaveLength(6);
-    expect(rows.every((g) => g.members === 0)).toBe(true);
-    ids.groups = Object.fromEntries(rows.map((g) => [g.name, g.id]));
-    const audited = await query(
-      `SELECT count(*)::int AS n FROM audit_log WHERE entity_type = 'membership_group' AND entity_id = ANY($1)`,
-      [Object.values(ids.groups)]);
-    expect(audited.rows[0].n).toBe(6);
-  });
-
-  test('an empty group flags no system', async () => {
-    const { rows } = await query(
-      `SELECT count(*)::int AS n FROM v_system_membership_gaps WHERE group_id = ANY($1)`, [Object.values(ids.groups)]);
-    expect(rows[0].n).toBe(0);
-    const lib = (await api('ciso', 'get', '/architecture')).body;
-    expect(lib.groups.find((g) => g.id === ids.groups.Hosting).systems_unanswered).toBe(0);
-  });
-
-  test('once it has a member, it asks every system that has not answered', async () => {
-    expect((await api('ciso', 'post', `/architecture/groups/${ids.groups.Hosting}/members`)
-      .send({ component_id: ids.HOST })).status).toBe(201);
-    const { rows: [{ n }] } = await query(
-      `SELECT count(*)::int AS n FROM v_system_membership_gaps WHERE group_id = $1`, [ids.groups.Hosting]);
-    const { rows: [{ active }] } = await query(`SELECT count(*)::int AS active FROM systems WHERE is_active`);
-    expect(n).toBe(active);
-    const others = await query(
-      `SELECT count(*)::int AS n FROM v_system_membership_gaps WHERE group_id = ANY($1)`,
-      [Object.values(ids.groups).filter((id) => id !== ids.groups.Hosting)]);
-    expect(others.rows[0].n).toBe(0);
-  });
-
-  test('pressing it again adds nothing', async () => {
-    const r = await api('ciso', 'post', '/architecture/groups/starter').send({ standard_id: ids.STD });
-    expect(r.status).toBe(200);
-    expect(r.body.created).toEqual([]);
+describe('v178: the starter template groups are retired', () => {
+  test('the endpoint is gone', async () => {
+    expect((await api('ciso', 'post', '/architecture/groups/starter').send({ standard_id: ids.STD })).status).toBe(404);
   });
 });
 

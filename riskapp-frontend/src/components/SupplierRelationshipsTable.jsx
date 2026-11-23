@@ -57,7 +57,7 @@ export function SupplierRelationshipsTable({ rows, show = 'supplier', isExpert =
               )}
             </td>
             <td>{supplierOwnerText(r)}</td>
-            <td title={`Touches ${r.systems_touched} system${r.systems_touched === 1 ? '' : 's'}`}>
+            <td title={`Touches ${r.systems_touched} ${r.figures_narrowed ? 'of your department’s ' : ''}system${r.systems_touched === 1 ? '' : 's'}`}>
               <RatingChip value={r.max_impact} scale="impact" variant={isExpert ? 'number' : 'word'} />
             </td>
             {renderActions && <td className={styles.right}>{renderActions(r)}</td>}

@@ -128,3 +128,14 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* The legend draws each node type's shape as well as its colour (2026-11-18). */
+.legendDot { width: 14px; height: 10px; }
+.shape_roundrectangle { border-radius: 3px; }
+.shape_diamond { width: 9px; height: 9px; transform: rotate(45deg); margin: 0 2px; border-radius: 1px; }
+.shape_ellipse { border-radius: 50%; }
+.shape_barrel { border-radius: 40% / 25%; }
+.shape_hexagon { clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.shape_octagon { clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
+.shape_cut_rectangle { clip-path: polygon(20% 0, 80% 0, 100% 25%, 100% 75%, 80% 100%, 20% 100%, 0 75%, 0 25%); }
+.shape_round_tag { clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%); border-radius: 2px; }

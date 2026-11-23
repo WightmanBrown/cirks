@@ -36,14 +36,14 @@ Assessment and triage,Incident response policy,information,Definition of inciden
 Containment and recovery,Incident management,process,Incident response
 Containment and recovery,Incident response playbooks,process,
 Containment and recovery,InfoSec Team,people,
-Containment and recovery,Zero trust isolation,technology,provides isolation capabilities for identified threats on the network to limit damage
-Containment and recovery,Crowdstrike Falcon Agent,technology,Endpoint detection & response
+Devices can be contained,Zero trust isolation,technology,provides isolation capabilities for identified threats on the network to limit damage
+Devices can be contained,Crowdstrike Falcon Agent,technology,Endpoint detection & response
 Role-based training,IT Administrators,people,
 Role-based training,Security awareness training,process,Awareness & training programme
-Central monitoring team,Crowdstrike Falcon Agent,technology,
-Central monitoring team,Crowdstrike SaaS,technology,
-Central monitoring team,InfoSec Team,people,
-Central monitoring team,Wazuh,technology,SIEM / log aggregation
+Central monitoring capability,Crowdstrike Falcon Agent,technology,
+Central monitoring capability,Crowdstrike SaaS,technology,
+Central monitoring capability,InfoSec Team,people,
+Central monitoring capability,Wazuh,technology,SIEM / log aggregation
 Software installation is controlled,Crowdstrike Falcon Agent,technology,Endpoint detection & response
 Software installation is controlled,End point monitoring (EPP),process,Endpoint protection
 Devices register,Asset management,process,Asset inventory
@@ -74,7 +74,7 @@ Physical entry is controlled,The Castle server room,facility,Secure facility
 Leadership commitment,CIRKS information risk knowledge system,technology,provides oversight an monitoring of all information security management processes
 Information risk assessments,CIRKS information risk knowledge system,technology,
 Information risk assessments,CIRKS Information Risk Management Process,process,
-Central monitoring team,Detective Monitoring,process,Security monitoring
+Central monitoring capability,Detective Monitoring,process,Security monitoring
 Vulnerability reports are handled,Vulnerability management,process,Vulnerability management
 Recovery is managed,Resilience and recovery,process,Resilience & recovery
 Security action plan,CIRKS Information Risk Management Process,process,Risk management
@@ -103,5 +103,6 @@ Continuity and recovery plans,Veeam Backup,technology,Backup & recovery
 Risk register,CIRKS Information Risk Management Process,process,Risk management
 Risk register,InfoSec Team,people,Security operations
 Strong authentication,Microsoft Active Directory Domain Services,technology,Identity & access management
-Vulnerabilities are identified,ME End-Point Central,technology,Patch & endpoint management
-Vulnerabilities are identified,Vulnerability management,process,Vulnerability management
+Software vulnerability scanning,ME End-Point Central,technology,Patch & endpoint management
+Software vulnerability scanning,Vulnerability management,process,Vulnerability management
+Acceptable use policy,Acceptable Use Policy,information,

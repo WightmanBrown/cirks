@@ -10,9 +10,39 @@ import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
 import { useAuth } from '../context/AuthContext';
 import { getTotpStatus, setupTotp, confirmTotp, disableTotp } from '../api';
+import { useMenuMode } from '../hooks/useMenuMode';
 import styles from './MyAccountPage.module.css';
 
 const errorOf = (err, fallback) => err?.response?.data?.error || fallback;
+
+// The simple or full menu (v183). Null = whatever the role's default is.
+function MenuChoice() {
+  const { menuMode, chosen, roleDefault, setMenuMode } = useMenuMode();
+  const [error, setError] = useState('');
+  const choose = (v) => setMenuMode(v).then(() => setError('')).catch(err => setError(errorOf(err, 'That was not saved.')));
+  const options = [
+    ['simple', 'Simple menu', 'Leaves out the design and library pages: threats, system patterns, standard builds, the control library, the Statement of Applicability, scopes, the remediation roll-up and the security architecture pages. Links to them from other pages still work.'],
+    ['full', 'Full menu', 'Every page you have access to.'],
+  ];
+  return (
+    <section className={styles.card}>
+      <h2 className={styles.cardTitle}>Menu <HelpDot k="account.menu" placement="bottom" /></h2>
+      {error && <p className={styles.error} role="alert">{error}</p>}
+      <div role="radiogroup" aria-label="Menu">
+        {options.map(([value, label, why]) => (
+          <label key={value} className={styles.menuOption}>
+            <input type="radio" name="menu_mode" value={value} checked={menuMode === value} onChange={() => choose(value)} />
+            <span><b>{label}</b>{roleDefault === value && <span className={styles.muted}> (the default for your role)</span>}<br />
+              <span className={styles.muted}>{why}</span></span>
+          </label>
+        ))}
+      </div>
+      {chosen && chosen !== roleDefault && (
+        <button type="button" className={styles.linkBtn} onClick={() => choose(null)}>Go back to my role&rsquo;s default</button>
+      )}
+    </section>
+  );
+}
 
 export function MyAccountPage() {
   const { user } = useAuth();
@@ -60,6 +90,8 @@ export function MyAccountPage() {
         <BackButton fallback="/dashboard" />
         <h1 className={styles.title}>My account <HelpDot k="account.title" placement="bottom" /></h1>
         <p className={styles.muted}>{user?.full_name} · {user?.email}</p>
+
+        <MenuChoice />
 
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>Two-factor sign-in <HelpDot k="account.totp" placement="bottom" /></h2>

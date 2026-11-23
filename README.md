@@ -93,7 +93,7 @@ guide is **[docs/INSTALL.md](docs/INSTALL.md)**. It builds one of two things:
 
 | | You get | Use it to |
 |---|---|---|
-| **A training instance** | *Misty Isles Government*, a fictional organisation with a year of risk management already done — 52 systems, 227 risks, actions, exceptions, minuted meetings | learn CIRKS, demonstrate it, try things out. Never put real information in it. |
+| **A training instance** | *Misty Isles Government*, a fictional organisation with a year of risk management already done — 58 systems, 227 risks, actions, exceptions, minuted meetings | learn CIRKS, demonstrate it, try things out. Never put real information in it. |
 | **Your organisation's instance** | an empty CIRKS with its reference data (roles and permissions, the CIRKS control objectives, mapped to ISO 27001, CIS Controls and NIST CSF, impact descriptors) | record your own organisation, loaded from a spreadsheet workbook |
 
 In outline, on Ubuntu with Docker installed (the guide explains every step and

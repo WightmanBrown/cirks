@@ -125,7 +125,12 @@ async function listSystems(departmentId, userId) {
             ORDER BY metric_key, period DESC`, [ids.map(systemKey)]),
     // Other departments' services that use this department's systems (M10).
     query(`SELECT bss.system_id, s.name AS system_name, d.id AS department_id, d.name AS department_name,
-                  array_agg(DISTINCT bs.name ORDER BY bs.name) AS services, o.owner_names
+                  array_agg(DISTINCT bs.name ORDER BY bs.name) AS services, o.owner_names,
+                  -- Their information on the system: the stake they would argue from.
+                  (SELECT COALESCE(json_agg(json_build_object('id', ia.id, 'name', ia.name,
+                            'level', GREATEST(ia.confidentiality, ia.integrity, ia.availability)) ORDER BY ia.name), '[]'::json)
+                     FROM system_assets sa JOIN information_assets ia ON ia.id = sa.asset_id AND ia.is_active
+                    WHERE sa.system_id = bss.system_id AND ia.department_id = d.id) AS assets
              FROM business_service_systems bss
              JOIN business_services bs ON bs.id = bss.service_id AND bs.is_active
              JOIN systems s ON s.id = bss.system_id

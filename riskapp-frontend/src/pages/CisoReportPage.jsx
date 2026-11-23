@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getCisoReport } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +9,10 @@ import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
 import { CapabilityGate } from '../components/CapabilityGate';
 import { CompletenessRing } from '../components/CompletenessRing';
+import { RiskAnswerRow, RiskOpener, useRiskUnfold } from '../components/RiskAnswer';
+import { PanelQuestions } from '../components/PanelQuestions';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
 import { Scatter } from '../components/BoardCharts';
 import { scoreLevel } from '../utils/riskColors';
 import styles from './BoardSummaryPage.module.css';
@@ -54,21 +58,21 @@ function Headlines({ r, action }) {
   return (
     <div className={styles.tiles}>
       <Tile value={h.agreed} of={h.at_or_above_action}
-        label={`risks scoring ${action} or more have a treatment the business has agreed`}
+        label={`risks scoring ${action} or higher have a treatment the business has agreed`}
         detail={`Agreed means the Security Working Group minuted a decision, or the risk owner accepted the risk or the action to treat it. ${notAgreed === 0 ? 'None is' : `${n(notAgreed)} ${notAgreed === 1 ? 'is' : 'are'}`} still to agree.`} />
       {top ? (
         <Tile value={top.points_removed}
           label="points the best single fix would take off risk scores"
-          detail={`Putting ${top.reference || top.title} in place would lower ${plural(top.risks, 'risk')} scoring ${action} or more by ${top.points_removed} points between them, bringing ${top.risks_brought_below_action} below ${action}.`} />
+          detail={`Putting ${top.reference || top.title} in place would lower ${plural(top.risks, 'risk')} scoring ${action} or higher by ${top.points_removed} points between them, bringing ${top.risks_brought_below_action} below ${action}.`} />
       ) : (
         <Tile value={0} label="points the best single fix would take off risk scores"
           detail="No fix yet has a judged effect on a risk." />
       )}
       <Tile value={h.joint_fixes}
         label="fixes that would lower risks in more than one department"
-        detail={`Control objectives not yet in place that counter risks scoring ${action} or more in two or more departments: the basis for a case the departments can make together.`} />
+        detail={`Control objectives not yet in place that counter risks scoring ${action} or higher in two or more departments: the basis for a case the departments can make together.`} />
       <Tile value={h.shared_systems_at_risk} of={r.shared.systems_total}
-        label={`systems shared between departments carry a risk scoring ${action} or more`}
+        label={`systems shared between departments carry a risk scoring ${action} or higher`}
         detail="A system used by several departments: one incident there would affect them all." />
     </div>
   );
@@ -100,14 +104,20 @@ const FIRST = 15;
 function Agreement({ a, action }) {
   const [show, setShow] = useState('not_agreed');
   const [all, setAll] = useState(false);
+  const [openId, toggle] = useRiskUnfold();
   const matching = a.risks.filter((r) => show === 'all' || (show === 'agreed' ? r.state === 'agreed' : r.state !== 'agreed'));
-  const rows = all ? matching : matching.slice(0, FIRST);
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(matching, { accessors: {
+    risk: (r) => `${r.system_name} ${r.threat_name}`, dept: (r) => r.department_name, score: (r) => r.score,
+    state: (r) => r.state, by: (r) => (r.minuted ? 'minuted' : r.owner_act ? 'owner' : null), hand: (r) => (r.in_hand ? r.in_hand.kind : null),
+  } });
+  const sort = { sortKey, sortDir, onSort: toggleSort };
+  const rows = all ? sorted : sorted.slice(0, FIRST);
   return (
-    <Panel title={`What the business has agreed — risks scoring ${action} or more`} helpKey="ciso.agreement" wide>
+    <Panel title={`What the business has agreed — risks scoring ${action} or higher`} helpKey="ciso.agreement" wide>
       <div className={own.split}>
         <CompletenessRing size={96} complete={a.agreed} partial={a.decided_not_agreed} missing={a.not_decided}
           labels={{ complete: 'agreed by the business', partial: 'decided, not agreed', missing: 'not decided' }}
-          of={`risks scoring ${action} or more`} />
+          of={`risks scoring ${action} or higher`} />
         <p className={styles.note}>
           A risk is agreed when a Security Working Group decision on it (or on its security action) is minuted, or
           when its owner accepted it or accepted the action for it. The CISO validating it alone does not count.
@@ -123,18 +133,19 @@ function Agreement({ a, action }) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Risk <HelpDot k="ciso.col.risk" placement="bottom" /></th>
-              <th>Department <HelpDot k="col.department" placement="bottom" /></th>
-              <th className={styles.num}>Score <HelpDot k="ciso.col.score" placement="bottom" /></th>
-              <th>Agreement <HelpDot k="ciso.col.agreement" placement="bottom" /></th>
-              <th>Agreed by <HelpDot k="ciso.col.agreed_by" placement="bottom" /></th>
-              <th>In hand <HelpDot k="ciso.col.in_hand" placement="bottom" /></th>
+              <SortableTh column="risk" {...sort} helpKey="ciso.col.risk">Risk</SortableTh>
+              <SortableTh column="dept" {...sort} helpKey="col.department">Department</SortableTh>
+              <SortableTh column="score" {...sort} className={styles.num} helpKey="ciso.col.score">Score</SortableTh>
+              <SortableTh column="state" {...sort} helpKey="ciso.col.agreement">Agreement</SortableTh>
+              <SortableTh column="by" {...sort} helpKey="ciso.col.agreed_by">Agreed by</SortableTh>
+              <SortableTh column="hand" {...sort} helpKey="ciso.col.in_hand">In hand</SortableTh>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.risk_id}>
-                <td><Link to={`/risks/${r.risk_id}`}>{r.system_name} — {r.threat_name}</Link></td>
+              <Fragment key={r.risk_id}>
+              <tr>
+                <td><RiskOpener open={openId === r.risk_id} onToggle={() => toggle(r.risk_id)}>{r.system_name} — {r.threat_name}</RiskOpener></td>
                 <td>{r.department_name || '—'}</td>
                 <td className={styles.num}><Score value={r.score} /></td>
                 <td><span className={`${own.state} ${STATE_TONE[r.state]}`}>{STATE_WORD[r.state]}</span>
@@ -148,6 +159,8 @@ function Agreement({ a, action }) {
                       : <>Accepted by {r.in_hand.by} ({r.in_hand.role}) until {day(r.in_hand.expires_at)}</>)
                   : <span className={styles.badText}>Nothing in hand</span>}</td>
               </tr>
+              {openId === r.risk_id && <RiskAnswerRow colSpan={6} riskId={r.risk_id} lead="decision" />}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -157,6 +170,10 @@ function Agreement({ a, action }) {
           Show all {matching.length} (highest score first)
         </button>
       )}
+      <PanelQuestions questions={[
+        { label: 'Which risks are awaiting agreement, from whom, and for how long?', to: '/reporting/decisions?stage=agree' },
+        { label: 'Which departments have most waiting?', to: '/reporting/decisions?by=department' },
+      ]} />
     </Panel>
   );
 }
@@ -169,27 +186,38 @@ function costWords(f) {
   return <>{c.from ? 'From ' : ''}{parts.join(', ')}{c.from ? ` (${c.solution})` : ''}</>;
 }
 
+// The library prefix (CIRKS1.) is the same on every shipped objective; the chart names a dot by the rest.
+const shortRef = (ref) => (ref ? ref.replace(/^CIRKS\d*\./, '') : null);
+
 function Investment({ inv, action }) {
   const top = inv.fixes;
   return (
     <Panel title="Where the money goes furthest" helpKey="ciso.investment" wide>
       <p className={styles.note}>
-        Control objectives not in place where they counter risks scoring {action} or more: what putting each in place
+        Control objectives not in place where they counter risks scoring {action} or higher: what putting each in place
         would remove, in risk points, using the residual each risk was judged to fall to. A gain is for that objective
         alone — gains do not add up across objectives. {inv.costed} of {inv.objectives} {inv.objectives === 1 ? 'has' : 'have'} a
         cost estimated; costs are given on each security solution&apos;s page.
       </p>
       {inv.unjudged > 0 && (
         <p className={styles.note}>
-          {plural(inv.unjudged, 'more objective')} {inv.unjudged === 1 ? 'counters' : 'counter'} risks scoring {action} or more where
+          {plural(inv.unjudged, 'more objective')} {inv.unjudged === 1 ? 'counters' : 'counter'} risks scoring {action} or higher where
           nobody has judged what putting {inv.unjudged === 1 ? 'it' : 'them'} in place would do; {inv.unjudged === 1 ? 'it is' : 'they are'} not ranked.
         </p>
       )}
-      {top.length > 0 && (
-        <Scatter corner="do these first" xLabel="systems to change" yLabel="risk points removed"
-          points={top.map((f, i) => ({ key: f.control_id, x: f.systems, y: f.points_removed, label: f.reference || f.title, named: i < 5 }))} />
-      )}
-      {top.length === 0 ? <p className={styles.note}>Nothing: every objective that counters a risk scoring {action} or more is in place.</p> : (
+      {top.length > 0 && (<>
+        <Scatter corner="most for least: do these first" xLabel="systems to change" yLabel="risk points removed"
+          points={top.map((f, i) => ({
+            key: f.control_id, x: f.systems, y: f.points_removed, named: i < 5,
+            label: shortRef(f.reference) || f.title, title: `${f.reference ? `${f.reference} ` : ''}${f.title}`,
+          }))} />
+        <p className={styles.note}>
+          Each dot is a control objective in the table below, named by its reference. Higher means more risk points
+          removed; further left means fewer systems to change. Dots in the shaded corner remove the most risk for the
+          least work. Point at a dot for the objective&apos;s name.
+        </p>
+      </>)}
+      {top.length === 0 ? <p className={styles.note}>Nothing: every objective that counters a risk scoring {action} or higher is in place.</p> : (
         <table className={styles.table}>
           <thead>
             <tr>
@@ -241,7 +269,7 @@ function Investment({ inv, action }) {
 // highest risk, so a row of red across departments reads at a glance.
 function SharedMatrix({ systems, action }) {
   const withRisk = systems.filter((s) => s.risks_at_or_above_action > 0).slice(0, 10);
-  if (!withRisk.length) return <p className={styles.note}>No shared system carries a risk scoring {action} or more.</p>;
+  if (!withRisk.length) return <p className={styles.note}>No shared system carries a risk scoring {action} or higher.</p>;
   const depts = [...new Map(withRisk.flatMap((s) => s.departments).map((d) => [d.id, d])).values()]
     .sort((a, b) => a.name.localeCompare(b.name));
   return (
@@ -258,7 +286,7 @@ function SharedMatrix({ systems, action }) {
                 const uses = s.departments.some((x) => x.id === d.id);
                 return (
                   <td key={s.system_id} className={uses ? `${own.cell} ${own[`band_${scoreLevel(s.max_score)}`]}` : own.cell}
-                      title={uses ? `${d.name} uses ${s.system_name}: ${plural(s.risks_at_or_above_action, 'risk')} scoring ${action} or more, highest ${s.max_score}` : undefined}>
+                      title={uses ? `${d.name} uses ${s.system_name}: ${plural(s.risks_at_or_above_action, 'risk')} scoring ${action} or higher, highest ${s.max_score}` : undefined}>
                     {uses ? s.risks_at_or_above_action : ''}
                   </td>
                 );
@@ -267,7 +295,7 @@ function SharedMatrix({ systems, action }) {
           ))}
         </tbody>
       </table>
-      <p className={styles.note}>A number is the risks scoring {action} or more on that system; its colour is the highest one&apos;s band. A blank square: the department does not use it.</p>
+      <p className={styles.note}>Each number is the count of risks scoring {action} or higher on that system. Its colour shows the band of the highest of those risks. A blank square means the department does not use the system.</p>
     </div>
   );
 }
@@ -282,10 +310,10 @@ function Shared({ sh, action }) {
     </Panel>
     <div className={own.pair}>
     <Panel title="Common threats" helpKey="ciso.common_threats">
-      {sh.threats.length === 0 ? <p className={styles.note}>No threat sits behind risks scoring {action} or more in more than one department.</p> : (
+      {sh.threats.length === 0 ? <p className={styles.note}>No threat sits behind risks scoring {action} or higher in more than one department.</p> : (
         <ul className={styles.facts}>
           {sh.threats.map((t) => (
-            <li key={t.threat_name}><strong>{t.departments.length}</strong>departments — {t.threat_name} ({plural(t.risks, 'risk')}, highest {t.max_score})</li>
+            <li key={t.threat_name}><strong>{t.departments.length}</strong>departments — {t.threat_name} ({plural(t.risks, 'risk')}, highest <Score value={t.max_score} />)</li>
           ))}
         </ul>
       )}
@@ -329,6 +357,10 @@ export function CisoReportPage() {
             <p className={styles.desc}>
               What the business has agreed, where investment removes the most risk, and which departments share it.
               {' '}<Link to="/reporting/unknown" data-print="hide">Where unknown risk is hiding →</Link>
+              {' '}<Link to="/reporting/owners" data-print="hide">Who owns what →</Link>
+              {' '}<Link to="/reporting/team" data-print="hide">The security team’s service →</Link>
+              {' '}<Link to="/reporting/audit" data-print="hide">Audit readiness →</Link>
+              {' '}<Link to="/reporting/record" data-print="hide">Is the record current? →</Link>
               {r && <> As at {new Date(r.generated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, from the live register.</>}
             </p>
           </div>

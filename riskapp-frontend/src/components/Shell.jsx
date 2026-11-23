@@ -6,6 +6,7 @@ import { useAuth }                    from '../context/AuthContext';
 import { useHelp }                    from '../context/HelpContext';
 import { useNavigate, useLocation }   from 'react-router-dom';
 import { getRoleHome }                from '../utils/getRoleHome';
+import { useMenuMode }                from '../hooks/useMenuMode';
 import styles from './Shell.module.css';
 
 // Each nav item declares a `cap` (RBAC capability key) that gates its visibility,
@@ -25,7 +26,7 @@ const NAV_GROUPS = [
       { label: 'Current Risks',        path: '/risks/current',  cap: 'risk_heatmap.read' },
       { label: 'New Risks',            path: '/risks/future',   cap: 'risk_heatmap.read' },
       { label: 'Pending Review',       path: '/risks/pending',  cap: 'governance.review' },
-      { label: 'Threats',              path: '/threats',        cap: 'threats.read' },
+      { label: 'Threats',              path: '/threats',        cap: 'threats.read', full: true },
       { label: 'Security Actions',     path: '/actions',        cap: 'actions.read' },
       { label: 'Security Exceptions',  path: '/exceptions',     cap: 'exceptions.read' },
       { label: 'Assurance Findings',   path: '/findings',       cap: 'findings.read' },
@@ -46,6 +47,8 @@ const NAV_GROUPS = [
       { label: 'Business Services',  path: '/services', cap: 'services.read' },
       { label: 'Information Assets', path: '/assets',   cap: 'assets.read' },
       { label: 'Systems',            path: '/systems',  cap: 'systems.read' },
+      // Also under Security Controls → Security Architecture (v177).
+      { label: 'System patterns',    path: '/system-patterns', cap: 'controls.read', pattern: 'template', full: true },
       { label: 'Suppliers',          path: '/suppliers', cap: 'suppliers.read' },
       { type: 'divider' },
       { type: 'header', label: 'System Components' },
@@ -55,24 +58,25 @@ const NAV_GROUPS = [
       { label: 'Facilities',            path: '/facilities',    cap: 'components.read' },
       // Also under Security Controls → Security Architecture: the patterns are
       // sets of components, so they are found from here too (owner, 2026-10-02).
-      { label: 'System architecture patterns', path: '/architecture-patterns', cap: 'controls.read', pattern: 'pattern' },
+      { label: 'Standard builds', path: '/architecture-patterns', cap: 'controls.read', pattern: 'pattern', full: true },
     ],
   },
 
   {
     label: 'Security Controls', dropdown: true,
     items: [
-      { label: 'Control Library',            path: '/controls',    cap: 'controls.read' },
-      { label: 'Statement of Applicability', path: '/soa',         cap: 'controls.read' },
-      { label: 'Scopes',                     path: '/scopes',      cap: 'controls.read' },
+      { label: 'Control Library',            path: '/controls',    cap: 'controls.read', full: true },
+      { label: 'Statement of Applicability', path: '/soa',         cap: 'controls.read', full: true },
+      { label: 'Scopes',                     path: '/scopes',      cap: 'controls.read', full: true },
       { label: 'Policies & documents',       path: '/policies-documents', cap: 'components.read' },
-      { label: 'Remediation roll-up',        path: '/remediation', cap: 'actions.read' },
+      { label: 'Remediation roll-up',        path: '/remediation', cap: 'actions.read', full: true },
       { type: 'divider' },
       { type: 'header', label: 'Security Architecture' },
-      { label: 'Security solutions',            path: '/security-solutions',        cap: 'controls.read', pattern: 'solution' },
-      { label: 'Systems architecture template', path: '/architecture-template',     cap: 'controls.read', pattern: 'template' },
-      { label: 'Security pattern triggers',     path: '/security-pattern-triggers', cap: 'controls.read' },
-      { label: 'System architecture patterns',  path: '/architecture-patterns',     cap: 'controls.read', pattern: 'pattern' },
+      { label: 'Security solutions',            path: '/security-solutions',        cap: 'controls.read', pattern: 'solution', full: true },
+      { label: 'Security solution patterns',    path: '/security-solution-patterns', cap: 'controls.read', pattern: 'solution', full: true },
+      { label: 'System patterns', path: '/system-patterns',          cap: 'controls.read', pattern: 'template', full: true },
+      { label: 'Security pattern triggers',     path: '/security-pattern-triggers', cap: 'controls.read', full: true },
+      { label: 'Standard builds',  path: '/architecture-patterns',     cap: 'controls.read', pattern: 'pattern', full: true },
     ],
   },
 
@@ -116,12 +120,53 @@ const NAV_GROUPS = [
       { label: 'CISO report',         path: '/reporting/ciso', cap: 'reports.read' },
       { label: 'My work',             path: '/reporting/analyst', cap: 'risks.write' },
       { label: 'Unknown risk',        path: '/reporting/unknown', cap: 'reports.read' },
+      { label: 'Who owns what',       path: '/reporting/owners', cap: 'reports.read' },
+      { label: 'Security team',       path: '/reporting/team', cap: 'reports.read' },
+      { label: 'Audit readiness',     path: '/reporting/audit', cap: 'reports.read' },
+      { label: 'Is the record current?', path: '/reporting/record', cap: 'reports.read' },
     ],
   },
 
 ];
 
-function DropdownNavItem({ label, items, location, navigate }) {
+// Drop section headers and dividers left with nothing under them (the simple
+// menu can empty a whole section, such as Security Architecture).
+export function tidyMenu(items) {
+  const out = [];
+  for (let n = 0; n < items.length; n++) {
+    const i = items[n];
+    if (i.type) {
+      const rest = items.slice(n + 1);
+      const nextReal = rest.findIndex(x => !x.type);
+      const nextStruct = rest.findIndex(x => x.type);
+      if (nextReal === -1 || (nextStruct !== -1 && nextStruct < nextReal && i.type === 'header')) continue;
+      if (i.type === 'divider' && (out.length === 0 || out[out.length - 1].type)) continue;
+    }
+    out.push(i);
+  }
+  return out;
+}
+
+// The foot of every dropdown: switch between the simple and the full menu
+// (v183). Says how many entries the full menu adds, so it is never a mystery.
+function MenuSwitch({ menu, onDone }) {
+  if (!menu) return null;
+  const text = menu.simple
+    ? `Show the full menu${menu.hidden ? ` (${menu.hidden} more)` : ''}`
+    : 'Show the simple menu';
+  return (
+    <>
+      <hr className={styles.dropDivider} />
+      <button type="button" className={styles.dropSwitch}
+        title="The simple menu leaves out the design and library pages. They are still reachable from links on other pages."
+        onClick={async () => { onDone(); await menu.toggle(); }}>
+        {text}
+      </button>
+    </>
+  );
+}
+
+function DropdownNavItem({ label, items, location, navigate, menu }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const isActive = items.some(i => i.path && location.pathname.startsWith(i.path));
@@ -157,6 +202,7 @@ function DropdownNavItem({ label, items, location, navigate }) {
               </button>
             );
           })}
+          <MenuSwitch menu={menu} onDone={() => setOpen(false)} />
         </div>
       )}
     </div>
@@ -172,7 +218,17 @@ export function Shell({ children }) {
 
   // An item is visible if its capability is held, or (legacy) its role matches.
   // Header/divider items are structural — always passed through.
-  const itemVisible = (i) => i.type ? true : (i.cap ? hasCapability(i.cap) : (!i.roles || i.roles.includes(role)));
+  const allowed = (i) => i.type ? true : (i.cap ? hasCapability(i.cap) : (!i.roles || i.roles.includes(role)));
+  // v183: the simple menu leaves out the entries marked `full` (the design and
+  // library pages). Still reachable by link; only the menu changes.
+  const menuMode = useMenuMode();
+  const itemVisible = (i) => allowed(i) && !(menuMode.simple && i.full);
+  const hiddenPaths = new Set(NAV_GROUPS.flatMap(g => g.items || []).filter(i => !i.type && i.full && allowed(i)).map(i => i.path));
+  const menu = hiddenPaths.size === 0 ? null : {
+    simple: menuMode.simple,
+    hidden: hiddenPaths.size,
+    toggle: () => menuMode.setMenuMode(menuMode.simple ? 'full' : 'simple'),
+  };
 
   function renderNavGroup(group) {
     if (!group.dropdown) {
@@ -190,10 +246,10 @@ export function Shell({ children }) {
       );
     }
 
-    const visible = group.items.filter(itemVisible);
+    const visible = tidyMenu(group.items.filter(itemVisible));
     if (visible.length === 0) return null;
 
-    if (visible.length === 1) {
+    if (visible.length === 1 && !visible[0].type) {
       const item = visible[0];
       const active = location.pathname.startsWith(item.path);
       return (
@@ -214,6 +270,7 @@ export function Shell({ children }) {
         items={visible}
         location={location}
         navigate={navigate}
+        menu={menu}
       />
     );
   }

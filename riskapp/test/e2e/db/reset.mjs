@@ -84,7 +84,7 @@ const checks = psql(cfg.database, ['-tAF', '|', '-c', `
 `]);
 
 const expected = {
-  users: 8, pending_risks: 1, proposed_actions: 1, completed_actions: 1,
+  users: 9, pending_risks: 1, proposed_actions: 1, completed_actions: 1,
   draft_cycles: 1, open_meetings: 1, closed_unissued: 1, issued_meetings: 1,
   active_exceptions: 1, recorded_decisions: 3,
 };

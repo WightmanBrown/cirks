@@ -10,7 +10,7 @@ import styles from './PatternChip.module.css';
 //   pattern  — one build fanning out to its components (violet)
 const KINDS = {
   template: {
-    label: 'Template', full: 'Systems architecture template',
+    label: 'Profile', full: 'System profile',
     glyph: (<>
       <path d="M8 8 8 3M8 8 3.5 11.5M8 8 12.5 11.5" />
       <circle className={styles.node} cx="8" cy="8" r="1.8" />
@@ -29,7 +29,7 @@ const KINDS = {
     </>),
   },
   pattern: {
-    label: 'Architecture pattern', full: 'System architecture pattern',
+    label: 'Standard build', full: 'Standard build',
     glyph: (<>
       <path d="M8 3.5 3 12M8 3.5 8 12M8 3.5 13 12" />
       <circle className={styles.node} cx="8" cy="3.5" r="1.9" />

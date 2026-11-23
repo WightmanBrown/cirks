@@ -192,7 +192,7 @@ describe('GET /api/v1/admin/export', () => {
       .get('/api/v1/admin/export/systems')
       .set('Authorization', `Bearer ${ADMIN_TOKEN}`);
     expect(res.status).toBe(200);
-    expect(res.text.split('\r\n')[0]).toBe('name,description,department_name,owner_email,manager_email,is_shared,is_active');
+    expect(res.text.split('\r\n')[0]).toBe('name,description,department_name,owner_email,manager_email,is_shared,is_active,system_pattern');
     expect(res.text).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-/);
   });
 
@@ -204,7 +204,7 @@ describe('GET /api/v1/admin/export', () => {
       .get('/api/v1/admin/export/system-components')
       .set('Authorization', `Bearer ${ADMIN_TOKEN}`);
     expect(res.status).toBe(200);
-    expect(res.text.split('\r\n')[0]).toBe('system_name,component_name,component_type,role,status');
+    expect(res.text.split('\r\n')[0]).toBe('system_name,component_name,component_type,role,status,slot_key');
   });
 
   test('8b — system-threats header row', async () => {
@@ -293,13 +293,12 @@ describe('GET /api/v1/admin/export', () => {
   // migrations added: scope and documents (v137/v139), the SoA and scopes
   // (v122/v126), suppliers and evidence (v142–v144), host IP addresses.
   test.each([
-    ['components', 'name,component_type,status,description,notes,created_by_email,instantiation,is_host,hostname,document_kind,document_version,document_owner_email,document_approved_by_email,document_approved_on,document_next_review,document_url'],
+    ['components', 'name,component_type,status,description,notes,created_by_email,instantiation,is_host,hostname,document_kind,document_version,document_owner_email,document_approved_by_email,document_approved_on,document_next_review,document_url,roles'],
     ['component-ip-addresses', 'component_name,component_type,ip_address,label'],
-    ['delivery-patterns', 'name,kind,notes,cost_one_off,cost_annual,cost_basis,cost_note,effort_hours_month,effort_basis,effort_note'],
+    ['delivery-patterns', 'name,kind,notes,cost_one_off,cost_annual,cost_basis,cost_note,effort_hours_month,effort_basis,effort_note,solution_pattern,slots_not_needed'],
     ['delivery-pattern-objectives', 'pattern_name,control_title'],
-    ['delivery-pattern-parts', 'pattern_name,component_name,component_type,location,service_system_name'],
-    ['architecture-rules', 'pattern_name,standard_name,notes,trigger_component_name,trigger_component_type'],
-    ['membership-groups', 'group_name,standard_name,notes,sort_index,role,component_name,component_type'],
+    ['delivery-pattern-parts', 'pattern_name,component_name,component_type,location,service_system_name,slot_key'],
+    ['architecture-rules', 'pattern_name,standard_name,notes,trigger_component_name,trigger_component_type,trigger_system_pattern'],
     ['system-builds', 'build_name,notes,component_name,component_type'],
     ['solution-choices', 'system_name,control_title,pattern_name,notes,chosen_by_email,source'],
     ['soa-entries', 'control_title,applicable,drivers,justification,implementation_status,implementation_description,owner_email'],

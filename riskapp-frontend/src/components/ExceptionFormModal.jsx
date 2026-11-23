@@ -90,7 +90,7 @@ export function ExceptionFormModal({ mode, riskId, exception, onClose, onSuccess
   }
 
   const heading =
-    mode === 'create' ? 'Create acceptance exception' :
+    mode === 'create' ? 'Create exception' :
     mode === 'renew'  ? 'Renew exception' :
                         'Revoke exception';
 

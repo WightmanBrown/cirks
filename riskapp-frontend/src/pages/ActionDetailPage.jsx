@@ -563,7 +563,6 @@ export function ActionDetailPage() {
             <div className={styles.card}>
               <div className={styles.fieldGrid}>
                 <Field label="Owner">{action.owner_name}</Field>
-                <Field label="Plan">{action.plan_title}</Field>
                 <Field label="Target date">
                   {action.is_overdue
                     ? <span className={styles.overdue}>{fmtDate(action.target_date)} — overdue</span>

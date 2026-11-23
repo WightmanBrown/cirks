@@ -29,6 +29,10 @@ module.exports = {
       "scope": "all_depts"
     },
     {
+      "key": "reports.tolerances",
+      "scope": "all_depts"
+    },
+    {
       "key": "reports.read",
       "scope": "all_depts"
     },
@@ -142,10 +146,6 @@ module.exports = {
     },
     {
       "key": "exceptions.revoke",
-      "scope": "all_depts"
-    },
-    {
-      "key": "graph.read",
       "scope": "all_depts"
     },
     {
@@ -360,10 +360,6 @@ module.exports = {
     },
     {
       "key": "governance.review",
-      "scope": "all_depts"
-    },
-    {
-      "key": "graph.read",
       "scope": "all_depts"
     },
     {
@@ -803,10 +799,6 @@ module.exports = {
       "scope": "all_depts"
     },
     {
-      "key": "graph.read",
-      "scope": "all_depts"
-    },
-    {
       "key": "knowledge.query",
       "scope": "all_depts"
     },
@@ -914,10 +906,6 @@ module.exports = {
     },
     {
       "key": "exceptions.read",
-      "scope": "all_depts"
-    },
-    {
-      "key": "graph.read",
       "scope": "all_depts"
     },
     {
@@ -1091,10 +1079,6 @@ module.exports = {
       "scope": "all_depts"
     },
     {
-      "key": "graph.read",
-      "scope": "all_depts"
-    },
-    {
       "key": "risk_heatmap.read",
       "scope": "all_depts"
     },
@@ -1162,10 +1146,6 @@ module.exports = {
     },
     {
       "key": "findings.read",
-      "scope": "all_depts"
-    },
-    {
-      "key": "graph.read",
       "scope": "all_depts"
     },
     {

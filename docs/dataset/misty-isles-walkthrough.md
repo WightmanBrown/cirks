@@ -100,7 +100,7 @@ The security architect role exists in CIRKS but no Misty Isles person has it. If
 
 ## The Misty Isles cast
 
-Misty Isles is a small island government with 12 departments, 31 people and 52 systems, built so that ten or so realistic problems produce a believable risk picture. Knowing who is who, and where the problems sit, tells you what you are supposed to find.
+Misty Isles is a small island government with 12 departments, 31 people and 58 systems, built so that ten or so realistic problems produce a believable risk picture. Knowing who is who, and where the problems sit, tells you what you are supposed to find.
 
 ### The roles in one line each
 
@@ -114,7 +114,7 @@ Misty Isles is a small island government with 12 departments, 31 people and 52 s
 | Information asset manager (IAM) | Keeps one department's records up to date | That department's assets and their ratings, systems, services, impact tables and suppliers |
 | Meeting secretary | Runs the Security Working Group (SWG) paperwork | Plans meetings, builds agendas, records decisions, issues minutes |
 | Security consultant | Onboards an organisation during the setup phase | Systems, assets, services and threats; moves CIRKS from setup to operational |
-| Security architect | Defines the standard security building blocks | Architecture patterns and components |
+| Security architect | Defines the standard security building blocks | Standard builds and components |
 | SOC analyst | Security operations staff who need to look things up | Nothing; read-only |
 
 Two things are worth noticing. Only the CISO can validate a risk, so everything the analyst raises queues up for the CISO. And IAMs and IAOs only see their own department; everyone else sees the whole organisation.
@@ -146,7 +146,7 @@ Lewis Fisher is the CISO (ciso@mig.local), and also holds the risk analyst and s
 
 ### What the history gives you
 
-The installer replays a year of work through the real screens as these people. You get 227 risks, 69 of them at or above the mandatory-action score of 12, a backlog of new risks awaiting the CISO, 8 security actions (three awaiting acceptance, three under way, two finished), 5 exceptions (one lapsed into breach), and four quarterly review cycles. Three cycles are closed and signed off; the current one is open, with its next SWG meeting already planned.
+The installer replays a year of work through the real screens as these people. You get 227 risks, 69 of them at or above the mandatory-action score of 12, a backlog of new risks awaiting the CISO, 7 security actions (three awaiting acceptance, two under way, two finished), 5 exceptions (one lapsed into breach), and four quarterly review cycles. Three cycles are closed and signed off; the current one is open, with its next SWG meeting already planned.
 
 ## Finding your way around
 
@@ -164,7 +164,7 @@ On the right you see your current role in capitals, a **Change Role** button if 
 | Knowledge | A search across the whole model ("which systems use Exchange?") | Everyone except the SIRO and meeting secretary |
 | Risk Management | **Current Risks** (the validated register), **New Risks** (raised but not yet validated), **Pending Review** (CISO only), Threats, Security Actions, Security Exceptions, Assurance Findings, Impact Tables, and the meetings pages (All Meetings, Plan Meeting, Acceptance Queue) | Most roles, each seeing only the items they can use |
 | Business Architecture | Organisation (departments), Business Services, Information Assets, Systems, Suppliers, and the building blocks of systems (People and Groups, Processes, Technology Components, Facilities) | Everyone except the meeting secretary and SIRO, who see very little here |
-| Security Controls | Control Library, Statement of Applicability, Scopes, Policies and documents, Remediation roll-up, and the security architecture pages (Security solutions, Systems architecture template, Security pattern triggers, System architecture patterns) | Everyone who can read controls |
+| Security Controls | Control Library, Statement of Applicability, Scopes, Policies and documents, Remediation roll-up, and the security architecture pages (Security solutions, System profile, Security pattern triggers, Standard builds) | Everyone who can read controls |
 | Setup | Objectives and standards (loading control frameworks) | Administrator |
 | Admin | Account Management, Access Control, Data Export, Audit Log, API Keys, Help Content | Administrator |
 | SIRO | Review Cycles | SIRO |
@@ -357,7 +357,7 @@ The Misty Isles risk picture comes from a short list of deliberate problems, eac
 | Supplier assurance expired | Suppliers, Super Bill (Utilities' billing) | Its SOC 2 report has passed its expiry date, so the assurance reads as expired |
 | Supplier contract with no exit terms | Suppliers, PeopleFirst HR (Cabinet Office) | Assurance only partial |
 | Records left unfinished | Assurance Findings; System Driver and Vehicle Licensing System | Some assets not rated against every mandatory impact table; a system with its operating system, hosting, support team and user group left blank |
-| A system that is two things at once | System Costal Radar and Ship Tracking (Maritime) | Recorded as both a Windows server and an OT device, so two security stacks apply and conflict |
+| A system that is two things at once | System Coastal Radar and Ship Tracking (Maritime) | Recorded as both a Windows server and an OT device, so two security stacks apply and conflict |
 
 ### Test yourself
 

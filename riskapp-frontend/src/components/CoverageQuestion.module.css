@@ -1,0 +1,21 @@
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .pair { grid-template-columns: 1fr; } }
+.side { display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-x: auto; }
+.sideTitle { margin: 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+.note { margin: 0; color: var(--text-muted); font-size: 12px; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text-primary); vertical-align: top; }
+.table a { color: var(--accent); text-decoration: none; }
+.table a:hover { text-decoration: underline; }
+.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sub { display: block; color: var(--text-muted); font-size: 12px; }
+.why { color: var(--text-secondary); font-size: 12px; }
+
+.bar { display: inline-flex; width: 64px; height: 7px; border-radius: 4px; overflow: hidden; vertical-align: middle;
+  background: color-mix(in srgb, var(--red) 35%, transparent); }
+.in  { display: block; height: 100%; background: var(--green); }
+.deg { display: block; height: 100%; background: var(--amber); }
+.shortfall { display: block; }
+.shortfall + .shortfall { margin-top: 6px; }

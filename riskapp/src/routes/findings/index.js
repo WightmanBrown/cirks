@@ -68,7 +68,7 @@ const FINDINGS = {
                                        ORDER BY wc.title), '[]')
                 FROM v_system_wanted_objectives w JOIN controls wc ON wc.id = w.control_id
                WHERE w.system_id = f.system_id AND w.state = 'conflict') AS conflict_objectives`,
-    order: `cardinality(f.missing_membership_names) DESC, f.missing_count DESC,
+    order: `f.pattern_not_stated DESC, cardinality(f.missing_membership_names) DESC, f.missing_count DESC,
             f.needs_solution_count + f.conflict_count DESC, d.name, f.system_name`,
     label: 'incomplete component record',
     fixed: 'This system records everything its controls and the security architecture need, and has a security solution for every objective that needs one',
@@ -121,11 +121,13 @@ const FINDINGS = {
 };
 const KINDS = Object.keys(FINDINGS).join('|');
 
-// The component-record finding's reasons, in the owner's words (v148, §5). A
-// missing membership comes first: without it the architecture cannot apply at
-// all, so a blank must read as a blank (§8, dragon 3).
+// The component-record finding's reasons, in the owner's words (v148, §5). No
+// pattern, then an unanswered slot of the pattern, come first: without them the
+// architecture cannot tell what the system needs, so a blank must read as a
+// blank (§8, dragon 3). missing_membership_names holds the slots since v178.
 function componentRecordReasons(f) {
   const out = [];
+  if (f.pattern_not_stated) out.push('No system pattern stated, so CIRKS cannot say what this system should record.');
   for (const g of f.missing_membership_names || []) out.push(`Nothing recorded for ${g}.`);
   if (f.missing_count > 0) out.push(`Not recorded on this system, though its controls need them: ${f.missing_component_names.join(', ')}.`);
   if ((f.unrecorded_objective_names || []).length) {
@@ -273,7 +275,7 @@ router.post(`/:kind(${KINDS})/:subjectId/actions`, requireCapability('findings.a
         WHERE origin = $1 AND subject_type = $2 AND subject_id = $3 AND status = 'active'`,
       [k.origin, k.subject, id]);
     if (accepted.length) {
-      return res.status(409).json({ error: 'This finding has been accepted — revoke the acceptance before raising an action.' });
+      return res.status(409).json({ error: 'This finding has been accepted — revoke the exception before raising an action.' });
     }
 
     const { owner_user_id, target_date, description } = req.body || {};
@@ -380,7 +382,7 @@ router.patch('/exceptions/:exceptionId/revoke', requireCapability('exceptions.re
     if (ex.subject_type === 'risk') {
       return res.status(409).json({ error: 'A risk exception is revoked on its risk.' });
     }
-    if (ex.status !== 'active') return res.status(409).json({ error: 'Only an active acceptance can be revoked.' });
+    if (ex.status !== 'active') return res.status(409).json({ error: 'Only an active exception can be revoked.' });
 
     const label = Object.values(FINDINGS).find(k => k.origin === ex.origin)?.label || ex.origin;
     const notes = req.body?.notes?.trim() || null;
@@ -395,7 +397,7 @@ router.patch('/exceptions/:exceptionId/revoke', requireCapability('exceptions.re
       INSERT INTO audit_log (user_id, user_role, user_name, entity_type, entity_id, action, human_narrative)
       VALUES ($1, $2, $3, 'exceptions', $4, 'update', $5)`,
       [req.user.id, req.user.role, who?.full_name || 'unknown', ex.id,
-       `${who?.full_name || 'Someone'} revoked the acceptance of the ${label} finding on "${ex.subject_name}"`
+       `${who?.full_name || 'Someone'} revoked the exception for the ${label} finding on "${ex.subject_name}"`
          + (notes ? `: ${notes}` : '.')]);
     res.json(updated[0]);
   } catch (err) { next(err); }

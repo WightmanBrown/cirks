@@ -44,4 +44,12 @@ describe('helpers', () => {
     expect(listWords(['a', 'b'])).toBe('a and b');
     expect(listWords(['a', 'b', 'c'])).toBe('a, b and c');
   });
+  it('says when another department\'s contract is counted over the reader\'s systems only', () => {
+    const r = { id: 'r1', status: 'active', relationship_type: 'product', component_name: 'Falcon', max_impact: 4,
+      department_name: 'Information Security', figures_narrowed: true,
+      criticality_systems: [{ name: 'Health Records', impact_c: 4, impact_i: 2, impact_a: 2 }] };
+    const { reasons } = criticalityNarrative('CrowdStrike', [r]);
+    expect(reasons[0].text).toMatch(/Information Security holds the contract; only your department's systems are counted\./);
+    expect(criticalityNarrative('CrowdStrike', [{ ...r, figures_narrowed: false }]).reasons[0].text).not.toMatch(/holds the contract/);
+  });
 });

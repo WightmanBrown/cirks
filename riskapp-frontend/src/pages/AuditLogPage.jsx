@@ -8,6 +8,7 @@ import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
 import styles from './AuditLogPage.module.css';
 import { DateField } from '../components/DateField';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 const PAGE_SIZE = 50;
 
@@ -31,6 +32,7 @@ export function AuditLogPage() {
 
   const [data,    setData]    = useState(null);    // { rows, total, filters }
   const [loading, setLoading] = useState(true);
+  useScrollRestore(!loading);   // Back from an item lands where you left the list
   const [error,   setError]   = useState('');
   const [expanded, setExpanded] = useState(null);
 

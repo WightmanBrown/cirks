@@ -45,16 +45,27 @@ export const TYPE_LABELS = {
   overflow: 'More…',
 };
 
+// Each node type has its own SHAPE as well as its colour, so colour is never the
+// only signal (owner, 2026-11-18: assets and components were too close to tell
+// apart). Components keep the rounded rectangle and are told apart by their
+// PPITF colour; nothing else uses that shape.
+export const TYPE_SHAPES = {
+  system: 'diamond', service: 'cut-rectangle', asset: 'barrel', risk: 'hexagon',
+  threat: 'ellipse', action: 'round-tag', control: 'octagon', component: 'roundrectangle',
+};
+
+const COMPONENT_LEGEND = [
+  ['people', 'People'], ['process', 'Process'], ['information', 'Policies & documents'],
+  ['technology', 'Technology'], ['facility', 'Facility'],
+];
+
 export const LEGEND_ITEMS = [
-  { key: 'system',  color: TYPE_COLORS.system },
-  { key: 'service', color: TYPE_COLORS.service },
-  { key: 'asset',   color: TYPE_COLORS.asset },
-  { key: 'risk',    color: TYPE_COLORS.risk },
-  { key: 'threat',  color: TYPE_COLORS.threat },
-  { key: 'action',  color: TYPE_COLORS.action },
-  { key: 'control', color: TYPE_COLORS.control },
-  { key: 'component', color: COMPONENT_COLORS.technology },
-].map((i) => ({ ...i, label: TYPE_LABELS[i.key] }));
+  ...['system', 'service', 'asset', 'risk', 'threat', 'action', 'control']
+    .map((key) => ({ key, color: TYPE_COLORS[key], shape: TYPE_SHAPES[key], label: TYPE_LABELS[key] })),
+  ...COMPONENT_LEGEND.map(([sub, label]) => ({
+    key: `component-${sub}`, color: COMPONENT_COLORS[sub], shape: TYPE_SHAPES.component, label: `Component: ${label}`,
+  })),
+];
 
 export function buildStylesheet() {
   const typeStyles = Object.entries(TYPE_COLORS).map(([type, c]) => ({
@@ -90,9 +101,13 @@ export function buildStylesheet() {
     },
     ...typeStyles,
     ...subtypeStyles,
-    { selector: 'node[type="system"]',  style: { shape: 'diamond', width: 110, height: 110, 'font-weight': 'bold', 'border-width': 3 } },
-    { selector: 'node[type="risk"]',    style: { shape: 'hexagon', width: 104, height: 84, 'font-weight': 'bold', 'border-width': 3 } },
-    { selector: 'node[type="threat"]',  style: { shape: 'ellipse', width: 140, height: 52 } },
+    { selector: 'node[type="system"]',  style: { shape: TYPE_SHAPES.system, width: 110, height: 110, 'font-weight': 'bold', 'border-width': 3 } },
+    { selector: 'node[type="risk"]',    style: { shape: TYPE_SHAPES.risk, width: 104, height: 84, 'font-weight': 'bold', 'border-width': 3 } },
+    { selector: 'node[type="threat"]',  style: { shape: TYPE_SHAPES.threat, width: 140, height: 52 } },
+    { selector: 'node[type="service"]', style: { shape: TYPE_SHAPES.service, width: 130 } },
+    { selector: 'node[type="asset"]',   style: { shape: TYPE_SHAPES.asset, width: 124, height: 50 } },
+    { selector: 'node[type="action"]',  style: { shape: TYPE_SHAPES.action, width: 130 } },
+    { selector: 'node[type="control"]', style: { shape: TYPE_SHAPES.control, width: 124, height: 52 } },
     { selector: 'node[type="overflow"]', style: { shape: 'roundrectangle', 'font-size': 10, opacity: 0.7, 'border-style': 'dotted' } },
     // still-walkable (unexpanded) nodes get a dashed border as an "expand me" cue
     { selector: 'node.walkable', style: { 'border-style': 'dashed' } },

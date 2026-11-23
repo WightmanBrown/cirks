@@ -43,6 +43,7 @@ against the new database first (`npm start`, or the container), set
 ```bash
 node db/dataset/misty-isles/architecture.js --base <api>  # the security architecture (v148) and each system's answers
 node db/dataset/misty-isles/objective-solutions.js --base <api>  # a security solution for every objective that needs one (v153)
+node db/dataset/misty-isles/solution-library.js --base <api>  # the policy library and the solutions built on it (P1–P8)
 node db/isms-cycle.js --base <api>                    # a first risk portfolio, actions, exceptions, one SWG meeting
 node db/isms-cycle.js --base <api> --assess-backlog   # assess the rest (four systems held back, deliberately)
 node db/dataset/misty-isles/story-cycle.js --base <api>   # the story's problems bite; a backlog; a year of history
@@ -64,14 +65,50 @@ security solutions) before any risk is assessed, because each control is judged
 from its status at that moment. Assessed first and settled after, 24 risks were
 left scored against statuses that had since changed (fixed 2026-10-28).
 
-What a build produces (checked 2026-10-28 with `install.js`, schema 0163): 12
-departments, 31 people, 52 systems, 227 risks (69 at or above the
+What a build produces (checked 2026-11-09 with `install.js`, schema 0175): 12
+departments, 31 people, 58 systems, 227 risks (69 at or above the
 mandatory-action score of 12), all from the story's deliberate problems; a
-validation backlog; 8 security actions — 3 awaiting acceptance, 3 under way on
+validation backlog; 7 security actions — 3 awaiting acceptance, 2 under way on
 the story's own problems, 2 finished — and no work ever lands on a deliberately
 degraded part, so every problem in §6 of the sheet is still there; 5 exceptions, one lapsed into the breach queue;
 four quarterly review cycles, three closed and signed off, each with a minuted SWG
 meeting.
+
+## The policy library and the security solution patterns
+
+`solution-library.js` (owner, 2026-11-16) gives MIG the documents a real ISMS
+holds and builds solutions on them, one pattern at a time:
+
+- **P1 Governing document**: twelve policies, each delivering its own policy
+  objective (backup BRR-01, monitoring DM-01, logging DM-02, classification and
+  handling DCH-01/02, encryption DCH-03, ISMS roles IRM-03, access control AA-01,
+  network security CS-01, vulnerability management SVM-01, supply chain SCM-01,
+  technology and cloud services SCM-06, AI use AI-01), communicated to their
+  audience with a training record, kept in SharePoint. The three guidelines
+  (encryption, risk assessment, risk register) are recorded and deliver nothing:
+  a guideline cannot (v139).
+- **P2 Managed process**: the ISMS process CIRKS supports, defined by the
+  Information Risk Management Policy, evidenced by SWG minutes and risk reviews.
+- **P3 Register**: the information asset, systems and risk registers CIRKS keeps,
+  each with a standard saying what it must hold.
+- **P4 Plan and exercise**: incident response planning and exercises.
+- **P5**: every central security service has its policy and its team, the
+  backups the Data Backup and Recovery Policy, monitoring the Detective
+  Monitoring Policy, endpoint agents the Endpoint Protection Standard, AI agent
+  monitoring the Logging Standard (and the AI Usage Policy), Wazuh's
+  configuration checks the CIS benchmarks. Azure Backup gained its security
+  system, the Recovery Services vault.
+- **P6 / P8**: settings tied to their standards; each site assessed and maintained.
+- **Two P5 examples, not new patterns** (owner, 2026-11-16): *Legacy system
+  isolation*: the firewall isolates a system that cannot be fixed but is still
+  needed, nothing installed on it; chosen on the Windows 7 Prison Management
+  System, whose decision to keep running is the exception on its risk.
+  *Brokered supplier access*: like a KVM switch, the supplier works only through
+  the supplier access gateway; in place on Power Generation (Gridline Controls).
+
+Gaps are left on purpose, at least one in each pattern with more than one
+solution (listed at the top of the script). None moves a score: a pattern's fit
+is report only and every part added is in place.
 
 ## The story is checked on every change
 

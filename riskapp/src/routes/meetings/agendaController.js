@@ -303,7 +303,7 @@ async function generateAgenda(req, res, next) {
           + `; ${rating.acted} with an action raised, ${rating.accepted} accepted`,
       { entity_type: 'finding:rating_incomplete',
         notes: rating.total > rating.acted + rating.accepted
-          ? 'An asset missing a mandatory impact table has its impact — and every risk score on the systems holding it — understated. For each asset with neither an action nor an acceptance, the group is asked to act or to accept.'
+          ? 'An asset missing a mandatory impact table has its impact — and every risk score on the systems holding it — understated. For each asset with neither an action nor an exception, the group is asked to act or to accept.'
           : null });
 
     // v138 — systems missing per-system components their controls need. Counts

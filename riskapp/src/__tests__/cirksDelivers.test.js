@@ -20,7 +20,7 @@ const cirks = new Set(readObjectives().map((o) => o.ref));
 describe('CIRKS as a security solution: what it can deliver', () => {
   test('both catalogues were read', () => {
     expect(nist.size).toBe(106);
-    expect(cirks.size).toBe(156);
+    expect(cirks.size).toBe(158);
   });
 
   test.each(Object.keys(CIRKS_DELIVERS))('%s is a CIRKS objective, with a reason', (ref) => {

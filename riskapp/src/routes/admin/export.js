@@ -128,9 +128,11 @@ const DATASETS = [
     columns: ['name', 'component_type', 'status', 'description', 'notes', 'created_by_email',
               'instantiation', 'is_host', 'hostname',
               'document_kind', 'document_version', 'document_owner_email', 'document_approved_by_email',
-              'document_approved_on', 'document_next_review', 'document_url'],
+              'document_approved_on', 'document_next_review', 'document_url', 'roles'],
+    // With the roles it can answer (v178), joined by " | ".
     fetch: () => query(`
       SELECT cc.name, cc.component_type, cc.status, cc.description, cc.notes,
+             array_to_string(cc.roles, ' | ') AS roles,
              u.email AS created_by_email,
              cc.instantiation, cc.is_host, cc.hostname,
              cc.document_kind, cc.document_version, dow.email AS document_owner_email,
@@ -184,13 +186,14 @@ const DATASETS = [
   // ── Systems ─────────────────────────────────────────────────────────────────
   {
     slug: 'systems',
-    columns: ['name', 'description', 'department_name', 'owner_email', 'manager_email', 'is_shared', 'is_active'],
+    // With the system pattern it follows (v177).
+    columns: ['name', 'description', 'department_name', 'owner_email', 'manager_email', 'is_shared', 'is_active', 'system_pattern'],
     fetch: () => query(`
       SELECT s.name, s.description,
              d.name  AS department_name,
              u.email AS owner_email,
              m.email AS manager_email,
-             s.is_shared, s.is_active
+             s.is_shared, s.is_active, s.system_pattern
         FROM systems s
         LEFT JOIN departments d ON d.id = s.department_id
         LEFT JOIN users       u ON u.id = s.owner_user_id
@@ -209,10 +212,11 @@ const DATASETS = [
   },
   {
     slug: 'system-components',
-    columns: ['system_name', 'component_name', 'component_type', 'role', 'status'],
+    // With the system pattern slot a person has said it fills (v177).
+    columns: ['system_name', 'component_name', 'component_type', 'role', 'status', 'slot_key'],
     fetch: () => query(`
       SELECT s.name AS system_name, cc.name AS component_name,
-             cc.component_type, sc.role, sc.status
+             cc.component_type, sc.role, sc.status, sc.slot_key
         FROM system_components sc
         JOIN systems            s  ON s.id  = sc.system_id
         JOIN control_components cc ON cc.id = sc.component_id
@@ -244,12 +248,14 @@ const DATASETS = [
   // ── Security solutions (v145 delivery patterns; shared since v147) ──────────
   {
     slug: 'delivery-patterns',
-    // With the optional estimates: cost (v170) and effort to operate (v173).
+    // With the optional estimates: cost (v170) and effort to operate (v173), and
+    // the security solution pattern it implements with any slots it does not need (v176).
     columns: ['name', 'kind', 'notes', 'cost_one_off', 'cost_annual', 'cost_basis', 'cost_note',
-              'effort_hours_month', 'effort_basis', 'effort_note'],
+              'effort_hours_month', 'effort_basis', 'effort_note', 'solution_pattern', 'slots_not_needed'],
     fetch: () => query(`
       SELECT p.name, p.kind, p.notes, p.cost_one_off, p.cost_annual, p.cost_basis, p.cost_note,
-             p.effort_hours_month, p.effort_basis, p.effort_note
+             p.effort_hours_month, p.effort_basis, p.effort_note,
+             p.solution_pattern, array_to_string(p.slots_not_needed, ' | ') AS slots_not_needed
         FROM delivery_patterns p ORDER BY p.kind, lower(p.name)`).then(r => r.rows),
   },
   {
@@ -264,10 +270,10 @@ const DATASETS = [
   },
   {
     slug: 'delivery-pattern-parts',
-    columns: ['pattern_name', 'component_name', 'component_type', 'location', 'service_system_name'],
+    columns: ['pattern_name', 'component_name', 'component_type', 'location', 'service_system_name', 'slot_key'],
     fetch: () => query(`
       SELECT p.name AS pattern_name, cc.name AS component_name, cc.component_type,
-             pp.location, s.name AS service_system_name
+             pp.location, s.name AS service_system_name, pp.slot_key
         FROM delivery_pattern_parts pp
         JOIN delivery_patterns p ON p.id = pp.pattern_id
         JOIN control_components cc ON cc.id = pp.component_id
@@ -280,30 +286,25 @@ const DATASETS = [
   // separator inside a cell; a rule, group or build with none is one blank row.
   {
     slug: 'architecture-rules',
-    columns: ['pattern_name', 'standard_name', 'notes', 'trigger_component_name', 'trigger_component_type'],
+    // One row per trigger: a component, or (v178) a system pattern.
+    columns: ['pattern_name', 'standard_name', 'notes', 'trigger_component_name', 'trigger_component_type', 'trigger_system_pattern'],
     fetch: () => query(`
-      SELECT p.name AS pattern_name, d.name AS standard_name, r.notes,
-             cc.name AS trigger_component_name, cc.component_type AS trigger_component_type
-        FROM architecture_rules r
-        JOIN delivery_patterns p ON p.id = r.pattern_id
-        JOIN control_components d ON d.id = r.standard_id
-        LEFT JOIN architecture_rule_triggers t ON t.rule_id = r.id
-        LEFT JOIN control_components cc ON cc.id = t.component_id
-       ORDER BY lower(p.name), d.name, cc.name`).then(r => r.rows),
-  },
-  {
-    slug: 'membership-groups',
-    columns: ['group_name', 'standard_name', 'notes', 'sort_index', 'role', 'component_name', 'component_type'],
-    fetch: () => query(`
-      SELECT g.name AS group_name, d.name AS standard_name, g.notes, g.sort_index,
-             x.role, cc.name AS component_name, cc.component_type
-        FROM membership_groups g
-        JOIN control_components d ON d.id = g.standard_id
-        LEFT JOIN (SELECT group_id, component_id, 'member' AS role FROM membership_group_members
-                   UNION ALL
-                   SELECT group_id, component_id, 'trigger' FROM membership_group_triggers) x ON x.group_id = g.id
-        LEFT JOIN control_components cc ON cc.id = x.component_id
-       ORDER BY g.sort_index, g.name, x.role, cc.name`).then(r => r.rows),
+      SELECT * FROM (
+        SELECT p.name AS pattern_name, d.name AS standard_name, r.notes,
+               cc.name AS trigger_component_name, cc.component_type::text AS trigger_component_type,
+               NULL::text AS trigger_system_pattern
+          FROM architecture_rules r
+          JOIN delivery_patterns p ON p.id = r.pattern_id
+          JOIN control_components d ON d.id = r.standard_id
+          LEFT JOIN architecture_rule_triggers t ON t.rule_id = r.id
+          LEFT JOIN control_components cc ON cc.id = t.component_id
+        UNION ALL
+        SELECT p.name, d.name, r.notes, NULL, NULL, pt.system_pattern
+          FROM architecture_rule_pattern_triggers pt
+          JOIN architecture_rules r ON r.id = pt.rule_id
+          JOIN delivery_patterns p ON p.id = r.pattern_id
+          JOIN control_components d ON d.id = r.standard_id
+      ) x ORDER BY lower(pattern_name), standard_name, trigger_component_name NULLS LAST, trigger_system_pattern`).then(r => r.rows),
   },
   {
     slug: 'system-builds',

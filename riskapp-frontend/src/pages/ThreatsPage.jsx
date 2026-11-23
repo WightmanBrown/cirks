@@ -11,6 +11,7 @@ import { useViewMode }                    from '../hooks/useViewMode';
 import styles from './ThreatsPage.module.css';
 import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
+import { useScrollRestore } from '../hooks/useScrollRestore';
 
 const CAN_WRITE = new Set(['ciso', 'risk_analyst', 'security_consultant', 'admin']);
 
@@ -320,6 +321,7 @@ export function ThreatsPage() {
 
   const [threats,        setThreats]       = useState([]);
   const [loading,        setLoading]       = useState(true);
+  useScrollRestore(!loading);   // Back from an item lands where you left the list
   const [error,          setError]         = useState('');
   const [search,         setSearch]        = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');

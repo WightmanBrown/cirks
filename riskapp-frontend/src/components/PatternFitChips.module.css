@@ -1,0 +1,34 @@
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.chip {
+  padding: 1px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-hint);
+  white-space: nowrap;
+  border: 1px solid var(--border-accent);
+  color: var(--text-secondary);
+}
+
+.complete,
+.recorded {
+  color: var(--green-light);
+  border-color: color-mix(in srgb, var(--green) 50%, transparent);
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+}
+
+.degraded,
+.not_in_place {
+  color: var(--amber-light);
+  border-color: var(--amber-dim);
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+}
+
+.missing {
+  color: var(--red-light);
+  border: 1px dashed var(--red);
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+}
+
+.not_recorded { border-style: dashed; }
+
+.note { color: var(--text-muted); font-size: var(--text-hint); }

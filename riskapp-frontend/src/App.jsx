@@ -57,7 +57,9 @@ import { SupplierDetailPage }          from './pages/SupplierDetailPage';
 import { SupplierControlSetsPage }     from './pages/SupplierControlSetsPage';
 import { SecuritySolutionsPage }       from './pages/SecuritySolutionsPage';
 import { SecuritySolutionDetailPage }  from './pages/SecuritySolutionDetailPage';
-import { ArchitectureTemplatePage, SecurityPatternTriggersPage, ArchitecturePatternsPage } from './pages/ArchitecturePages';
+import { SecuritySolutionPatternsPage } from './pages/SecuritySolutionPatternsPage';
+import { SystemPatternsPage }          from './pages/SystemPatternsPage';
+import { SecurityPatternTriggersPage, ArchitecturePatternsPage } from './pages/ArchitecturePages';
 import { MeetingsListPage }            from './pages/MeetingsListPage';
 import { MeetingDetailPage }           from './pages/MeetingDetailPage';
 import { PlanMeetingPage }             from './pages/PlanMeetingPage';
@@ -79,6 +81,14 @@ import { DepartmentReportPage }    from './pages/DepartmentReportPage';
 import { SystemsReportPage }       from './pages/SystemsReportPage';
 import { AnalystReportPage }       from './pages/AnalystReportPage';
 import { UnknownRiskPage }         from './pages/UnknownRiskPage';
+import { CoverageQuestionPage }    from './pages/CoverageQuestionPage';
+import { ExposureQuestionPage }    from './pages/ExposureQuestionPage';
+import { DecisionsQuestionPage }   from './pages/DecisionsQuestionPage';
+import { QualityQuestionPage, StandardQuestionPage, WorkQuestionPage, ChangesQuestionPage } from './pages/QuestionPages';
+import { OwnersReportPage }        from './pages/OwnersReportPage';
+import { TeamServicePage }         from './pages/TeamServicePage';
+import { AuditReadinessPage }      from './pages/AuditReadinessPage';
+import { RecordCurrentPage }       from './pages/RecordCurrentPage';
 import { SystemReportPage }        from './pages/SystemReportPage';
 import { RiskAppetitePage }        from './pages/RiskAppetitePage';
 
@@ -104,6 +114,17 @@ export default function App() {
             <Route path="/reporting/systems" element={<SystemsReportPage />} />
             <Route path="/reporting/analyst" element={<AnalystReportPage />} />
             <Route path="/reporting/unknown" element={<UnknownRiskPage />} />
+            <Route path="/reporting/coverage" element={<CoverageQuestionPage />} />
+            <Route path="/reporting/exposure" element={<ExposureQuestionPage />} />
+            <Route path="/reporting/decisions" element={<DecisionsQuestionPage />} />
+            <Route path="/reporting/quality" element={<QualityQuestionPage />} />
+            <Route path="/reporting/standard" element={<StandardQuestionPage />} />
+            <Route path="/reporting/work" element={<WorkQuestionPage />} />
+            <Route path="/reporting/changes" element={<ChangesQuestionPage />} />
+            <Route path="/reporting/owners" element={<OwnersReportPage />} />
+            <Route path="/reporting/team" element={<TeamServicePage />} />
+            <Route path="/reporting/audit" element={<AuditReadinessPage />} />
+            <Route path="/reporting/record" element={<RecordCurrentPage />} />
             <Route path="/reporting/systems/:id" element={<SystemReportPage />} />
             <Route path="/admin/risk-appetite" element={<RiskAppetitePage />} />
             <Route path="/dashboard"     element={<DashboardPage />} />
@@ -139,12 +160,15 @@ export default function App() {
             <Route path="/facilities"          element={<FacilitiesPage />} />
             <Route path="/policies-documents"  element={<PoliciesDocumentsPage />} />
             <Route path="/security-solutions"  element={<SecuritySolutionsPage />} />
+            <Route path="/security-solution-patterns" element={<SecuritySolutionPatternsPage />} />
             <Route path="/security-solutions/new" element={<SecuritySolutionWizard />} />
             <Route path="/security-solutions/:id" element={<SecuritySolutionDetailPage />} />
-            <Route path="/architecture-template"     element={<ArchitectureTemplatePage />} />
+            <Route path="/system-patterns"           element={<SystemPatternsPage />} />
+            {/* v178: the System profile page is retired; its address lands on System patterns. */}
+            <Route path="/architecture-template"     element={<Navigate to="/system-patterns" replace />} />
             <Route path="/security-pattern-triggers" element={<SecurityPatternTriggersPage />} />
             <Route path="/architecture-patterns"     element={<ArchitecturePatternsPage />} />
-            <Route path="/security-architecture"     element={<Navigate to="/architecture-template" replace />} />
+            <Route path="/security-architecture"     element={<Navigate to="/system-patterns" replace />} />
             <Route path="/suppliers"           element={<SuppliersPage />} />
             <Route path="/suppliers/control-sets" element={<SupplierControlSetsPage />} />
             <Route path="/suppliers/:id"       element={<SupplierDetailPage />} />

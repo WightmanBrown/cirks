@@ -4,6 +4,8 @@
 
 const net = require('net');
 const { query, withActor } = require('../../db/pool');
+const { can } = require('../../auth/permissions');
+const { ROLES } = require('../../lib/systemPatterns');
 
 // Policies & documents lifecycle (v139): API field → column.
 const DOCUMENT_FIELDS = {
@@ -107,7 +109,7 @@ async function searchComponents(req, res, next) {
     }
 
     const result = await query(
-      `SELECT cc.id, cc.component_type, cc.name, cc.status, cc.description, cc.instantiation,
+      `SELECT cc.id, cc.component_type, cc.name, cc.status, cc.description, cc.instantiation, cc.roles,
               -- DATE columns as text: node-pg turns a DATE into local midnight, which
               -- serialises as the PREVIOUS day in UTC during British Summer Time.
               cc.document_kind, cc.document_version, cc.document_next_review::text AS document_next_review, cc.document_url,
@@ -211,16 +213,29 @@ async function createComponent(req, res, next) {
   const docErr = validateDocumentFields(docFields);
   if (docErr) return res.status(400).json({ error: docErr });
   const docCols = Object.keys(docFields);
+  // The roles it can answer (v178), chosen as it is created: it is on no system
+  // yet, so there is nothing to preview. An architect's decision, as changing
+  // them later is (PUT /architecture/components/:id/roles).
+  let roles = [];
+  if (req.body?.roles != null) {
+    if (!Array.isArray(req.body.roles) || req.body.roles.some(r => !ROLES.some(x => x.key === r))) {
+      return res.status(400).json({ error: `roles is a list of: ${ROLES.map(x => x.key).join(', ')}.` });
+    }
+    if (req.body.roles.length && !can(req.user.role, 'architecture.write').allowed) {
+      return res.status(403).json({ error: 'Saying which questions a component answers needs the architecture permission (architecture.write).' });
+    }
+    roles = [...new Set(req.body.roles)].sort();
+  }
 
   try {
     const { rows } = await query(
       `INSERT INTO control_components
          (component_type, name, description, status, notes, created_by,
-          is_host, hostname${docCols.map(c => `, ${c}`).join('')})
+          is_host, hostname, roles${docCols.map(c => `, ${c}`).join('')})
        VALUES ($1, $2, $3, COALESCE($4, 'unknown'::component_status), $5, $6,
-               COALESCE($7, FALSE), $8${docCols.map((_, i) => `, $${9 + i}`).join('')})
+               COALESCE($7, FALSE), $8, $9${docCols.map((_, i) => `, $${10 + i}`).join('')})
        RETURNING id, component_type, name, description, status, created_at,
-                 is_host, hostname, ${DOCUMENT_RETURN}`,
+                 is_host, hostname, roles, ${DOCUMENT_RETURN}`,
       [
         component_type,
         name.trim(),
@@ -230,6 +245,7 @@ async function createComponent(req, res, next) {
         req.user.id,
         is_host === true,
         is_host === true ? (hostname?.trim() || null) : null,
+        roles,
         ...docCols.map(c => docFields[c]),
       ]
     );
@@ -400,7 +416,7 @@ async function getComponentDetail(req, res, next) {
          cc.id,
          cc.component_type,
          cc.name,
-         cc.status, cc.instantiation,
+         cc.status, cc.instantiation, cc.roles,
          cc.document_kind, cc.document_version, cc.document_owner_id, cc.document_approved_by,
          cc.document_approved_on::text AS document_approved_on,
          cc.document_next_review::text AS document_next_review, cc.document_url,
@@ -492,7 +508,62 @@ async function getComponentDetail(req, res, next) {
   }
 }
 
+// ── DELETE /components/:id — one created by mistake ───────────────────────────
+// Only a component nothing uses: on no system, in no security solution, trigger,
+// standard build or action, delivering no objective, cited by no rule, and no
+// supplier relationship recorded against it. Anything else answers a question
+// somewhere, so the refusal names where, and it is taken out there first (owner,
+// 2026-11-17: a duplicate typed into the wrong console could not be removed).
+// Its IP addresses go with it. Audited.
+const COMPONENT_USES = [
+  ['system_components',          'component_id', 'system',               'systems',
+    `SELECT s.name FROM system_components x JOIN systems s ON s.id = x.system_id WHERE x.component_id = $1 ORDER BY lower(s.name)`],
+  ['delivery_pattern_parts',     'component_id', 'security solution',    'security solutions',
+    `SELECT DISTINCT p.name FROM delivery_pattern_parts x JOIN delivery_patterns p ON p.id = x.pattern_id WHERE x.component_id = $1 ORDER BY p.name`],
+  ['control_component_links',    'component_id', 'control objective',    'control objectives', null],
+  ['control_component_systems',  'component_id', 'objective on a system', 'objectives on systems', null],
+  ['architecture_rule_triggers', 'component_id', 'security pattern trigger', 'security pattern triggers', null],
+  ['architecture_rules',         'standard_id',  'security pattern trigger citing it', 'security pattern triggers citing it', null],
+  ['system_build_components',    'component_id', 'standard build',       'standard builds', null],
+  ['security_action_items',      'component_id', 'security action item', 'security action items', null],
+  ['risk_components',            'component_id', 'risk',                 'risks', null],
+  ['supplier_relationships',     'component_id', 'supplier relationship', 'supplier relationships', null],
+];
+
+async function deleteComponent(req, res, next) {
+  const { id } = req.params;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return res.status(404).json({ error: 'Component not found.' });
+  try {
+    const { rows: found } = await query('SELECT id, name FROM control_components WHERE id = $1', [id]);
+    if (!found.length) return res.status(404).json({ error: 'Component not found.' });
+    const uses = [];
+    for (const [table, col, one, many, names] of COMPONENT_USES) {
+      const { rows } = await query(`SELECT count(*)::int AS n FROM ${table} WHERE ${col} = $1`, [id]);
+      const n = rows[0].n;
+      if (!n) continue;
+      const listed = names ? (await query(names, [id])).rows.map(r => r.name) : [];
+      uses.push({ what: n === 1 ? one : many, count: n, names: listed });
+    }
+    if (uses.length) {
+      const said = uses.map(u => `${u.count} ${u.what}${u.names.length ? ` (${u.names.slice(0, 5).join(', ')}${u.names.length > 5 ? ', …' : ''})` : ''}`).join('; ');
+      return res.status(409).json({
+        error: `${found[0].name} is still in use: ${said}. Take it out of those first; a component is deleted only when nothing uses it.`,
+        uses,
+      });
+    }
+    await withActor(req.user.id, async (db) => {
+      await db.query('DELETE FROM control_components WHERE id = $1', [id]);
+      await db.query(
+        `INSERT INTO audit_log (user_id, action, entity_type, entity_id, entity_label, human_narrative)
+         VALUES ($1, 'delete', 'control_components', $2, $3, $4)`,
+        [req.user.id, id, found[0].name, `Component "${found[0].name}" deleted (nothing used it)`]);
+    });
+    res.status(204).end();
+  } catch (err) { next(err); }
+}
+
 module.exports = {
+  deleteComponent,
   searchComponents, createComponent,
   isReviewDateRule, NEEDS_REVIEW_DATE,
   updateComponent, getComponentDetail, addComponentIp, removeComponentIp,

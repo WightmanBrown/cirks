@@ -99,6 +99,7 @@ describe('the template and the patterns are an architect\'s work', () => {
 
   test('a department manager cannot, until given the capability', async () => {
     expect((await api('iam', 'post', '/architecture/builds').send({ name: 'SSF pattern two' })).status).toBe(403);
-    expect((await api('iam', 'post', '/architecture/groups').send({ name: 'SSF group' })).status).toBe(403);
+    // v178: what a component can answer is the template now.
+    expect((await api('iam', 'put', '/architecture/components/00000000-0000-0000-0000-000000000000/roles').send({ roles: [] })).status).toBe(403);
   });
 });

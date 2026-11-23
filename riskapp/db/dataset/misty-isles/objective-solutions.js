@@ -29,6 +29,7 @@ const AS = opt('--as', 'ciso@mig.local');
 const PASSWORD = process.env.CIRKS_PASSWORD;
 if (!PASSWORD) { console.error('Set CIRKS_PASSWORD to the password of the account this signs in as (--as).'); process.exit(1); }
 const STANDARD = 'MIG Security Architecture Standard';
+const { patternFor } = require('./solution-patterns');
 
 // ── The owner's answers ──────────────────────────────────────────────────────
 // Q3: BitLocker and FileVault as technology components. Q2: BRR-05 is
@@ -41,7 +42,6 @@ const NEW_COMPONENTS = [
 
 // §2 — the solution already does this job; the library just did not say so.
 const ADD_TO_EXISTING = {
-  'CIRKS1.DM-08': ['CrowdStrike EDR', 'Microsoft Defender for Servers (Azure)', 'Wazuh agent (OT)', 'Syslog to Wazuh (network appliances)', 'Provided by the supplier'],
   'CIRKS1.IDA-01': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],
   'CIRKS1.IDA-04': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],
   'CIRKS1.IDA-05': ['Active Directory (on-premises)', 'Entra ID (cloud)', 'Provided by the supplier'],        // Q1: yes
@@ -56,9 +56,12 @@ const DATACENTRE = ['CIRKS1.PHY-02', 'CIRKS1.PHY-04', 'CIRKS1.PHY-05'];
 const WINDOWS = ['Windows 10', 'Windows 11', 'Windows Server 2016', 'Windows Server 2025'];
 const NEW_SOLUTIONS = [
   { name: 'Secure datacentre — Bank Street', was: 'Secure Datacentre', delivers: DATACENTRE,
-    parts: [['Bank Street server room', 'organisation'], ['Physical security', 'organisation']], triggers: ['Bank Street server room'] },
+    // CCTV and electronic access control: the owner's (CIRKS-dev 2026-10-09).
+    parts: [['Bank Street server room', 'organisation'], ['Physical security', 'organisation'],
+            ['Chubb electronic access control', 'organisation'], ['MIG CCTV system', 'organisation']], triggers: ['Bank Street server room'] },
   { name: 'Secure datacentre — The Castle', delivers: DATACENTRE,
-    parts: [['The Castle server room', 'organisation'], ['Physical security', 'organisation']], triggers: ['The Castle server room'] },
+    parts: [['The Castle server room', 'organisation'], ['Physical security', 'organisation'],
+            ['MIG CCTV system', 'organisation']], triggers: ['The Castle server room'] },
   { name: 'Secure datacentre — Shark Point', delivers: DATACENTRE,
     parts: [['Shark Point Server Room', 'organisation'], ['Physical security', 'organisation']], triggers: ['Shark Point Server Room'] },
   { name: 'Secure premises — MIG Official Premises', delivers: ['CIRKS1.PHY-02'],
@@ -91,9 +94,19 @@ const ORGANISATION_WIDE = ['CIRKS1.SCM-03', 'CIRKS1.DM-05', 'CIRKS1.SCM-02', 'CI
 
 // ── Plumbing ─────────────────────────────────────────────────────────────────
 let H;
-async function api(method, path, body) {
+// Sign in, and sign in again when the 15-minute access token runs out: on a slow
+// machine (the CI runner) a step can outlast it (2026-11-17, step 3 failed with
+// "401 Access token expired" partway through).
+async function signIn() {
+  const login = await (await fetch(`${BASE}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: AS, password: PASSWORD }) })).json();
+  if (!login.access_token) throw new Error(`could not sign in as ${AS}`);
+  H = { 'content-type': 'application/json', authorization: `Bearer ${login.access_token}` };
+}
+async function api(method, path, body, retried = false) {
   if (DRY && method !== 'GET') { console.log(`  [dry] ${method} ${path} ${body ? JSON.stringify(body) : ''}`); return {}; }
   const r = await fetch(`${BASE}${path}`, { method, headers: H, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 401 && !retried) { await signIn(); return api(method, path, body, true); }
   const t = await r.text();
   const data = t ? JSON.parse(t) : {};
   if (!r.ok && r.status !== 409) throw new Error(`${method} ${path} → ${r.status} ${data.error || t}`);
@@ -101,10 +114,7 @@ async function api(method, path, body) {
 }
 
 async function main() {
-  const login = await (await fetch(`${BASE}/auth/login`, { method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email: AS, password: PASSWORD }) })).json();
-  if (!login.access_token) throw new Error(`could not sign in as ${AS}`);
-  H = { 'content-type': 'application/json', authorization: `Bearer ${login.access_token}` };
+  await signIn();
   const done = { components: 0, objectives: 0, solutions: 0, parts: 0, rules: 0, triggers: 0, preserved: 0, organisation: 0 };
 
   // Components
@@ -191,6 +201,11 @@ async function main() {
     if (DRY) continue;
     library = (await api('GET', '/controls/solutions')).solutions;
     s = solution(def.name);
+    // The pattern it implements (v176, solution-patterns.js), on the first run.
+    const sp = patternFor(def.name);
+    if (sp.solution_pattern && !s.solution_pattern) {
+      await api('PATCH', `/controls/solutions/${s.id}`, sp);
+    }
     for (const ref of def.delivers) {
       if (s.objectives.some((o) => o.id === objective(ref).id)) continue;
       await api('POST', `/controls/solutions/${s.id}/objectives`, { control_id: objective(ref).id });
