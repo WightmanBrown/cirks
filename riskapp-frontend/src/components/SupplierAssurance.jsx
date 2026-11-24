@@ -47,13 +47,14 @@ export function coverageOf(objective, evidence) {
 //
 // `focus`: the page was opened for this relationship (from a finding), so the
 // details start open and scroll into view.
-export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus = false }) {
+// `defaultOpen`: start with the details open (the Assurance tab, under its picture).
+export function SupplierAssurance({ relationship: r, canEdit, onChanged, focus = false, defaultOpen = false }) {
   // false, or the control objectives to start the new evidence with ticked.
   const [adding, setAdding]           = useState(false);
   const [editing, setEditing]         = useState(null);
   const [showCovered, setShowCovered] = useState(false);
   // Folded by default: the summary line says how it stands; open it for detail.
-  const [open_, setOpen]              = useState(focus);
+  const [open_, setOpen]              = useState(focus || defaultOpen);
   const [error, setError]             = useState('');
   const sectionRef = useRef(null);
   useEffect(() => {

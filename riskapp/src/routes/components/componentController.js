@@ -471,6 +471,8 @@ async function getComponentDetail(req, res, next) {
              json_build_object(
                'id',              sys.id,
                'name',            sys.name,
+               'department_id',   sys.department_id,
+               'impact_c', sys.impact_c, 'impact_i', sys.impact_i, 'impact_a', sys.impact_a,
                'department_name', sdept.name,
                'max_risk_score',  (
                  SELECT MAX(r.risk_score)

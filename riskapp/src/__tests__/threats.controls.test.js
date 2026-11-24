@@ -57,7 +57,6 @@ const SAMPLE_LINK = {
   control_type:  'preventive',
   effectiveness: 4,
   status:        'active',
-  is_baseline:   true,
   link_id:       'ct-uuid-1',
   notes:         'Restrict who can export bulk data.',
 };

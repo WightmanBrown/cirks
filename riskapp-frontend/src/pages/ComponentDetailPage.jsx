@@ -16,6 +16,13 @@ import { scoreLevel }            from '../utils/riskColors';
 import styles                    from './ComponentDetailPage.module.css';
 import { COMPONENT_TYPE_OPTIONS, COMPONENT_TYPE_LABEL, componentStatusLabel, componentStatusOptions } from '../utils/componentTypes';
 import { SuppliersPanel } from '../components/SuppliersPanel';
+import { ComponentRisksDiagram, componentSystemsOf, componentCriticality } from '../components/ComponentRisksDiagram';
+import { bandStripe }            from '../components/SystemRisksDiagram';
+import { FilterChip }            from '../components/FilterChip';
+import { RatingChip }            from '../components/RatingChip';
+import { ViewModeToggle }        from '../components/ViewModeToggle';
+import { useViewMode }           from '../hooks/useViewMode';
+import { departmentColour }      from '../utils/departmentColour';
 
 
 const TYPE_OPTIONS = COMPONENT_TYPE_OPTIONS;
@@ -226,6 +233,14 @@ export function ComponentDetailPage() {
   const [error, setError]         = useState('');
   const [editing, setEditing]     = useState(false);
   const [deleteError, setDeleteError] = useState('');
+  const [tab, setTab]             = useState('risks');
+  // The system whose risks the picture draws, and which risks the list shows.
+  const [riskLayer, setRiskLayer] = useState(null);
+  // A component may be on most systems, with hundreds of risks between them, so
+  // the list starts on the chosen system's ('layer'); All risks is asked for.
+  const [riskList, setRiskList]   = useState('layer');
+  const viewMode = useViewMode();
+  const isExpert = viewMode.isExpert;
 
   function load() {
     setLoading(true);
@@ -268,9 +283,9 @@ export function ComponentDetailPage() {
   const col        = getComponentColor(component.component_type);
   const systems    = component.systems || [];
   const vulnerableOn = component.vulnerable_on || [];
-  const maxRisk    = systems.length
-    ? Math.max(...systems.map(s => s.max_risk_score ?? 0).filter(Boolean)) || null
-    : null;
+  // Its criticality is the highest impact of the systems it is on; a risk score
+  // only where an analyst named it on the risk (owner, 2026-11-19).
+  const crit = componentCriticality(component);
   // No seat scope: the catalogue is shared org-wide and has no owning
   // department — see docs/component-ownership.md.
   const canEdit    = hasCapability('components.write');
@@ -295,10 +310,39 @@ export function ComponentDetailPage() {
     return rb - ra || a.name.localeCompare(b.name);
   });
 
+  // The Risks tab (owner, 2026-11-19): component → systems → risks.
+  const compSystems = componentSystemsOf(component);
+  const layer = compSystems.find(s => s.id === riskLayer) || compSystems[0] || null;
+  const riskById = new Map();
+  for (const sys of compSystems) {
+    for (const r of sys.risks) riskById.set(r.id, { ...r, system_id: sys.id, system_name: sys.name });
+  }
+  const allRisks = [...riskById.values()].sort((x, y) => Number(y.named) - Number(x.named)
+    || (y.risk_score ?? 0) - (x.risk_score ?? 0) || x.threat_name.localeCompare(y.threat_name));
+  const listSystem = riskList === 'all' ? null : riskList === 'layer' ? layer : compSystems.find(s => s.id === riskList) || layer;
+  const listedRisks = listSystem ? listSystem.risks.map(r => riskById.get(r.id)) : allRisks;
+  const markedBy = new Map(vulnerableOn.map(v => [v.risk_id, v.marked_by]));
+  function pickRiskLayer(sid, keepOpen = false) {
+    setRiskLayer(sid);
+    setRiskList(cur => ((cur === sid || (cur === 'layer' && layer?.id === sid)) && !keepOpen ? 'all' : sid));
+  }
+  const hasDetails = component.is_host || component.component_type === 'information';
+  const hasSuppliers = ['people', 'process', 'technology'].includes(component.component_type);
+  const TABS = [
+    ['risks', 'Risks', allRisks.length],
+    ['systems', 'Systems', systems.length],
+    ...(hasDetails ? [['details', component.component_type === 'information' ? 'Document' : 'Network identity', null]] : []),
+    ...(hasSuppliers ? [['suppliers', 'Suppliers', null]] : []),
+  ];
+  const shownTab = TABS.some(([k]) => k === tab) ? tab : 'risks';
+
   return (
     <Shell>
       <div className={styles.page}>
-        <BackButton />
+        <div className={styles.breadcrumb}>
+          <BackButton />
+          <span className={styles.viewModeSlot}><ViewModeToggle {...viewMode} /></span>
+        </div>
 
         {/* Header */}
         <div className={styles.header}>
@@ -316,7 +360,17 @@ export function ComponentDetailPage() {
               {component.review_overdue && ' · review overdue'}
             </span>
             {component.is_host && <span className={styles.hostBadge}>HOST</span>}
-            {maxRisk != null && <RiskBand score={maxRisk} />}
+            {crit.impact != null && (
+              <span className={styles.critChip}
+                title={`The highest impact of the systems it is on: ${crit.from.map(x => x.name).slice(0, 3).join(', ')}${crit.from.length > 3 ? ` and ${crit.from.length - 3} more` : ''}`}>
+                Criticality <RatingChip value={crit.impact} scale="impact" variant={isExpert ? 'number' : 'word'} />
+              </span>
+            )}
+            {crit.namedRisk != null && (
+              <span className={styles.critChip} title="The worst risk an analyst named this component on">
+                Named on a risk <RatingChip value={crit.namedRisk} scale="risk" variant={isExpert ? 'number' : 'word'} />
+              </span>
+            )}
           </div>
           <div className={styles.headerRow}>
             <h1 className={styles.title}>{component.name}<EntityKind kind="component" /> <HelpDot k="component_detail.title" placement="bottom" /></h1>
@@ -334,18 +388,91 @@ export function ComponentDetailPage() {
           </div>
           {deleteError && <p className={styles.deleteError} role="alert">{deleteError}</p>}
           {component.description && (
-            <p className={styles.description}>{component.description}</p>
+            <p className={styles.description} title={component.description}>{component.description}</p>
           )}
           <InstantiationRow component={component} systems={systems} onSaved={refresh} />
         </div>
 
-        {component.component_type === 'information' && (<>
+        {component.component_type === 'information' && (
           <DocumentReviewFindingBanner component={component} onChanged={refresh} />
-          <DocumentLifecycle component={component} onSaved={refresh} />
-        </>)}
+        )}
 
-        {/* Network identity (hosts only) */}
-        {component.is_host && (
+        <div className={styles.tabs} role="tablist">
+          {TABS.map(([k, words, n]) => (
+            <button key={k} type="button" role="tab" aria-selected={shownTab === k}
+              className={shownTab === k ? styles.tabActive : styles.tab} onClick={() => setTab(k)}>
+              {words}{n != null && <span className={styles.tabCount}>{n}</span>}
+            </button>
+          ))}
+        </div>
+
+        {shownTab === 'risks' && (
+          <div className={styles.risksTab}>
+            <ComponentRisksDiagram component={component} selected={layer?.id}
+              onSelect={pickRiskLayer} onComponent={() => setRiskList('all')}
+              onRisk={(rid) => navigate(`/risks/${rid}#score`)} onMore={() => setTab('systems')} />
+            <p className={styles.sectionNote}>
+              Select a system to draw and list its risks, or All risks for every system; select a risk to open it.
+              A risk marked <strong>named here</strong> is one an analyst named this component on, as part of
+              why the threat succeeds.{' '}
+              <HelpDot k="component_detail.risks" placement="bottom" />
+            </p>
+            <div className={styles.riskListBar} role="group" aria-label="Which risks to list">
+              <button type="button" aria-pressed={!listSystem}
+                className={!listSystem ? styles.riskListAllOn : styles.riskListAll}
+                onClick={() => setRiskList('all')}>
+                All risks <span className={styles.tabCount}>{allRisks.length}</span>
+              </button>
+              {listSystem && (
+                <FilterChip words={`${listSystem.name} · ${listSystem.risks.length}`} stripe={departmentColour(listSystem.department_id)}
+                  onClose={() => setRiskList('all')} />
+              )}
+            </div>
+            <div className={styles.riskRows}>
+              {listedRisks.map(r => (
+                <button key={r.id} type="button" className={styles.riskRow}
+                  style={{ borderLeftColor: listSystem ? departmentColour(listSystem.department_id) : bandStripe(r.risk_score) }}
+                  onClick={() => navigate(`/risks/${r.id}#score`)}>
+                  <RatingChip value={r.risk_score} scale="risk" variant={isExpert ? 'number' : 'word'} />
+                  <span className={styles.riskRowName}>{r.threat_name}</span>
+                  {r.named && (
+                    <span className={styles.namedTag} title="An analyst named this component on the risk as part of why the threat succeeds">
+                      named here{markedBy.get(r.id) ? ` by ${markedBy.get(r.id)}` : ''}
+                    </span>
+                  )}
+                  <span className={styles.riskRowSystem}>{r.system_name}</span>
+                </button>
+              ))}
+              {listedRisks.length === 0 && (
+                <p className={styles.empty}>{listSystem ? 'No active risks on this system.' : 'No active risks on the systems it is on.'}</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {shownTab === 'systems' && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              Systems using this component <HelpDot k="component_detail.systems" placement="bottom" />
+              {systems.length > 0 && <span className={styles.sectionCount}>{systems.length}</span>}
+            </h2>
+            {sortedSystems.length === 0 ? (
+              <p className={styles.empty}>This component is not linked to any systems.</p>
+            ) : (
+              <div className={styles.systemGrid}>
+                {sortedSystems.map(s => (
+                  <SystemCard key={s.id} system={s} navigate={navigate} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {shownTab === 'details' && component.component_type === 'information' && (
+          <DocumentLifecycle component={component} onSaved={refresh} />
+        )}
+
+        {shownTab === 'details' && component.is_host && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Network identity <HelpDot k="component_detail.network_identity" placement="bottom" /></h2>
             {component.hostname && (
@@ -369,63 +496,7 @@ export function ComponentDetailPage() {
           </section>
         )}
 
-        {/* Named as a vulnerability — the DIRECT signal. Deliberately ABOVE the
-            systems section, because "someone judged this component to be part of
-            why a threat succeeds" is a stronger statement than "it sits on a
-            system that has risks", and the section below is the latter. */}
-        {vulnerableOn.length > 0 && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>
-              Named as a vulnerability <HelpDot k="component_detail.vulnerable_on" placement="bottom" />
-              <span className={styles.sectionCount}>{vulnerableOn.length}</span>
-            </h2>
-            <p className={styles.sectionNote}>
-              An analyst marked this component on these risks as part of why the threat
-              succeeds. That is a judgement about this component — separate from its
-              condition, and from the risks merely present on the systems it sits in.
-            </p>
-            <ul className={styles.vulnList}>
-              {vulnerableOn.map(v => (
-                <li key={v.risk_id}>
-                  <button
-                    type="button"
-                    className={styles.vulnRow}
-                    onClick={() => navigate(`/risks/${v.risk_id}`)}
-                  >
-                    <span className={styles.vulnThreat}>{v.threat_name}</span>
-                    <span className={styles.vulnSystem}>on {v.system_name}</span>
-                    <RiskBand score={v.risk_score} />
-                    {v.marked_by && (
-                      <span className={styles.vulnBy}>marked by {v.marked_by}</span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* Systems */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            Systems using this component <HelpDot k="component_detail.systems" placement="bottom" />
-            {systems.length > 0 && <span className={styles.sectionCount}>{systems.length}</span>}
-          </h2>
-
-          {sortedSystems.length === 0 ? (
-            <p className={styles.empty}>This component is not linked to any systems.</p>
-          ) : (
-            <div className={styles.systemGrid}>
-              {sortedSystems.map(s => (
-                <SystemCard key={s.id} system={s} navigate={navigate} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {['people', 'process', 'technology'].includes(component.component_type) && (
-          <SuppliersPanel componentId={component.id} />
-        )}
+        {shownTab === 'suppliers' && <SuppliersPanel componentId={component.id} />}
 
         {editing && (
           <EditModal

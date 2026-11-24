@@ -148,22 +148,26 @@ function Decision({ a, to, lead }) {
 
 const PARTS = { score: Score, why: Why, work: Work, decision: Decision };
 
-export function RiskAnswer({ riskId, lead = 'score' }) {
-  const [a, setA] = useState(null);
+// `answer` passes one already read (the risk page reads it once for its diagram
+// too); `omit` leaves out answers the page shows another way (the risk page
+// draws How bad is it? as a diagram).
+export function RiskAnswer({ riskId, lead = 'score', answer = null, omit = [] }) {
+  const [a, setA] = useState(answer);
   const [error, setError] = useState('');
   useEffect(() => {
+    if (answer) { setA(answer); return undefined; }
     let live = true;
     setA(null); setError('');
     getRiskAnswer(riskId).then((x) => { if (live) setA(x); })
       .catch((e) => { if (live) setError(e?.response?.status === 403 ? 'This risk is outside your department.' : 'Could not load the answer.'); });
     return () => { live = false; };
-  }, [riskId]);
+  }, [riskId, answer]);
   if (error) return <p className={styles.note} role="alert">{error}</p>;
   if (!a) return <p className={styles.note}>Working it out…</p>;
   const to = `/risks/${riskId}`;
   // A section with no answer of its own (#about, from the risk page's address)
   // leads with none: the four answers stay in their usual order.
-  const order = PARTS[lead] ? [lead, ...ORDER.filter((k) => k !== lead)] : ORDER;
+  const order = (PARTS[lead] ? [lead, ...ORDER.filter((k) => k !== lead)] : ORDER).filter((k) => !omit.includes(k));
   return (
     <div className={styles.answer} aria-label={`${a.system_name}, ${a.threat_name}: the answer`}>
       {order.map((k) => {

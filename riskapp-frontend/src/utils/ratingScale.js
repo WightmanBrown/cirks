@@ -89,6 +89,22 @@ export function scaleLabels(scale) {
 export const MATURITY_WORDS = ['Initial', 'Repeatable', 'Defined', 'Managed', 'Optimising'];
 export function maturityWord(v) { return word1to5(MATURITY_WORDS, v); }
 
+// What each maturity level means, one sentence each (COBIT capability levels,
+// owner 2026-11-23): the mouseover on every maturity chip.
+export const MATURITY_MEANINGS = [
+  'Done, but ad hoc: it depends on the people involved and is not documented.',
+  'Done the same way each time by habit, but not formally documented or trained.',
+  'Documented, standardised and communicated, and the people doing it are trained.',
+  'Measured and monitored, with action taken when it is not working as intended.',
+  'Continuously improved from what is measured, and automated where that helps.',
+];
+
+/** The whole scale in words, for a mouseover; `current` (1–5) is marked. */
+export function maturityScaleText(current = null) {
+  const lines = MATURITY_WORDS.map((w, i) => `${current === i + 1 ? '▶ ' : ''}${i + 1} ${w}: ${MATURITY_MEANINGS[i]}`);
+  return `Control effectiveness, 1 to 5:\n${lines.join('\n')}`;
+}
+
 /**
  * Band plus the actual score — "High (14)". The band alone is as ambiguous as an
  * impact word, but a band covers a RANGE, so the honest companion figure is the

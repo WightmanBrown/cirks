@@ -13,6 +13,9 @@ import styles from './ThreatsPage.module.css';
 import own from './SecuritySolutionsPage.module.css';
 import { HelpDot } from '../components/HelpDot';
 import { useScrollRestore } from '../hooks/useScrollRestore';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 // The security solutions library from the solution's side (v147), grouped by the
 // security solution pattern each implements (v176). Each row checks the solution
@@ -25,6 +28,24 @@ const FILTERS = [
   { key: 'incomplete', label: 'Missing a required part' },
   { key: 'complete', label: 'Complete against its pattern' },
 ];
+
+// How far a solution falls short of its pattern: each required part missing or not
+// in place counts 1, a degraded part a half, so complete sorts first and degraded
+// sits between. No pattern, or checked per supplier: null (sorts last).
+export function patternShortfall(fit) {
+  if (!fit || fit.state === 'no_pattern' || fit.state === 'per_supplier') return null;
+  return (fit.slots || []).reduce((n, sl) =>
+    n + (sl.state === 'missing' || sl.state === 'not_in_place' ? 1 : sl.state === 'degraded' ? 0.5 : 0), 0);
+}
+
+// Column key → value, for sorting by a header (useTableSort). One sort applies
+// within every pattern group.
+export const SOLUTION_ACCESSORS = {
+  name:     (s) => s.name,
+  delivers: (s) => s.objectives.length,
+  fit:      (s) => patternShortfall(s.pattern_fit),
+  in_place: (s) => s.systems_in_place,
+};
 
 export function SecuritySolutionsPage() {
   const { hasCapability } = useAuth();
@@ -67,14 +88,19 @@ export function SecuritySolutionsPage() {
         || s.parts.some(p => p.component_name.toLowerCase().includes(q)));
   }, [solutions, search, onlyPattern, fitFilter]);
 
+  // Sorted by a header (by name until one is chosen), the sort kept in the address.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(filtered, { accessors: SOLUTION_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: styles.th };
+
   // One group per pattern, in pattern order, then the solutions with none stated.
   const groups = useMemo(() => {
     const out = patterns.map(p => ({ key: p.code, title: `${p.code} · ${p.name}`, pattern: p,
-      rows: filtered.filter(s => s.solution_pattern === p.code) }));
+      rows: sorted.filter(s => s.solution_pattern === p.code) }));
     out.push({ key: 'none', title: 'No pattern stated',
-      rows: filtered.filter(s => !s.solution_pattern || !patterns.some(p => p.code === s.solution_pattern)) });
+      rows: sorted.filter(s => !s.solution_pattern || !patterns.some(p => p.code === s.solution_pattern)) });
     return out.filter(g => g.rows.length);
-  }, [patterns, filtered]);
+  }, [patterns, sorted]);
 
   const counts = useMemo(() => ({
     incomplete: (solutions || []).filter(s => s.pattern_fit?.state === 'incomplete').length,
@@ -147,10 +173,10 @@ export function SecuritySolutionsPage() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th className={styles.th}>Security solution <HelpDot k="col.solution" placement="bottom" /></th>
-                      <th className={styles.th}>Delivers <HelpDot k="security_solutions.col.delivers" placement="bottom" /></th>
-                      <th className={styles.th}>Against its pattern <HelpDot k="security_solutions.col.pattern_fit" placement="bottom" /></th>
-                      <th className={styles.th}>In place on <HelpDot k="security_solutions.col.in_place_on" placement="bottom" /></th>
+                      <SortableTh column="name" {...sortProps} helpKey="col.solution">Security solution</SortableTh>
+                      <SortableTh column="delivers" {...sortProps} helpKey="security_solutions.col.delivers">Delivers</SortableTh>
+                      <SortableTh column="fit" {...sortProps} helpKey="security_solutions.col.pattern_fit">Against its pattern</SortableTh>
+                      <SortableTh column="in_place" {...sortProps} helpKey="security_solutions.col.in_place_on">In place on</SortableTh>
                     </tr>
                   </thead>
                   <tbody>

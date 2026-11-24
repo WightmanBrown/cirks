@@ -350,10 +350,12 @@ router.get('/:id', canRead, async (req, res, next) => {
     // system sets the figure, and on which dimension.
     const touched = ids.length ? (await query(`
       SELECT rs.relationship_id, s.id, s.name, s.impact_c, s.impact_i, s.impact_a,
-             GREATEST(s.impact_c, s.impact_i, s.impact_a) AS impact
+             GREATEST(s.impact_c, s.impact_i, s.impact_a) AS impact,
+             s.department_id, sd.name AS department_name
         FROM v_supplier_relationship_systems rs
         JOIN supplier_relationships sr ON sr.id = rs.relationship_id
         JOIN systems s ON s.id = rs.system_id AND s.is_active
+        LEFT JOIN departments sd ON sd.id = s.department_id
        WHERE rs.relationship_id = ANY($1)
          -- Narrowed as the figures are (readerScope).
          AND ($2::uuid IS NULL OR sr.department_id = $2 OR s.department_id = $2)
@@ -362,11 +364,36 @@ router.get('/:id', canRead, async (req, res, next) => {
       r.criticality_systems = r.max_impact == null ? []
         : touched.filter((t) => t.relationship_id === r.id && t.impact === r.max_impact)
                  .map(({ relationship_id, ...t }) => t);  // eslint-disable-line no-unused-vars
+      // Every system it reaches, highest impact first (owner, 2026-11-19: a
+      // product's full list, under the picture when it is chosen).
+      r.systems = touched.filter((t) => t.relationship_id === r.id)
+        .map(({ relationship_id, ...t }) => t)  // eslint-disable-line no-unused-vars
+        .sort((x, y) => (y.impact ?? 0) - (x.impact ?? 0) || x.name.localeCompare(y.name));
       r.objectives = objectives.filter((o) => o.relationship_id === r.id);
       r.evidence = evidence.filter((e) => e.relationship_id === r.id);
       r.assurance_finding = answers.find((a) => a.relationship_id === r.id) || null;
     }
-    res.json({ ...sp.rows[0], relationships: rows });
+    // The information the supplier may reach (owner, 2026-11-19): every active
+    // asset held in a system one of its visible relationships touches, with
+    // the systems and relationships it is reached through. Narrowed as the
+    // systems are: another department's contract reaches only the reader's
+    // own department's systems (readerScope, #332).
+    const assets = ids.length ? (await query(`
+      SELECT ia.id, ia.name, ia.department_id, d.name AS department_name, ia.is_shared,
+             ia.confidentiality, ia.integrity, ia.availability,
+             array_agg(DISTINCT rs.system_id) AS system_ids,
+             array_agg(DISTINCT rs.relationship_id) AS relationship_ids
+        FROM v_supplier_relationship_systems rs
+        JOIN supplier_relationships sr ON sr.id = rs.relationship_id
+        JOIN systems s ON s.id = rs.system_id AND s.is_active
+        JOIN system_assets sa ON sa.system_id = s.id
+        JOIN information_assets ia ON ia.id = sa.asset_id AND ia.is_active
+        LEFT JOIN departments d ON d.id = ia.department_id
+       WHERE rs.relationship_id = ANY($1)
+         AND ($2::uuid IS NULL OR sr.department_id = $2 OR s.department_id = $2)
+       GROUP BY ia.id, d.name
+       ORDER BY GREATEST(ia.confidentiality, ia.integrity, ia.availability) DESC NULLS LAST, lower(ia.name)`, [ids, dept])).rows : [];
+    res.json({ ...sp.rows[0], relationships: rows, information_assets: assets });
   } catch (err) { next(err); }
 });
 

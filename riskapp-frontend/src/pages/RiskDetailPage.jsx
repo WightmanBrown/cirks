@@ -15,8 +15,14 @@ import {
   getSystem, linkSystemComponent, getRiskGap,
   setSystemControlStatus, setSystemComponentStatus,
   setRiskControlProbability, linkThreatControl, unlinkThreatControl,
+  getRiskAnswer,
 } from '../api';
 import { RiskAnswer }                        from '../components/RiskAnswer';
+import { RiskScoreDiagram }                  from '../components/RiskScoreDiagram';
+import { VulnerableComponentsDiagram }       from '../components/VulnerableComponentsDiagram';
+import { AboutRiskDiagram }                  from '../components/AboutRiskDiagram';
+import { DecisionDiagram }                   from '../components/DecisionDiagram';
+import { RiskControlsDiagram, partState }   from '../components/RiskControlsDiagram';
 import { ComponentPill, TypeBadge }          from '../components/ComponentPill';
 import { Shell }                             from '../components/Shell';
 import { HelpDot }                           from '../components/HelpDot';
@@ -29,7 +35,7 @@ import {
   ChipSelector, CiaLine, ProbabilityLine, SuggestedProbRow, CiaTableHeader,
 } from '../components/CiaTable';
 import {
-  FrameworkRef, TypePill, EffectivenessDots,
+  FrameworkRef, TypePill,
 } from '../components/ControlBadges';
 import { RiskPIG } from '../components/ProbabilityImpactGrid';
 import { patchRiskTreatment, getUsers,
@@ -121,14 +127,33 @@ export function RiskDetailPage() {
   const goToSection = useCallback((k, elementId = k) => {
     setOpenSections((cur) => new Set(cur).add(k));
     // After the section has rendered open.
-    setTimeout(() => document.getElementById(elementId)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+    // A box in a diagram lands on its record; the record is lit briefly so the
+    // eye finds it (relation diagrams, owner 2026-11-19).
+    setTimeout(() => {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: elementId === k ? 'start' : 'center' });
+      if (elementId !== k) {
+        el.classList.add(styles.landed);
+        setTimeout(() => el.classList.remove(styles.landed), 2200);
+      }
+    }, 0);
   }, []);
+  // Arriving from a picture elsewhere (the system's risks): the address names the
+  // section, the navigation state the record to land on.
   useEffect(() => {
     const k = sectionFromHash(location.hash);
-    if (k) goToSection(k);
-  }, [location.hash, goToSection]);
+    if (k) goToSection(k, location.state?.go || k);
+  }, [location.hash, location.state, goToSection]);
   // The answer is re-read whenever the risk is (an edit may change any of it).
   const [answerVersion, setAnswerVersion] = useState(0);
+  const [answer, setAnswer] = useState(null);
+  useEffect(() => {
+    if (!id) return undefined;
+    let live = true;
+    getRiskAnswer(id).then((x) => { if (live) setAnswer(x); }).catch(() => { if (live) setAnswer(null); });
+    return () => { live = false; };
+  }, [id, answerVersion]);
 
 
 
@@ -393,15 +418,18 @@ export function RiskDetailPage() {
                    Each section below answers one of them and opens on its own
                    address (#score, #why, #work, #decision, #about), so a report
                    or question page lands on the answer it was asked for. ── */}
-            <RiskAnswer key={answerVersion} riskId={risk.id} lead={sectionFromHash(location.hash) || 'score'} />
+            {/* The sections below fold to pictures (relation diagrams, owner
+                2026-11-19): each box opens its section at that record. */}
+            {answer && <RiskAnswer key={answerVersion} riskId={risk.id} answer={answer} lead={sectionFromHash(location.hash) || 'score'} />}
 
             <RiskSection id="score" question="How bad is it?" helpKey="risk_answer.score" summary="The score on each dimension, and how it has changed"
-              open={openSections.has('score')} onToggle={() => toggleSection('score')}>
+              open={openSections.has('score')} onToggle={() => toggleSection('score')}
+              picture={answer && <RiskScoreDiagram answer={answer} onGo={goToSection} />}>
               <ResidualRiskPanel risk={risk} form={form} simpleMode={simpleMode} />
               {!simpleMode && <ResidualHistoryPanel riskId={risk.id} />}
             </RiskSection>
 
-            <RiskSection id="why" question="Why this score?" helpKey="risk_answer.why" summary="The control objectives against this threat on this system, and its vulnerable components"
+            <RiskSection id="why" question="Why this score?" helpKey="risk_answer.why" summary="The control objectives against this threat on this system"
               open={openSections.has('why')} onToggle={() => toggleSection('why')}>
               <LinkedControlsSection
                 risk={risk}
@@ -411,6 +439,12 @@ export function RiskDetailPage() {
                 isExpert={!simpleMode}
                 startOpen={focusCoverage}
               />
+            </RiskSection>
+
+            <RiskSection id="components" question="Which components are vulnerable?" helpKey="risk.section.components"
+              summary="The system's components, and those marked vulnerable to this threat"
+              open={openSections.has('components')} onToggle={() => toggleSection('components')}
+              picture={<VulnerableComponentsDiagram risk={risk} onGo={goToSection} />}>
               <LinkedComponentsSection
                 risk={risk}
                 canEdit={user?.role === 'ciso' || user?.role === 'risk_analyst' || user?.role === 'admin'}
@@ -426,23 +460,25 @@ export function RiskDetailPage() {
             </RiskSection>
 
             <RiskSection id="decision" question="Who decided what?" helpKey="risk_answer.decision" summary="Treatment, exceptions, validation and the views recorded on decisions"
-              open={openSections.has('decision')} onToggle={() => toggleSection('decision')}>
+              open={openSections.has('decision')} onToggle={() => toggleSection('decision')}
+              picture={answer && <DecisionDiagram answer={answer} risk={risk} onGo={goToSection} />}>
               <TreatmentPanel
                 risk={risk} form={form} canEdit={canEdit}
                 onChange={handleFormChange}
                 onActionChange={load}
               />
               <div className={styles.metaGrid}>
-                <MetaRow label="Validation" value={risk.validation_status} />
+                <MetaRow label="Validation" id="risk-validation" value={risk.validation_status} />
                 {risk.validated_at && <MetaRow label="Validated" value={`${fmtDate(risk.validated_at)}${risk.validated_by_name ? `, by ${risk.validated_by_name}` : ''}`} />}
               </div>
               <RecordedViews riskId={risk.id} />
             </RiskSection>
 
             <RiskSection id="about" question="About this risk" helpKey="risk.section.about" summary="What the risk is, the system, threat, assets exposed, owner and dates"
-              open={openSections.has('about') || anyEditing} onToggle={() => toggleSection('about')}>
+              open={openSections.has('about') || anyEditing} onToggle={() => toggleSection('about')}
+              picture={<AboutRiskDiagram risk={risk} onGo={goToSection} />}>
             {/* ── rationale ── */}
-            <section className={`${styles.card} ${editingRationale ? styles.cardEditing : ''}`}>
+            <section id="risk-rationale" className={`${styles.card} ${editingRationale ? styles.cardEditing : ''}`}>
               <div className={styles.cardHeaderRow}>
                 <h2 className={styles.cardTitle}>Rationale <HelpDot k="risk.detail.rationale" placement="bottom" /></h2>
                 <div className={styles.cardHeaderActions}>
@@ -487,13 +523,13 @@ export function RiskDetailPage() {
               <p className={styles.cardHint}>What are the things associated with this risk?</p>
               <div className={styles.metaGrid}>
                 <MetaRow
-                  label="System"
+                  label="System" id="risk-system"
                   value={risk.system_name
                     ? `${risk.system_name} (C${risk.impact_c ?? '–'} I${risk.impact_i ?? '–'} A${risk.impact_a ?? '–'})`
                     : '—'
                   }
                 />
-                <MetaRow label="Threat"     value={risk.threat_name} />
+                <MetaRow label="Threat" id="risk-threat" value={risk.threat_name} />
                 <MetaRow label="Category"   value={risk.threat_category} />
                 <MetaRow label="Department" value={risk.department_name} />
                 <MetaRow
@@ -501,9 +537,9 @@ export function RiskDetailPage() {
                   value={
                     (risk.system_assets || []).length > 0
                       ? (
-                        <span className={styles.assetList}>
+                        <span className={styles.assetList} id="risk-assets">
                           {risk.system_assets.map(a => (
-                            <span key={a.id} className={styles.assetListItem}>
+                            <span key={a.id} id={`risk-asset-${a.id}`} className={styles.assetListItem}>
                               {a.name} (C{a.c ?? '–'} I{a.i ?? '–'} A{a.a ?? '–'})
                             </span>
                           ))}
@@ -518,7 +554,7 @@ export function RiskDetailPage() {
                     where it has none. Not editable, and there is nothing to
                     reassign: a risk moves owner when its SYSTEM moves. */}
                 <MetaRow
-                  label="Risk Owner"
+                  label="Risk Owner" id="risk-owner"
                   value={
                     <span className={styles.ownerRow}>
                       {risk.owner_name || '\u2014'}
@@ -531,7 +567,7 @@ export function RiskDetailPage() {
                     </span>
                   }
                 />
-                <MetaRow label="Review date"
+                <MetaRow label="Review date" id="risk-review"
                   value={editingContext
                     ? (
                       <DateField
@@ -563,9 +599,9 @@ export function RiskDetailPage() {
   );
 }
 
-function MetaRow({ label, value }) {
+function MetaRow({ label, value, id }) {
   return (
-    <div className={styles.metaRow}>
+    <div className={styles.metaRow} id={id}>
       <span className={styles.metaLabel}>{label}</span>
       <span className={styles.metaValue}>{value ?? '—'}</span>
     </div>
@@ -579,24 +615,27 @@ function MetaRow({ label, value }) {
 // The page's question sections (docs/insights-drilldown.md). A section is the
 // only thing that folds: the panels inside it are laid out flat (InSection), so
 // the reader opens one question and sees its whole answer without a second fold.
-const QUESTION_SECTIONS = ['score', 'why', 'work', 'decision', 'about'];
+const QUESTION_SECTIONS = ['score', 'why', 'components', 'work', 'decision', 'about'];
 function sectionFromHash(hash) {
   const k = (hash || '').replace(/^#/, '');
   return QUESTION_SECTIONS.includes(k) ? k : null;
 }
 const InSection = createContext(false);
 
-function RiskSection({ id, question, helpKey, summary, open, onToggle, children }) {
+// `picture` (a diagram) is the section's folded view, and stays at its head when
+// open: each box in it opens the section at its record.
+function RiskSection({ id, question, helpKey, summary, open, onToggle, picture, children }) {
   return (
     <section id={id} className={`${styles.questionSection} ${open ? styles.questionOpen : ''}`}>
       <div className={styles.questionHeaderRow}>
         <button type="button" className={styles.questionHeader} aria-expanded={open} onClick={onToggle}>
           <span className={styles.collapseChevron} aria-hidden="true">{open ? '▾' : '▸'}</span>
           <h2 className={styles.questionTitle}>{question}</h2>
-          {!open && <span className={styles.questionSummary}>{summary}</span>}
+          {!open && !picture && <span className={styles.questionSummary}>{summary}</span>}
         </button>
         <HelpDot k={helpKey} placement="bottom" />
       </div>
+      {picture && <div className={styles.questionPicture}>{picture}</div>}
       {open && <div className={styles.questionBody}><InSection.Provider value={true}>{children}</InSection.Provider></div>}
     </section>
   );
@@ -872,8 +911,8 @@ function GapItemFields({ sel, users, onField, isControl }) {
       {isControl && (
         <span className={styles.gapTargetFields}>
           <span className={styles.gapTargetLabel}
-            title="What the attack probability will be once this control is operational. One figure — applied across C/I/A, each capped by the threat's own ceiling. Leave blank if not yet estimated.">
-            once working, probability
+            title="What the attack likelihood will be once this control is operational. One figure — applied across C/I/A, each capped by the threat's own ceiling. Leave blank if not yet estimated.">
+            once working, likelihood
           </span>
           <ChipSelector
             value={sel.target}
@@ -1120,8 +1159,8 @@ function ActionItemRow({ risk, action, item, user, onChange }) {
       )}
       {confirming && (
         <span className={styles.gapResidConfirm}>
-          <span title="The attack probability now this control is working. One figure — it is applied across confidentiality, integrity and availability, each capped by the threat's own ceiling.">
-            probability now it is working
+          <span title="The attack likelihood now this control is working. One figure — it is applied across confidentiality, integrity and availability, each capped by the threat's own ceiling.">
+            likelihood now it is working
           </span>
           <ChipSelector
             value={resid}
@@ -1170,7 +1209,7 @@ function ExceptionSection({ canEdit, activeException, onOpenModal }) {
   :              styles.exceptionOk;
 
   return (
-    <div className={`${styles.exceptionCard} ${expiryClass}`}>
+    <div id="risk-section-exceptions" className={`${styles.exceptionCard} ${expiryClass}`}>
       <div className={styles.exceptionHeader}>
         <span className={styles.exceptionTitle}>Active exception <HelpDot k="risk.detail.active_exception" placement="bottom" /></span>
         <span className={styles.exceptionExpiry}>
@@ -1232,7 +1271,6 @@ function ControlsCounteringRow({ controls }) {
               </span>
               {c.maturity != null
                 ? <span className={styles.maturityReadCell}>
-                    <EffectivenessDots value={c.maturity} />
                     <MaturityChip value={c.maturity} />
                   </span>
                 : <span className={styles.cardHint}>not assessed</span>}
@@ -1291,7 +1329,7 @@ function ResidualRiskPanel({ risk, form, simpleMode = true }) {
   // Threat Coverage panel (migration 0092). Neither is edited here.
   const impactVals = { c: risk.impact_c, i: risk.impact_i, a: risk.impact_a };
   const probVals   = { c: form.probability_c, i: form.probability_i, a: form.probability_a };
-  const derivedNote = 'Probability is derived from the per-control judgements in Controls against this threat, below.';
+  const derivedNote = 'Likelihood is derived from the per-control judgements in Controls against this threat, below.';
 
   return (
     <CollapsibleCard
@@ -1331,7 +1369,7 @@ function ResidualRiskPanel({ risk, form, simpleMode = true }) {
             />
             <ControlsCounteringRow controls={risk.controls} />
             <ProbabilityLine
-              label="Current probability"
+              label="Current likelihood"
               values={probVals}
               editing={false}
               simpleMode={simpleMode}
@@ -1367,7 +1405,7 @@ function ResidualRiskPanel({ risk, form, simpleMode = true }) {
           />
           <ControlsCounteringRow controls={risk.controls} />
           <ProbabilityLine
-            label="Current probability"
+            label="Current likelihood"
             values={probVals}
             editing={false}
             simpleMode={simpleMode}
@@ -1431,7 +1469,7 @@ const SECTIONS = [
     title: 'Current operational controls on this system',
     helpKey: 'risk.detail.coverage_operational',
     blurb: 'Working here, with every delivering component in place. These are what hold the risk down today.',
-    empty: 'Nothing on this system is fully operational against this threat, so the probability stays at the threat\u2019s untreated level.' },
+    empty: 'Nothing on this system is fully operational against this threat, so the likelihood stays at the threat\u2019s untreated level.' },
   { key: IMPAIRED,
     title: 'Degraded controls which need improvement on this system',
     helpKey: 'risk.detail.coverage_degraded',
@@ -1449,7 +1487,7 @@ const SECTIONS = [
 function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, startOpen = false }) {
   const { hasCapability } = useAuth();
   const canCurate = hasCapability('controls.write'); // add/remove a control ↔ threat
-  const [gap, setGap]   = useState(null);   // GET /risks/gap (incl. per-control probability)
+  const [gap, setGap]   = useState(null);   // GET /risks/gap (incl. per-control likelihood)
   const [err, setErr]   = useState('');
   const [search,  setSearch]  = useState('');
   const [results, setResults] = useState([]);
@@ -1519,6 +1557,18 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
   // an unexplained exclusion.
   const [excluding, setExcluding] = useState(null);   // { control, reason }
 
+  // The picture: which solutions (and "other ways") are unfolded, which
+  // objective is chosen (its row shown beneath), and whether the full list is.
+  const [unfolded, setUnfolded] = useState(() => new Set());
+  const [chosen, setChosen] = useState(null);
+  const [listAll, setListAll] = useState(false);
+  const toggleUnfolded = (k) => setUnfolded(cur => {
+    const next = new Set(cur);
+    if (next.has(k)) next.delete(k); else next.add(k);
+    return next;
+  });
+  const chosenControl = chosen ? (gap?.controls || []).find(c => c.id === chosen) || null : null;
+
   // Component state picker — the same shape as handleControlState above.
   // Choosing a state on a component that is NOT yet on the system links it
   // first, because PATCH /systems/:id/components/:cid only updates an existing
@@ -1549,7 +1599,7 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
     setErr('');
     const body = expand(value, inherent);
     try { await setRiskControlProbability(risk.id, c.id, body); await refetchGap(); onChange(); }
-    catch (e) { setErr(e.response?.data?.error || 'Failed to set probability.'); }
+    catch (e) { setErr(e.response?.data?.error || 'Failed to set likelihood.'); }
   }
 
   // Add a control to the threat's coverage (catalogue-only → appears as a GAP;
@@ -1606,6 +1656,14 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
   const hasSolution = (c) => Array.isArray(c.solutions) && c.solutions.length > 0;
   const followsSolution = (c) => c.delivery === 'system';
 
+  // The chosen objective's components are each boxed as their box is drawn on
+  // the picture: the state's colour round it (green operational, amber
+  // degraded, red dashed missing) and the type's colour down its left side.
+  const linked = (c) => !listAll && c.id === chosen;
+  const compClass = (c, cc) => (linked(c)
+    ? `${styles.tcComp} ${styles.tcCompBox} ${styles[`tcCompTone_${partState(cc).tone}`]}` : styles.tcComp);
+  const compStyle = (c, cc) => (linked(c) ? { borderLeftColor: getComponentColor(cc.component_type).bg } : undefined);
+
   function renderControlRow(c) {
             const ctlValue = c.on_system && CONTROL_STATUSES.includes(c.system_status)
               ? c.system_status : 'unknown';
@@ -1634,7 +1692,7 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
             // parts of the solution in use; the others are alternatives.
             const solutions = solutionSummary(c.solutions);
             return (
-              <li key={c.id} className={`${styles.tcRow} ${isDriver ? styles.tcRowDriver : ''}`}>
+              <li key={c.id} id={`risk-objective-${c.id}`} className={`${styles.tcRow} ${isDriver ? styles.tcRowDriver : ''}`}>
                 <div className={styles.tcMain}>
                   {/* Control (left) */}
                   <div className={styles.tcControl}>
@@ -1704,8 +1762,8 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                     {isDriver && !isExcluded && (
                       <span
                         className={styles.tcDriverChip}
-                        title={`This control sets the current probability on ${dims.map(d => d.toUpperCase()).join(', ')}. It is the lowest-scoring deployed control on ${dims.length === 1 ? 'that dimension' : 'those dimensions'}, and the risk cannot fall further until it improves.`}
-                      >Greatest Probability Effect</span>
+                        title={`This control sets the current likelihood on ${dims.map(d => d.toUpperCase()).join(', ')}. It is the lowest-scoring deployed control on ${dims.length === 1 ? 'that dimension' : 'those dimensions'}, and the risk cannot fall further until it improves.`}
+                      >Greatest Likelihood Effect</span>
                     )}
                     <span className={ctlMuted(c) ? styles.tcMuted : undefined}>
                       {c.framework_ref && <span className={styles.tcRef}>{c.framework_ref} </span>}
@@ -1730,7 +1788,10 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                   </div>
 
                   {/* Components (right) */}
-                  <div className={styles.tcComponents}>
+                  {/* The chosen objective's components are framed in the colour its
+                      paths are lit in on the picture above, each with its type's
+                      trim as its box there has, so the two read as one. */}
+                  <div className={`${styles.tcComponents} ${!listAll && c.id === chosen ? styles.tcComponentsLinked : ''}`}>
                     {solutions && (
                       <div className={styles.tcSolutions}>
                         {solutions.inUse
@@ -1756,13 +1817,13 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                       // Delivered once, not system by system: its components
                       // have no per-system state to record here.
                       ? c.components.map(cc => (
-                          <div key={cc.id} className={styles.tcComp}>
+                          <div key={cc.id} className={compClass(c, cc)} style={compStyle(c, cc)}>
                             <span className={styles.compType}><TypeBadge type={cc.component_type} variant="text" /></span>
                             <span className={styles.tcCompName}>{cc.name}</span>
                           </div>
                         ))
                       : c.components.map(cc => (
-                          <div key={cc.id} className={styles.tcComp}>
+                          <div key={cc.id} className={compClass(c, cc)} style={compStyle(c, cc)}>
                             <span className={styles.compType}><TypeBadge type={cc.component_type} variant="text" /></span>
                             <span className={compMuted(cc) ? styles.tcMuted : styles.tcCompName}>{cc.name}</span>
                             {cc.has_open_action && <span className={styles.plannedTag} title="A security action is in flight to improve this">planned</span>}
@@ -1835,7 +1896,7 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                   </div>
                 )}
 
-                {/* Per-control residual probability. A DEPLOYED control
+                {/* Per-control residual likelihood. A DEPLOYED control
                     (operational | degraded) drives the current risk; a
                     not-deployed one records a dormant TARGET that doesn't move
                     the current risk (used to plan security actions). */}
@@ -1843,10 +1904,10 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
                   <span
                     className={styles.tcProbLabel}
                     title={countsNow
-                      ? "Attack probability once this deployed control is considered (scored as-is). The best (lowest) deployed control sets the current risk; not-deployed controls don't affect it."
+                      ? "Attack likelihood once this deployed control is considered (scored as-is). The best (lowest) deployed control sets the current risk; not-deployed controls don't affect it."
                       : "This control isn't deployed, so this score is a target for when it is — it does not change the current risk. The current risk is driven only by operational/degraded controls."}
                   >
-                    {countsNow ? 'Residual probability after this control' : 'Target probability (when in place)'}
+                    {countsNow ? 'Residual likelihood after this control' : 'Target likelihood (when in place)'}
                   </span>
                   <div className={styles.tcProbDims}>
                     <ChipSelector
@@ -2002,18 +2063,18 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
             {drivers.deployedCount === 0 ? (
               <>
                 <strong>No control is lowering this risk.</strong> Nothing here is
-                operational or degraded on this system, so the probability stays at the
+                operational or degraded on this system, so the likelihood stays at the
                 threat&rsquo;s untreated level ({inherent.c}/{inherent.i}/{inherent.a}).
                 Scores on the rows below are <em>targets</em> for when a control is deployed.
               </>
             ) : (
               <>
                 <strong>The best deployed control sets the score</strong> — on each of C, I
-                and A the current probability is the <em>lowest</em> figure among the{' '}
+                and A the current likelihood is the <em>lowest</em> figure among the{' '}
                 {drivers.deployedCount} deployed control{drivers.deployedCount === 1 ? '' : 's'},
                 now {drivers.floor.c}/{drivers.floor.i}/{drivers.floor.a}. The row
                 {drivers.driverIds.size === 1 ? '' : 's'} marked{' '}
-                <span className={styles.tcDriverChip}>greatest probability effect</span>{' '}
+                <span className={styles.tcDriverChip}>greatest likelihood effect</span>{' '}
                 {drivers.driverIds.size === 1 ? 'is' : 'are'} setting it today; the others are
                 not lowering it further, and a control that is not deployed does not count at
                 all. A <em>degraded</em> control counts one rung worse than its score.
@@ -2021,7 +2082,40 @@ function LinkedControlsSection({ risk, canEdit, onChange, navigate, isExpert, st
             )}
           </p>
 
-          {SECTIONS.map(({ key, title, helpKey, blurb, empty }) => {
+          {/* The picture is the panel (owner, 2026-11-23): every objective, its
+              security solutions and, on request, their parts. Choosing an
+              objective shows its detailed row beneath; the full list is one
+              click away. No objective is ever left off the picture. */}
+          <RiskControlsDiagram
+            groups={SECTIONS.map(({ key, title, empty }) => ({ key, title, empty, rows: sections[key] }))}
+            open={unfolded}
+            selected={chosen}
+            inherent={inherent}
+            threat={risk.threat_name ? { name: risk.threat_name, onClick: risk.threat_id ? () => navigate(`/threats/${risk.threat_id}`) : undefined } : null}
+            onSelect={setChosen}
+            onToggle={toggleUnfolded}
+          />
+          <div className={styles.tcPictureBar}>
+            <span className={styles.cardHint}>
+              Choose a control objective to see and change it; choose a security solution to see its parts.
+            </span>
+            <button type="button" className={styles.linkBtn} onClick={() => { setListAll(v => !v); setChosen(null); }}>
+              {listAll ? 'Hide the list' : 'List all'}
+            </button>
+          </div>
+
+          {!listAll && chosenControl && (
+            <section className={styles.tcSection} id={`control-${chosenControl.id}`}>
+              <h4 className={styles.tcSectionTitle}>
+                {SECTIONS.find(x => x.key === classifyControl(chosenControl).group)?.title}
+                <button type="button" className={styles.tcRemove} onClick={() => setChosen(null)}
+                  aria-label="Hide this control objective" title="Hide">×</button>
+              </h4>
+              <ul className={styles.tcList}>{renderControlRow(chosenControl)}</ul>
+            </section>
+          )}
+
+          {listAll && SECTIONS.map(({ key, title, helpKey, blurb, empty }) => {
             const rows = sections[key];
             // An empty section is dropped rather than shown as a reassuring
             // heading over nothing — except the operational one, whose emptiness
@@ -2264,7 +2358,7 @@ function LinkedComponentsSection({ risk, canEdit, onChange }) {
                     const chipCls  = isVulnerable ? styles.vulnChip : styles.notSelectedChip;
                     const chipText = isVulnerable ? 'vulnerable' : 'not selected';
                     return (
-                      <span key={c.id} className={styles.compVulnRow}>
+                      <span key={c.id} id={`risk-component-${c.id}`} className={styles.compVulnRow}>
                         <ComponentPill component={c} variant="subtle" showStatus />
                         {editMode ? (
                           <button
@@ -2411,7 +2505,7 @@ function ResidualHistoryPanel({ riskId }) {
           </button>
         </div>
       </div>
-      <p className={styles.cardHint}>Audit trail of every change to this risk&apos;s probability and impact.</p>
+      <p className={styles.cardHint}>Audit trail of every change to this risk&apos;s likelihood and impact.</p>
 
       {!collapsed && (
         <>

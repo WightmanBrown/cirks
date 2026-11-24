@@ -30,6 +30,9 @@ export function FindingBanner({ kind, subjectId, departmentId, title, detail, ac
   const [busy, setBusy] = useState(false);
   const [err, setErr]   = useState('');
   const [accepting, setAccepting] = useState(false);
+  // Folded to one line (owner, 2026-11-19): the title and the answer; the reasons
+  // open beneath on request.
+  const [open, setOpen] = useState(false);
 
   const canAccept = hasCapability('exceptions.accept');
   const canRaise = hasCapability('findings.act')
@@ -51,11 +54,17 @@ export function FindingBanner({ kind, subjectId, departmentId, title, detail, ac
 
   const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   return (
-    <div className={styles.banner} role="status">
+    <div className={`${styles.banner} ${open ? '' : styles.folded}`} role="status">
       <div className={styles.body}>
-        <div className={styles.title}>{title}{helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>}</div>
-        <div className={styles.detail}>{detail}</div>
-        {accepted && (
+        <div className={styles.titleRow}>
+          <button type="button" className={styles.toggle} aria-expanded={open} onClick={() => setOpen(o => !o)}
+            title={open ? 'Fold the reasons away' : 'Show the reasons'}>
+            <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+          </button>
+          <div className={styles.title}>{title}{helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>}</div>
+        </div>
+        {open && <div className={styles.detail}>{detail}</div>}
+        {open && accepted && (
           <div className={styles.accepted}>
             Accepted until <strong>{fmt(accepted.expires_at)}</strong>
             {accepted.accepted_by_name && <> by {accepted.accepted_by_name}</>}: &ldquo;{accepted.justification}&rdquo;

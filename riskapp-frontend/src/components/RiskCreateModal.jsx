@@ -27,7 +27,7 @@ import { DateField } from './DateField';
 const STEP_SYSTEM = 1, STEP_THREAT = 2, STEP_REPLICATE = 3;
 const STEP_TITLES = [
   { label: 'System', helpKey: 'risk_create.step_system' },
-  { label: 'Threat, probability & rationale', helpKey: 'risk_create.step_threat' },
+  { label: 'Threat, likelihood & rationale', helpKey: 'risk_create.step_threat' },
   { label: 'Replicate', helpKey: 'risk_create.step_replicate' },
 ];
 
@@ -330,7 +330,7 @@ export function RiskCreateModal({ onClose, onCreated, initialSystemId = '', init
               </div>
 
               <div className={styles.fieldGroup}>
-                <label className={styles.fieldLabel}>Probability</label>
+                <label className={styles.fieldLabel}>Likelihood</label>
                 {['c', 'i', 'a'].map((dim) => (
                   <div key={dim} className={styles.probRow}>
                     <span className={styles.probDim}>{dim === 'c' ? 'Confidentiality' : dim === 'i' ? 'Integrity' : 'Availability'}</span>
@@ -339,7 +339,7 @@ export function RiskCreateModal({ onClose, onCreated, initialSystemId = '', init
                   </div>
                 ))}
                 {maxScore != null && (
-                  <p className={styles.hint}>Worst-case current score: <RatingChip value={maxScore} scale="risk" variant="number" /> &nbsp;(probability × the system's CIA)</p>
+                  <p className={styles.hint}>Worst-case current score: <RatingChip value={maxScore} scale="risk" variant="number" /> &nbsp;(likelihood × the system's CIA)</p>
                 )}
               </div>
 
@@ -361,7 +361,7 @@ export function RiskCreateModal({ onClose, onCreated, initialSystemId = '', init
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>Replicate this risk to other systems</label>
               <p className={styles.fieldHint}>
-                Same threat &amp; probability. Where a system's gap matches this one, the rationale is copied;
+                Same threat &amp; likelihood. Where a system's gap matches this one, the rationale is copied;
                 where it differs, write a fresh one. Each risk's owner defaults to that system's IAO.
               </p>
               <select

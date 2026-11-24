@@ -91,7 +91,7 @@ export default {
 
   // GraphExplorerPage + WalkableGraph
   'graph_explorer.title':            { title: 'Graph explorer', body: 'The record you started from and what it is directly connected to. Select a node to see it, and expand it to walk one step further. Only records your role can read are shown; a “+ more” node stands for connections beyond the first 12.' },
-  'graph.node_panel':                { title: 'Selected node', body: 'The record selected in the graph, with its risk score, maturity or status where it has one. Expand it to add its own connections to the graph, or open its page.' },
+  'graph.node_panel':                { title: 'Selected node', body: 'The record selected in the graph, with its risk score, effectiveness or status where it has one. Expand it to add its own connections to the graph, or open its page.' },
 
   // MetricsPage
   'metrics.title':                   { title: 'Insights', body: 'The reports you may read, drawn from the live register. Reports are being added role by role; the first is the SIRO report, for the admin, CISO and SIRO.' },
@@ -103,6 +103,6 @@ export default {
   'style_sheet.title':       { title: 'Colours & fonts', body: 'Every font and colour CIRKS uses, read live from the one file that defines them (styles/globals.css). Nothing else in the app may set a colour, so this page is the whole palette. A day theme, when there is one, will show here too.' },
   'style_sheet.fonts':       { title: 'Fonts', body: 'The three font families: headings, body text, and the monospaced font used for labels and figures. Each is shown in every weight the app loads.' },
   'style_sheet.readability': { title: 'Text on each surface', body: 'Each text colour on each background, with its contrast ratio. 4.5:1 is the WCAG AA minimum for normal-sized text; a cross marks a pairing below it, which should not be used for reading text.' },
-  'style_sheet.pairings':    { title: 'Pairings in use', body: 'The colour combinations the app actually draws: risk bands, control maturity levels, coloured text on a tint of its own colour, text on solid buttons, and component types — each with its contrast ratio.' },
+  'style_sheet.pairings':    { title: 'Pairings in use', body: 'The colour combinations the app actually draws: risk bands, control effectiveness levels, coloured text on a tint of its own colour, text on solid buttons, and component types — each with its contrast ratio.' },
   'style_sheet.colours':     { title: 'Every colour', body: 'Every colour token, grouped as the stylesheet groups them, with its name and current value. A value shown "at N%" is translucent and takes some colour from what is behind it.' },
 };

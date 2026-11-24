@@ -12,9 +12,23 @@ import { getPendingRisks } from '../api';
 import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
-import { Th } from '../components/Th';
+import thStyles from '../components/Th.module.css';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 import { HelpDot } from '../components/HelpDot';
 import styles from './PendingRisksPage.module.css';
+
+// Column key → value, for sorting the queue by a header (useTableSort). The
+// asset column sorts by the asset's name, then by the system it sits on.
+export const PENDING_RISK_ACCESSORS = {
+  status:     (r) => r.validation_status,
+  threat:     (r) => r.threat_name,
+  category:   (r) => r.threat_category,
+  asset:      (r) => [r.asset_name, r.system_name].filter(Boolean).join(' ') || null,
+  department: (r) => r.department,
+  identified: (r) => r.identified_at,
+};
 
 export function PendingRisksPage() {
   const navigate = useNavigate();
@@ -37,6 +51,11 @@ export function PendingRisksPage() {
   }, [statusFilter]);
 
   useEffect(() => { fetchRisks(); }, [fetchRisks]);
+
+  // Sorted by a header, the sort kept in the address so Back returns to it.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(risks, { accessors: PENDING_RISK_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: thStyles.th };
 
   const pendingCount  = risks.filter((r) => r.validation_status === 'pending').length;
   const returnedCount = risks.filter((r) => r.validation_status === 'returned').length;
@@ -103,16 +122,16 @@ export function PendingRisksPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th helpKey="pending_risks.col.status">Status</Th>
-                    <Th helpKey="col.threat">Threat</Th>
-                    <Th helpKey="pending_risks.col.category">Category</Th>
-                    <Th helpKey="pending_risks.col.asset">Asset</Th>
-                    <Th helpKey="col.department">Department</Th>
-                    <Th helpKey="pending_risks.col.identified">Identified</Th>
+                    <SortableTh column="status" {...sortProps} helpKey="pending_risks.col.status">Status</SortableTh>
+                    <SortableTh column="threat" {...sortProps} helpKey="col.threat">Threat</SortableTh>
+                    <SortableTh column="category" {...sortProps} helpKey="pending_risks.col.category">Category</SortableTh>
+                    <SortableTh column="asset" {...sortProps} helpKey="pending_risks.col.asset">Asset</SortableTh>
+                    <SortableTh column="department" {...sortProps} helpKey="col.department">Department</SortableTh>
+                    <SortableTh column="identified" {...sortProps} helpKey="pending_risks.col.identified">Identified</SortableTh>
                   </tr>
                 </thead>
                 <tbody>
-                  {risks.map((risk) => (
+                  {sorted.map((risk) => (
                     <RiskRow
                       key={risk.risk_id}
                       risk={risk}

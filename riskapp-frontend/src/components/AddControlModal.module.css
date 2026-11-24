@@ -88,30 +88,6 @@
 
 .select { cursor: pointer; }
 
-/* Applicability */
-.radioGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.radioLabel {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.radioLabel input[type="radio"] { accent-color: var(--amber); flex-shrink: 0; }
-
-.radioHint {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
 .error {
   font-size: 13px;
   color: var(--red-light);

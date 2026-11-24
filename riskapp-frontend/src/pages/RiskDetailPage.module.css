@@ -2863,3 +2863,24 @@ button.notSelectedChip { cursor: pointer; }
 }
 .questionHeaderRow { display: flex; align-items: center; gap: 4px; padding-right: 16px; }
 .questionHeaderRow .questionHeader { flex: 1; min-width: 0; }
+
+/* A section's picture (relation diagrams, 2026-11-19): its folded view. */
+.questionPicture { padding: 0 16px 14px; }
+/* The record a diagram box led to, lit briefly. */
+.landed { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 12%, transparent); transition: background 0.4s; }
+
+/* Under the controls picture: how to use it, and the full list on request. */
+.tcPictureBar { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin: 0.5rem 0 1rem; flex-wrap: wrap; }
+.linkBtn { background: none; border: none; padding: 0; color: var(--accent); cursor: pointer; font: inherit; text-decoration: underline; }
+
+/* The chosen objective's components, framed to match the picture's lit path. */
+.tcComponentsLinked { border: 2px solid var(--accent); border-radius: var(--radius-md); padding: 8px 10px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent); }
+/* Each component boxed as on the picture: state round it, type down its left. */
+.tcCompBox { border: 1px solid var(--border-accent); border-left-width: 4px; border-radius: var(--radius-md);
+  padding: 4px 8px; background: var(--bg-elevated); }
+.tcCompTone_good { border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); }
+.tcCompTone_warn { border-top-color: var(--amber); border-right-color: var(--amber); border-bottom-color: var(--amber); }
+.tcCompTone_bad { border-style: dashed; border-left-style: solid;
+  border-top-color: var(--red); border-right-color: var(--red); border-bottom-color: var(--red); }

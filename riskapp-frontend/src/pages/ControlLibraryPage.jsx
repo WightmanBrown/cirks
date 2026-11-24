@@ -3,15 +3,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getControls, importControls, getStandards } from '../api';
-import { OBJECTIVE_STATUSES } from '../utils/objectiveStatus';
+import { OBJECTIVE_STATUSES, OBJECTIVE_STATUS } from '../utils/objectiveStatus';
 import { useAuth }            from '../context/AuthContext';
 import { Shell }              from '../components/Shell';
 import { AddControlModal }    from '../components/AddControlModal';
-import { FrameworkRef, TypePill, StatusPill, EffectivenessDots, ApplicabilityBadge } from '../components/ControlBadges';
+import { FrameworkRef, TypePill, StatusPill, ApplicabilityBadge } from '../components/ControlBadges';
+import { MaturityChip } from '../components/MaturityChip';
 import styles                 from './ControlLibraryPage.module.css';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
-import { Th } from '../components/Th';
+import thStyles from '../components/Th.module.css';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 import { HelpDot } from '../components/HelpDot';
 import { useScrollRestore } from '../hooks/useScrollRestore';
 
@@ -26,6 +30,19 @@ const FRAMEWORK_LABELS = {
   cis_v8:   'CIS',
   nist_csf: 'NIST',
   custom:   'Custom',
+};
+
+// Column key → value, for sorting the library by a header (useTableSort). Status
+// sorts by its words; effectiveness by the rating, unrated last.
+export const CONTROL_ACCESSORS = {
+  ref:           (c) => c.framework_ref,
+  title:         (c) => c.title,
+  type:          (c) => c.control_type,
+  status:        (c) => OBJECTIVE_STATUS[c.status]?.label ?? c.status,
+  effectiveness: (c) => c.effectiveness,
+  // Where it applies, as the SoA has it (v185): everywhere first, then scopes,
+  // not decided, ruled out.
+  applicability: (c) => ({ organisation: 0, scopes: 1, not_decided: 2, not_applicable: 3 })[c.applicability] ?? null,
 };
 
 export function ControlLibraryPage() {
@@ -50,6 +67,11 @@ export function ControlLibraryPage() {
       return next;
     }, { replace: true });
   }, [setSearchParams]);
+
+  // Sorted by a header, the sort kept in the address beside the filters.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(controls, { accessors: CONTROL_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: thStyles.th };
 
   const [showAddModal,     setShowAddModal]     = useState(false);
   const [importing,        setImporting]        = useState(false);
@@ -245,16 +267,16 @@ export function ControlLibraryPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th helpKey="col.reference">Ref</Th>
-                    <Th helpKey="controls.col.title">Title</Th>
-                    <Th helpKey="controls.col.type">Type</Th>
-                    <Th helpKey="controls.col.status">Status</Th>
-                    <Th helpKey="controls.effectiveness">Effectiveness</Th>
-                    <Th helpKey="controls.col.applicability">Applicability</Th>
+                    <SortableTh column="ref" {...sortProps} helpKey="col.reference">Ref</SortableTh>
+                    <SortableTh column="title" {...sortProps} helpKey="controls.col.title">Title</SortableTh>
+                    <SortableTh column="type" {...sortProps} helpKey="controls.col.type">Type</SortableTh>
+                    <SortableTh column="status" {...sortProps} helpKey="controls.col.status">Status</SortableTh>
+                    <SortableTh column="effectiveness" {...sortProps} helpKey="controls.effectiveness">Effectiveness</SortableTh>
+                    <SortableTh column="applicability" {...sortProps} helpKey="controls.col.applicability">Applicability</SortableTh>
                   </tr>
                 </thead>
                 <tbody>
-                  {controls.map((control) => (
+                  {sorted.map((control) => (
                     <ControlRow key={control.id} control={control} />
                   ))}
                 </tbody>
@@ -348,10 +370,10 @@ function ControlRow({ control }) {
         <StatusPill status={control.status} />
       </td>
       <td className={styles.td}>
-        <EffectivenessDots value={control.effectiveness} />
+        <MaturityChip value={control.effectiveness} />
       </td>
       <td className={styles.td}>
-        <ApplicabilityBadge isBaseline={control.is_baseline} />
+        <ApplicabilityBadge applicability={control.applicability} appliesIn={control.applies_in} />
       </td>
     </tr>
   );

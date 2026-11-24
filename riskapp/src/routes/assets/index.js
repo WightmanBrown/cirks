@@ -200,10 +200,26 @@ router.get('/:id', canView, async (req, res, next) => {
         m.email     AS manager_email,
         rb.full_name AS rated_by_name,
         ia.rated_at,
+        -- v104: derived via the systems holding this asset — a service touches
+        -- it when one of its systems holds it and the asset is the service's
+        -- department's (or shared). Each names the systems it reaches it
+        -- through, for the Linked services picture (owner, 2026-11-19).
         COALESCE(
-          json_agg(DISTINCT
-            jsonb_build_object('id', bs.id, 'name', bs.name, 'department_name', dept2.name)
-          ) FILTER (WHERE bs.id IS NOT NULL),
+          (SELECT json_agg(ls ORDER BY ls.name)
+             FROM (
+               SELECT bs.id, bs.name, bs.department_id, dept2.name AS department_name,
+                      bs.owner_department_id, od2.name AS owner_department_name,
+                      bs.confidentiality, bs.integrity, bs.availability,
+                      json_agg(DISTINCT sa_svc.system_id) AS system_ids
+                 FROM system_assets sa_svc
+                 JOIN business_service_systems bss ON bss.system_id = sa_svc.system_id
+                 JOIN business_services bs ON bs.id = bss.service_id
+                  AND (ia.department_id = bs.department_id OR ia.is_shared)
+                 LEFT JOIN departments dept2 ON dept2.id = bs.department_id
+                 LEFT JOIN departments od2 ON od2.id = bs.owner_department_id
+                WHERE sa_svc.asset_id = ia.id
+                GROUP BY bs.id, dept2.name, od2.name
+             ) ls),
           '[]'
         ) AS linked_services,
         COALESCE(
@@ -256,6 +272,7 @@ router.get('/:id', canView, async (req, res, next) => {
                     r.risk_score AS risk_score,
                     sys.id       AS system_id,
                     sys.name     AS system_name,
+                    sys.department_id AS system_department_id,
                     t.id         AS threat_id,
                     t.name       AS threat_name
              FROM system_assets sap
@@ -268,6 +285,18 @@ router.get('/:id', canView, async (req, res, next) => {
           ),
           '[]'
         ) AS risk_paths,
+        -- Every system holding it, with or without risks, for the Risks tab's
+        -- picture (owner, 2026-11-19): a system with no active risk still shows.
+        COALESCE(
+          (SELECT json_agg(json_build_object('id', sys.id, 'name', sys.name,
+                    'department_id', sys.department_id, 'department_name', sd.name)
+                  ORDER BY sys.name)
+             FROM system_assets sap
+             JOIN systems sys ON sys.id = sap.system_id AND sys.is_active
+             LEFT JOIN departments sd ON sd.id = sys.department_id
+            WHERE sap.asset_id = ia.id),
+          '[]'
+        ) AS linked_systems,
         -- The assurance finding on this asset, if it holds (v134), and the
         -- open action answering it — so the page offers to raise one only when
         -- there is none, and links to it when there is.
@@ -290,12 +319,6 @@ router.get('/:id', canView, async (req, res, next) => {
       LEFT JOIN users u ON u.id = ia.owner_user_id
       LEFT JOIN users m ON m.id = ia.managed_by_user_id
       LEFT JOIN users rb ON rb.id = ia.rated_by
-      -- v104: derived via the systems holding this asset — see the list query.
-      LEFT JOIN system_assets sa_svc ON sa_svc.asset_id = ia.id
-      LEFT JOIN business_service_systems bss ON bss.system_id = sa_svc.system_id
-      LEFT JOIN business_services bs ON bs.id = bss.service_id
-                AND (ia.department_id = bs.department_id OR ia.is_shared)
-      LEFT JOIN departments dept2 ON dept2.id = bs.department_id
       WHERE ia.id = $1
       GROUP BY ia.id, d.id, d.name, u.id, u.full_name, u.email, m.id, m.full_name, m.email, rb.full_name
     `, [req.params.id]);

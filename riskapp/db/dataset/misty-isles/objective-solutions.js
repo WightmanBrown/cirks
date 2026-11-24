@@ -29,6 +29,8 @@ const AS = opt('--as', 'ciso@mig.local');
 const PASSWORD = process.env.CIRKS_PASSWORD;
 if (!PASSWORD) { console.error('Set CIRKS_PASSWORD to the password of the account this signs in as (--as).'); process.exit(1); }
 const STANDARD = 'MIG Security Architecture Standard';
+// solution-library.js RENAMES, which runs after this on a new install.
+const RENAMED = { 'Data handling policy': 'Information Classification and Handling Policy' };
 const { patternFor } = require('./solution-patterns');
 
 // ── The owner's answers ──────────────────────────────────────────────────────
@@ -38,6 +40,9 @@ const NEW_COMPONENTS = [
   ['BitLocker', 'technology', 'Full-disk encryption on Windows desktops and servers.'],
   ['FileVault', 'technology', 'Full-disk encryption on macOS.'],
   ['Failover to Castle Vaults DR room', 'technology', 'The system is replicated to the Castle Vaults DR room and can be run from there.'],
+  // 2026-11-23: CS-03 is network access control by ExtremeCloud IQ Site Engine;
+  // 802.1X is what each system's network port has, recorded nowhere yet.
+  ['802.1X network access control', 'technology', 'The system authenticates to the network with 802.1X before it is given access, enforced by ExtremeCloud IQ Site Engine.'],
 ];
 
 // §2 — the solution already does this job; the library just did not say so.
@@ -48,11 +53,13 @@ const ADD_TO_EXISTING = {
   'CIRKS1.IR-09': ['Veeam backup', 'Azure Backup', 'Microsoft 365 Backup', 'Configuration backup (network appliances)', 'Provided by the supplier'],
 };
 
-// §3 — new solutions. parts: [component, where]; triggers: components that imply it.
+// §3 — new solutions. parts: [component, where, slot?]; triggers: components that imply it.
+// slot: the part's slot in the solution's pattern (solution-patterns.js), or none.
 // Q4: one per facility. Bank Street is recorded operational and The Castle
 // degraded, so the two on-premises datacentres read good and degraded as the
 // owner asked, from the facilities' own state.
-const DATACENTRE = ['CIRKS1.PHY-02', 'CIRKS1.PHY-04', 'CIRKS1.PHY-05'];
+// §10 (owner, 2026-11-23): perimeters, secure areas, siting and utilities, cabling.
+const DATACENTRE = ['CIRKS1.PHY-02', 'CIRKS1.PHY-04', 'CIRKS1.PHY-05', 'CIRKS1.PHY-01', 'CIRKS1.PHY-03', 'CIRKS1.PHY-06', 'CIRKS1.PHY-07'];
 const WINDOWS = ['Windows 10', 'Windows 11', 'Windows Server 2016', 'Windows Server 2025'];
 const NEW_SOLUTIONS = [
   { name: 'Secure datacentre — Bank Street', was: 'Secure Datacentre', delivers: DATACENTRE,
@@ -84,7 +91,55 @@ const NEW_SOLUTIONS = [
     parts: [['Failover to Castle Vaults DR room', 'on_system'], ['Castle Vaults DR room', 'organisation'],
             ['Resilience and recovery', 'organisation']],
     triggers: [] },
+
+  // §9 (owner, 2026-11-23): the objectives countering a threat that were
+  // delivered once, or not stated, and had no solution. Organisation-wide, so
+  // nothing on a system implies them and they have no triggers.
+  { name: 'Security awareness programme (KnowBe4)', delivers: ['CIRKS1.SAT-01', 'CIRKS1.SAT-03', 'CIRKS1.SAT-04'],   // §10: phishing, tracking
+    parts: [['Security awareness training', 'organisation', 'process'], ['KnowBe4', 'organisation'],
+            ['Security awareness completions (KnowBe4)', 'organisation', 'evidence'], ['All desktop users', 'organisation']], triggers: [] },
+  { name: 'Role-based security training', delivers: ['CIRKS1.SAT-02'],
+    parts: [['Security awareness training', 'organisation', 'process'], ['IT Administrators', 'organisation'],
+            ['Policy acknowledgements — IT and security staff', 'organisation', 'evidence']], triggers: [] },
+  { name: 'Access review', delivers: ['CIRKS1.AA-05'],
+    parts: [['User account management process', 'organisation', 'process'], ['Access Control and Account Management Policy', 'organisation', 'defined_by'],
+            ['IT Administrators', 'organisation', 'responsible'], ['Microsoft Active Directory Domain Services', 'organisation'],
+            ['Microsoft Entra ID', 'organisation']], triggers: [] },
+  { name: 'Defined roles and separation', delivers: ['CIRKS1.AA-06'],
+    parts: [['User account management process', 'organisation', 'process'], ['ISMS Roles and Responsibilities', 'organisation', 'defined_by'],
+            ['Access Control and Account Management Policy', 'organisation']], triggers: [] },
+  { name: 'Service account management', delivers: ['CIRKS1.IDA-06'],
+    parts: [['User account management process', 'organisation', 'process'], ['Access Control and Account Management Policy', 'organisation', 'defined_by'],
+            ['Microsoft Active Directory Domain Services', 'organisation'], ['IT Administrators', 'organisation', 'responsible']], triggers: [] },
+  { name: 'Recovery planning and exercise', delivers: ['CIRKS1.BRR-04'],
+    parts: [['Data Backup and Recovery Policy', 'organisation', 'plan'], ['Resilience and recovery', 'organisation'],
+            ['Incident response exercise reports', 'organisation', 'exercise']], triggers: [] },
+  { name: 'Device inventory', delivers: ['CIRKS1.EST-03'],
+    parts: [['ME End-Point Central', 'organisation', 'record'], ['Asset management', 'organisation', 'maintained_by']], triggers: [] },
+  { name: 'Software inventory', delivers: ['CIRKS1.EST-04'],
+    parts: [['ME End-Point Central', 'organisation', 'record'], ['Asset management', 'organisation', 'maintained_by'],
+            ['Systems Register Standard', 'organisation', 'standard']], triggers: [] },
+  { name: 'Asset return and disposal', delivers: ['CIRKS1.EST-06'],
+    parts: [['Asset management', 'organisation', 'process'], ['User account management process', 'organisation'],
+            ['IT Team', 'organisation', 'responsible']], triggers: [] },
+  { name: 'Equipment maintenance', delivers: ['CIRKS1.PHY-08'],
+    parts: [['IT Team', 'organisation', 'responsible'], ['Physical security maintenance log', 'organisation', 'evidence'],
+            ['Server room HVAC', 'organisation']], triggers: [] },
+  { name: 'Security monitoring coverage', delivers: ['CIRKS1.DM-05'],
+    parts: [['Wazuh', 'organisation', 'security_system'], ['InfoSec Team', 'organisation', 'team'],
+            ['Detective Monitoring Policy', 'organisation', 'policy'], ['Detective Monitoring', 'organisation']], triggers: [] },
+  { name: 'Vulnerability report handling', delivers: ['CIRKS1.SD-10'],
+    parts: [['Vulnerability management', 'organisation', 'process'], ['Vulnerability Management Policy', 'organisation', 'defined_by'],
+            ['InfoSec Team', 'organisation', 'responsible']], triggers: [] },
+  // Not implemented (the SoA): the 802.1X part is recorded on no system, so the
+  // solution reads incomplete until one is.
+  { name: 'Network access control (ExtremeCloud IQ Site Engine)', delivers: ['CIRKS1.CS-03'],
+    parts: [['ExtremeCloud IQ Site Engine', 'organisation', 'security_system'], ['802.1X network access control', 'on_system', 'on_system'],
+            ['Network Security Policy', 'organisation', 'policy']], triggers: [] },
 ];
+
+// §9 — links on an objective's own list that were never what delivers it.
+const UNLINK = [['CIRKS1.DM-05', 'Supply chain management']];
 
 // §4 / Q5 — one process for the whole organisation, not something each system has.
 const ORGANISATION_WIDE = ['CIRKS1.SCM-03', 'CIRKS1.DM-05', 'CIRKS1.SCM-02', 'CIRKS1.SD-10', 'CIRKS1.EST-03', 'CIRKS1.EST-02'];
@@ -130,8 +185,10 @@ async function main() {
     const c = comps.find((x) => x.name === name);
     if (c && !c.instantiation) await api('PATCH', `/components/${c.id}`, { instantiation: 'per_system' });
   }
+  // On an instance run before, solution-library.js (step 5) has since renamed
+  // some components; follow its RENAMES so a second run finds them (2026-11-23).
   const compId = (name) => {
-    const c = comps.find((x) => x.name === name);
+    const c = comps.find((x) => x.name === name) || comps.find((x) => x.name === RENAMED[name]);
     if (!c) throw new Error(`component "${name}" is not in the library`);
     return c.id;
   };
@@ -212,9 +269,9 @@ async function main() {
       done.objectives++;
     }
     const haveParts = new Set(s.parts.map((p) => p.component_id));
-    for (const [name, location] of def.parts) {
+    for (const [name, location, slot] of def.parts) {
       if (haveParts.has(compId(name))) continue;
-      await api('POST', `/controls/solutions/${s.id}/parts`, { component_id: compId(name), location });
+      await api('POST', `/controls/solutions/${s.id}/parts`, { component_id: compId(name), location, slot_key: slot || null });
       done.parts++;
     }
   }
@@ -253,13 +310,24 @@ async function main() {
     done.organisation++;
   }
 
+  // §9 — mislinked components off the objective's list
+  for (const [ref, name] of UNLINK) {
+    const c = objective(ref);
+    const linked = await api('GET', `/controls/${c.id}/components`);
+    const list = Array.isArray(linked) ? linked : linked.components || [];
+    if (!list.some((x) => (x.component_id || x.id) === compId(name))) continue;
+    await api('DELETE', `/controls/${c.id}/components/${compId(name)}`);
+    done.unlinked = (done.unlinked || 0) + 1;
+  }
+
   // One read of the findings settles every system (v152), whether or not the
   // server settles after each write.
   if (!DRY) await api('GET', '/findings/component-record');
 
   console.log(`${DRY ? '[dry run] ' : ''}components added ${done.components}; solutions added ${done.solutions}; `
     + `objectives given a solution ${done.objectives}; parts added ${done.parts}; rules ${done.rules} with ${done.triggers} triggers; `
-    + `on-system parts recorded from what was stated ${done.preserved}; objectives now organisation-wide ${done.organisation}.`);
+    + `on-system parts recorded from what was stated ${done.preserved}; objectives now organisation-wide ${done.organisation}; `
+    + `mislinked components removed ${done.unlinked || 0}.`);
 }
 
 main().catch((err) => { console.error(err.message); process.exit(1); });

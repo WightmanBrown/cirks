@@ -7,7 +7,10 @@ import { Shell } from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { chipClass, scoreColorClass } from '../utils/riskColors';
 import { Spinner } from '../components/Spinner';
-import { Th } from '../components/Th';
+import { SortableTh } from '../components/SortableTh';
+import thStyles from '../components/Th.module.css';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 import { HelpDot } from '../components/HelpDot';
 import { StatusPill } from '../components/StatusPill';
 import styles from './ActionsPage.module.css';
@@ -34,6 +37,17 @@ const FILTERS = [
   { value: 'archived',    label: 'Archived' }, // terminal states, for audit/lookup
   { value: 'all',         label: 'All' },
 ];
+
+// Column key → value, for sorting the list by a header (useTableSort). Status
+// sorts by the word the pill shows (an overdue action reads "overdue"); Items by
+// how far through its items an action is; Target Date by the date itself.
+export const ACTION_ACCESSORS = {
+  status: (a) => (a.is_overdue ? 'overdue' : (a.status ?? '').replace('_', ' ')),
+  title:  (a) => a.title,
+  items:  (a) => (Number(a.item_count ?? 0) > 0 ? Number(a.items_done ?? 0) / Number(a.item_count) : null),
+  owner:  (a) => a.owner_name,
+  target: (a) => a.target_date,
+};
 
 export function ActionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -109,6 +123,10 @@ export function ActionsPage() {
 
 
   useEffect(() => { fetchActions(); }, [fetchActions]);
+
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(actions, { accessors: ACTION_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: thStyles.th };
 
   const overdueCount     = actions.filter((a) => a.is_overdue).length;
   const inProgressCount  = actions.filter((a) => a.status === 'in_progress').length;
@@ -191,15 +209,15 @@ export function ActionsPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th helpKey="actions.col.status">Status</Th>
-                    <Th helpKey="actions.col.title">Title</Th>
-                    <Th helpKey="actions.col.items">Items</Th>
-                    <Th helpKey="actions.col.owner">Owner</Th>
-                    <Th helpKey="actions.col.target_date">Target Date</Th>
+                    <SortableTh column="status" {...sortProps} helpKey="actions.col.status">Status</SortableTh>
+                    <SortableTh column="title" {...sortProps} helpKey="actions.col.title">Title</SortableTh>
+                    <SortableTh column="items" {...sortProps} helpKey="actions.col.items">Items</SortableTh>
+                    <SortableTh column="owner" {...sortProps} helpKey="actions.col.owner">Owner</SortableTh>
+                    <SortableTh column="target" {...sortProps} helpKey="actions.col.target_date">Target Date</SortableTh>
                   </tr>
                 </thead>
                 <tbody>
-                  {actions.map((action) => (
+                  {sorted.map((action) => (
                     <ActionRow
                       key={action.id}
                       action={action}

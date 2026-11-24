@@ -11,7 +11,7 @@ import {
   getAvailableInformationAssets,
   searchComponents, getUsers,
   getControls, getSystemControls, addSystemControl, removeSystemControl,
-  getArchitecture, getSystemSecurity, chooseSystemSolution,
+  getArchitecture, getSystemSecurity, chooseSystemSolution, getSystemOrganisationObjectives, getRiskAnswer,
 } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { Shell } from '../components/Shell';
@@ -20,7 +20,11 @@ import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { CiaChipGroup } from '../components/CiaChipGroup';
 import { SystemSummaryCard } from '../components/SystemSummaryCard';
-import { RiskPathTree } from '../components/RiskPathTree';
+import { SystemRisksDiagram, bandStripe } from '../components/SystemRisksDiagram';
+import { SystemObjectivesDiagram, objectiveSets, SET_STRIPE } from '../components/SystemObjectivesDiagram';
+import { SystemAssetsDiagram, departmentsOf, settingDims, SETS_STRIPE } from '../components/SystemAssetsDiagram';
+import { SystemThreatsDiagram, combinationsOf } from '../components/SystemThreatsDiagram';
+import { FilterChip } from '../components/FilterChip';
 import { SuppliersPanel } from '../components/SuppliersPanel';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { useViewMode } from '../hooks/useViewMode';
@@ -364,7 +368,7 @@ function ComponentsTab({ system, canEdit, onRefresh }) {
           has recorded here. Not part of the list above: they are not on the
           system, and saying otherwise would be a claim no one has made. */}
       {expected.length > 0 && (
-        <section className={styles.expectedBlock}>
+        <section className={styles.expectedBlock} id="objectives-unrecorded">
           <h3 className={styles.expectedTitle}>
             {expected.length} component{expected.length === 1 ? '' : 's'} expected here but not recorded{' '}
             <HelpDot k="system_detail.expected_components" placement="bottom" />
@@ -429,6 +433,32 @@ function ThreatsTab({ system, canAssess, onAssess }) {
   const navigate = useNavigate();
   const threats  = system.threats || [];
   const pending  = threats.filter(t => !t.assessed);
+  // The picture at the head of the tab (relation diagrams, owner 2026-11-19).
+  // Down its left, each combination of source and category is a layer: the
+  // chosen one draws its threats, the objectives against them and the grid, and
+  // unfolds its threats below. Selecting it again folds the list away.
+  const combos = combinationsOf(threats);
+  const [layer, setLayer] = useState(combos[0]?.key ?? null);
+  const [filter, setFilter] = useState(null);
+  const [security, setSecurity] = useState(null);
+  const [controls, setControls] = useState(null);
+  useEffect(() => {
+    let live = true;
+    Promise.all([getSystemSecurity(system.id), getSystemControls(system.id)])
+      .then(([sec, ctl]) => { if (live) { setSecurity(sec); setControls(ctl); } })
+      .catch(() => {});
+    return () => { live = false; };
+  }, [system.id]);
+  const comboOf = (key) => combos.find((c) => c.key === key);
+  const listed = !filter ? [] : filter === 'all' ? threats : (comboOf(filter)?.threats || []);
+  const stripe = comboOf(filter)?.stripe;
+  const chipWords = filter === 'all' ? 'All threats' : comboOf(filter)?.word;
+  function pickThreats(key) {
+    if (key !== 'all') setLayer(key);
+    if (filter === key) { setFilter(null); return; }
+    setFilter(key);
+    setTimeout(() => document.getElementById('threats-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+  }
 
   if (threats.length === 0) {
     return (
@@ -452,15 +482,32 @@ function ThreatsTab({ system, canAssess, onAssess }) {
           : ' All have been assessed.'}
       </p>
 
+      <div className={styles.objectivesPicture}>
+        <SystemThreatsDiagram system={system} security={security} controls={controls} selected={layer} onSelect={pickThreats}
+          onThreat={(t) => (t.assessed ? navigate(`/risks/${t.risk_id}#score`) : canAssess ? onAssess(t) : null)}
+          onObjective={(cid) => (cid ? navigate(`/controls/${cid}`) : null)}
+          onGrid={() => navigate(`/risks/current?system=${system.id}`)} onAsset={(aid) => navigate(`/assets/${aid}`)} />
+        <p className={styles.muted}>
+          Select a kind of threat on the left to draw it and list its threats; select a threat to open its risk.{' '}
+          {filter !== 'all' && (
+            <button type="button" className={styles.linkBtn} onClick={() => pickThreats('all')}>List all {threats.length}</button>
+          )}
+          <HelpDot k="system_detail.threats_picture" placement="bottom" />
+        </p>
+      </div>
+
+      <div id="threats-list" />
+      {filter && <FilterChip words={chipWords} stripe={stripe} onClose={() => setFilter(null)} />}
+
       <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {threats.map(t => (
+        {listed.map(t => (
           <div
             key={t.id}
             style={{
               display: 'flex', alignItems: 'center', gap: 12,
               padding: '10px 12px',
               border: '1px solid var(--border)',
-              borderLeft: `3px solid ${t.assessed ? 'var(--border)' : 'var(--amber)'}`,
+              borderLeft: stripe ? `4px solid ${stripe}` : `3px solid ${t.assessed ? 'var(--border)' : 'var(--amber)'}`,
               borderRadius: 'var(--radius-sm)',
               background: 'var(--bg-surface)',
             }}
@@ -514,6 +561,17 @@ function ControlsTab({ system, canEdit, onRefresh }) {
   const [results,   setResults]   = useState([]);
   const [searching, setSearching] = useState(false);
   const [err,       setErr]       = useState('');
+  // The picture at the head of the tab (relation diagrams, owner 2026-11-19): a
+  // box filters the list below; what the organisation delivers once is drawn
+  // only when asked for.
+  const navigate = useNavigate();
+  const [filter,  setFilter]  = useState(null);
+  const [org,     setOrg]     = useState(null);
+  const [showOrg, setShowOrg] = useState(false);
+  useEffect(() => {
+    if (!showOrg || org) return;
+    getSystemOrganisationObjectives(system.id).then(setOrg).catch(() => setErr('Could not load what the organisation delivers.'));
+  }, [showOrg, org, system.id]);
 
   const load = useCallback(async () => {
     try { setControls(await getSystemControls(system.id)); }
@@ -528,11 +586,31 @@ function ControlsTab({ system, canEdit, onRefresh }) {
     .filter(o => o.state === 'delivered' && o.choice_source === 'in_place').map(o => [o.control_id, o]));
   const undecided = new Map((security?.objectives || []).filter(o => o.state !== 'delivered').map(o => [o.control_id, o]));
   // Undecided objectives first; one the system does not record yet still gets a row.
-  const rows = [
+  const allRows = [
     ...[...undecided.values()].filter(o => !(controls || []).some(c => c.id === o.control_id))
       .map(o => ({ id: o.control_id, title: o.title, unrecorded: true })),
     ...(controls || []),
   ].sort((a, b) => Number(undecided.has(b.id)) - Number(undecided.has(a.id)));
+  const sets = objectiveSets(security, controls);
+  const rows = filter && sets[filter] ? allRows.filter(r => sets[filter].has(r.id)) : allRows;
+  // The chip naming the box whose objectives are listed (no counts: the box
+  // carries them). `all` lists every objective, uncoloured: no box is chosen.
+  const CHIP = {
+    threats: 'Asked for by a threat', triggers: 'Asked for by a trigger, not a threat',
+    choices: 'With a solution chosen', solutions: 'Delivered by a solution', no_solution: 'No solution yet',
+    operational: 'In place', degraded: 'Degraded', missing: 'Missing or not checked', not_applicable: 'Not applicable here',
+    all: 'All objectives',
+  };
+  function pick(key) {
+    if (key === 'unrecorded') {
+      setFilter(null);
+      setTimeout(() => document.getElementById('objectives-unrecorded')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+      return;
+    }
+    if (filter === key) { setFilter(null); return; }   // selecting it again folds the list away
+    setFilter(key);
+    setTimeout(() => document.getElementById('objectives-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+  }
 
   // Objectives the security architecture wants here that nobody has recorded on
   // the system: delivered by a wanted solution, but with no row, so no status and
@@ -598,10 +676,30 @@ function ControlsTab({ system, canEdit, onRefresh }) {
 
   return (
     <div className={styles.ppitfSection}>
-      <p className={styles.muted}>
-        Control objectives recorded on this system. Select one to open its page. Maturity is set once for the
-        organisation on the control objective&rsquo;s page; how it is delivered on this system is shown here as its status.
-      </p>
+      {security && controls && (
+        <div className={styles.objectivesPicture}>
+          <SystemObjectivesDiagram security={security} controls={controls} org={showOrg ? org : null}
+            onFilter={pick} onSoa={() => navigate('/soa')} active={filter} />
+          <p className={styles.muted}>
+            Select a box to list its objectives.{' '}
+            {filter !== 'all' && (
+              <button type="button" className={styles.linkBtn} onClick={() => pick('all')}>List all {allRows.length}</button>
+            )}{' '}
+            <button type="button" className={styles.btnGhostSm} onClick={() => setShowOrg(v => !v)} aria-pressed={showOrg}>
+              {showOrg ? 'Hide what the organisation delivers once' : 'Show what the organisation delivers once'}
+            </button>
+            <HelpDot k="system_detail.objectives_picture" placement="bottom" />
+          </p>
+        </div>
+      )}
+      {/* The picture is the folded view (relation diagrams): the list unfolds
+          only for a box, or for "List all". Without the picture, it is shown. */}
+      {(filter || !security) && (
+        <p className={styles.muted}>
+          Select an objective to open its page. Maturity is set once for the organisation on the control
+          objective&rsquo;s page; how it is delivered on this system is shown here as its status.
+        </p>
+      )}
       {err && <p className={styles.linkError}>{err}</p>}
 
       {wantedUnrecorded.length > 0 && (
@@ -643,13 +741,16 @@ function ControlsTab({ system, canEdit, onRefresh }) {
         </section>
       )}
 
+      <div id="objectives-list" />
+      {filter && <FilterChip words={CHIP[filter]} stripe={SET_STRIPE[filter]} onClose={() => setFilter(null)} />}
       {controls == null ? (
         <p className={styles.muted}>Loading…</p>
-      ) : rows.length === 0 ? (
-        <p className={styles.emptyGroup}>No control objectives recorded on this system yet.</p>
+      ) : !filter && security ? null : rows.length === 0 ? (
+        <p className={styles.emptyGroup}>{filter && filter !== 'all' ? 'None.' : 'No control objectives recorded on this system yet.'}</p>
       ) : (
         rows.map(c => (
-          <div key={c.id} className={`${styles.componentCard} ${undecided.has(c.id) ? styles.cardUndecided : ''}`}>
+          <div key={c.id} className={`${styles.componentCard} ${undecided.has(c.id) ? styles.cardUndecided : ''}`}
+            style={SET_STRIPE[filter] ? { borderLeft: `4px solid ${SET_STRIPE[filter]}` } : undefined}>
             <div className={styles.componentCardLeft}>
               <div className={styles.componentName}><Link to={`/controls/${c.id}`}>{c.title}</Link></div>
               <div className={styles.componentRole}>
@@ -779,6 +880,31 @@ function InformationAssetsTab({ system, canLinkAssets, canUnlinkAsset, isExpert,
   const [search,    setSearch]    = useState('');
   const [linkError, setLinkError] = useState('');
   const [loadingAvail, setLoadingAvail] = useState(false);
+  // The picture at the head of the tab (relation diagrams, owner 2026-11-19): a
+  // department or the system's impact unfolds its assets below; nothing is listed
+  // until a box is chosen (or List all).
+  const [filter, setFilter] = useState(null);
+  const [worst, setWorst] = useState(null);
+  const worstId = system.risk_paths?.[0]?.risk_id;
+  useEffect(() => {
+    if (!worstId) { setWorst(null); return undefined; }
+    let live = true;
+    getRiskAnswer(worstId).then((a) => { if (live) setWorst(a); }).catch(() => {});
+    return () => { live = false; };
+  }, [worstId]);
+  const depts = departmentsOf(system);
+  const deptOf = (key) => depts.find((d) => `dept:${d.id}` === key);
+  const assets = system.information_assets || [];
+  const listed = !filter ? [] : filter === 'all' ? assets
+    : filter === 'sets' ? assets.filter((a) => settingDims(a, system).length)
+    : assets.filter((a) => `dept:${a.department_id || 'none'}` === filter);
+  const stripe = filter === 'sets' ? SETS_STRIPE : deptOf(filter)?.stripe;
+  const chipWords = filter === 'all' ? 'All information assets' : filter === 'sets' ? 'Setting the system\u2019s impact' : deptOf(filter)?.name;
+  function pickAssets(key) {
+    if (filter === key) { setFilter(null); return; }
+    setFilter(key);
+    setTimeout(() => document.getElementById('assets-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+  }
 
   const loadAvailable = useCallback(async () => {
     setLoadingAvail(true);
@@ -820,11 +946,27 @@ function InformationAssetsTab({ system, canLinkAssets, canUnlinkAsset, isExpert,
     <div>
       {linkError && <p className={styles.linkError}>{linkError}</p>}
 
+      <div className={styles.objectivesPicture}>
+        <SystemAssetsDiagram system={system} worst={worst} active={filter} onFilter={pickAssets}
+          onAsset={(aid) => navigate(`/assets/${aid}`)} onRisk={(section) => worstId && navigate(`/risks/${worstId}#${section}`)} />
+        <p className={styles.muted}>
+          Select a department, or the system&rsquo;s impact, to list its information assets; select an asset to open it.{' '}
+          {assets.length > 0 && filter !== 'all' && (
+            <button type="button" className={styles.linkBtn} onClick={() => pickAssets('all')}>List all {assets.length}</button>
+          )}
+          <HelpDot k="system_detail.assets_picture" placement="bottom" />
+        </p>
+      </div>
+
+      <div id="assets-list" />
+      {filter && <FilterChip words={chipWords} stripe={stripe} onClose={() => setFilter(null)} />}
+
       <div className={styles.assetList}>
-        {(system.information_assets || []).length === 0
+        {assets.length === 0
           ? <p className={styles.muted}>No information assets linked to this system.</p>
-          : (system.information_assets || []).map(ia => (
-            <div key={ia.id} className={`${styles.assetCard}${ia.impact_changed_in_cycle ? ` ${styles.assetCardChanged}` : ''}`} onClick={() => navigate(`/assets/${ia.id}`)}>
+          : listed.map(ia => (
+            <div key={ia.id} className={`${styles.assetCard}${ia.impact_changed_in_cycle ? ` ${styles.assetCardChanged}` : ''}`} onClick={() => navigate(`/assets/${ia.id}`)}
+              style={stripe ? { borderLeft: `4px solid ${stripe}` } : undefined}>
               <div className={styles.assetCardLeft}>
                 <div className={styles.assetName}>
                   {ia.name}
@@ -907,7 +1049,10 @@ export function SystemDetailPage() {
   const [saved,   setSaved]   = useState(false);
   const [formErr, setFormErr] = useState('');
 
-  const [activeTab, setActiveTab] = useState('details');
+  // The tabs are a set of pictures (relation diagrams, owner 2026-11-19); the
+  // page opens on its risks.
+  const [activeTab, setActiveTab] = useState('risks');
+  const [riskList, setRiskList] = useState(null);   // the Risks tab's list: null (folded), 'all' or a risk id
   // The threat currently being assessed — opens RiskCreateModal already pointed
   // at this system × threat pair.
   const [assessThreat, setAssessThreat] = useState(null);
@@ -984,14 +1129,15 @@ export function SystemDetailPage() {
           </span>
         </div>
 
-        <SystemSummaryCard system={system} isExpert={isExpert} showRiskPath={false} />
+        <SystemSummaryCard system={system} isExpert={isExpert} showRiskPath={false} compact />
         <ComponentRecordFindingBanner system={system} onChanged={load} />
 
-        {system.risk_paths && system.risk_paths.length > 0 && (
-          <RiskPathTree paths={system.risk_paths} title="Risks on this system" helpKey="system_detail.risks" isExpert={isExpert} />
-        )}
 
         <div className={styles.tabs}>
+          <button className={activeTab === 'risks' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('risks')}>
+            Risks
+            <span className={styles.tabCount}>{system.risk_count ?? 0}</span>
+          </button>
           <button className={activeTab === 'details'    ? styles.tabActive : styles.tab} onClick={() => setActiveTab('details')}>Details</button>
           <button className={activeTab === 'components' ? styles.tabActive : styles.tab} onClick={() => setActiveTab('components')}>
             Components
@@ -1040,19 +1186,38 @@ export function SystemDetailPage() {
               Suppliers
             </button>
           )}
-          <button
-            className={styles.tab}
-            onClick={() => {
-              const validated = system.risk_count_validated ?? 0;
-              const view = validated > 0 ? 'current' : 'future';
-              navigate(`/risks/${view}?system=${system.id}`);
-            }}
-            title="Open the risk summary filtered to this system"
-          >
-            Risks →
-            <span className={styles.tabCount}>{system.risk_count ?? 0}</span>
-          </button>
         </div>
+
+        {activeTab === 'risks' && (() => {
+          const view = (system.risk_count_validated ?? 0) > 0 ? 'current' : 'future';
+          const register = <button type="button" className={styles.linkBtn} onClick={() => navigate(`/risks/${view}?system=${system.id}`)}>
+            Open them in the risk register →</button>;
+          // The list beneath (as on the other tabs): folded until a risk is chosen
+          // on the left, or List all; a chosen risk wears its band's colour.
+          const risks = system.risk_paths || [];
+          const chosen = risks.find((r) => r.risk_id === riskList);
+          const listed = !riskList ? [] : riskList === 'all' ? risks : chosen ? [chosen] : [];
+          const stripe = chosen ? bandStripe(chosen.risk_score) : undefined;
+          return risks.length > 0 ? (<>
+            <SystemRisksDiagram key={system.id} risks={risks} helpKey="system_detail.risks"
+              onPick={(id) => setRiskList((cur) => (cur === id ? null : id))} />
+            <p className={styles.muted}>
+              Select a risk on the left to draw it and list it below.{' '}
+              {riskList !== 'all' && <button type="button" className={styles.linkBtn} onClick={() => setRiskList('all')}>List all {risks.length}</button>}{' '}
+              {register}
+            </p>
+            {riskList && <FilterChip words={riskList === 'all' ? 'All risks' : chosen?.threat_name} stripe={stripe} onClose={() => setRiskList(null)} />}
+            {listed.map((r) => (
+              <div key={r.risk_id} className={styles.riskRow} style={stripe ? { borderLeft: `4px solid ${stripe}` } : undefined}>
+                <span className={styles.riskRowName}>{r.threat_name}</span>
+                <RatingChip value={r.risk_score} scale="risk" variant="number" />
+                <button type="button" className={styles.btnSecondary} onClick={() => navigate(`/risks/${r.risk_id}`)}>Open risk →</button>
+              </div>
+            ))}
+          </>) : (
+            <p className={styles.muted}>No risks are assessed on this system yet. Assess a threat from the Threats tab. {register}</p>
+          );
+        })()}
 
         {activeTab === 'details' && (
           <form className={styles.form} onSubmit={handleSave}>
@@ -1160,7 +1325,7 @@ export function SystemDetailPage() {
         )}
 
         {activeTab === 'suppliers' && (
-          <SuppliersPanel systemId={system.id} isExpert={isExpert} />
+          <SuppliersPanel systemId={system.id} isExpert={isExpert} system={system} />
         )}
 
         {assessThreat && (

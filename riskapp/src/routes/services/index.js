@@ -334,6 +334,7 @@ router.get('/:id', canView, async (req, res, next) => {
                          ia.availability,
                          ia.is_shared,
                          ia.impact_changed_in_cycle,
+                         ia.department_id,
                          iad.name AS department_name
                     FROM business_service_systems bss_a
                     JOIN system_assets sa_a ON sa_a.system_id = bss_a.system_id
@@ -361,6 +362,15 @@ router.get('/:id', canView, async (req, res, next) => {
                         JOIN information_assets ia_l ON ia_l.id = sa_l.asset_id AND ia_l.is_active
                        WHERE sa_l.system_id = sysl.id
                          AND (ia_l.department_id = bs.department_id OR ia_l.is_shared)
+                    ),
+                    -- The service's information assets in this system, for the
+                    -- Systems and Information assets pictures (2026-11-19).
+                    'asset_ids', (
+                      SELECT COALESCE(json_agg(ia_i.id ORDER BY ia_i.name), '[]'::json)
+                        FROM system_assets sa_i
+                        JOIN information_assets ia_i ON ia_i.id = sa_i.asset_id AND ia_i.is_active
+                       WHERE sa_i.system_id = sysl.id
+                         AND (ia_i.department_id = bs.department_id OR ia_i.is_shared)
                     ),
                     'own_max_bil', (
                       SELECT MAX(GREATEST(ia_m.confidentiality, ia_m.integrity, ia_m.availability))

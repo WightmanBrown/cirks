@@ -11,6 +11,78 @@ Upgrading migrates your data in place, and CIRKS backs up the database before
 it changes anything. See [Upgrade](docs/INSTALL.md#upgrade) in the install
 guide.
 
+## v1.5.0
+
+Pictures: the risk, system, asset, service, threat, component and supplier
+pages show their relationships as diagrams, and *Why this score?* draws the
+threat, the control objectives against it, their security solutions and the
+best likelihood they reach. CIRKS now says *likelihood* everywhere, shows a
+control's effectiveness one way with its meaning on mouseover, takes an
+objective's applicability from the Statement of Applicability, and sorts every
+list page by any column.
+
+**To upgrade:** `git pull`, then `docker compose up -d --build`. One migration
+runs by itself when CIRKS starts (v185), and CIRKS backs up the database before
+applying it. Then:
+
+- **Baseline / Specific is gone.** An objective's applicability is now what the
+  Statement of Applicability says: *Whole organisation*, the scopes it is
+  narrowed to, *Not applicable* or *Not decided*. The typed flag it replaces is
+  dropped by the migration; nothing else read it. A CSV import or an older
+  export with an `is_baseline` column still loads (the column is ignored), and
+  setting it through the API is refused with a reason.
+- **"Probability" now reads "likelihood"** on every screen, help text and
+  message. Names in the API, the database and exports are unchanged, so
+  integrations and exports keep working. Help text an administrator has edited
+  keeps its own words.
+- **The row of amber dots is gone.** A control's effectiveness is one chip,
+  "3 Defined", with the five levels explained on mouseover.
+
+### Pictures
+
+- **Relation diagrams.** A section with many relationships shows them as boxes
+  and lines; choosing a box opens the record beneath. On the risk page: *How
+  bad is it?*, *Who decided what?*, *About this risk* and a new *Which
+  components are vulnerable?* section. On a system: its risks, control
+  objectives, information assets, threats and suppliers. And on asset, service,
+  threat, component and supplier pages.
+- **Why this score?** The threat fans out to every control objective against
+  it, each to its security solution, each solution to its parts on request.
+  Chips on the lines give the likelihood each brings; the objectives lowering
+  it run green into a *Best likelihood* box. Choosing an objective shows its
+  full row beneath, its components boxed as they are drawn.
+
+### Reading and finding things
+
+- **Every list page sorts** by any column — the threat catalogue and 17 more,
+  from pending risks to API keys. The sort is kept in the address, so Back
+  returns to it. References sort with their numbers in order (AA-9 before
+  AA-10). The audit log, paged by the server, does not yet.
+- **Links are readable** on the dark background, and the accent blue is
+  lighter (about 8:1 against the page).
+- **An objective delivered once** for the organisation or a group says so on
+  its page, and lists only the systems where it counters a risk, instead of
+  every system.
+
+### Misty Isles (the training dataset)
+
+New installs of the training dataset only; an existing instance is not changed.
+
+- **Security solutions for the objectives that had none:** 98 → 10. CIRKS
+  itself where it does the job, five new processes (incident management,
+  account management, HR security, security testing and audit, change
+  management), the policies and datacentres extended, and fifteen technical
+  solutions (web and email filtering, email authentication, DNSSEC, DDoS
+  protection, wireless, secure administration, mobile device management, time,
+  logging and more). Data leakage prevention is accepted for a year.
+- **Effectiveness ratings for 150 of the 154 applicable objectives** (it was
+  49), each with an evidence note, and the existing ratings that contradicted
+  the record corrected.
+- **How each objective is delivered is stated** for all but twenty, and the
+  Statement of Applicability corrected where it said less than was in place.
+
+No change to how risk is scored.
+
 ## v1.4.1
 
 No change to CIRKS itself: a fix to the automated tests that run on every

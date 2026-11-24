@@ -12,6 +12,9 @@ import styles from './ThreatsPage.module.css';
 import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
 import { useScrollRestore } from '../hooks/useScrollRestore';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 const CAN_WRITE = new Set(['ciso', 'risk_analyst', 'security_consultant', 'admin']);
 
@@ -28,6 +31,17 @@ const SOURCES = [
 ];
 
 const CATEGORY_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
+
+// Column key → value, for sorting the catalogue by a header (useTableSort). The
+// likelihood sorts by the highest of C, I and A, the figure business view shows.
+export const THREAT_ACCESSORS = {
+  name:     (t) => t.name,
+  category: (t) => CATEGORY_LABEL[t.threat_category] || t.threat_category,
+  source:   (t) => t.source,
+  ref:      (t) => t.reference_code,
+  likelihood: (t) => Math.max(t.probability_c ?? 0, t.probability_i ?? 0, t.probability_a ?? 0) || null,
+  risks:    (t) => t.usage_count,
+};
 
 function emptyForm() {
   return {
@@ -191,15 +205,15 @@ function ThreatFormModal({ initial, onClose, onSaved, canWrite, threatId }) {
           <fieldset className={styles.fieldset}>
             <legend
               className={styles.legend}
-              title="Probability hints are informed guesses intended to help at the point where risks are authored by pre-populating the risk probability levels."
+              title="Likelihood hints are informed guesses intended to help at the point where risks are authored by pre-populating the risk likelihood levels."
             >
               <span className={styles.legendInner}>
-                Probability hint <span className={styles.fieldHint}>ⓘ</span>
+                Likelihood hint <span className={styles.fieldHint}>ⓘ</span>
                 <ProbModeToggle mode={probMode} onChange={setProbMode} />
               </span>
             </legend>
             <p className={styles.fieldHint}>
-              Informed guess at this threat's typical probability. Used only to pre-populate the risk authoring modal — actual probability lives on each risk and is set by the analyst per (system, threat).
+              Informed guess at this threat's typical likelihood. Used only to pre-populate the risk authoring modal — actual likelihood lives on each risk and is set by the analyst per (system, threat).
             </p>
             {probMode === '1d' ? (
               <div className={styles.probCell1d}>
@@ -241,7 +255,7 @@ function ThreatFormModal({ initial, onClose, onSaved, canWrite, threatId }) {
           <div className={styles.row2}>
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel}>
-                Default baseline probability
+                Default baseline likelihood
                 <span className={styles.fieldHint}> (optional, 1–5)</span>
               </label>
               <input className={styles.input} type="number" min="1" max="5"
@@ -254,7 +268,7 @@ function ThreatFormModal({ initial, onClose, onSaved, canWrite, threatId }) {
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>Probability notes</label>
+            <label className={styles.fieldLabel}>Likelihood notes</label>
             <textarea className={styles.textarea} rows={2}
               value={form.probability_notes} onChange={e => set('probability_notes', e.target.value)}
               disabled={disabled} placeholder="Why these baselines? Any data source?"
@@ -265,7 +279,7 @@ function ThreatFormModal({ initial, onClose, onSaved, canWrite, threatId }) {
             <div className={styles.metaBox}>
               {detail.probability_set_at && (
                 <p className={styles.metaLine}>
-                  Probabilities last set {new Date(detail.probability_set_at).toLocaleString('en-GB')}
+                  Likelihoods last set {new Date(detail.probability_set_at).toLocaleString('en-GB')}
                   {detail.probability_set_by_name ? ` by ${detail.probability_set_by_name}` : ''}.
                 </p>
               )}
@@ -372,6 +386,11 @@ export function ThreatsPage() {
     return list;
   }, [threats, search, categoryFilter]);
 
+  // Sorted by a header, the sort kept in the address so Back returns to it.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(filtered, { accessors: THREAT_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: styles.th };
+
   return (
     <Shell>
       <div className={styles.page}>
@@ -426,16 +445,16 @@ export function ThreatsPage() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th className={styles.th}>Name <HelpDot k="threats.col.name" placement="bottom" /></th>
-                      <th className={styles.th}>Category <HelpDot k="threats.col.category" placement="bottom" /></th>
-                      <th className={styles.th}>Source <HelpDot k="threats.col.source" placement="bottom" /></th>
-                      <th className={styles.th}>Ref code <HelpDot k="threats.col.ref_code" placement="bottom" /></th>
-                      <th className={styles.th} title="Probability hint">Probability <HelpDot k="threats.col.probability" placement="bottom" /></th>
-                      <th className={styles.th}>Active risks <HelpDot k="threats.col.active_risks" placement="bottom" /></th>
+                      <SortableTh column="name" {...sortProps} helpKey="threats.col.name">Name</SortableTh>
+                      <SortableTh column="category" {...sortProps} helpKey="threats.col.category">Category</SortableTh>
+                      <SortableTh column="source" {...sortProps} helpKey="threats.col.source">Source</SortableTh>
+                      <SortableTh column="ref" {...sortProps} helpKey="threats.col.ref_code">Ref code</SortableTh>
+                      <SortableTh column="likelihood" {...sortProps} helpKey="threats.col.probability" title="Likelihood hint">Likelihood</SortableTh>
+                      <SortableTh column="risks" {...sortProps} helpKey="threats.col.active_risks">Active risks</SortableTh>
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map(t => {
+                    {sorted.map(t => {
                       const isSelected = selectedId === t.id;
                       const prob1d = Math.max(t.probability_c, t.probability_i, t.probability_a);
                       return (

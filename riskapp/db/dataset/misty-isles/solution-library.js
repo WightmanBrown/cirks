@@ -53,6 +53,11 @@ const args = process.argv.slice(2);
 const opt = (name, dflt) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : dflt; };
 const BASE = opt('--base', 'http://localhost:3000/api/v1');
 const DRY = args.includes('--dry-run');
+// --components-only: section 1 alone (the documents, records, technology and
+// processes, and the renames). install.js runs it before objective-solutions.js,
+// whose solutions use some of them as parts, and runs the whole script after it,
+// whose solutions add parts to some of objective-solutions.js's (2026-11-23).
+const COMPONENTS_ONLY = args.includes('--components-only');
 const AS = opt('--as', 'ciso@mig.local');
 const PASSWORD = process.env.CIRKS_PASSWORD;
 if (!PASSWORD) { console.error('Set CIRKS_PASSWORD to the password of the account this signs in as (--as).'); process.exit(1); }
@@ -111,11 +116,27 @@ const TECHNOLOGY = [
   // "I see a backup is missing its security system" (owner): Azure Backup had nothing central.
   ['Azure Recovery Services vault', 'The Recovery Services vault that holds the Azure servers’ backups, with soft delete and immutability on.'],
   // Brokered supplier access (owner, 2026-11-16): the equivalent of a KVM switch.
+  // §11 (owner's answers T1-T19, 2026-11-23)
+  ['Microsoft 365 email (Exchange Online)', 'MIG’s email, hosted in Microsoft 365.'],
+  ['SPF, DKIM and DMARC records', 'The DNS records that let receiving mail servers check that mail claiming to be from MIG is genuine.'],
+  ['GoDaddy DNS hosting', 'MIG’s public DNS zones, hosted and signed (DNSSEC) at GoDaddy.'],
+  ['Unsure Networks internet link', 'The internet connection from Unsure Networks, MIG’s ISP, with its DDoS protection.'],
+  ['Microsoft Intune', 'Mobile device management for MIG’s Windows and Android phones, tablets and laptops.'],
+  ['Jamf', 'Mobile device management for MIG’s Apple devices.'],
+  ['MIG CA Operation Ltd', 'The certificate authority that issues the certificates for MIG’s public services.'],
+  ['GPS time source', 'The GPS-disciplined clock that Active Directory and PAN-OS take the time from.'],
+  ['Syslog server', 'The central syslog server that applications and appliances send their logs to, alongside Wazuh.'],
   ['Supplier access gateway', 'The only route a supplier has to a sensitive MIG system: the supplier works through the gateway’s screen, keyboard and mouse and never connects to the system directly. Sessions are approved, watched and recorded.'],
+];
+// Processes the library was missing (§10).
+const PROCESSES = [
+  ['Change management', 'How a change to a system is requested, assessed for its security impact, approved, made and recorded.'],
 ];
 // Technology that exists once per system.
 const PER_SYSTEM_TECHNOLOGY = [
   ['Accepts connections only from the supplier access gateway', 'The system’s remote access is closed to everything except the supplier access gateway.'],
+  // §11 T17: an application's own roles (CIRKS has them).
+  ['Role-based access in the application', 'The application grants access by role, managed in the application itself.'],
 ];
 
 // ── 2–5. Solutions ───────────────────────────────────────────────────────────
@@ -131,7 +152,9 @@ const governing = (name, document, objectives, audience, record) => ({
 });
 const NEW_SOLUTIONS = [
   // P1 — governing documents
-  governing('Information classification and handling policy', 'Information Classification and Handling Policy', ['CIRKS1.DCH-01', 'CIRKS1.DCH-02'], EVERYONE, AWARE),
+  governing('Information classification and handling policy', 'Information Classification and Handling Policy', ['CIRKS1.DCH-01', 'CIRKS1.DCH-02',
+    // §10 (owner, 2026-11-23)
+    'CIRKS1.DCH-07', 'CIRKS1.DCH-08', 'CIRKS1.DCH-10', 'CIRKS1.DCH-11'], EVERYONE, AWARE),
   governing('Encryption policy and standard', 'Encryption Standard', ['CIRKS1.DCH-03'], 'IT Administrators', IT_STAFF),
   governing('Backup and recovery policy', 'Data Backup and Recovery Policy', ['CIRKS1.BRR-01'], 'IT Administrators', IT_STAFF),
   governing('Detective monitoring policy', 'Detective Monitoring Policy', ['CIRKS1.DM-01'], 'InfoSec Team', IT_STAFF),
@@ -139,12 +162,15 @@ const NEW_SOLUTIONS = [
   governing('ISMS roles and responsibilities', 'ISMS Roles and Responsibilities', ['CIRKS1.IRM-03'], 'Expert People Group', 'ISMS role acceptance records'),
   governing('Access control and account management policy', 'Access Control and Account Management Policy', ['CIRKS1.AA-01'], 'IT Administrators', IT_STAFF),
   governing('Network security policy', 'Network Security Policy', ['CIRKS1.CS-01'], 'IT Administrators', IT_STAFF),
-  governing('Vulnerability management policy', 'Vulnerability Management Policy', ['CIRKS1.SVM-01'], 'IT Administrators', IT_STAFF),
-  governing('Supply chain security policy', 'Supply Chain Security Policy', ['CIRKS1.SCM-01'], 'Procurement Team', 'Procurement policy briefing records'),
+  governing('Vulnerability management policy', 'Vulnerability Management Policy', ['CIRKS1.SVM-01', 'CIRKS1.SVM-05'], 'IT Administrators', IT_STAFF),   // §10: exceptions
+  governing('Supply chain security policy', 'Supply Chain Security Policy', ['CIRKS1.SCM-01',
+    'CIRKS1.SCM-04', 'CIRKS1.SCM-07', 'CIRKS1.SCM-09', 'CIRKS1.SD-09'], 'Procurement Team', 'Procurement policy briefing records'),   // §10
   governing('Technology and cloud service assessment policy', 'Technology and Cloud Service Assessment Policy', ['CIRKS1.SCM-06'], 'Procurement Team', null),
-  governing('AI usage policy', 'AI Usage Policy', ['CIRKS1.AI-01'], EVERYONE, AWARE),
+  governing('AI usage policy', 'AI Usage Policy', ['CIRKS1.AI-01', 'CIRKS1.AI-02', 'CIRKS1.AI-03', 'CIRKS1.AI-07', 'CIRKS1.AI-08'], EVERYONE, AWARE),   // §10
   // P2 — the ISMS process CIRKS supports
-  { name: 'Information security management (ISMS) process', objectives: ['CIRKS1.IRM-02'],
+  { name: 'Information security management (ISMS) process', objectives: ['CIRKS1.IRM-02',
+      // §10: the rest of running the ISMS
+      'CIRKS1.IRM-07', 'CIRKS1.IRM-10', 'CIRKS1.IRM-11', 'CIRKS1.IRM-12', 'CIRKS1.IRM-13', 'CIRKS1.IRM-14', 'CIRKS1.IRM-15'],
     parts: [['CIRKS Information Risk Management Process', 'process'], ['InfoSec Team', 'responsible'],
             ['Information Risk Management Policy', 'defined_by'], ['SWG minutes and risk review records', 'evidence'], ['CIRKS', null]] },
   // P3 — the registers CIRKS keeps
@@ -159,7 +185,7 @@ const NEW_SOLUTIONS = [
   // the firewall does the work and nothing is installed on the system (P5's
   // network-only form). The decision to keep running it is the exception on its
   // risk. Chosen on the Windows 7 Prison Management System below.
-  { name: 'Legacy system isolation', objectives: ['CIRKS1.CS-04', 'CIRKS1.SVM-04'],
+  { name: 'Legacy system isolation', objectives: ['CIRKS1.CS-04', 'CIRKS1.SVM-04', 'CIRKS.OT.T-01'],   // §11 T19
     parts: [['PaloAlto 850-22', 'security_system'], ['IT Administrators', 'team'], ['Network Security Policy', 'policy']] },
   // Brokered supplier access, like a KVM switch: the supplier never touches the
   // system directly. The part on the system is that it accepts nothing else.
@@ -170,6 +196,61 @@ const NEW_SOLUTIONS = [
   // P4 — incident response planning and exercises
   { name: 'Incident response planning and exercises', objectives: ['CIRKS1.IR-01', 'CIRKS1.IR-08'],
     parts: [['Incident Response Plan', 'plan'], ['InfoSec Team', 'team'], ['Incident response exercise reports', 'exercise']] },
+  // §10 (owner, 2026-11-23) — P2 managed processes, from components already in
+  // the library; non-technical, so no product had to be chosen.
+  { name: 'Incident management process', objectives: ['CIRKS1.IR-02', 'CIRKS1.IR-03', 'CIRKS1.IR-05', 'CIRKS1.IR-06', 'CIRKS1.IR-07'],
+    parts: [['Incident management', 'process'], ['InfoSec Team', 'responsible'], ['Incident response policy', 'defined_by'],
+            ['Incident response playbooks', null], ['Incident Response Plan', null]] },
+  { name: 'Account management process', objectives: ['CIRKS1.AA-02', 'CIRKS1.AA-04', 'CIRKS1.AA-10', 'CIRKS1.IDA-02', 'CIRKS1.IDA-03', 'CIRKS1.PER-04',
+      'CIRKS1.CS-13'],   // §11 T9: admin accounts, a procedural control backed by the policy
+    parts: [['User account management process', 'process'], ['IT Administrators', 'responsible'],
+            ['Access Control and Account Management Policy', 'defined_by'], ['HR Team', null]] },
+  { name: 'HR security process', objectives: ['CIRKS1.PER-01', 'CIRKS1.PER-03'],
+    parts: [['Background HR checks', 'process'], ['HR Team', 'responsible'], ['Acceptable Use Policy', 'defined_by']] },
+  { name: 'Security testing and audit', objectives: ['CIRKS1.RAST-02', 'CIRKS1.RAST-03', 'CIRKS1.RAST-04', 'CIRKS1.RAST-05', 'CIRKS1.RAST-06'],
+    parts: [['Annual Audit Process', 'process'], ['InfoSec Team', 'responsible'], ['Vulnerability Management Policy', 'defined_by'],
+            ['Vulnerability management', null]] },
+  // No change procedure is written yet, so its defined-by slot is left empty
+  // and the pattern says so.
+  { name: 'Change management', objectives: ['CIRKS1.CVM-03', 'CIRKS1.SD-08'],
+    parts: [['Change management', 'process'], ['IT Administrators', 'responsible'], ['System configuration', null]] },
+  // §11 — the owner's answers to the technical questions T1–T19 (2026-11-23).
+  { name: 'Web and email filtering (PAN-OS and Defender)', objectives: ['CIRKS1.CS-07'],          // T1
+    parts: [['PaloAlto 850-22', 'security_system'], ['Microsoft Defender XDR console', null], ['InfoSec Team', 'team'], ['Network Security Policy', 'policy']] },
+  { name: 'Email authentication (SPF, DKIM, DMARC)', objectives: ['CIRKS1.CS-14'],                // T2
+    parts: [['SPF, DKIM and DMARC records', 'setting'], ['Microsoft 365 email (Exchange Online)', null], ['GoDaddy DNS hosting', null], ['Network Security Policy', 'standard']] },
+  { name: 'DNSSEC (GoDaddy)', objectives: ['CIRKS1.CS-10'],                                        // T3
+    parts: [['GoDaddy DNS hosting', 'setting'], ['Network Security Policy', 'standard']] },
+  { name: 'DDoS protection (Azure and Unsure Networks)', objectives: ['CIRKS1.CS-11'],             // T5
+    parts: [['Azure cloud network', 'security_system'], ['Unsure Networks internet link', null], ['IT Administrators', 'team'], ['Network Security Policy', 'policy']] },
+  { name: 'Wireless (ExtremeCloud IQ)', objectives: ['CIRKS1.CS-06'],                              // T6
+    parts: [['ExtremeCloud IQ Site Engine', 'security_system'], ['IT Administrators', 'team'], ['Network Security Policy', 'policy']] },
+  { name: 'Network services hardening', objectives: ['CIRKS1.CS-05'],                              // T7
+    parts: [['PAN-OS', 'setting'], ['Microsoft Active Directory Domain Services', null], ['CIS Benchmarks — operating systems', 'standard']] },
+  { name: 'Secure administration (GlobalProtect with MFA)', objectives: ['CIRKS1.CS-08'],          // T8
+    parts: [['PaloAlto GlobalProtect gateway', 'security_system'], ['Entra ID sign-in', null], ['IT Administrators', 'team'],
+            ['Access Control and Account Management Policy', 'policy']] },
+  { name: 'Mobile device management (Microsoft Intune)', objectives: ['CIRKS1.CVM-06'],            // T11
+    parts: [['Microsoft Intune', 'security_system'], ['IT Administrators', 'team'], ['Endpoint Protection Standard', 'policy']] },
+  { name: 'Mobile device management (Jamf)', objectives: ['CIRKS1.CVM-06'],
+    parts: [['Jamf', 'security_system'], ['IT Administrators', 'team'], ['Endpoint Protection Standard', 'policy']] },
+  { name: 'Time from Active Directory (GPS source)', objectives: ['CIRKS1.DM-03'],                 // T13
+    parts: [['Microsoft Active Directory Domain Services', 'setting'], ['GPS time source', null], ['Logging Standard', 'standard']] },
+  { name: 'Time from PAN-OS (GPS source)', objectives: ['CIRKS1.DM-03'],
+    parts: [['PAN-OS', 'setting'], ['GPS time source', null], ['Logging Standard', 'standard']] },
+  { name: 'Application logging (Wazuh and syslog)', objectives: ['CIRKS1.DM-10'],                  // T14
+    parts: [['Wazuh', 'security_system'], ['Syslog server', null], ['InfoSec Team', 'team'], ['Logging Standard', 'policy']] },
+  // T15: the Linux servers sign in through the directory too (15 joined to AD,
+  // one through Entra ID), so their user accounts are in this record.
+  { name: 'Central account record (Active Directory and Entra ID)', objectives: ['CIRKS1.IDA-07'],
+    parts: [['Microsoft Active Directory Domain Services', 'record'], ['Microsoft Entra ID', null],
+            ['User account management process', 'maintained_by'], ['Access Control and Account Management Policy', 'standard']] },
+  { name: 'Application role-based access', objectives: ['CIRKS1.AA-11'],                           // T17
+    parts: [['Role-based access in the application', 'setting', 'on_system'], ['Access Control and Account Management Policy', 'standard']] },
+  { name: 'Public certificates (MIG CA Operation Ltd)', objectives: ['CIRKS1.CS-09'],                // T4
+    parts: [['MIG CA Operation Ltd', 'security_system'], ['IT Administrators', 'team'], ['Encryption Standard', 'policy']] },
+  { name: 'OT zero trust isolation', objectives: ['CIRKS.OT.T-01'],                                // T19
+    parts: [['Zero trust isolation', 'security_system'], ['IT Administrators', 'team'], ['Network Security Policy', 'policy']] },
 ];
 
 // Parts added to solutions that exist (and the one part that goes).
@@ -222,6 +303,23 @@ const ADD_PARTS = {
                                              ['MIG Official Premises physical security assessment', 'assessment'],
                                              ['Physical security maintenance log', 'maintenance']],
 };
+// Objectives added to solutions that exist (§10, owner 2026-11-23).
+const ADD_OBJECTIVES = {
+  'Acceptable Use Policy': ['CIRKS1.PER-02', 'CIRKS1.DCH-12', 'CIRKS1.PHY-09', 'CIRKS1.CVM-07', 'CIRKS1.PHY-10'],
+  // §11 T10, T16: removable media and privileged utilities, by CrowdStrike or ME End-Point Central
+  'CrowdStrike EDR': ['CIRKS1.CVM-05', 'CIRKS1.AA-08'],
+  'Patch and configuration management (ME End-Point Central)': ['CIRKS1.CVM-05', 'CIRKS1.AA-08'],
+  // §11 T17: role-based access through directory groups
+  'Active Directory (on-premises)': ['CIRKS1.AA-11'],
+  'Entra ID (cloud)': ['CIRKS1.AA-11'],
+};
+// §11 T12: no data leakage prevention product; the finding is accepted for now.
+const ACCEPT_FINDINGS = [
+  ['objective-solution', 'CIRKS1.DCH-09', 'Accepted for now: there is no data leakage prevention product yet. Review when one is chosen (owner, 2026-11-23).'],
+];
+// CIRKS itself chosen as the solution where it is the thing that does the job
+// (src/lib/cirksDelivers.js lists what it can deliver; offered, never assumed).
+const CIRKS_CHOSEN = ['CIRKS1.IRM-01', 'CIRKS1.IRM-05', 'CIRKS1.IRM-08', 'CIRKS1.IRM-09', 'CIRKS1.RAST-01'];
 // The backup policy replaces the handling policy that stood in for it.
 const REMOVE_PARTS = { 'Azure Backup': ['Information Classification and Handling Policy'] };
 // Where the two examples are in place: [system, solution, objective chosen for].
@@ -273,6 +371,11 @@ async function main() {
     await api('POST', '/components', { component_type: 'technology', name, description, status: 'operational' });
     done.technology++;
   }
+  for (const [name, description] of PROCESSES) {
+    if (comps.some((c) => c.name === name)) continue;
+    await api('POST', '/components', { component_type: 'process', name, description, status: 'operational' });
+    done.technology++;
+  }
   for (const [name, description] of PER_SYSTEM_TECHNOLOGY) {
     if (comps.some((c) => c.name === name)) continue;
     await api('POST', '/components', { component_type: 'technology', name, description, status: 'operational' });
@@ -284,10 +387,11 @@ async function main() {
     if (c && !c.instantiation) await api('PATCH', `/components/${c.id}`, { instantiation: 'per_system' });
   }
   // Every one of them exists once for the organisation; say so, never assume it.
-  for (const name of [...DOCUMENTS.map((d) => d[0]), ...TECHNOLOGY.map((t) => t[0])]) {
+  for (const name of [...DOCUMENTS.map((d) => d[0]), ...TECHNOLOGY.map((t) => t[0]), ...PROCESSES.map((t) => t[0])]) {
     const c = comps.find((x) => x.name === name);
     if (c && !c.instantiation) await api('PATCH', `/components/${c.id}`, { instantiation: 'organisational' });
   }
+  if (COMPONENTS_ONLY) { console.log('components:', JSON.stringify(done)); return; }
   const compId = (name) => {
     const c = comps.find((x) => x.name === name);
     if (!c) { if (DRY) return `<${name}>`; throw new Error(`component "${name}" is not in the library`); }
@@ -348,6 +452,28 @@ async function main() {
     const s = solution(name);
     if (!s) throw new Error(`security solution "${name}" is not in the library`);
     await addParts(s, parts);
+  }
+
+  for (const [name, refs] of Object.entries(ADD_OBJECTIVES)) {
+    const s = solution(name);
+    if (!s) throw new Error(`security solution "${name}" is not in the library`);
+    for (const ref of refs) {
+      if (s.objectives.some((o) => o.id === objective(ref).id)) continue;
+      await api('POST', `/controls/solutions/${s.id}/objectives`, { control_id: objective(ref).id });
+      done.objectives++;
+    }
+  }
+  for (const [kind, ref, why] of DRY ? [] : ACCEPT_FINDINGS) {
+    // A year from the build, so a training instance does not find it lapsed on day one.
+    await api('POST', `/findings/${kind}/${objective(ref).id}/exceptions`,
+      { justification: why, expires_at: day(365), review_cadence: 'annual' });
+    done.objectives++;
+  }
+  for (const ref of CIRKS_CHOSEN) {
+    const detail = await api('GET', `/controls/${objective(ref).id}`);
+    if (detail.cirks?.chosen) continue;
+    await api('POST', `/controls/${objective(ref).id}/patterns/cirks`);
+    done.objectives++;
   }
 
   // The examples, in place

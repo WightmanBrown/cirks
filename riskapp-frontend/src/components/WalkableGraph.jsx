@@ -179,7 +179,7 @@ export function WalkableGraph({ rootType, rootId }) {
             <h3 className={styles.panelName}>{selected.label} <HelpDot k="graph.node_panel" placement="left" /></h3>
             <dl className={styles.panelMeta}>
               {selected.risk_score != null && (<><dt>Risk score</dt><dd>{selected.risk_score}</dd></>)}
-              {selected.maturity != null && (<><dt>Maturity</dt><dd>{selected.maturity}</dd></>)}
+              {selected.maturity != null && (<><dt>Effectiveness</dt><dd>{selected.maturity}</dd></>)}
               {selected.status && (<><dt>Status</dt><dd>{selected.status}</dd></>)}
               {selected.subtype && (<><dt>Kind</dt><dd>{selected.subtype}</dd></>)}
             </dl>

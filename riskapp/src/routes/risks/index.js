@@ -193,7 +193,7 @@ router.get('/gap', canRead, async (req, res, next) => {
     // for), and the other solutions are listed as alternatives, never as gaps.
     const ctlIds = controls.map(c => c.id);
     const { rows: solRows } = ctlIds.length ? await query(`
-      SELECT o.control_id, p.id, p.name, p.kind,
+      SELECT o.control_id, p.id, p.name, p.kind, p.solution_pattern,
              ps.in_play, ps.state, ps.missing_parts, ps.degraded_parts,
              COALESCE(d.pattern_id = p.id, false) AS in_use
         FROM delivery_pattern_objectives o
@@ -213,15 +213,18 @@ router.get('/gap', canRead, async (req, res, next) => {
       if (!solutionsByControl.has(r.control_id)) solutionsByControl.set(r.control_id, []);
       solutionsByControl.get(r.control_id).push({
         id: r.id, name: r.name, kind: r.kind, in_use: r.in_use,
+        solution_pattern: r.solution_pattern,
         in_play: r.in_play ?? false, state: r.state ?? null,
         missing_parts: r.missing_parts, degraded_parts: r.degraded_parts,
       });
     }
 
-    const inUseIds = [...new Set(solRows.filter(r => r.in_use && r.kind === 'parts').map(r => r.id))];
-    const { rows: partRows } = inUseIds.length ? await query(`
+    // Every solution's parts, not only the one in use: the panel's picture
+    // unfolds any solution to show what it would take here (2026-11-23).
+    const partSolIds = [...new Set(solRows.filter(r => r.kind === 'parts').map(r => r.id))];
+    const { rows: partRows } = partSolIds.length ? await query(`
       SELECT pp.pattern_id, cc.id, cc.name, cc.component_type, cc.instantiation,
-             cc.status AS enterprise_status, pp.location,
+             cc.status AS enterprise_status, pp.location, pp.slot_key,
              pp.service_system_id, ss.name AS service_system_name,
              CASE pp.location
                WHEN 'on_system' THEN (SELECT x.status::text FROM system_components x
@@ -242,7 +245,7 @@ router.get('/gap', canRead, async (req, res, next) => {
         LEFT JOIN systems ss ON ss.id = pp.service_system_id
        WHERE pp.pattern_id = ANY($2::uuid[])
        ORDER BY pp.location, cc.component_type, cc.name
-    `, [system_id, inUseIds]) : { rows: [] };
+    `, [system_id, partSolIds]) : { rows: [] };
 
     // A part's shape matches a library component's, so the panel's gap rules
     // apply unchanged. A part on a security system or once for the organisation
@@ -257,11 +260,32 @@ router.get('/gap', canRead, async (req, res, next) => {
         system_status: r.raw_status,
         has_open_action: r.location === 'on_system' && r.has_open_action,
         delivered_via: r.location === 'organisation' ? 'organisation' : null,
-        part_location: r.location,
+        part_location: r.location, slot_key: r.slot_key,
         security_system: r.service_system_id ? { id: r.service_system_id, name: r.service_system_name } : null,
       });
     }
+    // An objective delivered once for the organisation or for a group has no
+    // per-system delivery (the state views cover per-system objectives only), so
+    // its solutions' state is read here from their parts, which are delivered
+    // once too, and the best of them is the one in use. Report only: its status
+    // stays the Statement of Applicability's (v129) (2026-11-23).
+    const deliveredOnce = new Set(controls.filter(c => c.delivery === 'organisation' || c.delivery === 'group').map(c => c.id));
+    const RANK = { complete: 0, degraded: 1, incomplete: 2 };
     for (const [controlId, sols] of solutionsByControl) {
+      for (const sol of sols) sol.parts = sol.kind === 'parts' ? (partsBySolution.get(sol.id) || []) : [];
+      if (deliveredOnce.has(controlId)) {
+        for (const sol of sols) {
+          if (sol.state || sol.kind !== 'parts' || !sol.parts.length) continue;
+          const st = sol.parts.map(x => x.system_status);
+          sol.state = st.every(x => x === 'operational') ? 'complete'
+            : st.every(x => x === 'operational' || x === 'degraded') ? 'degraded' : 'incomplete';
+          sol.in_play = true;
+        }
+        if (!sols.some(x => x.in_use)) {
+          const best = sols.filter(x => x.state).sort((x, y) => RANK[x.state] - RANK[y.state])[0];
+          if (best) best.in_use = true;
+        }
+      }
       const inUse = sols.find(x => x.in_use);
       compsByControl.set(controlId, inUse ? (partsBySolution.get(inUse.id) || []) : []);
     }
@@ -656,7 +680,7 @@ router.post('/:id/action-items/:iid/complete', async (req, res, next) => {
       const pA = req.body.probability_a != null ? parseInt(req.body.probability_a) : item.target_p_a;
       if ([pC, pI, pA].some(p => isNaN(p) || p < 1 || p > 5)) {
         client.release();
-        return res.status(400).json({ error: 'Confirmed probability must be integers 1–5.' });
+        return res.status(400).json({ error: 'Confirmed likelihood must be integers 1–5.' });
       }
       resid = { pC, pI, pA };
     }
@@ -834,7 +858,7 @@ router.patch('/:id/action-items/:iid', canWrite, async (req, res, next) => {
     if (isControl && (target_p_c != null || target_p_i != null || target_p_a != null)) {
       tC = parseInt(target_p_c); tI = parseInt(target_p_i); tA = parseInt(target_p_a);
       if ([tC, tI, tA].some(p => isNaN(p) || p < 1 || p > 5)) {
-        return res.status(400).json({ error: 'Target probability must be integers 1–5.' });
+        return res.status(400).json({ error: 'Target likelihood must be integers 1–5.' });
       }
       setTarget = true;
     }
@@ -995,7 +1019,7 @@ router.get('/:id', canRead, async (req, res, next) => {
     // threat (control_threats). Maturity lives on the control↔system relationship.
     const { rows: controls } = await query(`
       SELECT c.id, c.title, c.control_type,
-             c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status, c.is_baseline,
+             c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status,
              (SELECT vcr.framework FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework,
              (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref,
              c.effectiveness AS maturity, sc.status AS system_status, sc.created_at AS added_at,
@@ -1111,7 +1135,7 @@ router.post('/', canWrite, async (req, res, next) => {
     const pI = parseInt(probability_i);
     const pA = parseInt(probability_a);
     if ([pC, pI, pA].some(p => isNaN(p) || p < 1 || p > 5)) {
-      return res.status(400).json({ error: 'Probabilities must be integers 1–5.' });
+      return res.status(400).json({ error: 'Likelihoods must be integers 1–5.' });
     }
 
     const inhC = parseOptionalCia(inherent_probability_c);
@@ -1121,7 +1145,7 @@ router.post('/', canWrite, async (req, res, next) => {
     const resImpI = parseOptionalCia(residual_impact_i);
     const resImpA = parseOptionalCia(residual_impact_a);
     if ([inhC, inhI, inhA, resImpC, resImpI, resImpA].includes(INVALID)) {
-      return res.status(400).json({ error: 'Inherent probability and residual impact, when supplied, must be integers 1–5.' });
+      return res.status(400).json({ error: 'Inherent likelihood and residual impact, when supplied, must be integers 1–5.' });
     }
 
     if (treatment_decision != null && !VALID_TREATMENTS.has(treatment_decision)) {
@@ -1434,7 +1458,7 @@ router.put('/:id/controls/:cid/probability', canWrite, async (req, res, next) =>
     const pI = parseInt(probability_i);
     const pA = parseInt(probability_a);
     if ([pC, pI, pA].some(p => isNaN(p) || p < 1 || p > 5)) {
-      return res.status(400).json({ error: 'Probabilities must be integers 1–5.' });
+      return res.status(400).json({ error: 'Likelihoods must be integers 1–5.' });
     }
 
     const { rows: existing } = await query(
@@ -1569,7 +1593,7 @@ router.put('/:id', canWrite, async (req, res, next) => {
     const inhI = parseOptionalCia(inherent_probability_i);
     const inhA = parseOptionalCia(inherent_probability_a);
     if ([inhC, inhI, inhA].includes(INVALID)) {
-      return res.status(400).json({ error: 'Inherent probability, when supplied, must be integers 1–5.' });
+      return res.status(400).json({ error: 'Inherent likelihood, when supplied, must be integers 1–5.' });
     }
 
     if (treatment_decision != null && !VALID_TREATMENTS.has(treatment_decision)) {

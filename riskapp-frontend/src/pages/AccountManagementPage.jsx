@@ -1,7 +1,7 @@
 'use strict';
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   getAdminUsers, createUser, patchAdminUser,
   resetUserPassword, resetUserTotp, getDepartments,
@@ -10,6 +10,9 @@ import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import { useAuth }    from '../context/AuthContext';
 import { HelpDot } from '../components/HelpDot';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 import { passwordProblem } from '../utils/passwordPolicy';
 import styles from './AccountManagementPage.module.css';
 
@@ -21,6 +24,17 @@ export const ASSIGNABLE_ROLES = [
   'security_consultant', 'security_architect', 'siro', 'meeting_secretary', 'admin',
 ];
 const prettyRole = (r) => r.replace(/_/g, ' ');
+
+// Column key → value, for sorting the accounts by a header (useTableSort).
+// Each column sorts by the words it shows.
+export const ACCOUNT_ACCESSORS = {
+  name:        (u) => u.full_name,
+  email:       (u) => u.email,
+  role:        (u) => (u.role ? prettyRole(u.role) : null),
+  department:  (u) => u.department_name,
+  active:      (u) => (u.is_active ? 'Active' : 'Inactive'),
+  credentials: (u) => (!u.password_set ? 'Sign-in locked' : u.totp_enabled ? 'Password and 2FA' : 'Password only'),
+};
 
 export function AccountManagementPage() {
   const { user } = useAuth();
@@ -55,7 +69,16 @@ export function AccountManagementPage() {
   }
   useEffect(() => { load(); }, []);
 
-  const deptName = (id) => depts.find((d) => d.id === id)?.name ?? '—';
+  // The department's name read from the list, so a department changed in its
+  // row sorts under its new name straight away.
+  const rows = useMemo(
+    () => users.map((u) => ({ ...u, department_name: depts.find((d) => d.id === u.department_id)?.name ?? null })),
+    [users, depts],
+  );
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(rows, { accessors: ACCOUNT_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
+
   const setMsg = (id, msg) => setRowMsg((m) => ({ ...m, [id]: msg }));
   const setErr = (id, msg) => setRowErr((m) => ({ ...m, [id]: msg }));
 
@@ -165,16 +188,16 @@ export function AccountManagementPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Name <HelpDot k="admin.accounts.col.name" placement="bottom" /></th>
-                    <th>Email <HelpDot k="col.email" placement="bottom" /></th>
-                    <th>Role <HelpDot k="admin.accounts.col.role" placement="bottom" /></th>
-                    <th>Department <HelpDot k="admin.accounts.col.department" placement="bottom" /></th>
-                    <th>Active <HelpDot k="admin.accounts.col.active" placement="bottom" /></th>
-                    <th>Credentials <HelpDot k="admin.accounts.col.credentials" placement="bottom" /></th>
+                    <SortableTh column="name" {...sortProps} helpKey="admin.accounts.col.name">Name</SortableTh>
+                    <SortableTh column="email" {...sortProps} helpKey="col.email">Email</SortableTh>
+                    <SortableTh column="role" {...sortProps} helpKey="admin.accounts.col.role">Role</SortableTh>
+                    <SortableTh column="department" {...sortProps} helpKey="admin.accounts.col.department">Department</SortableTh>
+                    <SortableTh column="active" {...sortProps} helpKey="admin.accounts.col.active">Active</SortableTh>
+                    <SortableTh column="credentials" {...sortProps} helpKey="admin.accounts.col.credentials">Credentials</SortableTh>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u) => {
+                  {sorted.map((u) => {
                     const isSelf = u.id === selfId;
                     const selfTitle = 'You cannot change your own role, department or active status from this panel.';
                     return (

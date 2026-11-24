@@ -8,7 +8,7 @@ import { Shell }            from '../components/Shell';
 import { BackButton }       from '../components/BackButton';
 import { EntityKind }       from '../components/EntityKind';
 import { Spinner }          from '../components/Spinner';
-import { EffectivenessDots } from '../components/ControlBadges';
+import { ApplicabilityBadge } from '../components/ControlBadges';
 import { HelpDot }          from '../components/HelpDot';
 import { MaturityChip }     from '../components/MaturityChip';
 import styles               from './ControlDetailPage.module.css';
@@ -41,10 +41,6 @@ const FRAMEWORK_LABELS = {
   custom:   'Custom',
 };
 
-const APPLICABILITY_TIPS = {
-  baseline: 'Part of the mandatory minimum control set — applies to all systems regardless of risk profile.',
-  specific:  'Applied in response to a specific risk — supplements the baseline control set.',
-};
 
 const IMPL_LABEL = {
   not_implemented: 'Not implemented',
@@ -131,7 +127,6 @@ export function ControlDetailPage() {
   const [linkErr,         setLinkErr]         = useState('');
   const [linkBusy,        setLinkBusy]        = useState(false);
 
-  const [baselineSaving, setBaselineSaving] = useState(false);
 
   async function handleLinkThreat() {
     setLinkErr('');
@@ -194,18 +189,6 @@ export function ControlDetailPage() {
     load();
     return () => { cancelled = true; };
   }, [id, reloadKey]);
-
-  async function handleBaselineToggle(newValue) {
-    setBaselineSaving(true);
-    try {
-      const data = await updateControl(id, { is_baseline: newValue });
-      setControl(prev => ({ ...prev, ...data.control }));
-    } catch {
-      // silent — badge will revert visually on next load
-    } finally {
-      setBaselineSaving(false);
-    }
-  }
 
   // A custom objective's own reference (v123). Unique across the library; the
   // server says so if it clashes, and the message is shown as-is.
@@ -294,15 +277,14 @@ export function ControlDetailPage() {
                 <span className={styles.refCode}>{control.framework_ref}</span>
               )}
               <StatusPill status={control.status} />
-              {canWrite ? (
-                <ApplicabilityToggle
-                  isBaseline={control.is_baseline}
-                  saving={baselineSaving}
-                  onChange={handleBaselineToggle}
-                />
-              ) : (
-                <ApplicabilityBadge isBaseline={control.is_baseline} />
-              )}
+              {/* Where it applies is the SoA decision below (v185), not a flag set
+                  here; read from the decision this page holds, so it follows a
+                  change made on the page at once (the rule is the API's,
+                  src/routes/controls/applicability.js). */}
+              <ApplicabilityBadge
+                applicability={!soa?.decided ? 'not_decided' : !soa.applicable ? 'not_applicable'
+                  : (soa.scopes || []).length ? 'scopes' : 'organisation'}
+                appliesIn={(soa?.scopes || []).map(sc => sc.name)} />
             </div>
             <h1 className={styles.title}>{control.title}<EntityKind kind="control objective" /><HelpDot k="control_detail.title" placement="bottom" /></h1>
           </div>
@@ -393,7 +375,9 @@ export function ControlDetailPage() {
               {/* One list per system: how it is delivered there, and why it is
                   there. Was two panels over the same systems (owner, 2026-10-06). */}
               <h3 className={styles.subHeading}>On each system: how it is delivered, and why it is there <HelpDot k="control_detail.on_each_system" placement="bottom" /></h3>
-              {deployments.length === 0
+              {control?.delivery === 'organisation' || control?.delivery === 'group'
+                ? <DeliveredOnce control={control} readout={readout} deployments={deployments} deliveryBySystem={deliveryBySystem} />
+                : deployments.length === 0
                 ? <p className={styles.readoutNote}>Not recorded on any system.</p>
                 : <ControlDeployments deployments={deployments} deliveryBySystem={deliveryBySystem} />}
             </Section>
@@ -654,13 +638,12 @@ function Readout({ control, soa, readout, soaPath, fmtDate }) {
           </div>
 
           <div className={styles.readoutRow}>
-            <span className={styles.readoutLabel}>Maturity</span>
+            <span className={styles.readoutLabel}>Effectiveness</span>
             <span>
               {control.effectiveness === null ? (
                 <span className={styles.readoutMuted}>Not yet assessed</span>
               ) : (
                 <span className={styles.ratingRow}>
-                  <EffectivenessDots value={control.effectiveness} />
                   <MaturityChip value={control.effectiveness} />
                 </span>
               )}
@@ -811,6 +794,42 @@ function MaturityCeilingSection({ control, users, canWrite, onSaved }) {
 
 // Always open: "Our control" is read top to bottom, and folded sections hid
 // what the page is for (owner feedback, 2026-09-22).
+// An objective delivered once (for the organisation, or for a group) counts on
+// every system it reaches, in the state the SoA gives it, so that it counts
+// against their risks; nothing is recorded on the systems themselves. Listing
+// each of them as if it had been put there contradicted the choice just made
+// (owner, 2026-11-23), so it is said once, and only the systems where it counters
+// an identified risk are listed.
+const STATE_WORD = { operational: 'operational', degraded: 'degraded', missing: 'missing', unknown: 'not yet known' };
+function DeliveredOnce({ control, readout, deployments, deliveryBySystem }) {
+  const groups = (readout?.groups || []).map(g => g.name);
+  if (control.delivery === 'group' && !groups.length) {
+    return <p className={styles.readoutNote}>Delivered once for a group, but with no group linked it counts on no system.</p>;
+  }
+  const n = deployments.length;
+  const state = deployments[0]?.status;
+  const where = control.delivery === 'organisation' ? 'the organisation' : groups.join(', ');
+  const treating = deployments.filter(d => d.reason === 'risk');
+  return (
+    <>
+      <p className={styles.readoutNote}>
+        Delivered once for {where}, so it counts on {control.delivery === 'organisation' ? 'all ' : 'the '}{n} system{n === 1 ? '' : 's'}
+        {control.delivery === 'group' ? ` in ${groups.length === 1 ? 'it' : 'them'}` : ''}
+        {state ? <>, in the state the Statement of Applicability gives it: <strong>{STATE_WORD[state] || state}</strong>.</> : '.'}
+        {' '}Nothing is recorded on the systems themselves.
+      </p>
+      {treating.length > 0 ? (
+        <>
+          <p className={styles.readoutNote}>It counters identified risks on {treating.length} of them:</p>
+          <ControlDeployments deployments={treating} deliveryBySystem={deliveryBySystem} />
+        </>
+      ) : n > 0 && (
+        <p className={styles.readoutNote}>It counters no identified risk on any of them.</p>
+      )}
+    </>
+  );
+}
+
 function Section({ title, children, helpKey, helpPlacement = 'bottom', anchorRef }) {
   const dot = helpKey && (
     <HelpDot k={helpKey} placement={helpPlacement} label={typeof title === 'string' ? `About ${title}` : undefined} />
@@ -848,38 +867,6 @@ function StatusPill({ status }) {
   );
 }
 
-function ApplicabilityBadge({ isBaseline }) {
-  const label = isBaseline ? 'Baseline' : 'Specific';
-  const tip   = isBaseline ? APPLICABILITY_TIPS.baseline : APPLICABILITY_TIPS.specific;
-  return (
-    <span className={`${styles.applicabilityBadge} ${isBaseline ? styles.applicabilityBaseline : styles.applicabilitySpecific}`}>
-      {label}
-      <span className={styles.tooltip}>{tip}</span>
-    </span>
-  );
-}
 
-function ApplicabilityToggle({ isBaseline, saving, onChange }) {
-  return (
-    <span className={styles.applicabilityToggle} title="Click to change applicability">
-      <button
-        className={`${styles.applicabilityOption} ${!isBaseline ? styles.applicabilityOptionActive : ''}`}
-        onClick={() => !isBaseline || onChange(false)}
-        disabled={saving || !isBaseline}
-        type="button"
-      >
-        Specific
-      </button>
-      <button
-        className={`${styles.applicabilityOption} ${isBaseline ? styles.applicabilityOptionActive : ''}`}
-        onClick={() => isBaseline || onChange(true)}
-        disabled={saving || isBaseline}
-        type="button"
-      >
-        Baseline
-      </button>
-    </span>
-  );
-}
 
 

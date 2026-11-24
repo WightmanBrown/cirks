@@ -120,7 +120,11 @@ function useFitScale() {
 
 // `asQuestions` (a system against its pattern): an empty required slot is an
 // unanswered question, named as one; `answerHint` says where it is answered.
-export function PatternDiagram({ pattern, fit = null, muted = false, label, asQuestions = false, answerHint = null }) {
+// `marked` (a Set of component ids) rings each card holding one of them and says
+// so in words (a risk's vulnerable components, 2026-11-19); `onSlot(key, parts)`
+// makes each card a button, as the folded view of a section.
+export function PatternDiagram({ pattern, fit = null, muted = false, label, asQuestions = false, answerHint = null,
+  marked = null, markedWord = 'vulnerable', onSlot = null }) {
   const [ref, scale] = useFitScale();
   const dy = pattern.slots.some(s => ABOVE.includes(s.position)) ? 0 : BAND;
   const h = H - dy - (pattern.slots.some(s => BELOW.includes(s.position)) ? 0 : BAND);
@@ -153,16 +157,24 @@ export function PatternDiagram({ pattern, fit = null, muted = false, label, asQu
             const title = unanswered ? def.label
               : fit ? (partsText(slot) || (state === 'not_needed' ? def.label : `No ${def.label.toLowerCase()}`)) : def.label;
             const many = fit && (slot?.parts?.length || 0) > 1;
+            const hits = marked ? (slot?.parts || []).filter(p => marked.has(p.id)) : [];
             const detail = many ? null : unanswered ? (answerHint ? `Required. ${answerHint}` : 'Required: nothing recorded answers it.')
               : fit ? instanceDetail(def, slot) : def.hint;
-            return (
-              <div key={def.key} className={`${styles.card} ${styles[`state_${state}`] || ''}`}
-                style={{ left: at.left, top: at.top, width: CW, height: CH }} data-slot={def.key} data-state={state}
-                title={many ? `${def.label}: ${slot.parts.map(p => p.name).join(', ')}` : undefined}>
-                <span className={styles.tag}><TypeWord kind={def.kind} text={many ? `${tag} · ${slot.parts.length}` : tag} /></span>
-                <b className={`${styles.title} ${many ? styles.titleMany : ''}`}>{title}</b>
-                {detail && <span className={styles.detail}>{detail}</span>}
-              </div>
+            const markNote = hits.length ? `${markedWord}: ${hits.map(p => p.name).join(', ')}` : null;
+            const cls = `${styles.card} ${styles[`state_${state}`] || ''} ${hits.length ? styles.marked : ''} ${onSlot ? styles.clickable : ''}`;
+            const cardStyle = { left: at.left, top: at.top, width: CW, height: CH };
+            const tip = [many ? `${def.label}: ${slot.parts.map(p => p.name).join(', ')}` : null, markNote].filter(Boolean).join('. ') || undefined;
+            const inner = (<>
+              <span className={styles.tag}><TypeWord kind={def.kind} text={many ? `${tag} · ${slot.parts.length}` : tag} /></span>
+              <b className={`${styles.title} ${many ? styles.titleMany : ''}`}>{title}</b>
+              {markNote ? <span className={styles.markNote}>{markNote}</span> : detail && <span className={styles.detail}>{detail}</span>}
+            </>);
+            return onSlot ? (
+              <button type="button" key={def.key} className={cls} style={cardStyle} data-slot={def.key} data-state={state}
+                title={tip} aria-label={`${def.label}: ${title}${markNote ? `. ${markNote}` : ''}`}
+                onClick={() => onSlot(def.key, slot?.parts || [])}>{inner}</button>
+            ) : (
+              <div key={def.key} className={cls} style={cardStyle} data-slot={def.key} data-state={state} title={tip}>{inner}</div>
             );
           })}
           {pattern.slots.filter(s => s.position !== 'centre').map(s => {

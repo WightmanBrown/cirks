@@ -1,0 +1,7 @@
+/* The chip naming the box whose records are listed (FilterChip.jsx). */
+.line { margin: 4px 0 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 12px; border: 1px solid var(--border-accent);
+  border-radius: 999px; background: var(--bg-elevated); font-size: var(--text-body); font-weight: 600; color: var(--text-primary); }
+.dot { width: 9px; height: 9px; border-radius: 50%; }
+.close { background: none; border: 0; padding: 0 6px; font: inherit; font-size: 16px; line-height: 1; color: var(--text-secondary); cursor: pointer; }
+.close:hover, .close:focus-visible { color: var(--text-primary); }

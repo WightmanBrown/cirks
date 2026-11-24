@@ -169,7 +169,8 @@ describe('POST /api/v1/controls/import — validation', () => {
   });
 
   test('returns 400 when required column is missing', async () => {
-    // Native import requires control_type, title, description, is_baseline. Omit control_type.
+    // Native import requires control_type, title and description (an is_baseline
+    // column, retired in v185, is accepted and ignored). Omit control_type.
     const badHeader = 'title\tdescription\tis_baseline\nTest\tDesc\tTRUE';
     const res = await request(app)
       .post('/api/v1/controls/import')

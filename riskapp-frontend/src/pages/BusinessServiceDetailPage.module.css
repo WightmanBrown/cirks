@@ -13,7 +13,7 @@
 
 /* ── Back link ───────────────────────────────────────────────────────────── */
 .breadcrumb { display: flex; align-items: center; gap: 10px; }
-.viewModeSlot { margin-left: auto; }
+.viewModeSlot { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 
@@ -2219,3 +2219,23 @@
   border: 1px solid var(--border);
   color: var(--text-muted);
 }
+
+/* ── Risks tab (relation diagrams, owner 2026-11-19) ─────────────────────── */
+.risksTab { display: flex; flex-direction: column; gap: 8px; }
+.riskRows { display: flex; flex-direction: column; gap: 6px; }
+.riskRow {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; cursor: pointer;
+  font: inherit; color: var(--text-primary); background: var(--bg-surface);
+  border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: var(--radius-sm);
+}
+.riskRow:hover { background: var(--bg-inset); }
+.riskRowName { flex: 1; font-size: 13px; }
+.riskRowSystem { font-size: 12px; color: var(--text-muted); }
+.riskListBar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.riskListBar > p { margin: 0; }
+.riskListAll, .riskListAllOn {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 13px; cursor: pointer;
+  padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-secondary);
+}
+.riskListAll:hover { color: var(--text-primary); border-color: var(--border-accent); }
+.riskListAllOn { color: var(--text-primary); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)); }

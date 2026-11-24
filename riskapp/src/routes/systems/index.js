@@ -338,13 +338,25 @@ router.get('/:id', canView, async (req, res, next) => {
     // Without this the two states are indistinguishable in the UI and an
     // identified-but-unassessed threat silently looks like finished work.
     const { rows: threats } = await query(`
-      SELECT t.id, t.name, t.description, st.added_at,
+      SELECT t.id, t.name, t.description, t.threat_category, t.source AS threat_source,
+             GREATEST(t.probability_c, t.probability_i, t.probability_a) AS threat_likelihood,
+             st.added_at,
              r.id                AS risk_id,
              r.risk_score,
              r.validation_status,
-             (r.id IS NOT NULL)  AS assessed
+             (r.id IS NOT NULL)  AS assessed,
+             -- Where the risk sits on the grid (relation diagrams, 2026-11-19):
+             -- its likelihood and impact on the dimension that sets its score,
+             -- the worst of C, I and A (ties go C, then I, then A).
+             CASE WHEN r.id IS NULL THEN NULL
+                  WHEN r.risk_c >= GREATEST(r.risk_i, r.risk_a) THEN r.probability_c
+                  WHEN r.risk_i >= r.risk_a THEN r.probability_i ELSE r.probability_a END AS grid_likelihood,
+             CASE WHEN r.id IS NULL THEN NULL
+                  WHEN r.risk_c >= GREATEST(r.risk_i, r.risk_a) THEN s.impact_c
+                  WHEN r.risk_i >= r.risk_a THEN s.impact_i ELSE s.impact_a END AS grid_impact
       FROM system_threats st
       JOIN threats t ON t.id = st.threat_id
+      JOIN systems s ON s.id = st.system_id
       LEFT JOIN risks r
              ON r.system_id = st.system_id AND r.threat_id = st.threat_id AND r.is_active
       WHERE st.system_id = $1
@@ -523,6 +535,38 @@ router.get('/:id/controls', canView, async (req, res, next) => {
       ORDER BY c.title ASC
     `, [req.params.id]);
     res.json(rows);
+  } catch (err) { next(err); }
+});
+
+// ── GET /systems/:id/controls/organisation ───────────────────────────────────
+// What the organisation delivers ONCE that reaches this system (relation
+// diagrams, owner 2026-11-19): objectives delivered for the organisation or for
+// a group (a scope) the system is in, each with the status the Statement of
+// Applicability gives it; and the objectives a threat identified here calls for
+// that the SoA rules not applicable. Shown on the Control objectives tab only on
+// request, since it is much the same on every system.
+router.get('/:id/controls/organisation', canView, async (req, res, next) => {
+  try {
+    const [{ rows: reach }, { rows: notApplicable }] = await Promise.all([
+      query(`
+        SELECT c.id, c.title, vr.framework_ref, p.via, p.status, se.implementation_status
+          FROM v_control_presence p
+          JOIN controls c ON c.id = p.control_id
+          JOIN soa_entries se ON se.control_id = c.id
+          LEFT JOIN v_control_reference vr ON vr.control_id = c.id
+         WHERE p.system_id = $1 AND p.via IN ('organisation', 'group')
+         ORDER BY c.title`, [req.params.id]),
+      query(`
+        SELECT DISTINCT c.id, c.title, vr.framework_ref, se.justification
+          FROM system_threats st
+          JOIN control_threats ct ON ct.threat_id = st.threat_id
+          JOIN controls c ON c.id = ct.control_id
+          JOIN soa_entries se ON se.control_id = c.id AND se.applicable = FALSE
+          LEFT JOIN v_control_reference vr ON vr.control_id = c.id
+         WHERE st.system_id = $1
+         ORDER BY c.title`, [req.params.id]),
+    ]);
+    res.json({ reach, not_applicable: notApplicable });
   } catch (err) { next(err); }
 });
 

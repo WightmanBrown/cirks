@@ -5,7 +5,8 @@ import { useCallback, useMemo, useState } from 'react';
 // Sort `rows` by `accessor(row)`, ascending or descending. A null/undefined/''
 // value always sorts to the bottom, regardless of direction (matches the
 // "unrated sorts last" convention used on RiskSummaryPage). Numbers compare
-// numerically; everything else compares as a case-insensitive locale string.
+// numerically; everything else compares as a case-insensitive locale string,
+// with any digits inside it compared as numbers.
 const asNumber = (v) => {
   if (typeof v === 'number') return v;
   // Postgres COUNT()/bigint columns arrive as numeric strings — treat those as
@@ -27,7 +28,9 @@ export function sortRows(rows, accessor, dir = 'asc') {
     const nva = asNumber(va);
     const nvb = asNumber(vb);
     if (nva !== null && nvb !== null) return (nva - nvb) * factor;
-    return String(va).localeCompare(String(vb), undefined, { sensitivity: 'base' }) * factor;
+    // numeric: digits inside text compare as numbers, so a reference ending .9
+    // sorts before one ending .10 (CIRKS1.AA-9 < CIRKS1.AA-10).
+    return String(va).localeCompare(String(vb), undefined, { sensitivity: 'base', numeric: true }) * factor;
   });
 }
 

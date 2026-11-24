@@ -21,7 +21,7 @@ import styles from './RiskGrid.module.css';
 const plural = (n) => `${n} ${n === 1 ? 'risk' : 'risks'}`;
 
 export function RiskGrid({
-  countAt, marked, selected, onCellClick, onClick, label, helpKey, caption, size = 'normal', ariaLabel,
+  countAt, marked, selected, onCellClick, onClick, label, helpKey, caption, size = 'normal', ariaLabel, named = false,
 }) {
   const isMarked = (i, p) => marked && marked.impact === i && marked.likelihood === p;
   const isSelected = (i, p) => selected && selected.impact === i && selected.likelihood === p;
@@ -64,7 +64,7 @@ export function RiskGrid({
 
   const name = ariaLabel || [label, total != null ? plural(total) : null].filter(Boolean).join(': ');
   const content = <>
-    {label && <span className={styles.label}>{label}{helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>}</span>}
+    {label && <span className={`${styles.label} ${named ? styles.named : ''}`}>{label}{helpKey && <> <HelpDot k={helpKey} placement="bottom" /></>}</span>}
     {body}
     <span className={styles.caption}>Likelihood →{caption ? ` · ${caption}` : ''}</span>
   </>;

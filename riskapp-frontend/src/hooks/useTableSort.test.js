@@ -41,3 +41,10 @@ describe('sortRows', () => {
     expect(rows).toEqual(before);
   });
 });
+
+describe('numbers inside text', () => {
+  it('sort as numbers, so a reference ending 9 comes before one ending 10', () => {
+    const rows = [{ r: 'CIRKS1.AA-10' }, { r: 'CIRKS1.AA-9' }, { r: 'CIRKS1.AA-1' }];
+    expect(sortRows(rows, (x) => x.r).map((x) => x.r)).toEqual(['CIRKS1.AA-1', 'CIRKS1.AA-9', 'CIRKS1.AA-10']);
+  });
+});

@@ -65,11 +65,12 @@ const NEW_COMPONENTS = [
 const GROUPS = [
   { name: 'Connectivity', slot: 'network', members: ['MIGNet (internal)', 'MIGNet (DMZ)', 'Azure cloud network', 'External internet',
       'Power station OT network', 'Water works OT network', 'Airport and harbour OT network',
-      'MIG CCTV Network'] },   // the owner's (CIRKS-dev 2026-10-09), as the next three
+      'MIG CCTV Network', '3G remote access solution'] },   // the owner's (CIRKS-dev 2026-10-09), as the next three
   { name: 'Hosting', slot: 'hosting', members: ['Bank Street server room', 'The Castle server room', 'Shark Point Server Room', 'Castle Vaults DR room',
       "Crow's Nest Disaster Management Centre", 'MIG Official Premises', 'Mobile locations', 'MS O365 UK South', 'Super Bill SaaS cloud',
       'Dr Max Windshear Airport ATC tower', 'Dr Max Windshear Airport Fuel Bunker', 'Wellhead Road, Water Treatment Works',
-      'Microsoft Azure UK South', 'Raspberry Pi 5'] },   // the Pi is the hardware the Risk Management System runs on
+      'Microsoft Azure UK South', 'Raspberry Pi 5',   // the Pi is the hardware the Risk Management System runs on
+      'Kirksville Tourist Information Office', 'Spok Village Bus Station'] },   // the kiosks' sites (owner, CIRKS-dev 2026-11-17)
   { name: 'Operating system', slot: 'operating_system', members: ['Windows Server 2016', 'Windows Server 2025', 'Windows 11', 'Windows 10', 'Windows 7',
       'Ubuntu Server 24.04 LTS', 'Debian 12', 'AlmaLinux 9', 'Cisco IOS XE V26 26.1.1', 'PAN-OS',
       'HIKVision Embedded Linux / Firmware'] },
@@ -167,6 +168,7 @@ const FILL = {
   'IT Support Ticketing System': ['All desktop users'],
   'Support Knowledge base': ['All desktop users'],
   'Schools facilities management': ['Education Team'],
+  'Tourist Information Points – kiosks': ['Local accounts only'],   // the owner's record, CIRKS-dev 2026-11-17
 };
 // Left blank on purpose — what an unfinished record looks like:
 //   Driver and Vehicle Licensing System — operating system, hosting, support team, user group;

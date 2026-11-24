@@ -56,7 +56,6 @@ const VALID_BODY = {
   title:        'Test Control',
   description:  'A test control.',
   control_type: 'preventive',
-  is_baseline:  false,
 };
 
 const CREATED_CONTROL = {
@@ -67,7 +66,6 @@ const CREATED_CONTROL = {
   control_type:       'preventive',
   framework_function: null,
   status:             'under_review',
-  is_baseline:        false,
   created_at:         '2026-05-06T10:00:00Z',
 };
 

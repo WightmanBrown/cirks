@@ -103,6 +103,7 @@ router.get('/:id', canView, async (req, res, next) => {
     // rather than offer an action the API will refuse.
     const { rows: systems } = await query(
       `SELECT sys.id, sys.name, sys.is_shared,
+              d.id          AS department_id,
               d.name        AS department_name,
               st.added_at,
               au.full_name  AS added_by_name,
@@ -110,6 +111,14 @@ router.get('/:id', canView, async (req, res, next) => {
               r.risk_score,
               r.validation_status,
               (r.id IS NOT NULL) AS assessed,
+              -- Where the risk sits on the grid: the dimension driving its score
+              -- (as GET /systems/:id threats), for the threat's picture.
+              CASE WHEN r.id IS NULL THEN NULL
+                   WHEN r.risk_c >= GREATEST(r.risk_i, r.risk_a) THEN r.probability_c
+                   WHEN r.risk_i >= r.risk_a THEN r.probability_i ELSE r.probability_a END AS grid_likelihood,
+              CASE WHEN r.id IS NULL THEN NULL
+                   WHEN r.risk_c >= GREATEST(r.risk_i, r.risk_a) THEN sys.impact_c
+                   WHEN r.risk_i >= r.risk_a THEN sys.impact_i ELSE sys.impact_a END AS grid_impact,
               (r.id IS NULL
                 AND st.added_at < now() - make_interval(days => oc.meeting_max_interval_days)) AS stale,
               NOT EXISTS (SELECT 1 FROM risks rr
@@ -143,10 +152,29 @@ router.get('/:id/controls', canView, async (req, res, next) => {
 
     const { rows } = await query(
       `SELECT c.id, c.title, c.control_type,
-              c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status, c.is_baseline,
+              c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status,
               (SELECT vcr.framework FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework,
               (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref,
-              ct.id AS link_id, ct.notes
+              c.reference_code,
+              ct.id AS link_id, ct.notes,
+              -- Its state on each system the threat is identified against, for
+              -- the threat's picture (owner, 2026-11-19): which of them it
+              -- protects. A system with no row for it has it not recorded.
+              COALESCE((SELECT json_agg(json_build_object('system_id', s.id, 'system_name', s.name,
+                                                          'status', COALESCE(sc.status::text, 'not_recorded'))
+                                        ORDER BY s.name)
+                          FROM system_threats st
+                          JOIN systems s ON s.id = st.system_id AND s.is_active
+                          LEFT JOIN system_controls sc ON sc.system_id = s.id AND sc.control_id = c.id
+                         WHERE st.threat_id = ct.threat_id), '[]'::json) AS on_systems,
+              -- The security solutions delivering it (shared, v147): none means
+              -- nothing can put it in place on a system.
+              COALESCE((SELECT json_agg(json_build_object('id', dp.id, 'name', dp.name, 'kind', dp.kind,
+                                                          'solution_pattern', dp.solution_pattern)
+                                        ORDER BY dp.name)
+                          FROM delivery_pattern_objectives dpo
+                          JOIN delivery_patterns dp ON dp.id = dpo.pattern_id
+                         WHERE dpo.control_id = c.id), '[]'::json) AS solutions
        FROM control_threats ct
        JOIN controls c ON c.id = ct.control_id
        WHERE ct.threat_id = $1
@@ -174,7 +202,7 @@ router.post('/:id/controls', canWriteControlLink, async (req, res, next) => {
 
     const { rows } = await query(
       `SELECT c.id, c.title, c.control_type,
-              c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status, c.is_baseline,
+              c.effectiveness, (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status,
               (SELECT vcr.framework FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework,
               (SELECT vcr.framework_ref FROM v_control_reference vcr WHERE vcr.control_id = c.id) AS framework_ref,
               ct.id AS link_id, ct.notes
@@ -300,7 +328,7 @@ router.post('/', canWrite, async (req, res, next) => {
     const pI = validateProbability(probability_i) ?? 3;
     const pA = validateProbability(probability_a) ?? 3;
     if (pC === undefined || pI === undefined || pA === undefined) {
-      return res.status(400).json({ error: 'Probabilities must be integers 1–5.' });
+      return res.status(400).json({ error: 'Likelihoods must be integers 1–5.' });
     }
     const baseline = validateProbability(default_baseline_probability);
     if (baseline === undefined) {
@@ -362,7 +390,7 @@ router.put('/:id', canWrite, async (req, res, next) => {
     const pI = validateProbability(probability_i) ?? 3;
     const pA = validateProbability(probability_a) ?? 3;
     if (pC === undefined || pI === undefined || pA === undefined) {
-      return res.status(400).json({ error: 'Probabilities must be integers 1–5.' });
+      return res.status(400).json({ error: 'Likelihoods must be integers 1–5.' });
     }
     const baseline = validateProbability(default_baseline_probability);
     if (baseline === undefined) {

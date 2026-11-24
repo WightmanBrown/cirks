@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 import { HelpDot } from '../components/HelpDot';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getSuppliers, createSupplier } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -15,6 +15,9 @@ import { CompletenessRing } from '../components/CompletenessRing';
 import { supplierTypeLabel } from '../utils/supplierTypes';
 import styles from './ScopesPage.module.css';
 import { useScrollRestore } from '../hooks/useScrollRestore';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 // Suppliers (v142). A supplier is the organisation; what we have with it is a
 // relationship — its supplier type, the department that contracts it (and so owns it),
@@ -24,6 +27,23 @@ import { useScrollRestore } from '../hooks/useScrollRestore';
 // by current evidence (v144): met, evidenced once but expired, never evidenced —
 // and whether anyone has answered the gap.
 const RING_LABELS = { complete: 'met', partial: 'evidence expired', missing: 'not evidenced' };
+
+// The percentage of a supplier's expected control objectives met, rounded down as
+// the ring shows it; null (sorts last) when it has no live relationship or none expected.
+export function assurancePercent(s) {
+  if (!s.live_count) return null;
+  const total = (s.objectives_met || 0) + (s.objectives_expired || 0) + (s.objectives_missing || 0);
+  return total ? Math.floor(((s.objectives_met || 0) / total) * 100) : null;
+}
+
+// Column key → value, for sorting the list by a header (useTableSort).
+export const SUPPLIER_ACCESSORS = {
+  name:          (s) => s.name,
+  relationships: (s) => s.relationship_count,
+  contracted_by: (s) => (s.departments || []).join(', '),
+  criticality:   (s) => s.max_impact,
+  assurance:     assurancePercent,
+};
 
 function AssuranceCell({ s }) {
   if (s.live_count === 0) {
@@ -58,6 +78,12 @@ export function SuppliersPage() {
   const [name, setName]   = useState('');
   const [busy, setBusy]   = useState(false);
   const [gapsOnly, setGapsOnly] = useState(false);
+
+  const shown = useMemo(() => (gapsOnly ? (rows || []).filter(s => s.gap_count > 0) : (rows || [])), [rows, gapsOnly]);
+  // Sorted by a header, the sort kept in the address so Back returns to it.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(shown, { accessors: SUPPLIER_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
 
   const load = useCallback(async () => {
     try { setRows(await getSuppliers()); setError(''); }
@@ -113,7 +139,6 @@ export function SuppliersPage() {
         {rows && (() => {
           const withGaps   = rows.filter(s => s.gap_count > 0);
           const unanswered = withGaps.filter(s => s.unanswered_gaps > 0).length;
-          const shown      = gapsOnly ? withGaps : rows;
           const sum = (k) => rows.reduce((n, s) => n + (s[k] || 0), 0);
           return (<>
           <div className={styles.create}>
@@ -138,15 +163,15 @@ export function SuppliersPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Supplier <HelpDot k="col.supplier" placement="bottom" /></th>
-                <th>Relationships <HelpDot k="suppliers.col.relationships" placement="bottom" /></th>
-                <th>Contracted by <HelpDot k="suppliers.col.contracted_by" placement="bottom" /></th>
-                <th>Criticality <HelpDot k="suppliers.col.criticality" placement="bottom" /></th>
-                <th>Assurance <HelpDot k="suppliers.col.assurance" placement="bottom" /></th>
+                <SortableTh column="name" {...sortProps} helpKey="col.supplier">Supplier</SortableTh>
+                <SortableTh column="relationships" {...sortProps} helpKey="suppliers.col.relationships">Relationships</SortableTh>
+                <SortableTh column="contracted_by" {...sortProps} helpKey="suppliers.col.contracted_by">Contracted by</SortableTh>
+                <SortableTh column="criticality" {...sortProps} helpKey="suppliers.col.criticality">Criticality</SortableTh>
+                <SortableTh column="assurance" {...sortProps} helpKey="suppliers.col.assurance">Assurance</SortableTh>
               </tr>
             </thead>
             <tbody>
-              {shown.map(s => (
+              {sorted.map(s => (
                 <tr key={s.id}>
                   <td>
                     <Link className={styles.name} to={`/suppliers/${s.id}`}>{s.name}</Link>

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
 import { RiskPath } from './RiskPath';
+import { RatingChip } from './RatingChip';
+import { levelClass, scoreLevel } from '../utils/riskColors';
 import { Gap } from './Gap';
 import { EntitySummaryCard } from './EntitySummaryCard';
 import { CiaContributionTable } from './CiaContributionTable';
@@ -11,8 +13,16 @@ const SOURCE_LABEL = {
   assets: 'CIA derived from linked assets',
 };
 
-export function ServiceSummaryCard({ service, openHref, isExpert = true, showRiskPath = true }) {
+// `compact` (the service's own page, owner 2026-11-19): one header line, as
+// on a system's page. The maximum impact and the worst risk sit on the right,
+// the description is one line; the C/I/A breakdown and the impact tables are
+// the page's tabs, so they are not repeated here.
+export function ServiceSummaryCard({ service, openHref, isExpert = true, showRiskPath = true, compact = false }) {
   if (!service) return null;
+  const maxImpact = [service.effective_c, service.effective_i, service.effective_a].some(v => v != null)
+    ? Math.max(service.effective_c ?? 0, service.effective_i ?? 0, service.effective_a ?? 0) : null;
+  const worst = (service.risk_paths || []).reduce((m, p) => Math.max(m, p.risk_score ?? 0), 0);
+  const worstLevel = worst ? scoreLevel(worst) : null;
 
   const hasDesc = !!(service.description && service.description.trim());
 
@@ -37,6 +47,16 @@ export function ServiceSummaryCard({ service, openHref, isExpert = true, showRis
       kind="business service"
       helpKey="service_card.title"
       openHref={openHref}
+      rightSlot={compact ? <>
+        {maxImpact != null && (
+          <span className={styles.compactImpact} title={`Maximum impact C${service.effective_c ?? '–'} I${service.effective_i ?? '–'} A${service.effective_a ?? '–'}`}>
+            Impact <RatingChip value={maxImpact} scale="impact" variant={isExpert ? 'number' : 'word'} />
+          </span>
+        )}
+        {worstLevel
+          ? <span className={`${styles.riskPill} ${levelClass(worstLevel)}`}>Risk: {worstLevel}</span>
+          : <span className={styles.riskPillNone}>no risk rated</span>}
+      </> : undefined}
       meta={
         <>
           {homeDept && <span className={styles.metaChip}>{homeDept}</span>}
@@ -54,6 +74,11 @@ export function ServiceSummaryCard({ service, openHref, isExpert = true, showRis
         </>
       }
     >
+      {compact ? (
+        <p className={styles.compactDesc} title={hasDesc ? service.description : undefined}>
+          {hasDesc ? service.description : <Gap label="No description" />}
+        </p>
+      ) : (<>
       {showRiskPath && <RiskPath paths={service.risk_paths ?? null} helpKey="service_card.risk_path" />}
 
       <CiaContributionTable
@@ -85,6 +110,7 @@ export function ServiceSummaryCard({ service, openHref, isExpert = true, showRis
           </span>
         </div>
       </div>
+      </>)}
     </EntitySummaryCard>
   );
 }

@@ -49,16 +49,21 @@
   --green:          #4caf7d;
   --green-light:    #95d5b2;
   --green-dim:      rgba(76, 175, 125, 0.12);
-  --blue:           #5b8dee;
-  --blue-light:     #98b9f5;
+  /* Lightened 2026-11-23 (owner): #5b8dee read as vivid on the dark surfaces. */
+  --blue:           #82a8f5;
+  --blue-light:     #b4cdfa;
+  /* Links (2026-11-23): the light blue, about 9:1 on the page; the browser's
+     own #0000ee was barely readable on the dark surfaces. */
+  --link:           var(--blue-light);
+  --link-hover:     var(--text-primary);
   --violet:         #a58bf0;             /* system architecture patterns (PatternChip) */
   --teal:           #4fc3c7;
 
   /* Secondary accent — blue, distinct from the amber brand accent. Used for
      focus rings, interactive highlights, selected states. */
   --accent:         var(--blue);
-  --accent-hover:   #4778d6;             /* darker blue for accent :hover */
-  --accent-faint:   rgba(91, 141, 238, 0.12);
+  --accent-hover:   #a3c0f8;             /* lighter blue for accent :hover (dark surfaces) */
+  --accent-faint:   rgba(130, 168, 245, 0.12);
 
   /* What a colour means, for use where the meaning is the point */
   --danger:         var(--red);
@@ -184,6 +189,20 @@ body {
 ::-webkit-scrollbar-track { background: var(--bg-base); }
 ::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Links. Without this every link with no class of its own took the browser's
+   default blue (and purple once visited), which is hard to read on the dark
+   surfaces; 111 links across the app had none. A link with its own class keeps
+   its colour: an element selector is the weakest rule there is. */
+a, a:visited {
+  color: var(--link);
+  text-decoration-color: color-mix(in srgb, var(--link) 45%, transparent);
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--link-hover);
+  text-decoration-color: currentColor;
+}
 
 /* Focus ring */
 :focus-visible {

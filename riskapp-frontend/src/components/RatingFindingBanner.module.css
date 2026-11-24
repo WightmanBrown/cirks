@@ -13,7 +13,7 @@
 .side { flex-shrink: 0; align-self: center; }
 .btn { composes: btnPrimary btnSm from './buttons.module.css'; }
 .btnGhost { composes: btnGhost btnSm from './buttons.module.css'; }
-.buttons { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.buttons { display: flex; gap: 6px; align-items: center; }
 .accepted { margin-top: 6px; font-size: 13px; color: var(--text-primary); }
 .link { font-size: 13px; white-space: nowrap; }
 .muted { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
@@ -28,3 +28,11 @@
    took the browser's default blue, unreadable on the dark theme. */
 .title a, .detail a { color: var(--text-primary); text-decoration: none; border-bottom: 1px dotted var(--border); }
 .title a:hover, .detail a:hover { color: var(--accent); border-bottom-color: currentColor; }
+
+/* Folded to one line: the title (one line, cut short) and the answer beside it. */
+.titleRow { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.toggle { background: none; border: 0; padding: 0 2px; font: inherit; color: var(--text-secondary); cursor: pointer; flex: none; }
+.toggle:hover, .toggle:focus-visible { color: var(--text-primary); }
+.folded { padding: 6px 12px; align-items: center; margin: 8px 0; }
+.folded .body { flex: 1; }
+.folded .title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: var(--text-body); min-width: 0; }

@@ -201,7 +201,7 @@ export function SuggestedProbRow({ threatName, values, simpleMode = false }) {
   return (
     <div className={styles.ciaLine}>
       <span className={styles.ciaLineLabel}>
-        Threat probability
+        Threat likelihood
         {threatName && <span className={styles.ciaLineSub}>{threatName}</span>}
       </span>
       {simpleMode

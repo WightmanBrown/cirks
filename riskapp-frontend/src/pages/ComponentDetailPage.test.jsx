@@ -10,6 +10,7 @@ const api = vi.hoisted(() => ({
   deleteComponent: vi.fn(),
   getUsers: vi.fn(async () => []),
   getSupplierRelationships: vi.fn(async () => []),
+  getViewMode: vi.fn(async () => ({ view_mode: 'business' })), setViewMode: vi.fn(async () => ({})),
   raiseFindingAction: vi.fn(), revokeFindingAcceptance: vi.fn(),
 }));
 vi.mock('../api', () => api);

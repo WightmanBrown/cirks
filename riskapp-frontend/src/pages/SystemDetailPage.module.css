@@ -542,3 +542,14 @@
 .undecidedTag { align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase;
                 color: var(--amber-light); border: 1px solid var(--amber-dim); background: var(--amber-faint); border-radius: 4px; padding: 2px 6px; }
 .undecidedChoose { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+/* The Control objectives tab's picture (relation diagrams, 2026-11-19). */
+.objectivesPicture { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+/* The chip itself is components/FilterChip. */
+
+.linkBtn { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+/* A risk in the Risks tab's list. */
+.riskRow { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 6px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg-surface); }
+.riskRowName { flex: 1; min-width: 0; font-size: var(--text-body); color: var(--text-primary); }

@@ -113,7 +113,7 @@ export function ControlSetsSetupPage() {
             <section className={styles.block}>
               <h2 className={styles.blockTitle}>1 · Control objectives <HelpDot k="setup.step_objectives" placement="bottom" /></h2>
               <p className={styles.blockDesc}>
-                Import control objectives into the library (columns: <code>title, control_type, description, is_baseline</code>,
+                Import control objectives into the library (columns: <code>title, control_type, description</code>,
                 and optionally <code>reference_code</code> — your own reference, e.g. ORG-AC-01, for objectives mapped to no standard).
                 The library is the ideal set; the Statement of Applicability decides which apply.
               </p>

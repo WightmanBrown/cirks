@@ -8,8 +8,8 @@
 // `tone` picks the existing colour class in each component's own stylesheet:
 // good (green) · attention (amber) · neutral · muted.
 export const OBJECTIVE_STATUSES = [
-  { value: 'adopted',        label: 'Adopted',        tone: 'good',      hint: 'Adopted in the SoA, and its maturity has been rated.' },
-  { value: 'not_assessed',   label: 'Not assessed',   tone: 'attention', hint: 'Adopted in the SoA; its maturity has not been rated yet.' },
+  { value: 'adopted',        label: 'Adopted',        tone: 'good',      hint: 'Adopted in the SoA, and its control effectiveness has been rated.' },
+  { value: 'not_assessed',   label: 'Not assessed',   tone: 'attention', hint: 'Adopted in the SoA; its control effectiveness has not been rated yet.' },
   { value: 'not_decided',    label: 'Not decided',    tone: 'neutral',   hint: 'Nobody has yet decided in the SoA whether it applies.' },
   { value: 'not_applicable', label: 'Not applicable', tone: 'muted',     hint: 'Judged not applicable in the SoA.' },
 ];

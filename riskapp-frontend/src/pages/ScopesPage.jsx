@@ -8,6 +8,17 @@ import { Shell } from '../components/Shell';
 import { HelpDot } from '../components/HelpDot';
 import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
+
+// Column key → value, for sorting the scopes by a header (useTableSort). The
+// whole-organisation row is not a scope and stays first.
+export const SCOPE_ACCESSORS = {
+  scope:      (s) => s.name,
+  systems:    (s) => s.system_count,
+  objectives: (s) => s.objective_count,
+};
 import styles from './ScopesPage.module.css';
 
 // Scopes (v126): named sets of systems in which a control objective can apply —
@@ -21,6 +32,10 @@ export function ScopesPage() {
   const [name, setName]   = useState('');
   const [desc, setDesc]   = useState('');
   const [busy, setBusy]   = useState(false);
+
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(data?.scopes || [], { accessors: SCOPE_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
 
   const load = useCallback(async () => {
     try { setData(await getScopes()); setError(''); }
@@ -74,7 +89,11 @@ export function ScopesPage() {
         {data && (
           <table className={styles.table}>
             <thead>
-              <tr><th>Scope <HelpDot k="scopes.col.scope" placement="bottom" /></th><th>Systems <HelpDot k="scopes.col.systems" placement="bottom" /></th><th>Objectives narrowed to it <HelpDot k="scopes.col.objectives" placement="bottom" /></th></tr>
+              <tr>
+                <SortableTh column="scope" {...sortProps} helpKey="scopes.col.scope">Scope</SortableTh>
+                <SortableTh column="systems" {...sortProps} helpKey="scopes.col.systems">Systems</SortableTh>
+                <SortableTh column="objectives" {...sortProps} helpKey="scopes.col.objectives">Objectives narrowed to it</SortableTh>
+              </tr>
             </thead>
             <tbody>
               <tr className={styles.orgRow}>
@@ -85,7 +104,7 @@ export function ScopesPage() {
                 <td>{data.organisation_system_count}</td>
                 <td className={styles.muted}>every adopted objective not narrowed to a scope</td>
               </tr>
-              {data.scopes.map(s => (
+              {sorted.map(s => (
                 <tr key={s.id}>
                   <td>
                     <Link className={styles.name} to={`/scopes/${s.id}`}>{s.name}</Link>

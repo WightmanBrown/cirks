@@ -236,7 +236,7 @@ export function StyleSheetPage() {
             ))}
           </div>
 
-          <h3 className={styles.subTitle}>Control maturity</h3>
+          <h3 className={styles.subTitle}>Control effectiveness</h3>
           <div className={styles.row}>
             {[1, 2, 3, 4, 5].map(m => (
               <div key={m} className={styles.pair}>

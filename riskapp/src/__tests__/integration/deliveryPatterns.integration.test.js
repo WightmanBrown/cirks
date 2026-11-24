@@ -313,6 +313,40 @@ describe('on the risk page', () => {
     expect(res.body.summary.components_missing).toBe(0);
   });
 
+  test('every solution carries its parts, so the picture can unfold one not used here', async () => {
+    const res = await api('analyst', 'get', `/risks/gap?system_id=${ids.s1}&threat_id=${threat}&risk_id=${risk}`);
+    const c = res.body.controls.find((x) => x.id === ids.obj);
+    const b = c.solutions.find((s) => s.name === 'DPT Agent B stack');
+    expect(b.in_use).toBe(false);
+    expect(b.parts.map((x) => x.name)).toContain('DPT Agent B');
+    expect(b).toHaveProperty('solution_pattern');
+    const a = c.solutions.find((s) => s.in_use);
+    expect(a.parts.map((x) => x.name)).toEqual(expect.arrayContaining(['DPT Agent A', 'DPT SOC']));
+    expect(a.parts[0]).toHaveProperty('slot_key');
+  });
+
+  test('an objective delivered once takes its solution\'s state from the parts, and that solution is in use', async () => {
+    const q1 = async (sql, p) => (await query(sql, p)).rows[0].id;
+    const once = await q1(`INSERT INTO controls (title, description, delivery) VALUES ('DPT Awareness', 'fixture', 'organisation') RETURNING id`);
+    try {
+      await query(`INSERT INTO control_threats (control_id, threat_id) VALUES ($1, $2)`, [once, threat]);
+      const sol = await q1(`INSERT INTO delivery_patterns (name, kind) VALUES ('DPT Awareness programme', 'parts') RETURNING id`);
+      const idle = await q1(`INSERT INTO delivery_patterns (name, kind) VALUES ('DPT Awareness alternative', 'parts') RETURNING id`);
+      await query(`INSERT INTO delivery_pattern_objectives (pattern_id, control_id) VALUES ($1, $3), ($2, $3)`, [sol, idle, once]);
+      await query(`INSERT INTO delivery_pattern_parts (pattern_id, component_id, location) VALUES ($1, $2, 'organisation'), ($1, $3, 'organisation'), ($4, $5, 'organisation')`,
+        [sol, ids.console, ids.soc, idle, ids.agentB]);
+      await query(`UPDATE control_components SET status = 'degraded' WHERE id = $1`, [ids.agentB]);
+      const res = await api('analyst', 'get', `/risks/gap?system_id=${ids.s1}&threat_id=${threat}&risk_id=${risk}`);
+      const c = res.body.controls.find((x) => x.id === once);
+      expect(c.solutions.find((s) => s.id === sol)).toMatchObject({ state: 'complete', in_use: true });
+      expect(c.solutions.find((s) => s.id === idle)).toMatchObject({ state: 'degraded', in_use: false });
+      expect(c.components.map((x) => x.name).sort()).toEqual(['DPT Console A', 'DPT SOC']);
+    } finally {
+      await query(`UPDATE control_components SET status = 'operational' WHERE id = $1`, [ids.agentB]);
+      await query(`DELETE FROM controls WHERE id = $1`, [once]);
+    }
+  });
+
   test('a degraded agent of an unused solution is not a mandatory remediation item', async () => {
     const res = await api('analyst', 'get', `/risks/${risk}/action-items/candidates`);
     expect(res.status).toBe(200);

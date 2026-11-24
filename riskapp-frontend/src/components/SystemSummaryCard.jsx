@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
+import { RatingChip } from './RatingChip';
 import { levelClass, scoreLevel } from '../utils/riskColors';
 import { isShared } from './SharedComponentChip';
 import { RiskPath } from './RiskPath';
@@ -19,11 +20,17 @@ function RiskPill({ level }) {
   );
 }
 
-export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskPath = true }) {
+// `compact` (the system's own page, owner 2026-11-19): one header line. The
+// maximum impact sits beside the risk as a chip, a changed impact is a tag, the
+// description one line; the components and the C/I/A breakdown are the page's
+// tabs, so they are not repeated here.
+export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskPath = true, compact = false }) {
   if (!system) return null;
 
   const hasOwner = !!system.owner_name;
   const hasDesc  = !!(system.description && system.description.trim());
+  const maxImpact = [system.impact_c, system.impact_i, system.impact_a].some(v => v != null)
+    ? Math.max(system.impact_c ?? 0, system.impact_i ?? 0, system.impact_a ?? 0) : null;
 
   const linkedAssets   = Array.isArray(system.information_assets) ? system.information_assets : null;
   const components     = Array.isArray(system.components) ? system.components : null;
@@ -37,7 +44,14 @@ export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskP
       kind="system"
       helpKey="system_card.title"
       openHref={openHref}
-      rightSlot={<RiskPill level={(() => { const sc = system.max_risk_score ?? system.top_risk?.risk_score; return sc != null ? scoreLevel(sc) : null; })()} />}
+      rightSlot={<>
+        {compact && maxImpact != null && (
+          <span className={styles.compactImpact} title={`Maximum impact C${system.impact_c ?? '–'} I${system.impact_i ?? '–'} A${system.impact_a ?? '–'}`}>
+            Impact <RatingChip value={maxImpact} scale="impact" variant={isExpert ? 'number' : 'word'} />
+          </span>
+        )}
+        <RiskPill level={(() => { const sc = system.max_risk_score ?? system.top_risk?.risk_score; return sc != null ? scoreLevel(sc) : null; })()} />
+      </>}
       meta={
         <>
           {system.department_name && (
@@ -49,9 +63,19 @@ export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskP
           {hasOwner
             ? <span className={styles.metaLine}>Owner: {system.owner_name}</span>
             : <Gap label="No owner assigned" />}
+          {compact && system.impact_changed_in_cycle && (
+            <span className={styles.compactChanged} title="Impact values have changed within the current review cycle: review the risk assessments.">
+              impact changed this cycle
+            </span>
+          )}
         </>
       }
     >
+      {compact ? (
+        <p className={styles.compactDesc} title={hasDesc ? system.description : undefined}>
+          {hasDesc ? system.description : <Gap label="No description" />}
+        </p>
+      ) : (<>
       {system.impact_changed_in_cycle && (
         <div className={styles.warnBanner}>
           Impact values have changed within the current review cycle — review risk assessments.
@@ -93,6 +117,7 @@ export function SystemSummaryCard({ system, openHref, isExpert = true, showRiskP
           </span>
         </div>
       </div>
+      </>)}
     </EntitySummaryCard>
   );
 }

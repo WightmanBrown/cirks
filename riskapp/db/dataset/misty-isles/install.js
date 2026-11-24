@@ -21,6 +21,8 @@
 //                          directory (the container's root filesystem is read-only)
 //   2. import.js           loads it — every account gets the demo password
 //   3. architecture.js     the security architecture and each system's answers
+//  3b. solution-library.js --components-only   its documents, records and components,
+//                          which step 4's solutions use as parts
 //   4. objective-solutions.js   a security solution for every objective that needs one
 //   5. solution-library.js the policy library and the solutions built on it (P1–P8)
 //   6. isms-cycle.js       a first risk portfolio, actions, exceptions, a meeting
@@ -126,6 +128,8 @@ async function lockPersonas() {
   step(2, 'import it', 'db/import.js', [dir, '--password', PASSWORD], pw);
   fs.rmSync(dir, { recursive: true, force: true });
   step(3, 'security architecture', 'db/dataset/misty-isles/architecture.js', ['--base', BASE], pw);
+  // The library's components first: step 4's solutions use some of them as parts.
+  step('3b', 'the policy library\'s components', 'db/dataset/misty-isles/solution-library.js', ['--base', BASE, '--components-only'], pw);
   step(4, 'security solutions for objectives', 'db/dataset/misty-isles/objective-solutions.js', ['--base', BASE], pw);
   step(5, 'the policy library and its security solutions', 'db/dataset/misty-isles/solution-library.js', ['--base', BASE], pw);
   step(6, 'first risk portfolio', 'db/isms-cycle.js', ['--base', BASE], pw);

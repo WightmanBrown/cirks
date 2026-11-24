@@ -73,7 +73,8 @@ const SAMPLE_CONTROL = {
   effectiveness:        4,
   effectiveness_notes:  'AV deployed to all endpoints.',
   status:               'active',
-  is_baseline:          true,
+  applicability:        'organisation',
+  applies_in:           [],
   rated_by_name:        'Alice Analyst',
   rated_at:             '2026-01-15T10:00:00Z',
   created_by_name:      'Admin User',
@@ -204,7 +205,7 @@ describe('GET /api/v1/controls/:id — success', () => {
     expect(ctrl).toHaveProperty('effectiveness');
     expect(ctrl).toHaveProperty('effectiveness_notes');
     expect(ctrl).toHaveProperty('status');
-    expect(ctrl).toHaveProperty('is_baseline');
+    expect(ctrl).toHaveProperty('applicability');
     expect(ctrl).toHaveProperty('rated_by_name');
     expect(ctrl).toHaveProperty('rated_at');
     expect(ctrl).toHaveProperty('created_by_name');

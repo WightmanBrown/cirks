@@ -17,7 +17,9 @@ export function supplierOwnerText(r) {
 
 // Supplier relationships as a table. `show` picks the first column: the supplier
 // (on a system or component page) or what it touches (on the supplier's page).
-export function SupplierRelationshipsTable({ rows, show = 'supplier', isExpert = false, renderActions = null }) {
+// `onSelect`: a row chooses the relationship (the supplier's page, beside its
+// picture); `selectedId` marks the chosen one.
+export function SupplierRelationshipsTable({ rows, show = 'supplier', isExpert = false, renderActions = null, selectedId = null, onSelect = null }) {
   return (
     <table className={styles.table}>
       <thead>
@@ -35,7 +37,9 @@ export function SupplierRelationshipsTable({ rows, show = 'supplier', isExpert =
       </thead>
       <tbody>
         {rows.map(r => (
-          <tr key={r.id}>
+          <tr key={r.id} aria-selected={onSelect ? r.id === selectedId : undefined}
+            className={onSelect ? (r.id === selectedId ? styles.rowChosen : styles.rowChoosable) : undefined}
+            onClick={onSelect ? () => onSelect(r.id) : undefined}>
             <td>
               {show === 'supplier'
                 ? <Link className={styles.name} to={`/suppliers/${r.supplier_id}`}>{r.supplier_name}</Link>

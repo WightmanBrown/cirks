@@ -17,7 +17,12 @@ import { personLabel } from '../utils/roles';
 import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { AssetSummaryCard } from '../components/AssetSummaryCard';
-import { RiskPathTree } from '../components/RiskPathTree';
+import { AssetRisksDiagram, assetSystemsOf } from '../components/AssetRisksDiagram';
+import { AssetServicesDiagram, ownerOf } from '../components/AssetServicesDiagram';
+import { bandStripe } from '../components/SystemRisksDiagram';
+import { FilterChip } from '../components/FilterChip';
+import { RatingChip } from '../components/RatingChip';
+import { departmentColour } from '../utils/departmentColour';
 import { RatingFindingBanner } from '../components/RatingFindingBanner';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { useViewMode } from '../hooks/useViewMode';
@@ -454,7 +459,15 @@ export function InformationAssetDetailPage() {
   const [error, setError]       = useState('');
   const [saved, setSaved]       = useState(false);
 
-  const [activeTab, setActiveTab] = useState('details');
+  // The Risks tab is first and the one the page opens on (owner, 2026-11-19).
+  const [activeTab, setActiveTab] = useState('risks');
+  // Its picture draws one system as a layer; the list beneath shows every risk
+  // until a system narrows it, and All risks (or the chip's ×) widens it again.
+  const [riskLayer, setRiskLayer] = useState(null);
+  const [riskList,  setRiskList]  = useState('all');
+  // Linked services: a service in the picture lights its systems and narrows
+  // the table to it; the chip's ×, the asset or choosing it again lists all.
+  const [svcPick,   setSvcPick]   = useState(null);
 
   // Seat eligibility: dept-scoped roles edit only their own dept's assets.
   // Creating a new asset is allowed (no existing row to scope against).
@@ -668,6 +681,22 @@ export function InformationAssetDetailPage() {
   if (!asset && error) return <Shell><p className={styles.errorMsg}>{error}</p></Shell>;
   if (!asset) return null;
 
+  const assetSystems = assetSystemsOf(asset);
+  const layer = assetSystems.find(s => s.id === riskLayer) || assetSystems[0] || null;
+  const allRisks = assetSystems.flatMap(s => s.risks)
+    .sort((x, y) => (y.risk_score ?? 0) - (x.risk_score ?? 0) || x.threat_name.localeCompare(y.threat_name));
+  const listSystem = riskList !== 'all' ? assetSystems.find(s => s.id === riskList) : null;
+  const listedRisks = listSystem ? listSystem.risks : allRisks;
+  // A system draws its layer and lists its risks; choosing it again lists all.
+  function pickRiskLayer(sid, keepOpen = false) {
+    setRiskLayer(sid);
+    setRiskList(cur => (cur === sid && !keepOpen ? 'all' : sid));
+  }
+
+  const linkedServices = asset.linked_services || [];
+  const pickedService = svcPick ? linkedServices.find(s => `svc:${s.id}` === svcPick) : null;
+  const listedServices = pickedService ? [pickedService] : linkedServices;
+
   return (
     <Shell>
       <div className={styles.page}>
@@ -677,15 +706,18 @@ export function InformationAssetDetailPage() {
           <span className={styles.viewModeSlot}><ViewModeToggle {...viewMode} /></span>
         </div>
 
-        <AssetSummaryCard asset={asset} isExpert={isExpert} />
+        <AssetSummaryCard asset={asset} isExpert={isExpert} compact />
 
         <RatingFindingBanner asset={asset} onChanged={reload} />
 
-        {asset.risk_paths && asset.risk_paths.length > 0 && (
-          <RiskPathTree paths={asset.risk_paths} title="Risks to this information asset" helpKey="asset_detail.risks" groupBy="system" collapsed isExpert={isExpert} />
-        )}
-
         <div className={styles.tabs}>
+          <button
+            className={activeTab === 'risks' ? styles.tabActive : styles.tab}
+            onClick={() => setActiveTab('risks')}
+          >
+            Risks
+            <span className={styles.tabCount}>{allRisks.length}</span>
+          </button>
           <button
             className={activeTab === 'details' ? styles.tabActive : styles.tab}
             onClick={() => setActiveTab('details')}
@@ -705,6 +737,43 @@ export function InformationAssetDetailPage() {
             <span className={styles.tabCount}>{(asset.impact_ratings || []).length}</span>
           </button>
         </div>
+
+        {activeTab === 'risks' && (
+          <div className={styles.risksTab}>
+            <AssetRisksDiagram asset={asset} selected={layer?.id}
+              onSelect={pickRiskLayer} onAsset={() => setRiskList('all')}
+              onRisk={(rid) => navigate(`/risks/${rid}#score`)} />
+            <p className={styles.muted}>
+              Select a system to draw its risks and list only those; select a risk to open it.{' '}
+              <HelpDot k="asset_detail.risks" placement="bottom" />
+            </p>
+            <div className={styles.riskListBar} role="group" aria-label="Which risks to list">
+              <button type="button" aria-pressed={!listSystem}
+                className={!listSystem ? styles.riskListAllOn : styles.riskListAll}
+                onClick={() => setRiskList('all')}>
+                All risks <span className={styles.tabCount}>{allRisks.length}</span>
+              </button>
+              {listSystem && (
+                <FilterChip words={listSystem.name} stripe={departmentColour(listSystem.department_id)}
+                  onClose={() => setRiskList('all')} />
+              )}
+            </div>
+            <div className={styles.riskRows}>
+              {listedRisks.map(r => (
+                <button key={r.risk_id} type="button" className={styles.riskRow}
+                  style={{ borderLeftColor: listSystem ? departmentColour(listSystem.department_id) : bandStripe(r.risk_score) }}
+                  onClick={() => navigate(`/risks/${r.risk_id}#score`)}>
+                  <RatingChip value={r.risk_score} scale="risk" variant={isExpert ? 'number' : 'word'} />
+                  <span className={styles.riskRowName}>{r.threat_name}</span>
+                  <span className={styles.riskRowSystem}>{r.system_name}</span>
+                </button>
+              ))}
+              {listedRisks.length === 0 && (
+                <p className={styles.muted}>{listSystem ? 'No active risks on this system.' : 'No active risks reach this asset.'}</p>
+              )}
+            </div>
+          </div>
+        )}
 
         {activeTab === 'details' && (
           <form className={styles.form} onSubmit={handleSave}>
@@ -848,7 +917,20 @@ export function InformationAssetDetailPage() {
 
         {activeTab === 'services' && (
           <div className={styles.servicesPanel}>
-            {(asset.linked_services || []).length === 0 ? (
+            <div className={styles.risksTab}>
+              <AssetServicesDiagram asset={asset} active={svcPick}
+                onService={(sid) => setSvcPick(cur => (cur === `svc:${sid}` ? null : `svc:${sid}`))}
+                onSystem={(yid) => navigate(`/systems/${yid}`)} onAsset={() => setSvcPick(null)} />
+              <p className={styles.muted}>
+                The systems holding this asset and the business services they deliver that count it.
+                Select a service to light its way and list only it; a system opens it.{' '}
+                <HelpDot k="asset_detail.services_picture" placement="bottom" />
+              </p>
+              {pickedService && (
+                <FilterChip words={pickedService.name} stripe={departmentColour(ownerOf(pickedService))} onClose={() => setSvcPick(null)} />
+              )}
+            </div>
+            {linkedServices.length === 0 ? (
               <p className={styles.muted}>No services linked to this asset.</p>
             ) : (
               <table className={styles.table}>
@@ -860,7 +942,7 @@ export function InformationAssetDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(asset.linked_services || []).map(s => (
+                  {listedServices.map(s => (
                     <tr key={s.id}>
                       <td>
                         <Link to={`/services/${s.id}`} className={styles.serviceLink}>{s.name}</Link>

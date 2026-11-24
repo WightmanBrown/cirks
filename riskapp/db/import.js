@@ -243,13 +243,14 @@ const DATASETS = [
 
   // A fresh install already holds the seeded NIST catalogue, so an objective that
   // exists is UPDATED with what the organisation said about it (delivery, rating,
-  // owner, reference) rather than skipped. `status` is derived (v124) and ignored.
-  { slug: 'controls', columns: ['title', 'description', 'control_type', 'reference_code', 'delivery', 'is_baseline', 'effectiveness', 'effectiveness_notes', 'owner_email'],
+  // owner, reference) rather than skipped. `status` is derived (v124) and ignored,
+  // as is an `is_baseline` column from an export made before v185.
+  { slug: 'controls', columns: ['title', 'description', 'control_type', 'reference_code', 'delivery', 'effectiveness', 'effectiveness_notes', 'owner_email'],
     handle: async (r, c) => {
       const title = req(r.title, 'title');
       const fields = {
         reference_code: txt(r.reference_code), delivery: txt(r.delivery),
-        is_baseline: boolOpt(r.is_baseline), effectiveness: intOpt(r.effectiveness),
+        effectiveness: intOpt(r.effectiveness),
         effectiveness_notes: txt(r.effectiveness_notes), owner_user_id: await c.userId(r.owner_email),
       };
       const { rows } = await c.q('SELECT id FROM controls WHERE title = $1', [title]);

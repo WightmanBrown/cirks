@@ -1,0 +1,14 @@
+-- v185: an objective's applicability is the Statement of Applicability's, not a
+-- flag typed beside it (owner, 2026-11-23).
+--
+-- controls.is_baseline ("Baseline: applies to all systems regardless of risk
+-- profile" / "Specific") was typed on the objective, defaulted to false and read
+-- by nothing but a badge and the control library's sort order. Where an objective
+-- applies is decided in the SoA (v126): the whole organisation unless narrowed to
+-- named scopes. On Misty Isles 152 of the 153 objectives applying to the whole
+-- organisation read "Specific": a default that looked like an answer. The library
+-- and the objective's page now show the SoA's answer, derived on read
+-- (src/routes/controls/applicability.js): whole organisation, in named scopes,
+-- not applicable, or not decided. The flag and its index go; nothing else read it
+-- (no view, function or trigger).
+ALTER TABLE controls DROP COLUMN is_baseline;

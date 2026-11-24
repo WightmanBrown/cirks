@@ -142,7 +142,7 @@ describe('GET /api/v1/admin/export', () => {
     mockQuery.mockResolvedValueOnce({ rows: [
       { framework: 'iso27001', framework_ref: 'A.8.5', title: 'MFA',
         description: null, control_type: 'preventive', status: 'active',
-        is_baseline: true, framework_function: null,
+        framework_function: null,
         effectiveness: null, effectiveness_notes: null },
     ] });
     const res = await request(app)
@@ -151,7 +151,7 @@ describe('GET /api/v1/admin/export', () => {
     expect(res.status).toBe(200);
     // status is derived (v124) and not exported; delivery and reference travel.
     expect(res.text.split('\r\n')[0]).toBe(
-      'title,description,control_type,reference_code,delivery,is_baseline,effectiveness,effectiveness_notes,owner_email'
+      'title,description,control_type,reference_code,delivery,effectiveness,effectiveness_notes,owner_email'
     );
     expect(res.text).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-/);
   });

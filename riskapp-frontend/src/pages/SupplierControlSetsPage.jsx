@@ -11,11 +11,23 @@ import { ControlStatusPill } from '../components/ControlStatusPill';
 import { SUPPLIER_TYPES } from '../utils/supplierTypes';
 import styles from './ScopesPage.module.css';
 import { HelpDot } from '../components/HelpDot';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
+import { OBJECTIVE_STATUS } from '../utils/objectiveStatus';
 
 const SETS = [
   { key: 'all', label: 'Every supplier', hint: 'The supplier programme itself — expected of every relationship, whatever its supplier type.' },
   ...SUPPLIER_TYPES.map(t => ({ key: t.value, label: t.label, hint: t.hint })),
 ];
+
+// Column key → value, for sorting the sets by a header (useTableSort). One sort
+// applies within every set. The objective sorts by its reference, else its title;
+// the SoA status by the words the pill shows.
+export const SET_OBJECTIVE_ACCESSORS = {
+  objective: (o) => o.ref || o.title,
+  soa:       (o) => OBJECTIVE_STATUS[o.objective_status]?.label || o.objective_status,
+};
 
 // The control objectives each supplier type is expected to meet
 // (v143). They are data, edited with the control catalogue (controls.write): a
@@ -44,6 +56,13 @@ export function SupplierControlSetsPage() {
     (a.framework_ref || '~').localeCompare(b.framework_ref || '~', undefined, { numeric: true }) || a.title.localeCompare(b.title)
   ), [controls]);
 
+  // Every set's rows sorted together by one sort (hooks cannot run per set), then
+  // handed back to their own set, each keeping the API's order until a header is chosen.
+  const flat = useMemo(() => SETS.flatMap(set => (sets?.[set.key] || []).map(o => ({ ...o, _set: set.key }))), [sets]);
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(flat, { accessors: SET_OBJECTIVE_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
+
   const run = async (fn) => {
     setError('');
     try { await fn(); await load(); }
@@ -70,7 +89,7 @@ export function SupplierControlSetsPage() {
         {error && <div className={styles.error} role="alert">{error}</div>}
 
         {sets && SETS.map(set => {
-          const rows = sets[set.key] || [];
+          const rows = sorted.filter(o => o._set === set.key);
           const inSet = new Set(rows.map(r => r.control_id));
           return (
             <section key={set.key} className={styles.section}>
@@ -80,7 +99,11 @@ export function SupplierControlSetsPage() {
                 <p className={styles.muted}>No objectives in this set.</p>
               ) : (
                 <table className={styles.table}>
-                  <thead><tr><th>Objective <HelpDot k="col.control" placement="bottom" /></th><th>In the SoA <HelpDot k="supplier_sets.col.in_soa" placement="bottom" /></th>{canEdit && <th />}</tr></thead>
+                  <thead><tr>
+                    <SortableTh column="objective" {...sortProps} helpKey="col.control">Objective</SortableTh>
+                    <SortableTh column="soa" {...sortProps} helpKey="supplier_sets.col.in_soa">In the SoA</SortableTh>
+                    {canEdit && <th />}
+                  </tr></thead>
                   <tbody>
                     {rows.map(o => (
                       <tr key={o.control_id}>

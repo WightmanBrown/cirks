@@ -46,6 +46,8 @@ afterAll(async () => {
   await query(`DELETE FROM suppliers WHERE name LIKE 'SUP %'`);
   await query(`DELETE FROM system_components WHERE component_id = $1`, [tech]);
   await query(`DELETE FROM control_components WHERE name LIKE 'SUP %'`);
+  await query(`DELETE FROM system_assets WHERE asset_id IN (SELECT id FROM information_assets WHERE name LIKE 'SUP %')`);
+  await query(`DELETE FROM information_assets WHERE name LIKE 'SUP %'`);
   await query(`DELETE FROM systems WHERE name LIKE 'SUP %'`);
   await query(`DELETE FROM departments WHERE id = $1`, [otherDept]);
   _setDepartmentIsolation(false);
@@ -143,6 +145,31 @@ describe('derived owner and criticality', () => {
     expect(p.criticality_systems).toEqual([expect.objectContaining({ name: 'SUP Other Sys', impact: 5, impact_i: 5 })]);
     const saasRel = detail.body.relationships.find((r) => r.id === saas.body.id);
     expect(saasRel.criticality_systems.map((x) => x.name)).toEqual(['SUP IT SaaS']);
+    // ...and every system each reaches, highest impact first.
+    expect(p.systems.map((x) => x.name)).toEqual(['SUP Other Sys', 'SUP IT SaaS']);
+    expect(p.systems[1]).toMatchObject({ department_id: IT_DEPT, impact: 4 });
+  });
+
+  test('the detail lists the information assets the supplier may reach, through which systems', async () => {
+    const asset = (await query(
+      `INSERT INTO information_assets (name, department_id, confidentiality, integrity, availability)
+       VALUES ('SUP Reached records', $1, 3, 3, 3) RETURNING id`, [IT_DEPT])).rows[0].id;
+    try {
+      await query(`INSERT INTO system_assets (system_id, asset_id) VALUES ($1, $2)`, [itSys, asset]);
+      const sid = await makeSupplier('SUP Reach Co');
+      const rel = await api('ciso', 'post', `/suppliers/${sid}/relationships`).send({
+        relationship_type: 'product', component_id: tech, department_id: IT_DEPT, status: 'active' });
+      const detail = await api('ciso', 'get', `/suppliers/${sid}`);
+      expect(detail.status).toBe(200);
+      const a = detail.body.information_assets.find((x) => x.id === asset);
+      expect(a).toMatchObject({ name: 'SUP Reached records', system_ids: [itSys], relationship_ids: [rel.body.id] });
+    } finally {
+      await query(`DELETE FROM system_assets WHERE asset_id = $1`, [asset]);
+      await query(`DELETE FROM information_assets WHERE id = $1`, [asset]);
+      // Unlinking it re-derives the system's impact (empty now); later tests
+      // read the impact the fixture gave it.
+      await query(`UPDATE systems SET impact_c = 4, impact_i = 2, impact_a = 3 WHERE id = $1`, [itSys]);
+    }
   });
 });
 
@@ -226,6 +253,27 @@ describe('another department\'s relationship counts only the reader\'s systems (
     for (const r of res.body.relationships) {
       expect(r).toMatchObject({ systems_touched: 2, max_impact: 5, figures_narrowed: false });
     }
+  });
+
+  test('the information it may reach is narrowed the same way (relation diagrams)', async () => {
+    // Rated as the systems are, so linking them leaves the systems' impact unchanged.
+    const asset = async (name, dept, sys, [c, i, a]) => {
+      const id = (await query(`INSERT INTO information_assets (name, department_id, confidentiality, integrity, availability)
+                                VALUES ($1, $2, $3, $4, $5) RETURNING id`, [name, dept, c, i, a])).rows[0].id;
+      await query(`INSERT INTO system_assets (system_id, asset_id) VALUES ($1, $2)`, [sys, id]);
+      return id;
+    };
+    const mine = await asset('SUP IT records', IT_DEPT, itSys, [4, 2, 3]);
+    const elsewhere = await asset('SUP Other records', otherDept, otherSys, [2, 5, 1]);
+    const reached = async (who) => Object.fromEntries((await api(who, 'get', `/suppliers/${sid}`)).body
+      .information_assets.map((x) => [x.id, [...x.relationship_ids].sort()]));
+    // The IAO: the other department's contract reaches only the IT asset; the
+    // other department's asset is reached only through their own contract.
+    const owner = await reached('owner');
+    expect(owner[mine]).toEqual([theirs, ours].sort());
+    expect(owner[elsewhere]).toEqual([ours]);
+    const ciso = await reached('ciso');
+    expect(ciso[elsewhere]).toEqual([theirs, ours].sort());
   });
 
   test('the list and the system page narrow the same way', async () => {

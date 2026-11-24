@@ -1,0 +1,117 @@
+/* The box-and-stick diagram (RelationDiagram.jsx). Every colour is a token;
+   states are told apart by words and border style as well as hue. */
+
+.scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
+}
+
+.host { position: relative; margin: 0; overflow: hidden; }
+.stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.lines { position: absolute; left: 0; top: 0; pointer-events: none; }
+
+.link { fill: none; stroke: var(--text-muted); stroke-width: 1.5; stroke-linejoin: round; }
+.strong { stroke: var(--text-primary); stroke-width: 2.5; }
+.dashed { stroke-dasharray: 5 5; }
+.link_good { stroke: var(--green); }
+.link_bad { stroke: var(--red); }
+.link_warn { stroke: var(--amber); }
+.head { fill: var(--text-muted); }
+.litLink { stroke-width: 2.5; }
+.fadedLink { opacity: 0.18; }
+
+.box {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 6px 10px 6px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-accent);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--text-body);
+  line-height: 17px;
+  color: var(--text-primary);
+  text-align: left;
+  overflow: hidden;
+}
+.custom { padding: 4px; border-left-width: 1px; align-items: center; background: transparent; border-color: transparent; overflow: visible; }
+
+.clickable { cursor: pointer; }
+.clickable:hover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--bg-elevated)); }
+.clickable:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.custom.clickable:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-weight: 600;
+}
+.detail { font-size: var(--text-hint); line-height: 15px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* A box whose title is one line may give its detail two (lines: 2). */
+.detail2 { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* The stripe says what kind of thing the box is (graph and PPITF colours). */
+.kind_threat { border-left-color: var(--graph-threat); }
+.kind_asset { border-left-color: var(--graph-asset); }
+.kind_risk { border-left-color: var(--graph-risk); }
+.kind_control { border-left-color: var(--accent); }
+.kind_technology { border-left-color: var(--ppitf-technology); }
+.kind_people { border-left-color: var(--ppitf-people); }
+.kind_process { border-left-color: var(--ppitf-process); }
+.kind_information { border-left-color: var(--ppitf-information); }
+.kind_facility { border-left-color: var(--ppitf-facility); }
+
+/* The state, in border style as well as colour. */
+.tone_good { border-top-color: var(--green); border-right-color: var(--green); border-bottom-color: var(--green); }
+.tone_warn { border-top-color: var(--amber); border-right-color: var(--amber); border-bottom-color: var(--amber); }
+.tone_bad { border-style: dashed; border-left-style: solid; border-top-color: var(--red); border-right-color: var(--red); border-bottom-color: var(--red); }
+.tone_quiet { opacity: 0.75; }
+.tone_quiet .title { font-weight: 500; }
+
+.linkLabel {
+  position: absolute;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  background: var(--bg-inset);
+  padding: 1px 4px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* The chosen one of a list (its picture is the one drawn). */
+.selected { border-color: var(--accent); border-width: 2px; border-left-width: 6px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-elevated)); }
+
+.tagRow { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+.badge { flex: none; display: inline-flex; }
+/* A chip in a box is slimmed to the tag line's height, so a two-line title and
+   its detail still fit beneath it. */
+.badge > * { padding-top: 0; padding-bottom: 0; line-height: 16px; min-height: 0; font-size: var(--text-sm); }
+
+/* A custom box drawn with a frame (the grid, named for its system). */
+.custom.framed { border: 1px solid var(--border-accent); border-left-width: 1px; background: var(--bg-elevated); padding: 6px 8px; }
+
+/* The boxes a chosen box leads to (lit, with its colour inline) and the rest (faded). */
+.lit { border-width: 2px; }
+.faded { opacity: 0.4; }

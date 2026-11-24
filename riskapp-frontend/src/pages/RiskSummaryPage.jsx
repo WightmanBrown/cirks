@@ -531,7 +531,7 @@ export function RiskSummaryPage({ view }) {
                   <>
                     <span className={styles.filterActive}>
                       Filtered — {gridDefs.find(g => g.key === activeFilter.gridKey)?.label},
-                      {' '}Impact {activeFilter.i}, Probability {activeFilter.p}
+                      {' '}Impact {activeFilter.i}, Likelihood {activeFilter.p}
                       {' '}· {displayedRisks.length} of {scopedRisks.length}
                     </span>
                     <button className={styles.clearFilter} onClick={() => setActiveFilter(null)}>

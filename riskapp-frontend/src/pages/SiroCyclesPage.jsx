@@ -7,8 +7,23 @@ import { Shell }           from '../components/Shell';
 import styles              from './ActionsPage.module.css';
 import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
-import { Th } from '../components/Th';
+import thStyles from '../components/Th.module.css';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 import { HelpDot } from '../components/HelpDot';
+
+// Column key → value, for sorting the cycles by a header (useTableSort). Period
+// sorts by its start; Changes by how many changes the cycle carries in all.
+export const SIRO_CYCLE_ACCESSORS = {
+  cycle:    (c) => c.name,
+  period:   (c) => c.start_date,
+  meeting:  (c) => c.meeting_date,
+  frozenAt: (c) => c.frozen_at,
+  frozenBy: (c) => c.frozen_by_name,
+  changes:  (c) => ['new_risks', 'increased_risks', 'reduced_risks', 'new_actions', 'closed_actions']
+    .reduce((n, k) => n + (Number(c[k]) || 0), 0),
+};
 
 export function SiroCyclesPage() {
   const [cycles,  setCycles]  = useState([]);
@@ -30,6 +45,11 @@ export function SiroCyclesPage() {
   }, []);
 
   useEffect(() => { fetchCycles(); }, [fetchCycles]);
+
+  // Sorted by a header, the sort kept in the address so Back returns to it.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(cycles, { accessors: SIRO_CYCLE_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: thStyles.th };
 
   return (
     <Shell>
@@ -70,16 +90,16 @@ export function SiroCyclesPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <Th helpKey="siro_cycles.col.cycle">Cycle</Th>
-                    <Th helpKey="siro_cycles.col.period">Period</Th>
-                    <Th helpKey="siro_cycles.col.meeting_date">Meeting Date</Th>
-                    <Th helpKey="siro_cycles.col.frozen_at">Frozen At</Th>
-                    <Th helpKey="siro_cycles.col.frozen_by">Frozen By</Th>
-                    <Th helpKey="siro_cycles.col.changes">Changes</Th>
+                    <SortableTh column="cycle" {...sortProps} helpKey="siro_cycles.col.cycle">Cycle</SortableTh>
+                    <SortableTh column="period" {...sortProps} helpKey="siro_cycles.col.period">Period</SortableTh>
+                    <SortableTh column="meeting" {...sortProps} helpKey="siro_cycles.col.meeting_date">Meeting Date</SortableTh>
+                    <SortableTh column="frozenAt" {...sortProps} helpKey="siro_cycles.col.frozen_at">Frozen At</SortableTh>
+                    <SortableTh column="frozenBy" {...sortProps} helpKey="siro_cycles.col.frozen_by">Frozen By</SortableTh>
+                    <SortableTh column="changes" {...sortProps} helpKey="siro_cycles.col.changes">Changes</SortableTh>
                   </tr>
                 </thead>
                 <tbody>
-                  {cycles.map((cycle) => (
+                  {sorted.map((cycle) => (
                     <CycleRow
                       key={cycle.id}
                       cycle={cycle}

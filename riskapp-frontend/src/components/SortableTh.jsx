@@ -9,8 +9,8 @@ import styles from './SortableTh.module.css';
 // Clicking cycles ascending → descending → default order. Renders a real <th>,
 // so it inherits the table's existing header styling; className is merged through.
 // `helpKey` adds an ⓘ after the label — outside the sort button, so opening help
-// does not sort.
-export function SortableTh({ column, sortKey, sortDir, onSort, children, className = '', helpKey, helpPlacement = 'bottom', ...rest }) {
+// does not sort; `helpLabel` names it for a screen reader when the title alone would not.
+export function SortableTh({ column, sortKey, sortDir, onSort, children, className = '', helpKey, helpPlacement = 'bottom', helpLabel, ...rest }) {
   const active = sortKey === column;
   return (
     <th
@@ -24,7 +24,7 @@ export function SortableTh({ column, sortKey, sortDir, onSort, children, classNa
           {active ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
         </span>
       </button>
-      {helpKey && <HelpDot k={helpKey} placement={helpPlacement} />}
+      {helpKey && <HelpDot k={helpKey} placement={helpPlacement} label={helpLabel} />}
     </th>
   );
 }

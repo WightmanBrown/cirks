@@ -293,6 +293,10 @@ const OWNER_COMPONENTS = [
   ['Server room HVAC', 'technology', 'organisational', 'Server room cooling.'],
   ['Crowdstrike AIDR', 'technology', 'organisational', 'CrowdStrike AI Detection and Response.'],
   ['CIRKS', 'technology', 'organisational', 'The CIRKS application, installed from the public CIRKS repository.'],
+  // The kiosks' record (CIRKS-dev, 2026-11-17): where they stand and how they connect.
+  ['Kirksville Tourist Information Office', 'facility', 'per_system', ''],
+  ['Spok Village Bus Station', 'facility', 'per_system', ''],
+  ['3G remote access solution', 'technology', 'per_system', 'Our low trust 3G base remotely deployable System. This requires a VPN to operate at secure locations.'],
   ['User account management process', 'process', 'organisational', 'The process by which we check that a request to access a system, change permissions or decommission a user\'s account is valid. It includes the rules for requesting changes and for verifying identity.'],
 ];
 // What the owner recorded on each system (an "unknown" status is theirs: not yet assessed).
@@ -310,6 +314,10 @@ const OWNER_ON_SYSTEM = {
   'CIRKS': [['Ubuntu Server 24.04 LTS'], ['Crowdstrike Falcon Agent'], ['Veeam Backup'], ['TLS 1.2+ configuration'],
     ['IT Administrators'], ['Bank Street server room', 'unknown'], ['CIRKS'], ['InfoSec Team']],
   'Medical Records System': [['Rapid7 Nexpose Login', 'unknown']],
+  // CIRKS-dev, 2026-11-17: the kiosks stand in public places and connect over 3G.
+  'Tourist Information Points – kiosks': [['Spok Village Bus Station'], ['Kirksville Tourist Information Office', 'unknown'],
+    ['3G remote access solution'], ['HIKVision Embedded Linux / Firmware'], ['IT Administrators', 'unknown']],
+  // (and Local accounts only, which architecture.js creates: its FILL)
 };
 // The back end has no backup and no TLS: the owner's record says so.
 const OWNER_OFF_SYSTEM = { 'Tourist Information Points – back end': ['Veeam Backup', 'TLS 1.2+ configuration'] };
@@ -365,11 +373,14 @@ for (const [slug, col] of [['components', 'name'], ['control-component-links', '
 dedupe('components', (r) => `${r.name}|${r.component_type}`);
 dedupe('control-component-links', (r) => `${r.control_title}|${r.component_name}|${r.component_type}`);
 dedupe('system-components', (r) => `${r.system_name}|${r.component_name}|${r.component_type}`);
+const PER_SYSTEM_SITES = new Set(['Kirksville Tourist Information Office', 'Spok Village Bus Station']);
 for (const [name, type, inst, description] of [...NEW_COMPONENTS, ...OWNER_COMPONENTS]) {
   rows('components').push({ name, component_type: type, status: 'operational', description, created_by_email: 'ciso@mig.local', instantiation: inst });
 }
 for (const r of rows('components')) {
   r.instantiation = r.component_type === 'technology' ? (ORGANISATIONAL_TECH.has(r.name) ? 'organisational' : 'per_system') : 'organisational';
+  // A kiosk's site is where that one kiosk stands (the owner's record, CIRKS-dev 2026-11-17).
+  if (PER_SYSTEM_SITES.has(r.name)) r.instantiation = 'per_system';
   if (r.status === 'unknown') r.status = 'operational';
 }
 const typeOf = Object.fromEntries(rows('components').map((r) => [r.name, r.component_type]));
@@ -511,7 +522,9 @@ for (const s of OT_SCOPE.systems) {
   rows('scope-systems').push({ scope_name: OT_SCOPE.name, system_name: s });
 }
 rows('controls').push({ title: OT_OBJECTIVE.title, description: OT_OBJECTIVE.description, control_type: 'preventive',
-  reference_code: OT_OBJECTIVE.reference_code, delivery: 'group', is_baseline: 'false', effectiveness: '', effectiveness_notes: '', owner_email: '' });
+  reference_code: OT_OBJECTIVE.reference_code, delivery: 'group',
+  // Rated with the rest in the 2026 review (owner, 2026-11-23): not in place yet.
+  effectiveness: '1', effectiveness_notes: 'Not yet in place; anything done today is ad hoc.', owner_email: '' });
 rows('soa-entries').push({ control_title: OT_OBJECTIVE.title, applicable: 'true', drivers: 'risk', justification: '',
   implementation_status: 'not_implemented', implementation_description: '', owner_email: '' });
 rows('soa-entry-scopes').push({ control_title: OT_OBJECTIVE.title, scope_name: OT_SCOPE.name });

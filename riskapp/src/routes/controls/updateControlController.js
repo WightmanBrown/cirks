@@ -9,8 +9,12 @@ const { normaliseReference, referenceConflict } = require('./referenceCode');
 module.exports = async function updateControl(req, res, next) {
   try {
     const { id } = req.params;
+    // Where an objective applies is the SoA's decision (v185): the old
+    // Baseline/Specific flag is gone, and setting it says so rather than vanishing.
+    if (req.body.is_baseline !== undefined) {
+      return res.status(400).json({ error: 'Baseline/Specific was retired: where an objective applies is decided in the Statement of Applicability.' });
+    }
     // An objective's status is derived (v124) and cannot be set.
-    const { is_baseline } = req.body;
     if (req.body.status !== undefined) {
       return res.status(400).json({ error: 'status is derived from the SoA and the maturity rating; it cannot be set.' });
     }
@@ -54,11 +58,6 @@ module.exports = async function updateControl(req, res, next) {
     const sets = [];
     const params = [id];
 
-    if (is_baseline !== undefined) {
-      params.push(Boolean(is_baseline));
-      sets.push(`is_baseline = $${params.length}`);
-    }
-
     if (ref.value !== undefined) {
       params.push(ref.value);
       sets.push(`reference_code = $${params.length}`);
@@ -89,7 +88,7 @@ module.exports = async function updateControl(req, res, next) {
       const { rows } = await db.query(
         `UPDATE controls SET ${sets.join(', ')}, updated_at = now()
          WHERE id = $1
-         RETURNING id, is_baseline, reference_code, title, description, delivery`,
+         RETURNING id, reference_code, title, description, delivery`,
         params
       );
       if (!rows.length) return rows;

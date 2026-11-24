@@ -50,7 +50,7 @@ const { ControlDetailPage } = await import('./ControlDetailPage');
 
 const control = {
   id: 'c1', title: 'Administrative access requires MFA', description: 'All admin logins use a second factor.',
-  control_type: 'preventive', status: 'active', is_baseline: false, framework: 'nist_csf', framework_ref: 'PR.AA-03',
+  control_type: 'preventive', status: 'active', applicability: 'organisation', applies_in: [], framework: 'nist_csf', framework_ref: 'PR.AA-03',
   standard_refs: [{ standard: 'nist_csf', standard_name: 'NIST Cybersecurity Framework', ref: 'PR.AA-03' }],
   effectiveness: 4, effectiveness_notes: 'Audited Q3', rated_by_name: 'Lewis Fisher', rated_at: '2026-09-01T00:00:00Z',
 };
@@ -161,7 +161,7 @@ describe('an adopted objective', () => {
 
     await user.click(screen.getByRole('button', { name: 'Edit control' }));
     await user.selectOptions(screen.getByRole('combobox', { name: /Implementation status/ }), 'implemented');
-    await user.click(screen.getByRole('button', { name: /Maturity 5/ }));
+    await user.click(screen.getByRole('button', { name: /Effectiveness 5/ }));
     const evidence = screen.getByPlaceholderText(/Evidence for this rating/);
     await user.clear(evidence);
     await user.type(evidence, 'Pen-tested');
@@ -349,6 +349,37 @@ describe('how the control is delivered (v127)', () => {
     detail = { control: { ...control, delivery: 'group' }, threats, soa: adopted, readout: { ...readout, reach_systems: 0, groups: [] } };
     show();
     expect(await screen.findByText(/no group is linked yet/)).toBeInTheDocument();
+  });
+
+  // Delivered once, it counts on every system it reaches, but is recorded on
+  // none: the section says so once and lists only where it counters a risk
+  // (owner, 2026-11-23: a list of every system contradicted the choice).
+  const sys = (id, reason, risks = []) => ({ system_id: id, system_name: `System ${id}`, department_name: 'IT', status: 'operational', via: 'organisation', reason, risks,
+    threats: reason === 'risk' ? [{ id: 't1', name: 'Phishing' }] : [] });
+  test('organisation-wide: says once that it counts everywhere, and lists only the systems where it counters a risk', async () => {
+    detail = { control: { ...control, delivery: 'organisation' }, threats, soa: adopted, readout: { ...readout, reach_systems: 3 },
+               deployments: [sys('a', 'baseline'), sys('b', 'risk', [{ risk_id: 'r1', threat: 'Phishing', score: 12, probability: '3/3/3', judged: '3/3/3' }]), sys('c', 'baseline')] };
+    show();
+    expect(await screen.findByText(/Delivered once for the organisation, so it counts on all 3 systems/)).toBeInTheDocument();
+    expect(screen.getByText(/It counters identified risks on 1 of them/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'System b' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'System a' })).not.toBeInTheDocument();
+  });
+
+  test('organisation-wide and countering nothing: no list at all', async () => {
+    detail = { control: { ...control, delivery: 'organisation' }, threats, soa: adopted, readout: { ...readout, reach_systems: 2 },
+               deployments: [sys('a', 'baseline'), sys('c', 'baseline')] };
+    show();
+    expect(await screen.findByText(/It counters no identified risk on any of them/)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'System a' })).not.toBeInTheDocument();
+  });
+
+  test('for a group: names the group and counts only its systems', async () => {
+    detail = { control: { ...control, delivery: 'group' }, threats, soa: adopted,
+               readout: { ...readout, reach_systems: 2, groups: [{ id: 'g1', name: 'IT Administrators', systems: 2 }] },
+               deployments: [sys('a', 'baseline'), sys('c', 'baseline')] };
+    show();
+    expect(await screen.findByText(/Delivered once for IT Administrators, so it counts on the 2 systems in it/)).toBeInTheDocument();
   });
 
   test('the mode is chosen in Edit control, one only, and saved', async () => {

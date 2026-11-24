@@ -8,6 +8,9 @@ import { BackButton } from '../components/BackButton';
 import { HelpDot } from '../components/HelpDot';
 import styles from './ApiKeysPage.module.css';
 import { DateField } from '../components/DateField';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 // Admin management of machine API keys (SOC enrichment — Stage 3). A key is shown
 // exactly ONCE, on creation; thereafter only its metadata is visible.
@@ -17,11 +20,30 @@ function fmt(ts) {
   return new Date(ts).toLocaleString();
 }
 
-function statusOf(k) {
-  if (k.revoked_at) return { label: 'Revoked', cls: styles.revoked };
-  if (k.expires_at && new Date(k.expires_at) <= new Date()) return { label: 'Expired', cls: styles.expired };
-  return { label: 'Active', cls: styles.active };
+function statusWord(k) {
+  if (k.revoked_at) return 'Revoked';
+  if (k.expires_at && new Date(k.expires_at) <= new Date()) return 'Expired';
+  return 'Active';
 }
+
+const STATUS_CLASS = { Revoked: styles.revoked, Expired: styles.expired, Active: styles.active };
+
+function statusOf(k) {
+  const label = statusWord(k);
+  return { label, cls: STATUS_CLASS[label] };
+}
+
+// Column key → value, for sorting the keys by a header (useTableSort). Status
+// sorts by the word shown; the timestamps sort as ISO strings, never-used last.
+export const API_KEY_ACCESSORS = {
+  label:     (k) => k.label,
+  prefix:    (k) => k.key_prefix,
+  role:      (k) => k.role,
+  status:    (k) => statusWord(k),
+  last_used: (k) => k.last_used_at,
+  expires:   (k) => k.expires_at,
+  created:   (k) => k.created_at,
+};
 
 export function ApiKeysPage() {
   const [keys, setKeys]     = useState(null);
@@ -38,6 +60,10 @@ export function ApiKeysPage() {
     catch { setError('Could not load API keys.'); }
   }
   useEffect(() => { load(); }, []);
+
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(keys ?? [], { accessors: API_KEY_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
 
   async function handleCreate(e) {
     e.preventDefault();
@@ -134,18 +160,18 @@ export function ApiKeysPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Label <HelpDot k="api_keys.col.label" placement="bottom" /></th>
-                  <th>Prefix <HelpDot k="api_keys.col.prefix" placement="bottom" /></th>
-                  <th>Role <HelpDot k="api_keys.col.role" placement="bottom" /></th>
-                  <th>Status <HelpDot k="api_keys.col.status" placement="bottom" /></th>
-                  <th>Last used <HelpDot k="api_keys.col.last_used" placement="bottom" /></th>
-                  <th>Expires <HelpDot k="api_keys.col.expires" placement="bottom" /></th>
-                  <th>Created <HelpDot k="col.created" placement="bottom" /></th>
+                  <SortableTh column="label" {...sortProps} helpKey="api_keys.col.label">Label</SortableTh>
+                  <SortableTh column="prefix" {...sortProps} helpKey="api_keys.col.prefix">Prefix</SortableTh>
+                  <SortableTh column="role" {...sortProps} helpKey="api_keys.col.role">Role</SortableTh>
+                  <SortableTh column="status" {...sortProps} helpKey="api_keys.col.status">Status</SortableTh>
+                  <SortableTh column="last_used" {...sortProps} helpKey="api_keys.col.last_used">Last used</SortableTh>
+                  <SortableTh column="expires" {...sortProps} helpKey="api_keys.col.expires">Expires</SortableTh>
+                  <SortableTh column="created" {...sortProps} helpKey="col.created">Created</SortableTh>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {keys.map((k) => {
+                {sorted.map((k) => {
                   const st = statusOf(k);
                   return (
                     <tr key={k.id}>

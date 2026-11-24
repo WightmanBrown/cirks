@@ -6,7 +6,6 @@ import { MaturityChip } from './MaturityChip';
 import { maturityWord } from '../utils/ratingScale';
 import { DRIVERS, IMPLEMENTATION_STATUSES, IMPLEMENTATION_LABEL, DELIVERY_MODES, DELIVERY_LABEL } from '../utils/soaVocabulary';
 import { explainImplementation, partialQualifier } from '../utils/implementationStatus';
-import { EffectivenessDots } from './ControlBadges';
 import styles from './ObjectiveDecision.module.css';
 
 // The objective page edits what the SoA register reports (2026-09-22). Two forms:
@@ -131,7 +130,7 @@ export function ImplementationForm({ controlId, soa, control, onSaved }) {
   const deliveryChanged = delivery !== (control?.delivery ?? null);
 
   async function save() {
-    if (ratingChanged && level && !evidence.trim()) { setErr('Evidence is required for a maturity rating.'); return; }
+    if (ratingChanged && level && !evidence.trim()) { setErr('Evidence is required for an effectiveness rating.'); return; }
     setBusy(true); setErr(''); setDone('');
     try {
       const patch = {};
@@ -197,10 +196,10 @@ export function ImplementationForm({ controlId, soa, control, onSaved }) {
                   placeholder="e.g. Provided by our endpoint management platform" />
       </label>
       <div className={styles.field}>
-        <span className={styles.label}>Maturity</span>
-        <div className={styles.chips} role="group" aria-label="Maturity level">
+        <span className={styles.label}>Control effectiveness</span>
+        <div className={styles.chips} role="group" aria-label="Control effectiveness level">
           {[1, 2, 3, 4, 5].map(n => (
-            <button key={n} type="button" aria-pressed={level === n} aria-label={`Maturity ${n}: ${maturityWord(n)}`}
+            <button key={n} type="button" aria-pressed={level === n} aria-label={`Effectiveness ${n}: ${maturityWord(n)}`}
                     className={`${styles.pick} ${level === n ? styles.pickOn : ''}`} title={maturityWord(n)}
                     onClick={() => setLevel(level === n ? 0 : n)}>
               <MaturityChip value={n} variant="number" />
@@ -252,13 +251,12 @@ export function ImplementationView({ soa, control, fmtDate }) {
       <dt>How it is implemented</dt>
       <dd>{soa?.implementation_description || <span className={styles.none}>Not described</span>}</dd>
 
-      <dt>Maturity</dt>
+      <dt>Effectiveness</dt>
       <dd>
         {control?.effectiveness == null ? (
           <span className={styles.none}>Not yet assessed</span>
         ) : (
           <span className={styles.maturity}>
-            <EffectivenessDots value={control.effectiveness} />
             <MaturityChip value={control.effectiveness} />
           </span>
         )}

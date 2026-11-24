@@ -23,6 +23,10 @@ import { Spinner } from '../components/Spinner';
 import { HelpDot } from '../components/HelpDot';
 import styles from './FindingsPage.module.css';
 import { TypeBadge } from '../components/ComponentPill';
+import { componentTypeShort } from '../utils/componentTypes';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 const SOA_TYPE_LABEL = {
   deployed_where_not_applicable:  'deployed on a system where it was ruled not applicable',
@@ -33,6 +37,50 @@ const SOA_TYPE_LABEL = {
 const STATUS_WORD = {
   proposed: 'awaiting acceptance', planned: 'accepted', in_progress: 'in progress', deferred: 'deferred',
 };
+
+// What the Response column says, as a word to sort by: accepted, the action's
+// status, or no response yet.
+const responseWord = (r) => (r.exception_id ? 'accepted'
+  : r.action_id ? (STATUS_WORD[r.action_status] || r.action_status)
+  : 'no response');
+
+// A document never given a review date is more overdue than any dated one.
+const NEVER_SCHEDULED = Number.MAX_SAFE_INTEGER;
+
+const DELIVERY_WORD = { system: 'on each system', organisation: 'once for the organisation', group: 'for a group' };
+
+// Column key → value, for sorting each finding's table by a header
+// (useTableSort), one map per finding kind. The keys are the columns' `sort`
+// keys in KINDS below; a column with no accessor (an "Applies to" that is the
+// organisation on every row) does not sort.
+const common = { department: (r) => r.department_name, owner: (r) => r.owner_name, response: responseWord };
+export const FINDING_ACCESSORS = {
+  'rating-incomplete': { ...common, name: (r) => r.asset_name,
+    missing: (r) => (r.missing_table_names || []).length,      // how many tables are missing
+    extra:   (r) => r.last_rated_at },                         // never rated sorts last
+  'component-record': { ...common, name: (r) => r.system_name,
+    missing: (r) => componentRecordReasonItems(r).length,      // how many things to record or decide
+    extra:   (r) => (r.needed_count ? Number(r.missing_count) : null) },
+  'document-review': { ...common, name: (r) => r.document_name, department: undefined,
+    missing: (r) => r.next_review,
+    extra:   (r) => (r.reason === 'no_review_date' ? NEVER_SCHEDULED : r.days_overdue) },
+  'objective-solution': { ...common, name: (r) => r.objective_title, department: undefined,
+    missing: (r) => DELIVERY_WORD[r.delivery] || 'delivery not stated',
+    extra:   (r) => r.systems_count },
+  'supplier-assurance': { ...common, name: (r) => r.supplier_name,
+    missing: (r) => (r.unmet_refs || []).length,                // how many objectives not covered
+    extra:   (r) => (r.expected_count ? Number(r.met_count) / Number(r.expected_count) : null) },
+};
+
+// The scope question's table: by component, type word, and systems it is needed on.
+export const INSTANTIATION_ACCESSORS = {
+  component: (c) => c.name,
+  type:      (c) => componentTypeShort(c.component_type),
+  needed_on: (c) => c.implied_on,
+  scope:     (c) => (c.instantiation ? (c.instantiation === 'organisational' ? 'once for the organisation' : 'once per system') : null),
+};
+
+const SORT_COLS = ['name', 'department', 'owner', 'missing', 'extra'];
 
 const fmtDate = d => d
   ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -46,8 +94,11 @@ function InstantiationSection({ data, canAnswer, onAnswered }) {
   const [busy, setBusy] = useState(null);
   const [err, setErr]   = useState('');
   const [showAnswered, setShowAnswered] = useState(false);
-  const unstated = data.components.filter(c => !c.instantiation);
-  const answered = data.components.filter(c => c.instantiation);
+  const sortState = useUrlSortState('sort_scope');
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(data.components, { accessors: INSTANTIATION_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
+  const unstated = sorted.filter(c => !c.instantiation);
+  const answered = sorted.filter(c => c.instantiation);
 
   async function answer(c, value) {
     setBusy(c.component_id); setErr('');
@@ -96,9 +147,9 @@ function InstantiationSection({ data, canAnswer, onAnswered }) {
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr>
-              <th>Component <HelpDot k="col.component" placement="bottom" /></th>
-              <th>Type <HelpDot k="findings.instantiation.col.type" placement="bottom" /></th>
-              <th>Needed on <HelpDot k="findings.instantiation.col.needed_on" placement="bottom" /></th>
+              <SortableTh column="component" {...sortProps} helpKey="col.component">Component</SortableTh>
+              <SortableTh column="type" {...sortProps} helpKey="findings.instantiation.col.type">Type</SortableTh>
+              <SortableTh column="needed_on" {...sortProps} helpKey="findings.instantiation.col.needed_on">Needed on</SortableTh>
               <th>Scope <HelpDot k="findings.instantiation.col.scope" placement="bottom" /></th>
             </tr></thead>
             <tbody>{unstated.map(row)}</tbody>
@@ -231,6 +282,9 @@ function FindingSection({ kind }) {
   const [busy, setBusy]       = useState(null);
   const [rowErr, setRowErr]   = useState({});
   const [accepting, setAccepting] = useState(null);
+  const sortState = useUrlSortState(`sort_${kind}`);
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(rows || [], { accessors: FINDING_ACCESSORS[kind], state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
 
   const load = useCallback(async () => {
     try { setRows((await getFindings(kind)).findings); setError(''); }
@@ -266,9 +320,14 @@ function FindingSection({ kind }) {
       ) : (
         <div className={styles.tableWrap}>
           <table className={styles.table}>
-            <thead><tr>{k.cols.map(c => <th key={c.label}>{c.label} <HelpDot k={c.helpKey} placement="bottom" /></th>)}<th>Response <HelpDot k="findings.col.response" placement="bottom" /></th></tr></thead>
+            <thead><tr>
+              {k.cols.map((c, i) => (FINDING_ACCESSORS[kind][SORT_COLS[i]]
+                ? <SortableTh key={c.label} column={SORT_COLS[i]} {...sortProps} helpKey={c.helpKey}>{c.label}</SortableTh>
+                : <th key={c.label}>{c.label} <HelpDot k={c.helpKey} placement="bottom" /></th>))}
+              <SortableTh column="response" {...sortProps} helpKey="findings.col.response">Response</SortableTh>
+            </tr></thead>
             <tbody>
-              {rows.map(r => {
+              {sorted.map(r => {
                 const id = r[k.key];
                 return (
                   <Fragment key={id}>

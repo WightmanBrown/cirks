@@ -51,6 +51,17 @@ const OBJECTIVES_SQL = `
    WHERE r.id = $1
    ORDER BY c.title`;
 
+// The information assets the system holds, rated: the system's impact is the
+// highest of them on each dimension (recompute_system_impact), so the ones at
+// that rating are what set it. For the diagram's impact line.
+const ASSETS_SQL = `
+  SELECT ia.id, ia.name, ia.confidentiality AS c, ia.integrity AS i, ia.availability AS a
+    FROM risks r
+    JOIN system_assets sa      ON sa.system_id = r.system_id
+    JOIN information_assets ia ON ia.id = sa.asset_id AND ia.is_active
+   WHERE r.id = $1
+   ORDER BY ia.name`;
+
 const ACTIONS_SQL = `
   SELECT a.id, a.title, a.status, a.target_date, a.accepted_at, u.full_name AS owner_name,
          (a.target_date < CURRENT_DATE AND ${OPEN_ACTION}) AS overdue,
@@ -68,7 +79,7 @@ async function riskAnswer(riskId) {
   const { rows: [r] } = await query(`${one(RISKS_SQL.replace('SELECT * FROM r', 'SELECT r.*, r.id AS risk_id FROM r'))}`, [riskId]);
   if (!r) return null;
   const [{ rows: [extra] }, { rows: [cfg] }, { rows: objectives }, { rows: fixes }, { rows: actions },
-         { rows: [minuted] }, { rows: [ownerActs] }, { rows: [inHand] }] = await Promise.all([
+         { rows: [minuted] }, { rows: [ownerActs] }, { rows: [inHand] }, { rows: assets }] = await Promise.all([
     query(`SELECT validation_status, risk_c, risk_i, risk_a FROM risks WHERE id = $1`, [riskId]),
     query(`SELECT mandatory_action_score, exception_accept_owner_max FROM org_config LIMIT 1`),
     query(OBJECTIVES_SQL, [riskId]),
@@ -77,6 +88,7 @@ async function riskAnswer(riskId) {
     query(one(MINUTED_SQL), [riskId]),
     query(one(OWNER_ACTS_SQL), [riskId]),
     query(one(IN_HAND_SQL), [riskId]),
+    query(ASSETS_SQL, [riskId]),
   ]);
 
   // ── How bad ────────────────────────────────────────────────────────────────
@@ -117,6 +129,11 @@ async function riskAnswer(riskId) {
     score: {
       now: r.score, target: r.target_score, probability, impact, driving,
       threat_probability: threatOwn,
+      // Highest rated on the dimension that sets the score first; `sets` marks
+      // those at the system's impact on that dimension.
+      assets: assets
+        .map((x) => ({ id: x.id, name: x.name, c: x.c, i: x.i, a: x.a, sets: x[d] != null && x[d] === impact[d] }))
+        .sort((x, y) => (y[d] ?? 0) - (x[d] ?? 0) || x.name.localeCompare(y.name)),
     },
     why: {
       counts,
@@ -129,6 +146,11 @@ async function riskAnswer(riskId) {
                         status: fix.status_here, score_if_fixed: fix.score_if_fixed } : null,
       fixes_unjudged: unjudgedFixes,
       not_in_place: objectives.filter((o) => !['operational', 'degraded', 'not_applicable'].includes(o.status)).map(ref),
+      // Every objective against the threat, for the diagram: its state, what it
+      // brings the setting dimension to (null when not in place), and whether it
+      // is one of those setting the probability now.
+      objectives: objectives.map((o) => ({ ...ref(o), now: o[`now_${d}`],
+        sets: setters.some((x) => x.control_id === o.control_id) })),
     },
     work: {
       actions: actions.map((a) => ({

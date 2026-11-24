@@ -19,6 +19,9 @@ import { BackButton } from '../components/BackButton';
 import { Spinner } from '../components/Spinner';
 import { HelpDot } from '../components/HelpDot';
 import styles from './HelpContentPage.module.css';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 const DEFAULT_LOCALE = 'en';
 const PLACEMENTS = ['top', 'bottom', 'left', 'right', 'auto'];
@@ -32,6 +35,20 @@ const GLOSSARY_ROWS = [
   })),
   ...Object.entries(HELP_DEFAULTS).map(([key, d]) => ({ help_key: key, fallback: d })),
 ];
+
+const SOURCE_WORD = { custom: 'Custom', default: 'Code default', unwritten: 'Unwritten' };
+
+// Column key → value, for sorting the keys by a header (useTableSort). English
+// sorts written against not written; Source by the word its chip shows.
+export const HELP_CONTENT_ACCESSORS = {
+  key:     (r) => r.help_key,
+  english: (r) => (r.writtenEn ? 'Written' : 'Not written'),
+  other:   (r) => (r.otherLocales.length ? r.otherLocales.join(', ') : null),
+  source:  (r) => SOURCE_WORD[r.source],
+};
+
+// The list's own order until a header is clicked: alphabetical by key.
+const byKey = (a, b) => a.help_key.localeCompare(b.help_key);
 
 export function HelpContentPage() {
   const [coverage, setCoverage] = useState([]);   // [{help_key, placement, page_hint, locales[]}]
@@ -79,8 +96,12 @@ export function HelpContentPage() {
         const source = writtenEn ? 'custom' : (r.fallback ? 'default' : 'unwritten');
         return { ...r, writtenEn, otherLocales, source };
       })
-      .sort((a, b) => a.help_key.localeCompare(b.help_key));
+      .sort(byKey);
   }, [coverage]);
+
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(rows, { accessors: HELP_CONTENT_ACCESSORS, state: sortState, defaultCompare: byKey });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: styles.th };
 
   const stats = useMemo(() => ({
     total: rows.length,
@@ -97,9 +118,9 @@ export function HelpContentPage() {
   }
 
   const SOURCE_LABEL = {
-    custom:    { text: 'Custom',       cls: styles.srcCustom },
-    default:   { text: 'Code default', cls: styles.srcDefault },
-    unwritten: { text: 'Unwritten',    cls: styles.srcUnwritten },
+    custom:    { text: SOURCE_WORD.custom,    cls: styles.srcCustom },
+    default:   { text: SOURCE_WORD.default,   cls: styles.srcDefault },
+    unwritten: { text: SOURCE_WORD.unwritten, cls: styles.srcUnwritten },
   };
 
   return (
@@ -133,15 +154,15 @@ export function HelpContentPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Key <HelpDot k="help_content.col.key" placement="bottom" /></th>
-                  <th className={styles.th}>English <HelpDot k="help_content.col.english" placement="bottom" /></th>
-                  <th className={styles.th}>Other languages <HelpDot k="help_content.col.other_languages" placement="bottom" /></th>
-                  <th className={styles.th}>Source <HelpDot k="help_content.col.source" placement="bottom" /></th>
+                  <SortableTh column="key" {...sortProps} helpKey="help_content.col.key">Key</SortableTh>
+                  <SortableTh column="english" {...sortProps} helpKey="help_content.col.english">English</SortableTh>
+                  <SortableTh column="other" {...sortProps} helpKey="help_content.col.other_languages">Other languages</SortableTh>
+                  <SortableTh column="source" {...sortProps} helpKey="help_content.col.source">Source</SortableTh>
                   <th className={styles.th}></th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map(r => {
+                {sorted.map(r => {
                   const src = SOURCE_LABEL[r.source];
                   const isEditing = editingKey === r.help_key;
                   return (

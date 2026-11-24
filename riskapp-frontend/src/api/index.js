@@ -866,6 +866,12 @@ export async function getSystemControls(systemId) {
   const { data } = await client.get(`/systems/${systemId}/controls`);
   return data;
 }
+// What the organisation delivers once that reaches the system, with the SoA's
+// status, and objectives a threat here calls for that the SoA rules out.
+export async function getSystemOrganisationObjectives(systemId) {
+  const { data } = await client.get(`/systems/${systemId}/controls/organisation`);
+  return data;
+}
 export async function addSystemControl(systemId, controlId, maturity) {
   await client.post(`/systems/${systemId}/controls`, {
     control_id: controlId,

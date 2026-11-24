@@ -68,11 +68,12 @@ const DATASETS = [
   {
     slug: 'controls',
     // `status` is derived (v124) and is not exported; `delivery` (v127) and
-    // `reference_code` (v123) are what a re-import needs to say.
-    columns: ['title', 'description', 'control_type', 'reference_code', 'delivery', 'is_baseline',
+    // `reference_code` (v123) are what a re-import needs to say. Applicability is
+    // the SoA's (v185), exported with the SoA.
+    columns: ['title', 'description', 'control_type', 'reference_code', 'delivery',
               'effectiveness', 'effectiveness_notes', 'owner_email'],
     fetch: () => query(`
-      SELECT c.title, c.description, c.control_type, c.reference_code, c.delivery, c.is_baseline,
+      SELECT c.title, c.description, c.control_type, c.reference_code, c.delivery,
              c.effectiveness, c.effectiveness_notes, u.email AS owner_email
         FROM controls c LEFT JOIN users u ON u.id = c.owner_user_id
        ORDER BY c.title`).then(r => r.rows),

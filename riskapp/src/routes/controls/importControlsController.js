@@ -111,7 +111,6 @@ function transformRow(headers, fields, lineNumber) {
   const rawType      = get('control_type');
   const title        = get('title');
   const description  = get('description');
-  const rawBaseline  = get('is_baseline').toLowerCase();
   // Optional (v123): the objective's own reference. Blank = none.
   const reference    = get('reference_code') || null;
 
@@ -125,14 +124,11 @@ function transformRow(headers, fields, lineNumber) {
 
   if (errors.length) return { lineNumber, errors };
 
-  const is_baseline = ['true', '1', 'yes'].includes(rawBaseline);
-
   return {
     lineNumber,
     title,
     description:  description || null,
     control_type: typeEntry.control_type,
-    is_baseline,
     reference_code: reference,
     errors: [],
   };
@@ -163,7 +159,9 @@ async function importControls(req, res, next) {
   // Native-control import. Standard reference catalogues + mappings have their own
   // import endpoints (routes/standards). framework/framework_ref columns, if present,
   // are ignored here.
-  const REQUIRED_HEADERS = ['control_type', 'title', 'description', 'is_baseline'];
+  // An is_baseline column (retired in v185; where an objective applies is the
+  // SoA's decision) is accepted and ignored, so older files still load.
+  const REQUIRED_HEADERS = ['control_type', 'title', 'description'];
   const missingHeaders = REQUIRED_HEADERS.filter((h) => !headers.includes(h));
   if (missingHeaders.length) {
     return res.status(400).json({
@@ -226,17 +224,17 @@ async function importControls(req, res, next) {
   // rows so re-running the import is idempotent; no framework unique key any more.
   const params       = [];
   const placeholders = valid.map((row, i) => {
-    const b = i * 6;
-    params.push(row.title, row.description, row.control_type, row.is_baseline, req.user.id, row.reference_code);
-    return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6})`;
+    const b = i * 5;
+    params.push(row.title, row.description, row.control_type, req.user.id, row.reference_code);
+    return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5})`;
   });
 
   try {
     const result = await query(
-      `INSERT INTO controls (title, description, control_type, is_baseline, created_by, reference_code)
-       SELECT v.title, v.description, v.control_type::control_type, v.is_baseline::boolean,
+      `INSERT INTO controls (title, description, control_type, created_by, reference_code)
+       SELECT v.title, v.description, v.control_type::control_type,
               v.created_by::uuid, NULLIF(btrim(v.reference_code), '')
-       FROM (VALUES ${placeholders.join(',')}) AS v(title, description, control_type, is_baseline, created_by, reference_code)
+       FROM (VALUES ${placeholders.join(',')}) AS v(title, description, control_type, created_by, reference_code)
        WHERE NOT EXISTS (SELECT 1 FROM controls c WHERE lower(c.title) = lower(v.title))
        RETURNING id`,
       params

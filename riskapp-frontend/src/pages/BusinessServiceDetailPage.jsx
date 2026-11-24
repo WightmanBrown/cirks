@@ -20,10 +20,14 @@ import { personLabel } from '../utils/roles';
 import { BackButton } from '../components/BackButton';
 import { ReadOnlyBadge } from '../components/ReadOnlyBadge';
 import { ServiceSummaryCard } from '../components/ServiceSummaryCard';
-import { RiskPathTree } from '../components/RiskPathTree';
+import { ServiceRisksDiagram, serviceSystemsOf } from '../components/ServiceRisksDiagram';
+import { ServiceSystemsDiagram, ServiceAssetsDiagram } from '../components/ServiceSystemsDiagram';
+import { FilterChip } from '../components/FilterChip';
+import { RatingChip } from '../components/RatingChip';
+import { bandStripe } from '../components/SystemRisksDiagram';
+import { departmentColour } from '../utils/departmentColour';
 import { ViewModeToggle } from '../components/ViewModeToggle';
 import { useViewMode } from '../hooks/useViewMode';
-import { RatingChip } from '../components/RatingChip';
 import { CiaBadge } from '../components/CiaBadge';
 // No department scope filter on the systems picker, deliberately. The asset
 // picker had one because impact is about YOUR stake; a service legitimately
@@ -75,8 +79,12 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
     }
   }
 
-  const linked  = service.linked_systems || [];
-  const derived = service.linked_information_assets || [];
+  const allLinked = service.linked_systems || [];
+  // The picture's department box narrows the table to its systems (folding
+  // rule, relation diagrams); with none chosen the table lists them all.
+  const [deptPick, setDeptPick] = useState(null);
+  const pickedDept = deptPick ? allLinked.find(s => `dept:${s.department_id || 'none'}` === deptPick) : null;
+  const linked = deptPick ? allLinked.filter(s => `dept:${s.department_id || 'none'}` === deptPick) : allLinked;
 
   const matches = a => search.length < 1 || a.name.toLowerCase().includes(search.toLowerCase());
   // The grouping IS the linking discipline: what a choice actually does, rather
@@ -121,6 +129,24 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
         <div className={styles.tableAssignTitleRow}>
           <h3 className={styles.tableAssignTitle}>Systems delivering this service <HelpDot k="service_detail.systems" placement="bottom" /></h3>
         </div>
+
+        {allLinked.length > 0 && (
+          <div className={styles.risksTab}>
+            <ServiceSystemsDiagram service={service} active={deptPick}
+              onDepartment={(key) => setDeptPick(cur => (cur === key ? null : key))}
+              onSystem={(sid) => navigate(`/systems/${sid}`)} onAsset={(aid) => navigate(`/assets/${aid}`)}
+              onRisk={(rid) => navigate(`/risks/${rid}#score`)} />
+            <p className={styles.muted}>
+              Each department running one of its systems, the information the service holds in each system,
+              and its worst risk. Select a department to list only its systems; anything else opens it.{' '}
+              <HelpDot k="service_detail.systems_picture" placement="bottom" />
+            </p>
+            {pickedDept && (
+              <FilterChip words={pickedDept.department_name || 'No department'} stripe={departmentColour(pickedDept.department_id)}
+                onClose={() => setDeptPick(null)} />
+            )}
+          </div>
+        )}
 
         {linked.length === 0
           ? <p className={styles.emptyHint}>
@@ -225,7 +251,7 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
                     {bearing.length > 0 && (
                       <tr className={styles.pickerGroupRow}>
                         <td colSpan={5}>
-                          Systems holding your information — contribute <strong>impact and probability</strong>
+                          Systems holding your information — contribute <strong>impact and likelihood</strong>
                         </td>
                       </tr>
                     )}
@@ -233,7 +259,7 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
                     {dependOn.length > 0 && (
                       <tr className={styles.pickerGroupRow}>
                         <td colSpan={5}>
-                          Systems you would depend on — contribute <strong>probability only</strong>
+                          Systems you would depend on — contribute <strong>likelihood only</strong>
                         </td>
                       </tr>
                     )}
@@ -246,14 +272,47 @@ function ServiceSystemsTab({ service, canEdit, isExpert, onRefresh }) {
         )}
       </div>
 
+    </div>
+  );
+}
+
+
+// ---- Information assets tab (2026-11-19) -----------------------------------
+// Derived, read-only: the information this service touches, the assets its
+// department holds in its systems. Split from the Systems tab by the owner,
+// with a picture of which system holds each.
+
+function ServiceAssetsTab({ service, isExpert }) {
+  const navigate = useNavigate();
+  const all = service.linked_information_assets || [];
+  // An asset in the picture lights the systems holding it and narrows the
+  // table to it; the chip's × or choosing it again lists them all.
+  const [pick, setPick] = useState(null);
+  const picked = pick ? all.find(a => `asset:${a.id}` === pick) : null;
+  const derived = picked ? [picked] : all;
+  return (
+    <div className={styles.impactTableTab}>
+      <div className={styles.risksTab}>
+        <ServiceAssetsDiagram service={service} active={pick}
+          onAsset={(aid) => setPick(cur => (cur === `asset:${aid}` ? null : `asset:${aid}`))}
+          onSystem={(sid) => navigate(`/systems/${sid}`)} />
+        <p className={styles.muted}>
+          Each information asset the service touches and the systems holding it, with each system&apos;s worst risk.
+          Select an asset to light the systems holding it; a system opens it.{' '}
+          <HelpDot k="service_detail.assets_picture" placement="bottom" />
+        </p>
+        {picked && (
+          <FilterChip words={picked.name} stripe={departmentColour(picked.department_id)} onClose={() => setPick(null)} />
+        )}
+      </div>
       {/* Derived, read-only: the information this service touches, computed from
           its systems rather than curated. */}
-      <div className={styles.tableAssignSection} style={{ marginTop: 24 }}>
+      <div className={styles.tableAssignSection} style={{ marginTop: 12 }}>
         <div className={styles.tableAssignTitleRow}>
           <h3 className={styles.tableAssignTitle}>Information this service touches <HelpDot k="service_detail.information" placement="bottom" /></h3>
         </div>
         <p className={styles.emptyHint} style={{ marginTop: 0 }}>
-          Derived from the systems above — your department&apos;s information in them.
+          Derived from the service&apos;s systems — your department&apos;s information in them.
           This is what the service&apos;s impact is calculated from.
         </p>
         {derived.length === 0
@@ -432,7 +491,13 @@ export function BusinessServiceDetailPage() {
   const [service,      setService]      = useState(null);
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
-  const [activeTab,    setActiveTab]    = useState('overview');
+  // The Risks tab is first and the one the page opens on (owner, 2026-11-19).
+  const [activeTab,    setActiveTab]    = useState('risks');
+  // Its picture: the system drawn as a layer, and the folded list beneath.
+  const [riskLayer,    setRiskLayer]    = useState(null);
+  // The list beneath shows every risk by default (owner, 2026-11-19); a system
+  // narrows it to its own, and All risks (or the chip's ×) widens it again.
+  const [riskList,     setRiskList]     = useState('all');
 
   const [editing,      setEditing]      = useState(false);
   const [editDraft,    setEditDraft]    = useState({});
@@ -569,6 +634,20 @@ export function BusinessServiceDetailPage() {
   if (!service) return null;
 
   const hasLinked = (service.impact_tables || []).length > 0;
+  const serviceSystems = serviceSystemsOf(service);
+  const layer = serviceSystems.find(s => s.id === riskLayer) || serviceSystems[0] || null;
+  const allRisks = serviceSystems.flatMap(s => s.risks.map(r => ({ ...r, system_name: s.name })))
+    .sort((x, y) => (y.risk_score ?? 0) - (x.risk_score ?? 0));
+  const riskCount = allRisks.length;
+  const listSystem = riskList && riskList !== 'all' ? serviceSystems.find(s => s.id === riskList) : null;
+  const listedRisks = !riskList ? [] : riskList === 'all' ? allRisks
+    : (listSystem?.risks || []).map(r => ({ ...r, system_name: listSystem.name }));
+  // A system draws its layer and unfolds its risks; choosing it again folds them.
+  function pickRiskLayer(sid, keepOpen = false) {
+    setRiskLayer(sid);
+    setRiskList(cur => (cur === sid && !keepOpen ? 'all' : sid));
+  }
+  function pickRiskList(key) { setRiskList(key); }
 
   return (
     <Shell>
@@ -576,34 +655,27 @@ export function BusinessServiceDetailPage() {
         <div className={styles.breadcrumb}>
           <BackButton fallback="/services" />
           {!canEdit && !canTransfer && <ReadOnlyBadge reason="Your role has view-only access to business services." />}
-          <span className={styles.viewModeSlot}><ViewModeToggle {...viewMode} /></span>
+          <span className={styles.viewModeSlot}>
+            {(canEdit || canTransfer || canDelete) && !editing && !transferring && (
+              <span className={styles.headerActions}>
+                {canEdit && (
+                  <button className={styles.btnSecondary} onClick={openEdit}>Edit</button>
+                )}
+                {canDelete && (
+                  <button className={styles.btnDanger} onClick={handleDelete}>Delete service</button>
+                )}
+                {canTransfer && (
+                  <button className={styles.btnSecondary} onClick={openTransfer}>Transfer department</button>
+                )}
+              </span>
+            )}
+            <ViewModeToggle {...viewMode} />
+          </span>
         </div>
 
-        <ServiceSummaryCard service={service} isExpert={isExpert} showRiskPath={false} />
-
-        {/* groupBy="system": under v104 a service reaches risks through its
-            SYSTEMS, so System | Threat | Risk is the honest tree. The asset
-            grouping was a leftover from the model where the path ran through
-            assets — and a dependency system has no asset of yours to group by. */}
-        {service.risk_paths && service.risk_paths.length > 0 && (
-          <RiskPathTree paths={service.risk_paths} title="Risks to this service" helpKey="service_detail.risks" groupBy="system" collapsed isExpert={isExpert} />
-        )}
+        <ServiceSummaryCard service={service} isExpert={isExpert} showRiskPath={false} compact />
 
         {deleteError && <p className={styles.error}>{deleteError}</p>}
-
-        {(canEdit || canTransfer || canDelete) && !editing && !transferring && (
-          <div className={styles.headerActions}>
-            {canEdit && (
-              <button className={styles.btnSecondary} onClick={openEdit}>Edit</button>
-            )}
-            {canDelete && (
-              <button className={styles.btnDanger} onClick={handleDelete}>Delete service</button>
-            )}
-            {canTransfer && (
-              <button className={styles.btnSecondary} onClick={openTransfer}>Transfer department</button>
-            )}
-          </div>
-        )}
 
         {editing && (
           <div className={styles.editForm}>
@@ -741,9 +813,11 @@ export function BusinessServiceDetailPage() {
 
         <div className={styles.tabs}>
           {[
+            { key: 'risks',       label: 'Risks', count: riskCount },
             { key: 'overview',    label: 'Overview' },
             { key: 'impactTable', label: 'Impact Tables',             warn: !hasLinked },
             { key: 'systems',     label: 'Systems', count: (service.linked_systems || []).length },
+            { key: 'assets',      label: 'Information assets', count: (service.linked_information_assets || []).length },
             { key: 'treatment',   label: 'Treatment',
               warn:  (service.untreated_risks  || []).length > 0,
               count: (service.security_actions || []).length },
@@ -761,6 +835,44 @@ export function BusinessServiceDetailPage() {
             </button>
           ))}
         </div>
+
+        {/* ---- Risks tab: the picture, and the folded list beneath ---- */}
+        {activeTab === 'risks' && (
+          <div className={styles.risksTab}>
+            <ServiceRisksDiagram service={service} selected={layer?.id}
+              onSelect={pickRiskLayer} onService={() => pickRiskList('all')}
+              onRisk={(rid) => navigate(`/risks/${rid}#score`)} onAsset={(aid) => navigate(`/assets/${aid}`)} />
+            <p className={styles.muted}>
+              Select a system to draw its risks and list only those; select a risk to open it.{' '}
+              <HelpDot k="service_detail.risks" placement="bottom" />
+            </p>
+            <div className={styles.riskListBar} role="group" aria-label="Which risks to list">
+              <button type="button" aria-pressed={riskList === 'all'}
+                className={riskList === 'all' ? styles.riskListAllOn : styles.riskListAll}
+                onClick={() => pickRiskList('all')}>
+                All risks <span className={styles.tabCount}>{riskCount}</span>
+              </button>
+              {riskList !== 'all' && listSystem && (
+                <FilterChip words={listSystem.name} stripe={departmentColour(listSystem.department_id)}
+                  onClose={() => pickRiskList('all')} />
+              )}
+            </div>
+            {riskList && (
+              <div className={styles.riskRows}>
+                {listedRisks.map(r => (
+                  <button key={r.risk_id} type="button" className={styles.riskRow}
+                    style={{ borderLeftColor: riskList === 'all' ? bandStripe(r.risk_score) : departmentColour(listSystem?.department_id) }}
+                    onClick={() => navigate(`/risks/${r.risk_id}#score`)}>
+                    <RatingChip value={r.risk_score} scale="risk" variant={isExpert ? 'number' : 'word'} />
+                    <span className={styles.riskRowName}>{r.threat_name}</span>
+                    <span className={styles.riskRowSystem}>{r.system_name}</span>
+                  </button>
+                ))}
+                {listedRisks.length === 0 && <p className={styles.muted}>No active risks on this system.</p>}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ---- Overview tab ---- */}
         {activeTab === 'overview' && (
@@ -819,7 +931,9 @@ export function BusinessServiceDetailPage() {
           </div>
         )}
 
-        {/* ---- Linked Information Assets tab ---- */}
+        {activeTab === 'assets' && <ServiceAssetsTab service={service} isExpert={isExpert} />}
+
+        {/* ---- Systems tab ---- */}
         {activeTab === 'systems' && (
           <ServiceSystemsTab
             service={service}

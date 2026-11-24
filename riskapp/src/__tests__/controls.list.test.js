@@ -78,7 +78,8 @@ const SAMPLE_CONTROL = {
   effectiveness:        4,
   effectiveness_notes:  'AV deployed to all endpoints.',
   status:               'active',
-  is_baseline:          true,
+  applicability:        'organisation',
+  applies_in:           [],
   rated_by_name:        'Alice Analyst',
   rated_at:             '2026-01-15T10:00:00Z',
   created_at:           '2026-01-01T09:00:00Z',
@@ -206,7 +207,7 @@ describe('GET /api/v1/controls — success', () => {
     expect(ctrl).toHaveProperty('control_type');
     expect(ctrl).toHaveProperty('effectiveness');
     expect(ctrl).toHaveProperty('status');
-    expect(ctrl).toHaveProperty('is_baseline');
+    expect(ctrl).toHaveProperty('applicability');
   });
 
   test('returns 200 filtering by ?framework=iso27001', async () => {

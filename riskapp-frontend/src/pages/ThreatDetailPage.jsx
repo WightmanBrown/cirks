@@ -15,7 +15,12 @@ import { RatingScaleRow } from '../components/RatingScaleRow';
 import { RatingChip } from '../components/RatingChip';
 import { RiskCreateModal } from '../components/RiskCreateModal';
 import { ChipSelector } from '../components/CiaTable';
-import { FrameworkRef, TypePill, EffectivenessDots } from '../components/ControlBadges';
+import { FrameworkRef, TypePill } from '../components/ControlBadges';
+import { MaturityChip } from '../components/MaturityChip';
+import { ThreatControlsDiagram, reachOf, OBJECTIVE_STRIPE, NO_SOLUTION_STRIPE } from '../components/ThreatControlsDiagram';
+import { STATE } from '../components/SystemThreatsDiagram';
+import { FilterChip } from '../components/FilterChip';
+import { ThreatSystemsDiagram, departmentsOf } from '../components/ThreatSystemsDiagram';
 import styles from './ThreatDetailPage.module.css';
 
 const CAN_WRITE = new Set(['ciso', 'risk_analyst', 'security_consultant', 'admin']);
@@ -60,6 +65,15 @@ export function ThreatDetailPage() {
   const [ctrlResults, setCtrlResults] = useState([]);
   const [ctrlBusy,    setCtrlBusy]    = useState(false);
   const [ctrlErr,     setCtrlErr]     = useState('');
+  // The Mitigating controls picture is the folded view: no box chosen, no list.
+  // The threat box lists every objective (and the way to add one); an
+  // objective's box unfolds it with its state on each system.
+  const [ctrlPick,    setCtrlPick]    = useState(null);
+  // The same folding on Systems affected: the threat lists every system (and
+  // the way to identify another), a department its systems.
+  const [sysPick,     setSysPick]     = useState(null);
+  // The page's panels are tabs (owner, 2026-11-19), opening on the systems.
+  const [tab,         setTab]         = useState('systems');
 
   // Identification: which systems this threat applies to. Gated on risks.write
   // rather than threats.write — declaring an exposure is a risk-register act,
@@ -181,6 +195,35 @@ export function ThreatDetailPage() {
     }
   }
 
+  // A system's next step: its risk when assessed, else assessing it.
+  function openSystem(s) {
+    if (s.assessed) {
+      navigate(`/risks/${s.validation_status === 'validated' ? 'current' : 'future'}?selected=${s.risk_id}`);
+    } else if (canIdentify) {
+      setAssessSystem(s);
+    } else {
+      navigate(`/systems/${s.id}`);
+    }
+  }
+  function pickSystems(key) {
+    setSysPick(p => (p === key ? null : key));
+  }
+
+  function pickControls(key) {
+    setCtrlPick(p => (p === key ? null : key));
+  }
+  const sysDepts = departmentsOf(systems);
+  const deptStripe = new Map(sysDepts.map(d => [d.id, d.stripe]));
+  const sysDept = sysPick?.startsWith('dept:') ? sysDepts.find(d => `dept:${d.id}` === sysPick) : null;
+  // Listed in the picture's order: by department, worst risk first.
+  const listedSystems = !sysPick ? [] : sysPick === 'all' ? sysDepts.flatMap(d => d.systems) : (sysDept?.systems || []);
+
+  const pickedControl = ctrlPick?.startsWith('obj:') ? controls.find(c => `obj:${c.id}` === ctrlPick) : null;
+  const listedControls = !ctrlPick ? [] : ctrlPick === 'all' ? controls
+    : ctrlPick === 'none' ? controls.filter(c => !(c.solutions || []).length)
+    : pickedControl ? [pickedControl] : [];
+  const pickStripe = ctrlPick === 'none' ? NO_SOLUTION_STRIPE : pickedControl ? OBJECTIVE_STRIPE : undefined;
+
   function set(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
   function setProbAll(v) {
@@ -262,12 +305,29 @@ export function ThreatDetailPage() {
           <p className={styles.desc}>{threat.description}</p>
         )}
 
-        {/* ── Probability panel ──────────────────────────────────────────── */}
+        {!editing && (
+          <div className={styles.tabs} role="tablist">
+            {[
+              ['systems', 'Systems affected', systems.length],
+              ['controls', 'Mitigating controls', controls.length],
+              ['probability', 'Likelihood hint', null],
+              ['metadata', 'Metadata', null],
+            ].map(([key, words, n]) => (
+              <button key={key} type="button" role="tab" aria-selected={tab === key}
+                className={tab === key ? styles.tabActive : styles.tab} onClick={() => setTab(key)}>
+                {words}{n != null && <span className={styles.tabCount}>{n}</span>}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Likelihood panel ──────────────────────────────────────────── */}
+        {(editing || tab === 'probability') && (
         <section className={styles.panel}>
-          <span className={styles.panelTitle}>Probability hint <HelpDot k="threat_detail.probability" placement="bottom" /></span>
+          <span className={styles.panelTitle}>Likelihood hint <HelpDot k="threat_detail.probability" placement="bottom" /></span>
           <p className={styles.panelHint}>
-            Informed guess at this threat's typical probability. Used to pre-populate
-            the risk authoring form — actual probability is set per risk by the analyst.
+            Informed guess at this threat's typical likelihood. Used to pre-populate
+            the risk authoring form — actual likelihood is set per risk by the analyst.
           </p>
 
           {editing ? (
@@ -309,9 +369,9 @@ export function ThreatDetailPage() {
                   value={form.description} onChange={e => set('description', e.target.value)} />
               </div>
 
-              {/* Probability — business: single word ladder; expert: 3 × chip selector */}
+              {/* Likelihood — business: single word ladder; expert: 3 × chip selector */}
               <div className={styles.probSection}>
-                <span className={styles.probSectionLabel}>Probability</span>
+                <span className={styles.probSectionLabel}>Likelihood</span>
                 {isExpert ? (
                   <div className={styles.probExpertGrid}>
                     {['c', 'i', 'a'].map(dim => {
@@ -336,7 +396,7 @@ export function ThreatDetailPage() {
               </div>
 
               <div className={styles.fieldGroup} style={{ marginTop: 12 }}>
-                <label className={styles.fieldLabel}>Probability notes</label>
+                <label className={styles.fieldLabel}>Likelihood notes</label>
                 <textarea className={styles.textarea} rows={2}
                   value={form.probability_notes} onChange={e => set('probability_notes', e.target.value)}
                   placeholder="Why these baselines? Any data source?" />
@@ -386,9 +446,10 @@ export function ThreatDetailPage() {
             </div>
           )}
         </section>
+        )}
 
         {/* ── Metadata ──────────────────────────────────────────────────── */}
-        {!editing && (
+        {!editing && tab === 'metadata' && (
           <section className={styles.panel}>
             <span className={styles.panelTitle}>Metadata <HelpDot k="threat_detail.metadata" placement="bottom" /></span>
             <div className={styles.metaGrid}>
@@ -403,7 +464,7 @@ export function ThreatDetailPage() {
               <span className={styles.metaGridLabel}>Active risks</span>
               <span>{usage} risk{usage !== 1 ? 's' : ''}</span>
               {threat.probability_set_at && <>
-                <span className={styles.metaGridLabel}>Probability set</span>
+                <span className={styles.metaGridLabel}>Likelihood set</span>
                 <span>{fmtDate(threat.probability_set_at)}{threat.probability_set_by_name ? ` by ${threat.probability_set_by_name}` : ''}</span>
               </>}
             </div>
@@ -411,8 +472,8 @@ export function ThreatDetailPage() {
         )}
 
         {/* ── Systems affected (identification) ──────────────────────────── */}
-        {!editing && (
-          <section className={styles.panel}>
+        {!editing && tab === 'systems' && (
+          <section className={styles.panel} id="threat-systems">
             <span className={styles.panelTitle}>Systems affected <HelpDot k="threat_detail.systems" placement="bottom" /></span>
             <p className={styles.panelHint}>
               Systems this threat has been identified against. Identifying an exposure
@@ -420,7 +481,25 @@ export function ThreatDetailPage() {
               produces its risk.
             </p>
 
-            {canIdentify && (
+            <div className={styles.picture}>
+              <ThreatSystemsDiagram threat={threat} active={sysPick} isExpert={isExpert}
+                onFilter={pickSystems} onSystem={openSystem} />
+              <p className={styles.muted}>
+                Select a system to open its risk{canIdentify ? ' or assess it' : ''}, a department to list its
+                systems, or the threat to list them all{canIdentify ? ' and identify another' : ''}.{' '}
+                {sysPick !== 'all' && systems.length > 0 && (
+                  <button type="button" className={styles.linkBtn} onClick={() => pickSystems('all')}>List all {systems.length}</button>
+                )}
+                <HelpDot k="threat_detail.systems_picture" placement="bottom" />
+              </p>
+            </div>
+
+            {sysPick && (
+              <FilterChip words={sysPick === 'all' ? 'All systems' : sysDept?.name} stripe={sysDept?.stripe}
+                onClose={() => setSysPick(null)} />
+            )}
+
+            {canIdentify && (sysPick === 'all' || systems.length === 0) && (
               <div className={styles.addRow}>
                 <select
                   className={styles.select}
@@ -447,23 +526,15 @@ export function ThreatDetailPage() {
 
             {systems.length === 0 ? (
               <p className={styles.muted}>This threat is not identified against any system yet.</p>
-            ) : (
+            ) : listedSystems.length > 0 && (
               <ul className={styles.controlList}>
-                {systems.map(s => {
+                {listedSystems.map(s => {
                   // The WHOLE row is the click target — .controlRow styles it as
                   // clickable (pointer + hover), so anything less is a dead
                   // affordance. Destination follows the row's state: an assessed
                   // row opens its risk, an unassessed one opens the assessment
                   // for this exact pair, which is the obvious next step.
-                  const openRow = () => {
-                    if (s.assessed) {
-                      navigate(`/risks/${s.validation_status === 'validated' ? 'current' : 'future'}?selected=${s.risk_id}`);
-                    } else if (canIdentify) {
-                      setAssessSystem(s);
-                    } else {
-                      navigate(`/systems/${s.id}`);
-                    }
-                  };
+                  const openRow = () => openSystem(s);
                   // Inner buttons must not also fire the row.
                   const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
 
@@ -471,6 +542,7 @@ export function ThreatDetailPage() {
                     <li
                       key={s.id}
                       className={styles.controlRow}
+                      style={{ borderLeft: `4px solid ${deptStripe.get(s.department_id || 'none')}` }}
                       role="button"
                       tabIndex={0}
                       onClick={openRow}
@@ -525,20 +597,41 @@ export function ThreatDetailPage() {
         )}
 
         {/* ── Mitigating controls (catalogue) ───────────────────────────── */}
-        {!editing && (
+        {!editing && tab === 'controls' && (
           <section className={styles.panel}>
             <span className={styles.panelTitle}>Mitigating controls <HelpDot k="threat_detail.controls" placement="bottom" /></span>
             <p className={styles.panelHint}>
-              Controls known to address this threat. Apply them to a system from a
-              risk's “Controls against this threat” panel.
+              Control objectives known to address this threat, coloured by how far each
+              protects the systems it is identified on, and the security solutions that
+              deliver them. Apply one to a system from a risk's “Controls against this
+              threat” panel.
             </p>
-            {controls.length === 0 ? (
-              <p className={styles.muted}>No controls linked to this threat yet.</p>
-            ) : (
-              <ul className={styles.controlList}>
-                {controls.map(c => (
-                  <li
-                    key={c.id}
+            <div className={styles.picture}>
+              <ThreatControlsDiagram threat={threat} controls={controls} active={ctrlPick}
+                onFilter={pickControls}
+                onSolution={(sid) => navigate(`/security-solutions/${sid}`)} />
+              <p className={styles.muted}>
+                Select an objective to see it on each system, a security solution to open it,
+                or the threat to list every objective{canWrite ? ' and link another' : ''}.{' '}
+                {ctrlPick !== 'all' && (
+                  <button type="button" className={styles.linkBtn} onClick={() => pickControls('all')}>List all {controls.length}</button>
+                )}
+                <HelpDot k="threat_detail.controls_picture" placement="bottom" />
+              </p>
+            </div>
+
+            {ctrlPick && (
+              <FilterChip words={ctrlPick === 'all' ? 'All control objectives' : ctrlPick === 'none' ? 'No security solution' : pickedControl?.title}
+                stripe={pickStripe} onClose={() => setCtrlPick(null)} />
+            )}
+            {ctrlPick && listedControls.length > 0 && (
+              <ul className={styles.controlList} id="threat-controls-list">
+                {listedControls.map(c => {
+                  const reach = reachOf(c);
+                  return (
+                  <li key={c.id} className={styles.controlItem}
+                    style={pickStripe ? { borderLeft: `4px solid ${pickStripe}` } : undefined}>
+                  <div
                     className={styles.controlRow}
                     onClick={() => navigate(`/controls/${c.id}?from=threat`)}
                     role="button"
@@ -547,8 +640,9 @@ export function ThreatDetailPage() {
                   >
                     <FrameworkRef framework={c.framework} frameworkRef={c.framework_ref} />
                     <span className={styles.controlTitle}>{c.title}</span>
+                    <span className={styles.reach}>{reach.words}</span>
                     <TypePill type={c.control_type} />
-                    {c.effectiveness != null && <EffectivenessDots value={c.effectiveness} />}
+                    {c.effectiveness != null && <MaturityChip value={c.effectiveness} />}
                     {canWrite && (
                       <button
                         className={styles.controlRemove}
@@ -557,14 +651,28 @@ export function ThreatDetailPage() {
                         aria-label={`Remove control: ${c.title}`}
                       >×</button>
                     )}
+                  </div>
+                  {pickedControl && (c.on_systems || []).length > 0 && (
+                    <ul className={styles.onSystems}>
+                      {c.on_systems.map(s => (
+                        <li key={s.system_id}>
+                          <button type="button" className={`${styles.onSystem} ${styles[`on_${s.status}`] || ''}`}
+                            onClick={() => navigate(`/systems/${s.system_id}`)}>
+                            {s.system_name} <span className={styles.onState}>{STATE[s.status] || s.status}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
 
             {ctrlErr && <p className={styles.error}>{ctrlErr}</p>}
 
-            {canWrite && (
+            {canWrite && ctrlPick === 'all' && (
               <div className={styles.addControlBlock}>
                 <input
                   className={styles.input}

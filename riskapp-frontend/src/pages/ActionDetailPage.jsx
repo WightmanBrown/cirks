@@ -281,8 +281,8 @@ function ItemCompleteCell({ item, riskId, onDone, threatInherent }) {
 
   return (
     <span className={styles.itemConfirm}>
-      <span title="The attack probability now this control is working. One figure — applied across confidentiality, integrity and availability, each capped by the threat's own ceiling.">
-        probability now it is working
+      <span title="The attack likelihood now this control is working. One figure — applied across confidentiality, integrity and availability, each capped by the threat's own ceiling.">
+        likelihood now it is working
       </span>
       <ChipSelector
         value={resid}

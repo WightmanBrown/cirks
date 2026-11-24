@@ -3,6 +3,7 @@
 // Copyright (C) 2026 Wightman Brown Limited
 
 const { query } = require('../../db/pool');
+const { APPLICABILITY_COLUMNS, APPLICABILITY_RANK } = require('./applicability');
 
 // Controls are now CIRKS-native (no framework). The `framework` query param, when
 // supplied, filters to controls MAPPED to that standard (via control_mappings).
@@ -90,7 +91,7 @@ async function getControls(req, res, next) {
            c.effectiveness,
            c.effectiveness_notes,
            vcs.status,
-           c.is_baseline,
+           ${APPLICABILITY_COLUMNS},
            c.owner_user_id,
            c.reference_code, c.subject, vcr.framework, vcr.framework_label, vcr.framework_ref,
            ow.full_name AS owner_name,
@@ -105,7 +106,7 @@ async function getControls(req, res, next) {
          LEFT JOIN users ow ON ow.id = c.owner_user_id
          ${whereClause}
          ORDER BY
-           c.is_baseline DESC,
+           ${APPLICABILITY_RANK},
            c.title       ASC`,
         params
       ),

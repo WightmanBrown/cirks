@@ -23,7 +23,6 @@ export function AddControlModal({ onClose, onSuccess }) {
     reference_code:     '',
     description:        '',
     control_type:       '',
-    is_baseline:        false,
   });
   const [error, setError] = useState('');
   const [busy,  setBusy]  = useState(false);
@@ -50,7 +49,6 @@ export function AddControlModal({ onClose, onSuccess }) {
       const body = {
         title:        form.title.trim(),
         control_type: form.control_type,
-        is_baseline:  form.is_baseline,
       };
       if (form.description.trim())    body.description    = form.description.trim();
       if (form.reference_code.trim()) body.reference_code = form.reference_code.trim();
@@ -148,37 +146,6 @@ export function AddControlModal({ onClose, onSuccess }) {
               </select>
             </div>
 
-          </div>
-
-          {/* Applicability */}
-          <div className={styles.field}>
-            <span className={styles.label}>Applicability</span>
-            <div className={styles.radioGroup}>
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="applicability"
-                  value="specific"
-                  checked={!form.is_baseline}
-                  onChange={() => set('is_baseline', false)}
-                  disabled={busy}
-                />
-                <span>Specific</span>
-                <span className={styles.radioHint}>Risk-specific supplementary control</span>
-              </label>
-              <label className={styles.radioLabel}>
-                <input
-                  type="radio"
-                  name="applicability"
-                  value="baseline"
-                  checked={form.is_baseline}
-                  onChange={() => set('is_baseline', true)}
-                  disabled={busy}
-                />
-                <span>Baseline</span>
-                <span className={styles.radioHint}>Mandatory minimum — applies to all systems</span>
-              </label>
-            </div>
           </div>
 
           {error && <p className={styles.error} role="alert">{error}</p>}

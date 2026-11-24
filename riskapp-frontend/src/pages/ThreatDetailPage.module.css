@@ -329,3 +329,38 @@
   color: var(--red);
   margin: 6px 0 0;
 }
+
+/* ── Mitigating controls picture (relation diagrams, 2026-11-19) ─────────── */
+
+.picture { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.linkBtn { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; }
+.controlItem { border-radius: var(--radius-sm); }
+.reach { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.onSystems { list-style: none; margin: 0 0 8px; padding: 0 10px 0 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+.onSystem {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 12px; color: var(--text-primary);
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 3px 8px; cursor: pointer;
+}
+.onSystem:hover { background: var(--bg-inset); }
+.onState { color: var(--text-muted); }
+.on_operational { border-color: var(--green); }
+.on_degraded { border-color: var(--amber); }
+.on_missing, .on_unknown, .on_not_recorded { border-color: var(--red); border-style: dashed; }
+.on_not_applicable { opacity: 0.75; }
+
+/* ── Tabs (owner, 2026-11-19: the page's panels are tabs) ────────────────── */
+
+.tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border); gap: 2px; }
+.tab, .tabActive {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 8px 16px; border: none; border-bottom: 2px solid transparent; background: none;
+  color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.tabActive { color: var(--accent); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--text-primary); }
+.tabCount {
+  font-size: 10px; background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0 5px; color: var(--text-muted);
+}

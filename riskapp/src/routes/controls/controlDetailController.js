@@ -3,6 +3,7 @@
 // Copyright (C) 2026 Wightman Brown Limited
 
 const { query } = require('../../db/pool');
+const { APPLICABILITY_COLUMNS } = require('./applicability');
 const { CIRKS_NAME, cirksReasonFor } = require('../../lib/cirksDelivers');
 
 // CIRKS itself can deliver this objective: the reason, and whether it is chosen.
@@ -25,7 +26,7 @@ async function getControl(req, res, next) {
            c.effectiveness,
            c.effectiveness_notes,
            (SELECT vcs.status FROM v_control_status vcs WHERE vcs.control_id = c.id) AS status,
-           c.is_baseline,
+           ${APPLICABILITY_COLUMNS},
            c.owner_user_id,
            c.reference_code, c.subject,
            vcr.framework, vcr.framework_label, vcr.framework_ref,

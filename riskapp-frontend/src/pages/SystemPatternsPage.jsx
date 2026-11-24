@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (C) 2026 Wightman Brown Limited
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getSystemPatterns, listComponents } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -14,6 +14,9 @@ import { PatternFitChips } from '../components/PatternFitChips';
 import { slotComponentType } from '../components/SystemPatternSection';
 import { TypeBadge } from '../components/ComponentPill';
 import { useScrollRestore } from '../hooks/useScrollRestore';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 import shared from './ScopesPage.module.css';
 import styles from './SecuritySolutionPatternsPage.module.css';
 
@@ -51,6 +54,25 @@ export function closestPattern(patterns, recorded) {
   return best;
 }
 
+// Column key → value, for sorting the systems under each pattern (useTableSort).
+// One sort applies within every pattern; the patterns stay in their defined order.
+// Against its pattern sorts by how many required questions are unanswered.
+export const PATTERN_SYSTEM_ACCESSORS = {
+  name:       (s) => s.name,
+  department: (s) => s.department_name,
+  fit:        (s) => (s.pattern_fit && s.pattern_fit.state !== 'no_pattern' ? (s.pattern_fit.missing || []).length : null),
+};
+
+// The same for the systems with no pattern, each row carrying its closest
+// pattern as `near` (closestPattern): what it records sorts by how many
+// components it records, the closest pattern by its code.
+export const UNSTATED_SYSTEM_ACCESSORS = {
+  name:       (s) => s.name,
+  department: (s) => s.department_name,
+  records:    (s) => (s.recorded || []).length,
+  closest:    (s) => s.near?.code,
+};
+
 export function SystemPatternsPage() {
   const { hasCapability } = useAuth();
   const canArchitect = hasCapability('architecture.write');
@@ -71,8 +93,13 @@ export function SystemPatternsPage() {
     setChange({ component: { id: c.id, name: c.name, roles: now }, roles: add ? [...new Set([...now, role])] : now.filter(r => r !== role) });
   };
 
-  const systemsOf = (code) => (data?.systems || []).filter(s => s.system_pattern === code);
-  const unstated = (data?.systems || []).filter(s => !s.system_pattern);
+  // Sorted by a header, each table kind with its own address parameter.
+  const patternSort = useTableSort(data?.systems || [], { accessors: PATTERN_SYSTEM_ACCESSORS, state: useUrlSortState() });
+  const unstatedRows = useMemo(() => (data?.systems || []).filter(s => !s.system_pattern)
+    .map(s => ({ ...s, near: closestPattern(data.patterns, s.recorded) })), [data]);
+  const unstatedSort = useTableSort(unstatedRows, { accessors: UNSTATED_SYSTEM_ACCESSORS, state: useUrlSortState('sort_unstated') });
+  const systemsOf = (code) => patternSort.sorted.filter(s => s.system_pattern === code);
+  const unstated = unstatedSort.sorted;
   const unstatedBusiness = unstated.filter(s => !s.is_security_system);
   const unstatedSecurity = unstated.filter(s => s.is_security_system);
   // What a system records, said by role: "Operating system: Windows 11 · No role: ArcGIS".
@@ -86,22 +113,25 @@ export function SystemPatternsPage() {
   };
   const gaps = (list) => list.filter(s => s.pattern_fit?.state === 'incomplete').length;
 
+  const patternProps = { sortKey: patternSort.sortKey, sortDir: patternSort.sortDir, onSort: patternSort.toggleSort };
+  const unstatedProps = { sortKey: unstatedSort.sortKey, sortDir: unstatedSort.sortDir, onSort: unstatedSort.toggleSort };
+
   // One row per system with no pattern: what it records, and its closest pattern.
   const unstatedTable = (list) => (
     <div className={styles.tableWrap}>
       <table className={shared.table}>
         <thead>
           <tr>
-            <th>System <HelpDot k="col.name" /></th>
-            <th>Department <HelpDot k="col.department" /></th>
-            <th>What it records <HelpDot k="system_patterns.col.records" /></th>
-            <th>Closest pattern <HelpDot k="system_patterns.col.closest" /></th>
+            <SortableTh column="name" {...unstatedProps} helpKey="col.name">System</SortableTh>
+            <SortableTh column="department" {...unstatedProps} helpKey="col.department">Department</SortableTh>
+            <SortableTh column="records" {...unstatedProps} helpKey="system_patterns.col.records">What it records</SortableTh>
+            <SortableTh column="closest" {...unstatedProps} helpKey="system_patterns.col.closest">Closest pattern</SortableTh>
           </tr>
         </thead>
         <tbody>
           {list.map(s => {
             const lines = recordedByRole(s.recorded);
-            const near = closestPattern(data.patterns, s.recorded);
+            const near = s.near;
             return (
               <tr key={s.id}>
                 <td><Link to={`/systems/${s.id}`}>{s.name}</Link></td>
@@ -220,9 +250,9 @@ export function SystemPatternsPage() {
                     <table className={shared.table}>
                       <thead>
                         <tr>
-                          <th>System <HelpDot k="col.name" /></th>
-                          <th>Department <HelpDot k="col.department" /></th>
-                          <th>Against its pattern <HelpDot k="system_patterns.col.fit" /></th>
+                          <SortableTh column="name" {...patternProps} helpKey="col.name">System</SortableTh>
+                          <SortableTh column="department" {...patternProps} helpKey="col.department">Department</SortableTh>
+                          <SortableTh column="fit" {...patternProps} helpKey="system_patterns.col.fit">Against its pattern</SortableTh>
                         </tr>
                       </thead>
                       <tbody>

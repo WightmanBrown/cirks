@@ -33,11 +33,24 @@ import styles from './ImpactTablesPage.module.css';
 import { BackButton }      from '../components/BackButton';
 import { ReadOnlyBadge }  from '../components/ReadOnlyBadge';
 import { HelpDot }        from '../components/HelpDot';
+import { SortableTh }     from '../components/SortableTh';
+import { useTableSort }   from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 const CAN_EDIT = new Set(['ciso', 'admin', 'risk_analyst', 'information_asset_manager']);
 const CAN_ORG  = new Set(['ciso', 'siro', 'admin']);
 
 const DIM_LABELS = { c: 'Confidentiality', i: 'Integrity', a: 'Availability' };
+
+// Column key → value, for sorting the list by a header (useTableSort): each
+// column by the words it shows. Attributes sort by their badges, none last.
+export const IMPACT_TABLE_ACCESSORS = {
+  name:       (t) => t.name,
+  scope:      (t) => (t.scope === 'organisation' ? 'Organisation' : 'Department'),
+  department: (t) => t.department_name,
+  status:     (t) => (t.published_at ? 'Published' : 'Draft'),
+  attributes: (t) => [t.mandatory && 'Mandatory', t.is_reputational && 'Reputational'].filter(Boolean).join(', ') || null,
+};
 
 function fmtDate(d) {
   if (!d) return null;
@@ -474,6 +487,9 @@ export function ImpactTablesPage() {
   }
 
   const visible = scopeCtl.filtered;
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(visible, { accessors: IMPACT_TABLE_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort, className: styles.th };
 
   return (
     <Shell>
@@ -596,15 +612,15 @@ export function ImpactTablesPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Name <HelpDot k="col.name" placement="bottom" /></th>
-                  <th className={styles.th}>Scope <HelpDot k="impact_tables.col.scope" placement="bottom" /></th>
-                  <th className={styles.th}>Department <HelpDot k="impact_tables.col.department" placement="bottom" /></th>
-                  <th className={styles.th}>Status <HelpDot k="impact_tables.col.status" placement="bottom" /></th>
-                  <th className={styles.th}>Attributes <HelpDot k="impact_tables.col.attributes" placement="bottom" /></th>
+                  <SortableTh column="name" {...sortProps} helpKey="col.name">Name</SortableTh>
+                  <SortableTh column="scope" {...sortProps} helpKey="impact_tables.col.scope">Scope</SortableTh>
+                  <SortableTh column="department" {...sortProps} helpKey="impact_tables.col.department">Department</SortableTh>
+                  <SortableTh column="status" {...sortProps} helpKey="impact_tables.col.status">Status</SortableTh>
+                  <SortableTh column="attributes" {...sortProps} helpKey="impact_tables.col.attributes">Attributes</SortableTh>
                 </tr>
               </thead>
               <tbody>
-                {visible.map(t => {
+                {sorted.map(t => {
                   const isSelected = selectedId === t.id;
                   return (
                     <Fragment key={t.id}>

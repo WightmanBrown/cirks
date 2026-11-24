@@ -23,8 +23,8 @@ export const GROUPS = [
     title: 'Threats & controls',
     helpKey: 'data_export.group.threats_controls',
     datasets: [
-      { key: 'threats',               label: 'Threats',                    desc: 'Threat catalogue with category, source, per-dimension probability and baseline.' },
-      { key: 'controls',              label: 'Controls',                   desc: 'Control objectives: type, reference, how each is delivered (organisation, group or per system), baseline flag, maturity rating and owner. Status is derived, so not exported.' },
+      { key: 'threats',               label: 'Threats',                    desc: 'Threat catalogue with category, source, per-dimension likelihood and baseline.' },
+      { key: 'controls',              label: 'Controls',                   desc: 'Control objectives: type, reference, how each is delivered (organisation, group or per system), baseline flag, effectiveness rating and owner. Status is derived, so not exported.' },
       { key: 'control-threats',       label: 'Control — threat links',     desc: 'Which threats each control addresses.' },
       { key: 'control-component-links', label: 'Control — component links', desc: 'PPITF components attached to each control.' },
       { key: 'delivery-patterns',       label: 'Security solutions',       desc: 'The valid ways of delivering control objectives — a set of parts, or provided by the supplier.' },

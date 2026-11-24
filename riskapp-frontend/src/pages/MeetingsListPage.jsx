@@ -8,6 +8,9 @@ import { Shell }      from '../components/Shell';
 import { BackButton } from '../components/BackButton';
 import styles from './MeetingsListPage.module.css';
 import { HelpDot } from '../components/HelpDot';
+import { SortableTh } from '../components/SortableTh';
+import { useTableSort } from '../hooks/useTableSort';
+import { useUrlSortState } from '../hooks/useUrlState';
 
 const STATE_LABELS = {
   draft:          { label: 'Draft',          cls: 'draft' },
@@ -26,6 +29,18 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+// Column key → value, for sorting the list by a header (useTableSort).
+export const MEETING_ACCESSORS = {
+  date:      (m) => m.meeting_date,
+  // In the order a meeting goes through them, not alphabetically.
+  state:     (m) => { const k = Object.keys(STATE_LABELS).indexOf(m.state); return k >= 0 ? k : null; },
+  cycle:     (m) => m.cycle_name,
+  chair:     (m) => m.chaired_by_name,
+  secretary: (m) => m.secretary_name,
+  attendees: (m) => m.attendee_count,
+  agenda:    (m) => m.agenda_item_count,
+};
+
 export function MeetingsListPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -41,6 +56,11 @@ export function MeetingsListPage() {
   }, []);
 
   const isSecretary = user?.role === 'meeting_secretary';
+
+  // Sorted by a header, the sort kept in the address so Back returns to it.
+  const sortState = useUrlSortState();
+  const { sorted, sortKey, sortDir, toggleSort } = useTableSort(meetings, { accessors: MEETING_ACCESSORS, state: sortState });
+  const sortProps = { sortKey, sortDir, onSort: toggleSort };
 
   return (
     <Shell>
@@ -76,17 +96,17 @@ export function MeetingsListPage() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Date <HelpDot k="meetings.col.date" placement="bottom" /></th>
-              <th>State <HelpDot k="meetings.col.state" placement="bottom" /></th>
-              <th>Cycle <HelpDot k="meetings.col.cycle" placement="bottom" /></th>
-              <th>Chair <HelpDot k="meetings.col.chair" placement="bottom" /></th>
-              <th>Secretary <HelpDot k="meetings.col.secretary" placement="bottom" /></th>
-              <th>Attendees <HelpDot k="meetings.col.attendees" placement="bottom" /></th>
-              <th>Agenda items <HelpDot k="meetings.col.agenda_items" placement="bottom" /></th>
+              <SortableTh column="date" {...sortProps} helpKey="meetings.col.date">Date</SortableTh>
+              <SortableTh column="state" {...sortProps} helpKey="meetings.col.state">State</SortableTh>
+              <SortableTh column="cycle" {...sortProps} helpKey="meetings.col.cycle">Cycle</SortableTh>
+              <SortableTh column="chair" {...sortProps} helpKey="meetings.col.chair">Chair</SortableTh>
+              <SortableTh column="secretary" {...sortProps} helpKey="meetings.col.secretary">Secretary</SortableTh>
+              <SortableTh column="attendees" {...sortProps} helpKey="meetings.col.attendees">Attendees</SortableTh>
+              <SortableTh column="agenda" {...sortProps} helpKey="meetings.col.agenda_items">Agenda items</SortableTh>
             </tr>
           </thead>
           <tbody>
-            {meetings.map(m => (
+            {sorted.map(m => (
               <tr
                 key={m.id}
                 className={`${styles.row} ${m.state === 'closed' ? styles.rowNeedsAction : ''}`}

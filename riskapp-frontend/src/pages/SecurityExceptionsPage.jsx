@@ -10,6 +10,9 @@ import { Shell }               from '../components/Shell';
 import { BackButton }          from '../components/BackButton';
 import { ReadOnlyBadge }      from '../components/ReadOnlyBadge';
 import { HelpDot }             from '../components/HelpDot';
+import { SortableTh }          from '../components/SortableTh';
+import { useTableSort }        from '../hooks/useTableSort';
+import { useUrlSortState }     from '../hooks/useUrlState';
 import { ExceptionFormModal }  from '../components/ExceptionFormModal';
 import { scoreLevel }           from '../utils/riskColors';
 import styles from './SecurityExceptionsPage.module.css';
@@ -53,6 +56,20 @@ const LEVEL_FILTERS = [
   { value: 'medium',   label: 'Medium' },
   { value: 'low',      label: 'Low' },
 ];
+
+// Column key → value, for sorting either table by a header (useTableSort).
+// Level sorts by the score it bands, so Low < Medium < High < Critical.
+export const EXCEPTION_ACCESSORS = {
+  level:      (e) => e.risk_score,
+  threat:     (e) => e.threat_name,
+  system:     (e) => e.system_name,
+  department: (e) => e.department_name,
+  acceptedBy: (e) => e.accepted_by_name,
+  cadence:    (e) => CADENCE_LABEL[e.review_cadence] || e.review_cadence,
+  expires:    (e) => e.expires_at,
+  days:       (e) => e.days_until_expiry,
+  overdue:    (e) => e.days_overdue,
+};
 
 export function SecurityExceptionsPage() {
   const navigate = useNavigate();
@@ -118,6 +135,15 @@ export function SecurityExceptionsPage() {
   const scopedItems    = applyDepartmentScope(items,    scopeArgs);
   const scopedBreaches = applyDepartmentScope(breaches, scopeArgs);
 
+  // Each table sorted by its headers, the sort kept in the address. With no
+  // column chosen the active list keeps its order from load() (most urgent first).
+  const itemSortState   = useUrlSortState();
+  const breachSortState = useUrlSortState('sort_breaches');
+  const itemSort   = useTableSort(scopedItems,    { accessors: EXCEPTION_ACCESSORS, state: itemSortState });
+  const breachSort = useTableSort(scopedBreaches, { accessors: EXCEPTION_ACCESSORS, state: breachSortState });
+  const itemTh   = { sortKey: itemSort.sortKey,   sortDir: itemSort.sortDir,   onSort: itemSort.toggleSort };
+  const breachTh = { sortKey: breachSort.sortKey, sortDir: breachSort.sortDir, onSort: breachSort.toggleSort };
+
   const overdue = Number(stats?.overdue  || 0);
   const dueSoon = Number(stats?.due_soon || 0);
   const ok      = Number(stats?.ok       || 0);
@@ -173,18 +199,18 @@ export function SecurityExceptionsPage() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th className={styles.th}>Level <HelpDot k="exceptions.col.level" placement="bottom" /></th>
-                    <th className={styles.th}>Threat <HelpDot k="col.threat" placement="bottom" /></th>
-                    <th className={styles.th}>System <HelpDot k="col.system" placement="bottom" /></th>
-                    <th className={styles.th}>Department <HelpDot k="col.department" placement="bottom" /></th>
-                    <th className={styles.th}>Accepted by <HelpDot k="exceptions.col.accepted_by" placement="bottom" /></th>
-                    <th className={styles.th}>Expired <HelpDot k="exceptions.col.expired" placement="bottom" /></th>
-                    <th className={`${styles.th} ${styles.thDays}`}>Overdue <HelpDot k="exceptions.col.overdue" placement="bottom" /></th>
+                    <SortableTh column="level" {...breachTh} className={styles.th} helpKey="exceptions.col.level">Level</SortableTh>
+                    <SortableTh column="threat" {...breachTh} className={styles.th} helpKey="col.threat">Threat</SortableTh>
+                    <SortableTh column="system" {...breachTh} className={styles.th} helpKey="col.system">System</SortableTh>
+                    <SortableTh column="department" {...breachTh} className={styles.th} helpKey="col.department">Department</SortableTh>
+                    <SortableTh column="acceptedBy" {...breachTh} className={styles.th} helpKey="exceptions.col.accepted_by">Accepted by</SortableTh>
+                    <SortableTh column="expires" {...breachTh} className={styles.th} helpKey="exceptions.col.expired">Expired</SortableTh>
+                    <SortableTh column="overdue" {...breachTh} className={`${styles.th} ${styles.thDays}`} helpKey="exceptions.col.overdue">Overdue</SortableTh>
                     {canWrite && <th className={styles.th} />}
                   </tr>
                 </thead>
                 <tbody>
-                  {scopedBreaches.map(e => (
+                  {breachSort.sorted.map(e => (
                     <tr
                       key={e.exception_id}
                       className={`${styles.row} ${styles.row_overdue}`}
@@ -269,19 +295,19 @@ export function SecurityExceptionsPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th className={styles.th}>Level <HelpDot k="exceptions.col.level" placement="bottom" /></th>
-                  <th className={styles.th}>Threat <HelpDot k="col.threat" placement="bottom" /></th>
-                  <th className={styles.th}>System <HelpDot k="col.system" placement="bottom" /></th>
-                  <th className={styles.th}>Department <HelpDot k="col.department" placement="bottom" /></th>
-                  <th className={styles.th}>Accepted by <HelpDot k="exceptions.col.accepted_by" placement="bottom" /></th>
-                  <th className={styles.th}>Cadence <HelpDot k="exceptions.col.cadence" placement="bottom" /></th>
-                  <th className={styles.th}>Expires<HelpDot k="exceptions.expiry" placement="top" label="About exception expiry" /></th>
-                  <th className={`${styles.th} ${styles.thDays}`}>Days <HelpDot k="exceptions.col.days" placement="bottom" /></th>
+                  <SortableTh column="level" {...itemTh} className={styles.th} helpKey="exceptions.col.level">Level</SortableTh>
+                  <SortableTh column="threat" {...itemTh} className={styles.th} helpKey="col.threat">Threat</SortableTh>
+                  <SortableTh column="system" {...itemTh} className={styles.th} helpKey="col.system">System</SortableTh>
+                  <SortableTh column="department" {...itemTh} className={styles.th} helpKey="col.department">Department</SortableTh>
+                  <SortableTh column="acceptedBy" {...itemTh} className={styles.th} helpKey="exceptions.col.accepted_by">Accepted by</SortableTh>
+                  <SortableTh column="cadence" {...itemTh} className={styles.th} helpKey="exceptions.col.cadence">Cadence</SortableTh>
+                  <SortableTh column="expires" {...itemTh} className={styles.th} helpKey="exceptions.expiry" helpPlacement="top" helpLabel="About exception expiry">Expires</SortableTh>
+                  <SortableTh column="days" {...itemTh} className={`${styles.th} ${styles.thDays}`} helpKey="exceptions.col.days">Days</SortableTh>
                   {canWrite && <th className={styles.th} />}
                 </tr>
               </thead>
               <tbody>
-                {scopedItems.map(e => (
+                {itemSort.sorted.map(e => (
                   <tr
                     key={e.exception_id}
                     className={`${styles.row} ${styles[`row_${e.expiry_status}`] || ''}`}

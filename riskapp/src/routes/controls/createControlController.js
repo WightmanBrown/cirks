@@ -15,8 +15,9 @@ async function createControl(req, res, next) {
     title,
     description,
     control_type,
-    is_baseline = false,
   } = req.body;
+  // is_baseline was retired in v185: where an objective applies is the SoA's
+  // decision. Sent by an older client, it is ignored.
   const ref = normaliseReference(req.body.reference_code);
   if (ref.error) return res.status(400).json({ error: ref.error });
 
@@ -32,14 +33,14 @@ async function createControl(req, res, next) {
   try {
     const result = await query(
       `INSERT INTO controls
-         (title, description, control_type, is_baseline, created_by, reference_code)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, title, control_type, 'not_decided'::text AS status, is_baseline, reference_code, created_at`,
+         (title, description, control_type, created_by, reference_code)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, title, control_type, 'not_decided'::text AS status,
+                 'not_decided'::text AS applicability, '{}'::text[] AS applies_in, reference_code, created_at`,
       [
         title.trim(),
         description?.trim() || null,
         control_type,
-        Boolean(is_baseline),
         req.user.id,
         ref.value ?? null,
       ]

@@ -5,10 +5,19 @@ import { RatingChip } from './RatingChip';
 import { EntitySummaryCard } from './EntitySummaryCard';
 import { Gap } from './Gap';
 import { maxCia } from '../utils/cia';
+import { levelClass, scoreLevel } from '../utils/riskColors';
 import styles from './EntitySummaryCard.module.css';
 
-export function AssetSummaryCard({ asset, openHref, isExpert = true }) {
+// `compact` (the asset's own page, owner 2026-11-19): one header line, as on a
+// system's and a service's page. The maximum impact and the worst risk sit on
+// the right, the description is one line; the linked services and the rating
+// are the page's tabs, so they are not repeated here.
+export function AssetSummaryCard({ asset, openHref, isExpert = true, compact = false }) {
   if (!asset) return null;
+  const maxImpact = [asset.confidentiality, asset.integrity, asset.availability].some(v => v != null)
+    ? maxCia(asset.confidentiality, asset.integrity, asset.availability) : null;
+  const worst = (asset.risk_paths || []).reduce((m, p) => Math.max(m, p.risk_score ?? 0), 0);
+  const worstLevel = worst ? scoreLevel(worst) : null;
 
   const hasOwner   = !!asset.owner_name;
   const hasManager = !!asset.manager_name;
@@ -23,7 +32,16 @@ export function AssetSummaryCard({ asset, openHref, isExpert = true }) {
       kind="information asset"
       helpKey="asset_card.title"
       openHref={openHref}
-      rightSlot={
+      rightSlot={compact ? <>
+        {maxImpact != null && (
+          <span className={styles.compactImpact} title={`Impact C${asset.confidentiality ?? '–'} I${asset.integrity ?? '–'} A${asset.availability ?? '–'}`}>
+            Impact <RatingChip value={maxImpact} scale="impact" variant={isExpert ? 'number' : 'word'} />
+          </span>
+        )}
+        {worstLevel
+          ? <span className={`${styles.riskPill} ${levelClass(worstLevel)}`}>Risk: {worstLevel}</span>
+          : <span className={styles.riskPillNone}>no risk rated</span>}
+      </> : (
         isExpert ? (
           <CiaChipGroup
             c={asset.confidentiality}
@@ -38,7 +56,7 @@ export function AssetSummaryCard({ asset, openHref, isExpert = true }) {
             variant="word"
           />
         )
-      }
+      )}
       meta={
         <>
           {asset.department_name && (
@@ -56,6 +74,11 @@ export function AssetSummaryCard({ asset, openHref, isExpert = true }) {
         </>
       }
     >
+      {compact ? (
+        <p className={styles.compactDesc} title={hasDesc ? asset.description : undefined}>
+          {hasDesc ? asset.description : <Gap label="No description" />}
+        </p>
+      ) : (
       <div className={styles.body}>
         <div className={styles.bodyRow}>
           <span className={styles.bodyLabel}>Description</span>
@@ -84,6 +107,7 @@ export function AssetSummaryCard({ asset, openHref, isExpert = true }) {
           </span>
         </div>
       </div>
+      )}
     </EntitySummaryCard>
   );
 }

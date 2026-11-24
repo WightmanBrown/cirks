@@ -25,7 +25,7 @@ module.exports = {
         'Network Intrusion Detection System', 'Security monitoring platform', 'MIG Remote Access VPN',
         'Vulnerability Scanning System', 'CIRKS'],
   // Systems the IT template's class answers do not fit: what they record is
-  // their own (the CCTV system's pattern), or nothing yet (the kiosks). The
+  // their own (the CCTV system's pattern, the kiosks' sites and 3G). The
   // owner's backlog item: more than one kind of systems architecture template.
   OTHER: ['MIG CCTV system', 'Tourist Information Points – kiosks'],
 };
